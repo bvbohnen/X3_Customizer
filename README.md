@@ -1,31 +1,28 @@
 
 X3 Customizer v2.0
----
+------------------
 
 This tool will read in source files from X3, perform transforms on them,
 and write the results back out.  Transforms will often perform complex
 or repetitive tasks succinctly, avoiding the need for hand editing of
-source files.  Source files will generally support any premodded input.
+source files.  Source files will generally support any prior modding.
 
 This tool is written in Python, and tested on version 3.6.
 
 Usage:
- * "X3_Customizer user_transform_module.py"
+ * "X3_Customizer <user_transform_module.py>"
    - Runs the customizer using the provided module, located in this
      directory, to specify the path to the AP directory, the folder
      containing the source files to be modified, and the transforms
-     to be run.
-     See User_Transforms_Example.py for an example.
+     to be run. See User_Transforms_Example.py for an example.
  * "Make_Documentation.py"
-   - Generates documentation for this project, writing output
-     to Documentation.txt.
+   - Generates documentation for this project.
 
 Setup:
-
   * Transforms will operate on source files which need to be set up
   prior to running this tool. Source files can be extracted using
-  X2 Editor 2 if needed.     
-  Source files may be captured after any other mods have been applied.
+  X2 Editor 2 if needed. Source files may be provided after any other 
+  mods have been applied.
 
   * Source files need to be located in a folder underneath the 
   specified AP addon directory, and will have an internal folder
@@ -72,11 +69,13 @@ Change Log:
      Filling out documentation generation.
 
 Full documentation found in Documentation.md.
+
 ***
 
 Setup methods:
 
   * Set_Path
+
 ***
 
 Transform List:
@@ -134,6 +133,7 @@ Transform List:
  * Standardize_Start_Plot_Overtunings
  * Standardize_Tunings
  * Swap_Standard_Gates_To_Terran_Gates
+
 ***
 
 Example input file, User_Transforms_Example.py:

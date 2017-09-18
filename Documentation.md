@@ -1,31 +1,28 @@
 
 X3 Customizer v2.0
----
+------------------
 
 This tool will read in source files from X3, perform transforms on them,
 and write the results back out.  Transforms will often perform complex
 or repetitive tasks succinctly, avoiding the need for hand editing of
-source files.  Source files will generally support any premodded input.
+source files.  Source files will generally support any prior modding.
 
 This tool is written in Python, and tested on version 3.6.
 
 Usage:
- * "X3_Customizer user_transform_module.py"
+ * "X3_Customizer <user_transform_module.py>"
    - Runs the customizer using the provided module, located in this
      directory, to specify the path to the AP directory, the folder
      containing the source files to be modified, and the transforms
-     to be run.
-     See User_Transforms_Example.py for an example.
+     to be run. See User_Transforms_Example.py for an example.
  * "Make_Documentation.py"
-   - Generates documentation for this project, writing output
-     to Documentation.txt.
+   - Generates documentation for this project.
 
 Setup:
-
   * Transforms will operate on source files which need to be set up
   prior to running this tool. Source files can be extracted using
-  X2 Editor 2 if needed.     
-  Source files may be captured after any other mods have been applied.
+  X2 Editor 2 if needed. Source files may be provided after any other 
+  mods have been applied.
 
   * Source files need to be located in a folder underneath the 
   specified AP addon directory, and will have an internal folder
@@ -70,6 +67,7 @@ Change Log:
    - Restructuring of project for general use, isolating individual
      transforms, separating out transform calls, adding robustness.
      Filling out documentation generation.
+
 ***
 
 Setup methods:
@@ -94,6 +92,7 @@ Setup methods:
            (eg. output to addon	ypes will source from input in
             addon\source_folder	ypes).
        
+
 
 ***
 
@@ -864,6 +863,7 @@ Transform List:
       large ship suicides when entering a system.
       
 
+
 ***
 
 Example input file, User_Transforms_Example.py:
@@ -892,6 +892,7 @@ Example input file, User_Transforms_Example.py:
     #Rescale OOS weapon damage according to IS DPS, and
     # apply an additional 30% reduction.
     Rescale_Weapon_OOS_Damage(scaling_factor = 0.7)
+
 ***
 
 Copyright (c) 2016,2017 Brent Vince Bohnenstiehl

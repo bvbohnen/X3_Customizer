@@ -40,6 +40,11 @@ from collections import OrderedDict
 
 def Make(args):
 
+    #TODO:
+    #Make a variation on the simple doc which has some formatting for
+    # the egosoft forum, including code blocks and removing newlines
+    # when the next line starts with a lowercase character.
+
     #Make a list of lines or text blocks to print out.
     doc_lines = []
 
@@ -56,8 +61,8 @@ def Make(args):
     indent = ' '
 
     def Make_Horizontal_Line(include_in_simple = True):
-        'Adds a horizontal line, with extra newline after.'
-        this_line = '***\n'
+        'Adds a horizontal line, with extra newline before and after.'
+        this_line = '\n***\n'
         doc_lines.append(this_line)
         if include_in_simple:
             doc_short_lines.append(this_line)
@@ -178,7 +183,7 @@ def Make(args):
     #Print out the license.
     #The simple version will skip this.
     Make_Horizontal_Line(include_in_simple = False)
-    with open(os.path.join('..','Mit_License.txt'), 'r') as file:
+    with open(os.path.join('..','License.txt'), 'r') as file:
         Add_Lines(file.read(), include_in_simple = False)
 
     #Write out the full doc.
