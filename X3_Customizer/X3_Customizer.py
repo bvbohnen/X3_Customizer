@@ -1,5 +1,6 @@
 '''
 X3 Customizer v2.0
+---
 
 This tool will read in source files from X3, perform transforms on them,
 and write the results back out.  Transforms will often perform complex
@@ -9,62 +10,74 @@ source files.  Source files will generally support any premodded input.
 This tool is written in Python, and tested on version 3.6.
 
 Usage:
-    "X3_Customizer user_transform_module.py"
-        Runs the customizer using the provided module, located in this
-        directory, to specify the path to the AP directory, the folder
-        containing the source files to be modified, and the transforms
-        to be run.
-        See User_Transforms_Example.py for an example.
-    "Make_Documentation.py"
-        Generates documentation for this project, writing output
-        to Documentation.txt.
+ * "X3_Customizer user_transform_module.py"
+   - Runs the customizer using the provided module, located in this
+     directory, to specify the path to the AP directory, the folder
+     containing the source files to be modified, and the transforms
+     to be run.
+     See User_Transforms_Example.py for an example.
+ * "Make_Documentation.py"
+   - Generates documentation for this project, writing output
+     to Documentation.txt.
 
 Setup:
-    Transforms will operate on source files which need to be set up
-    prior to running this tool. Source files can be extracted using
-    X2 Editor 2 if needed.     
-    Source files may be captured after any other mods have been applied.
-    
-    Source files need to be located in a folder underneath the 
-    specified AP addon directory, and will have an internal folder
-    structure matching that of the files in the normal addon directory.
-    
-    Output files will be generated in the addon directory matching
-    the folder structure in the source folder. Non-transformed files
-    will generate output files. Files which do not have a name matching
-    the requirement of any transform will be ignored and not copied.
-    
-    Warning: Generated output will overwrite any existing files.
-    
-    Example directory:
-        <path to X3 installation>
-            addon
-                source_folder
-                    maps
-                        x3_universe.xml
-                    types
-                        TBullets.txt
-                        TLaser.txt
-                        TShips.txt
-                        TShips_backup.txt
-                        
-        This will write to the following files, overwriting any
-        existing ones:
-        <path to X3 installation>
-            addon
+
+  * Transforms will operate on source files which need to be set up
+  prior to running this tool. Source files can be extracted using
+  X2 Editor 2 if needed.     
+  Source files may be captured after any other mods have been applied.
+
+  * Source files need to be located in a folder underneath the 
+  specified AP addon directory, and will have an internal folder
+  structure matching that of the files in the normal addon directory.
+
+  * Output files will be generated in the addon directory matching
+  the folder structure in the source folder. Non-transformed files
+  will generate output files. Files which do not have a name matching
+  the requirement of any transform will be ignored and not copied.
+
+  * Warning: Generated output will overwrite any existing files.
+
+  Example directory:
+
+    <path to X3 installation>
+        addon
+            source_folder
                 maps
                     x3_universe.xml
                 types
                     TBullets.txt
                     TLaser.txt
                     TShips.txt
+                    TShips_backup.txt
+
+   This will write to the following files, overwriting any
+   existing ones:
+
+    <path to X3 installation>
+        addon
+            maps
+                x3_universe.xml
+            types
+                TBullets.txt
+                TLaser.txt
+                TShips.txt
 
 Change Log:
-    1.x : Original project development for private use.
-    2.0 : Restructuring of project for general use, isolating individual
-          transforms, separating out transform calls, adding robustness.
-          Filling out documentation generation.
+ * 1.x :
+   - Original project development for private use.
+ * 2.0 :
+   - Restructuring of project for general use, isolating individual
+     transforms, separating out transform calls, adding robustness.
+     Filling out documentation generation.
 '''
+#Note: the above comment gets printed to the markdown file, so avoid
+# having a 4-space indent because text will get code blocked.
+#-Need to also avoid this 4-space group across newlines, annoyingly.
+#-Spaces in text being put into a list seems okay.
+#-In general, check changes in markdown (can use Visual Studio plugin)
+# to verify they look okay.
+
 import sys, os
 #Load up the file manager.
 import File_Manager

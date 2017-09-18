@@ -4,6 +4,32 @@ This will parse the docstrings at the top of X3_Customizer and
 for each transform, and write them to a plain text file.
 
 This can generally be called directly as an entry function.
+
+
+Quick markdown notes, for the readme which will be dispayed on
+github, and the main documentation just because:
+
+ -Newlines don't particularly matter. Can break up lines for a text
+ file, and they will get joined back together.
+
+ -This is bad for a list of transforms, since they get lumped together,
+ so aim to put markdown characters on them to listify them.
+
+ -Adding asterisks at the start of lines will turn them into a list,
+ as long as there is a space between the asterisk and the text.
+
+ -Indentation by 4 spaces or 1 tab creates code blocks; try to avoid 
+ this level of indent unless code blocking is intentional.
+
+ -Indentation is built into some docstrings, though the only one that
+ should matter for the markdown version is x3_customizer. That one needs
+ to be carefully adjusted to avoid 4-space chains, including across
+ newlines.
+
+ -Triple -,*,_ will place a horizontal thick line. Can be used between
+ sections. Avoid dashes, though, since they make whatever is above them
+ into a header, unless that is desired.
+
 '''
 
 import X3_Customizer
@@ -24,8 +50,17 @@ def Make(args):
     # generate that, although one directory up.
     doc_short_lines = []
 
-    #Set the indent type. A couple spaces for now.
-    indent = '  '
+    #Set the indent type. A single spaces for now.
+    #Avoid indenting by 4 unless wanting a code block, for the simple
+    # file that gets markdowned.
+    indent = ' '
+
+    def Make_Horizontal_Line(include_in_simple = True):
+        'Adds a horizontal line, with extra newline after.'
+        this_line = '***\n'
+        doc_lines.append(this_line)
+        if include_in_simple:
+            doc_short_lines.append(this_line)
 
     def Add_Line(line, indent_level = 0, include_in_simple = True):
         'Add a single line to the files, including any newlines.'
@@ -56,15 +91,22 @@ def Make(args):
         'Adds lines for a function name with docstring.'
 
         #Get the name as-is.
-        Add_Lines(function.__name__, indent_level)
+        #Put an asterix in front for markdown.
+        Add_Lines('* ' + function.__name__, indent_level)
 
         #If there are required files, print them.
         if hasattr(function, '_file_names'):
-            Add_Lines('Requires: {}'.format(
-                #Join the required file names with commas.
-                ', '.join(function._file_names)),
-                                indent_level +1,
-                                include_in_simple)
+            #For markdown, don't want this attached to the file name,
+            # but also don't want it causing an extra list indent on
+            # the docstring. An extra newline and a healthy indent
+            # seems to work.
+            Add_Lines('\n{}Requires: {}'
+                        .format(
+                             indent * (indent_level + 1),
+                             #Join the required file names with commas.
+                             ', '.join(function._file_names)),
+                         indent_level +1,
+                         include_in_simple)
 
         Add_Lines(function.__doc__, indent_level +1, include_in_simple)
         #Don't put a newline in the simple version, which will be a
@@ -77,11 +119,11 @@ def Make(args):
     Add_Lines(X3_Customizer.__doc__)
     
     #Add a note for the simple documentation to point to the full one.
-    doc_short_lines.append('\nFull documentation found in Documentation.txt.')
+    doc_short_lines.append('\nFull documentation found in Documentation.md.')
 
     #Grab any setup methods.
     #Skip this for the simple summary.
-    Add_Line('')
+    Make_Horizontal_Line()
     Add_Line('Setup methods:')
     Add_Line('')
     #For now, just the Set_Path method.
@@ -90,7 +132,7 @@ def Make(args):
     
 
     #Put a header for the transform list.
-    Add_Line('')
+    Make_Horizontal_Line()
     Add_Line('Transform List:')
     Add_Line('')
 
@@ -123,23 +165,28 @@ def Make(args):
     #Print out the example module as well.
     #The example will accompany the simple version, since it is a good way
     # to express what the customizer is doing.
-    Add_Line('')
+    Make_Horizontal_Line()
     Add_Line('Example input file, User_Transforms_Example.py:')
+    #Need a newline before the code, otherwise the code block
+    # isn't made right away (the file header gets lumped with the above).
+    Add_Line('')
     with open('User_Transforms_Example.py', 'r') as file:
-        Add_Lines(file.read(), indent_level = 2)
+        #Put in 4 indents to make a code block.
+        Add_Lines(file.read(), indent_level = 4)
 
 
     #Print out the license.
     #The simple version will skip this.
-    Add_Line('', include_in_simple = False)
-    with open('Mit_License.txt', 'r') as file:
+    Make_Horizontal_Line(include_in_simple = False)
+    with open(os.path.join('..','Mit_License.txt'), 'r') as file:
         Add_Lines(file.read(), include_in_simple = False)
 
     #Write out the full doc.
     #Put these 1 directory up to separate from the code.
-    with open(os.path.join('..','Documentation.txt'), 'w') as file:
+    with open(os.path.join('..','Documentation.md'), 'w') as file:
         file.write('\n'.join(doc_lines))
-    #Write out the simple doc; maybe consider calling it a ReadMe.
+
+    #Write out the simpler readme.
     with open(os.path.join('..','README.md'), 'w') as file:
         file.write('\n'.join(doc_short_lines))
 
