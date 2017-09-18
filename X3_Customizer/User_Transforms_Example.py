@@ -19,6 +19,5 @@ Adjust_Ship_Speed(adjustment_factors_dict = {'SG_SH_M4' : 1.5})
 #Increase frigate laser regeneration by 50%.
 Adjust_Ship_Laser_Recharge(adjustment_factors_dict = {'SG_SH_M7': 1.5})
 
-#Rescale OOS weapon damage according to IS DPS, and
-# apply an additional 30% reduction.
-Rescale_Weapon_OOS_Damage(scaling_factor = 0.7)
+#Reduce OOS damage by 30%.
+Adjust_Weapon_OOS_Damage(scaling_factor = 0.7)

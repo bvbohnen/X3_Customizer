@@ -437,19 +437,8 @@ if Vanilla:
             })
 
     
-    #Rescale OOS damage values to reflects actual weapon DPS, and remove bugs
-    # with PSP and similar that are out of line due to fire rate being ignored.
-    #Also adjust general OOS damage downward for better combat resolution precision.
-    #This may work best if it reduces damage less for small weapons, more for large
-    # weapons; for now, this just uses a single factor for all weapon types.
-    #0.2 observed to be somewhat too low for small fighters, with them often not being
-    # able to break shields.  Try 0.5 for now, which might still tend to be low for
-    # big ships.
-    #TODO: tune big and small weapons separately maybe, with less reduction for
-    # capital weapons, based on gameplay observation of m2 combat sometimes taking
-    # a long time to complete (though in general not all that bad).
-    #Swapping to something higher to get big ship combat to go faster. Try 0.6.
-    Rescale_Weapon_OOS_Damage(scaling_factor = 0.6)
+    #Reduce OOS damage by 40%.
+    Adjust_Weapon_OOS_Damage(scaling_factor = 0.6)
         
 
 if XRM:
@@ -564,13 +553,11 @@ if XRM:
     # has been observed.
     #The XRM oos damage values are around 1/4 of vanilla, so if
     # vanilla needs a 0.6 factor, then xrm needs a 4 * 0.6 = 2.4x factor.
-    #However, the XRM oos damage values should be ignored, since values are
-    # being recalculated from IS values.
-    #The IS damage in XRM is around 1/2.5 of vanilla, so set this closer to
-    # 0.6 * 2.5.  
     #Since the weapon damage adjustment may have been applied in general, affecting
     # OOS damage as well, that should be included here as a correction.
-    Rescale_Weapon_OOS_Damage(scaling_factor = 0.6 * 2.5 / Flat_damage_adjustment_factor)
+    #After the correction, apply a scaling similar to that used in vanilla,
+    # eg. around 40% reduction.
+    Adjust_Weapon_OOS_Damage(scaling_factor = 0.6 * 2.4 / Flat_damage_adjustment_factor)
 
     
 

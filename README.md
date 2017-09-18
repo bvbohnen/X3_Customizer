@@ -101,6 +101,7 @@ Transform List:
  * Adjust_Weapon_DPS
  * Adjust_Weapon_Energy_Usage
  * Adjust_Weapon_Fire_Rate
+ * Adjust_Weapon_OOS_Damage
  * Adjust_Weapon_Range
  * Adjust_Weapon_Shot_Speed
  * Boost_Truelight_Seeker_Shield_Reactor
@@ -116,7 +117,6 @@ Transform List:
  * Remove_Weapon_Drain_Flag
  * Remove_Weapon_Shot_Sound
  * Replace_Weapon_Shot_Effects
- * Rescale_Weapon_OOS_Damage
  * Restore_Aldrin_rock
  * Restore_Hub_Music
  * Restore_M148_Music
@@ -159,6 +159,5 @@ Example input file, User_Transforms_Example.py:
     #Increase frigate laser regeneration by 50%.
     Adjust_Ship_Laser_Recharge(adjustment_factors_dict = {'SG_SH_M7': 1.5})
     
-    #Rescale OOS weapon damage according to IS DPS, and
-    # apply an additional 30% reduction.
-    Rescale_Weapon_OOS_Damage(scaling_factor = 0.7)
+    #Reduce OOS damage by 30%.
+    Adjust_Weapon_OOS_Damage(scaling_factor = 0.7)

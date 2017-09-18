@@ -447,6 +447,18 @@ Transform List:
           no good way to adjust ammo consumption.
       
 
+ * Adjust_Weapon_OOS_Damage
+  
+    Requires: TBullets.txt, TLaser.txt
+  
+      Scale OOS damage. Damage may be scaled down to improve accuracy in
+       combat evaluation, at the potential drawback of stalemates when shield
+       regeneration outperforms damage.
+  
+      scaling_factor:
+          The base multiplier to apply to OOS damage.
+      
+
  * Adjust_Weapon_Range
   
     Requires: TBullets.txt
@@ -645,40 +657,6 @@ Transform List:
           Avoid using 0, else sticky white lights have been observed.
       launch_replacement:
           Int, the effect to use for weapon launch.
-      
-
- * Rescale_Weapon_OOS_Damage
-  
-    Requires: TBullets.txt, TLaser.txt
-  
-      Scale OOS damage. This will set the base scaling using weapon IS DPS,
-       fixing issues in Vanilla where OOS damage is set only on IS bullet
-       damage, causing slow firing weapons to be overpowered when OOS.
-      Damage may additionally be scaled down to improve accuracy in combat
-       evaluation, at the potential drawback of stalemates when shield
-       regeneration outperforms damage.
-      If a bullet is used by multiple lasers, the first laser will
-       be used for setting the bullet damage.
-  
-      scaling_factor:
-          The base multiplier to apply to OOS damage.
-      vanilla_calibration_factor:
-          Multiplier to use to recreate (approximately) vanilla OOS bullet damage with
-          ROF factored in; calibrated for HEPT by default.
-          This is applied in addition to other multipliers, and can generally be
-          left at default.
-      areal_weapon_multiplier:
-          Weapons with areal effects (eg. plasma burst generator (PD) or phased
-          shockwave cannon) will have an additional factor applied, 
-          representing multiple hits per shot.
-          Default is 12x, approximately calibrated based on vanilla areal
-          values compared to their contemporary weapons (eg. PD vs HEPT).
-      bullet_name_hits_per_shot_dict:
-          Dict, keyed by bullet name (eg. 'SS_BULLET_PD'), with the
-          multiplier to apply to represent a shot hitting multiple times.
-          This is applied in addition to scaling_factor, and will
-          override the multiplier from areal_weapon_multiplier, to be
-          used in customizing the number of hits per areal weapons.
       
 
  * Restore_Aldrin_rock
@@ -889,9 +867,8 @@ Example input file, User_Transforms_Example.py:
     #Increase frigate laser regeneration by 50%.
     Adjust_Ship_Laser_Recharge(adjustment_factors_dict = {'SG_SH_M7': 1.5})
     
-    #Rescale OOS weapon damage according to IS DPS, and
-    # apply an additional 30% reduction.
-    Rescale_Weapon_OOS_Damage(scaling_factor = 0.7)
+    #Reduce OOS damage by 30%.
+    Adjust_Weapon_OOS_Damage(scaling_factor = 0.7)
 
 ***
 

@@ -2,7 +2,7 @@
 '''
 Notes:
 -Vanilla game OOS damage values appear to assume fire rate applies OOS.
--In game testing makes it obvious fire rate does *not* apply OOS.
+-In game testing makes it seem like fire rate does not apply OOS.
  Simple test:
     Setup: 1 PPC vs. 1 PSP attacking a factory (Xenon Station in this case).
     Reasoning: PSP OOS damage is ~5x that of PPC, and IS fire rate is ~1/7,
@@ -13,6 +13,12 @@ Notes:
     Result: PSP does ~10% shield damage per 30s, PPC does ~2% shield damage.
     Conclusion: Fire rate is ignored OOS, even though damage values depend on
      it being used for weapons to be balanced.
+Update:
+-Testing more directly, by changing fire rate on lasers by an 10-50x, shows that
+ fire rate is accounted for, with the higher rate doing more damage.
+-Above observations are not explained, though may be due to variance if the game
+ considered the PPC test to have missed much more often than the PSP test.
+
 
 -IS, lag appears to be related to collision detection between many bullets and
  ships with large amounts of geometry.
@@ -29,23 +35,6 @@ Notes:
  are needed to complete a combat. Even a few turns will give much better results than
  the common 1-turn combat in vanilla. Note this may cause some oddities with shield regen
  being proportionally stronger.
-
-For rescaling the OOS bullet damage based on IS dps, there is some complexity 
- picking the right damage scaling factor to use to get results into the right 
- ballpark (similar damage per round to vanilla), since the vanilla numbers
- appear to have been hand tweaked around a couple test scenarios.
- -Using HEPT as an example: ~300 rounds/minute, 2k IS damage, 800 OOS damage in vanilla.
-  -When recalculating OOS damage using both IS damage and fire rate, want to determine
-   the scaling factor to use.
-  -It is unclear how the game uses bullet damage in its combat rounds, since round time
-   is variable (5s, 30s, maybe other partial increments).
-  -Damage/second IS would be (IS damage * rounds/minute / 60).
-  -For hept, this would be ~10k dps.
-  -To achieve the same OOS result as vanilla, the scaling factor would be 800/10k:
-    OOS damage = IS dps * 0.08
- -Can use the 0.08 factor as a baseline, then apply an extra derating on top of it to
-  reduce OOS damage below vanilla.
- -This approach may not hold for all weapons, but is a good starting point as HEPT is common.
 
 -Added option to disable fire rate changes on ammo based weapons, since there is no good way to
 adjust ammo consumption.
@@ -82,7 +71,7 @@ Take this into consideration dps changes if modifying ship hulls as well; withou
 For XRM OOS combat, the heavily nerfed values exist for various weapons. Eg:
     Vanilla pac does 460 OOS shield damage, XRM pac does 106, a 4.3x difference.
     Vanilla ppc does 13698 OOS shield damage, XRM ppc does 3048, a 4.4x difference.
-This problem is made worse by many ships having increase shield regeneration, such as
+This problem is made worse by many ships having increased shield regeneration, such as
  small transports with 10x the shield regen, destroyers with 3x shield regen, or
  orbital weapons platforms with 10x shield regen.
 The effect is that OOS combat often stalemates with ships unable to kill each other,
@@ -274,21 +263,24 @@ def Adjust_Weapon_Fire_Rate(
 
 
 
-            
+#Note: this function has been overhauled to remove IS DPS calculation;
+# the original idea that ROF wasn't accounted for OOS was mistaken.
 @Check_Dependencies('TBullets.txt', 'TLaser.txt')
-def Rescale_Weapon_OOS_Damage(
+def Adjust_Weapon_OOS_Damage(
     scaling_factor = 1,
 
+    #-Removed.
     #Multiplier to use to recreate (approximately) vanilla OOS bullet damage with
     # ROF factored in; calibrated for HEPT (see comments at start of file).
     # 9.4k shield dps, 795 OOS shield damage value.
     #This will be used for XRM as well, since it is a general calibration to put
     # damages where the underlying OOS combat code was built around.
-    vanilla_calibration_factor = 795 / 9400,
-
+    #vanilla_calibration_factor = 795 / 9400,
+    
+    #-Removed.
     #Set a default for all areal weapons, in case a mod mixes them up.
     #The numbers calculated below can be roughly approximated here.
-    areal_weapon_multiplier = 12,
+    #areal_weapon_multiplier = 12,
 
     bullet_name_multiplier_dict = {
         #Plasma burst generator (PD).
@@ -298,7 +290,7 @@ def Rescale_Weapon_OOS_Damage(
         # PD_dps_hull   = 1/13.7  HEPT_dps_hull   * number_of_hits_per_shot.
         #If the two are assumed to be balanced on average (not just when a player is
         # in the sweet spot), then can mult PD by 18.
-        'SS_BULLET_PD' : 18,
+        #'SS_BULLET_PD' : 18,
 
         #Phased shockwave generator (PSG).
         #Compare this against Flak (same tier and anti-fighter role).
@@ -306,7 +298,7 @@ def Rescale_Weapon_OOS_Damage(
         # PSG_dps_shield = 1/5.1   Flak_dps_shield * number_of_hits_per_shot.
         # PSG_dps_hull   = 1/14.1  Flak_dps_hull   * number_of_hits_per_shot.
         #PSG does far less hull damage, so direct comparison is imperfect, but go with it.
-        'SS_BULLET_PSG' : 9,
+        #'SS_BULLET_PSG' : 9,
         
         #TODO: how to dynamically determine this:
         #PD  has areal flag set, speed 375, lifetime 2.1
@@ -319,108 +311,112 @@ def Rescale_Weapon_OOS_Damage(
         },
     ):
     '''
-    Scale OOS damage. This will set the base scaling using weapon IS DPS,
-     fixing issues in Vanilla where OOS damage is set only on IS bullet
-     damage, causing slow firing weapons to be overpowered when OOS.
-    Damage may additionally be scaled down to improve accuracy in combat
-     evaluation, at the potential drawback of stalemates when shield
+    Scale OOS damage. Damage may be scaled down to improve accuracy in
+     combat evaluation, at the potential drawback of stalemates when shield
      regeneration outperforms damage.
-    If a bullet is used by multiple lasers, the first laser will
-     be used for setting the bullet damage.
 
     scaling_factor:
         The base multiplier to apply to OOS damage.
-    vanilla_calibration_factor:
-        Multiplier to use to recreate (approximately) vanilla OOS bullet damage with
-        ROF factored in; calibrated for HEPT by default.
-        This is applied in addition to other multipliers, and can generally be
-        left at default.
-    areal_weapon_multiplier:
-        Weapons with areal effects (eg. plasma burst generator (PD) or phased
-        shockwave cannon) will have an additional factor applied, 
-        representing multiple hits per shot.
-        Default is 12x, approximately calibrated based on vanilla areal
-        values compared to their contemporary weapons (eg. PD vs HEPT).
-    bullet_name_hits_per_shot_dict:
-        Dict, keyed by bullet name (eg. 'SS_BULLET_PD'), with the
-        multiplier to apply to represent a shot hitting multiple times.
-        This is applied in addition to scaling_factor, and will
-        override the multiplier from areal_weapon_multiplier, to be
-        used in customizing the number of hits per areal weapons.
     '''
-    #TODO: maybe give a selective buff to beam weapons, since they seem oddly
-    # weak in OOS combat (maybe; it is hard to say for sure without tests).
-    tbullets_dict_list = Load_File('TBullets.txt')
+    #Step through the bullets and scale their OOS numbers.
+    for this_dict in Load_File('TBullets.txt'):
+        if scaling_factor != 1:
+            for field in ['hull_damage_oos', 'shield_damage_oos']:
+                value = int(this_dict[field])
+                this_dict[field] = str(round(value * scaling_factor))
 
-        
-    #Set up a dict which tracks modified bullets, to prevent a bullet
-    # being modded more than once by different lasers (though it might
-    # not matter if they are set instead of multiply the value).
-    bullet_indices_seen_list = []
-
-    #Step through each laser.
-    for laser_dict in Load_File('TLaser.txt'):
-
-        #Grab the fire delay, in milliseconds.
-        this_fire_delay = int(laser_dict['fire_delay'])
-
-        #Determine fire rate, per second.
-        fire_rate = Flags.Game_Ticks_Per_Minute / this_fire_delay / 60
-            
-        #Loop over the bullets created by this laser.
-        for bullet_index in Get_Laser_Bullets(laser_dict):
-            #Look up the bullet.
-            bullet_dict = tbullets_dict_list[bullet_index]
-
-            #Unpack the flags.
-            flags_dict = Flags.Unpack_Tbullets_flags(bullet_dict['flags'])
-                
-            #Skip if this bullet was already seen.
-            if bullet_index in bullet_indices_seen_list:
-                continue
-            #Add this bullet to the seen list.
-            bullet_indices_seen_list.append(bullet_index)
-
-            #Note: if multiple lasers use the same bullet, the latest laser will
-            # be the one whose fire_rate is used here.
-            #Assume lasers using the same bullet are very similar to each other,
-            # eg. the experimental aldrin weapons and terran counterparts.
-
-            #Loop over the hull and shield fields, IS and OOS.
-            for is_field, oos_field in zip(
-                ['hull_damage', 'shield_damage'],
-                ['hull_damage_oos', 'shield_damage_oos']):
-                                            
-                #Pull the IS hull/shield damage.
-                damage_is = int(bullet_dict[is_field])
-
-                #Calculate hull and shield dps for this weapon.
-                dps_is = damage_is * fire_rate
-
-                #Convert dps to OOS damage units, applying the calibrated vanilla factor
-                # along with the extra derating factor.
-                damage_oos = dps_is * vanilla_calibration_factor * scaling_factor
-
-                #If this bullet has a special bonus multiplier, apply it,
-                # to represent areal weapon multihit.
-                if bullet_dict['name'] in bullet_name_multiplier_dict:
-                    damage_oos   *= bullet_name_multiplier_dict[bullet_dict['name']]
-                #Otherwise, if this is an areal weapon, apply its multiplier.
-                elif flags_dict['areal']:
-                    damage_oos *= areal_weapon_multiplier
-
-                #-Removed; old version modified existing entries, but those were found to be
-                # rotten since they had stuff like PSP doing 10x the damage of PPC.
-                #hull_damage_oos   = int(this_list[tbullets_field_index_dict['hull_damage_oos']])
-                #shield_damage_oos = int(this_list[tbullets_field_index_dict['shield_damage_oos']])
-                #hull_damage_oos   = max(1, round(hull_damage_oos   * damage_factor_oos))
-                #shield_damage_oos = max(1, round(shield_damage_oos * damage_factor_oos))
-
-                #Floor at 1, and round off fraction.
-                damage_oos   = max(1, round(damage_oos))
-
-                #Put the updated value back.
-                bullet_dict[oos_field] = str(int(damage_oos  ))
+    #-Removed; older code from when it was thought ROF was ignored OOS.
+    #vanilla_calibration_factor:
+    #    Multiplier to use to recreate (approximately) vanilla OOS bullet damage with
+    #    ROF factored in; calibrated for HEPT by default.
+    #    This is applied in addition to other multipliers, and can generally be
+    #    left at default.
+    #areal_weapon_multiplier:
+    #    Weapons with areal effects (eg. plasma burst generator (PD) or phased
+    #    shockwave cannon) will have an additional factor applied, 
+    #    representing multiple hits per shot.
+    #    Default is 12x, approximately calibrated based on vanilla areal
+    #    values compared to their contemporary weapons (eg. PD vs HEPT).
+    #bullet_name_hits_per_shot_dict:
+    #    Dict, keyed by bullet name (eg. 'SS_BULLET_PD'), with the
+    #    multiplier to apply to represent a shot hitting multiple times.
+    #    This is applied in addition to scaling_factor, and will
+    #    override the multiplier from areal_weapon_multiplier, to be
+    #    used in customizing the number of hits per areal weapons.
+    #
+    ##TODO: maybe give a selective buff to beam weapons, since they seem oddly
+    ## weak in OOS combat (maybe; it is hard to say for sure without tests).
+    #tbullets_dict_list = Load_File('TBullets.txt')
+    #
+    #    
+    ##Set up a dict which tracks modified bullets, to prevent a bullet
+    ## being modded more than once by different lasers (though it might
+    ## not matter if they are set instead of multiply the value).
+    #bullet_indices_seen_list = []
+    #
+    ##Step through each laser.
+    #for laser_dict in Load_File('TLaser.txt'):
+    #
+    #    #Grab the fire delay, in milliseconds.
+    #    this_fire_delay = int(laser_dict['fire_delay'])
+    #
+    #    #Determine fire rate, per second.
+    #    fire_rate = Flags.Game_Ticks_Per_Minute / this_fire_delay / 60
+    #        
+    #    #Loop over the bullets created by this laser.
+    #    for bullet_index in Get_Laser_Bullets(laser_dict):
+    #        #Look up the bullet.
+    #        bullet_dict = tbullets_dict_list[bullet_index]
+    #
+    #        #Unpack the flags.
+    #        flags_dict = Flags.Unpack_Tbullets_flags(bullet_dict['flags'])
+    #            
+    #        #Skip if this bullet was already seen.
+    #        if bullet_index in bullet_indices_seen_list:
+    #            continue
+    #        #Add this bullet to the seen list.
+    #        bullet_indices_seen_list.append(bullet_index)
+    #
+    #        #Note: if multiple lasers use the same bullet, the latest laser will
+    #        # be the one whose fire_rate is used here.
+    #        #Assume lasers using the same bullet are very similar to each other,
+    #        # eg. the experimental aldrin weapons and terran counterparts.
+    #
+    #        #Loop over the hull and shield fields, IS and OOS.
+    #        for is_field, oos_field in zip(
+    #            ['hull_damage', 'shield_damage'],
+    #            ['hull_damage_oos', 'shield_damage_oos']):
+    #                                        
+    #            #Pull the IS hull/shield damage.
+    #            damage_is = int(bullet_dict[is_field])
+    #
+    #            #Calculate hull and shield dps for this weapon.
+    #            dps_is = damage_is * fire_rate
+    #
+    #            #Convert dps to OOS damage units, applying the calibrated vanilla factor
+    #            # along with the extra derating factor.
+    #            damage_oos = dps_is * vanilla_calibration_factor * scaling_factor
+    #
+    #            #If this bullet has a special bonus multiplier, apply it,
+    #            # to represent areal weapon multihit.
+    #            if bullet_dict['name'] in bullet_name_multiplier_dict:
+    #                damage_oos   *= bullet_name_multiplier_dict[bullet_dict['name']]
+    #            #Otherwise, if this is an areal weapon, apply its multiplier.
+    #            elif flags_dict['areal']:
+    #                damage_oos *= areal_weapon_multiplier
+    #
+    #            #-Removed; old version modified existing entries, but those were found to be
+    #            # rotten since they had stuff like PSP doing 10x the damage of PPC.
+    #            #hull_damage_oos   = int(this_list[tbullets_field_index_dict['hull_damage_oos']])
+    #            #shield_damage_oos = int(this_list[tbullets_field_index_dict['shield_damage_oos']])
+    #            #hull_damage_oos   = max(1, round(hull_damage_oos   * damage_factor_oos))
+    #            #shield_damage_oos = max(1, round(shield_damage_oos * damage_factor_oos))
+    #
+    #            #Floor at 1, and round off fraction.
+    #            damage_oos   = max(1, round(damage_oos))
+    #
+    #            #Put the updated value back.
+    #            bullet_dict[oos_field] = str(int(damage_oos  ))
 
 
             
