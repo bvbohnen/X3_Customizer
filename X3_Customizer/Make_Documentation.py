@@ -16,9 +16,12 @@ def Make(args):
 
     #Make a list of lines or text blocks to print out.
     doc_lines = []
+
     #Also include a simple version, which will truncate
     # the transform descriptions, aimed at providing a summary which
     # is suitable for posting.
+    #Git appears to expect a README.md file; this can be used to
+    # generate that, although one directory up.
     doc_short_lines = []
 
     #Set the indent type. A couple spaces for now.
@@ -133,10 +136,11 @@ def Make(args):
         Add_Lines(file.read(), include_in_simple = False)
 
     #Write out the full doc.
-    with open('Documentation.txt', 'w') as file:
+    #Put these 1 directory up to separate from the code.
+    with open(os.path.join('..','Documentation.txt'), 'w') as file:
         file.write('\n'.join(doc_lines))
     #Write out the simple doc; maybe consider calling it a ReadMe.
-    with open('Documentation_Short.txt', 'w') as file:
+    with open(os.path.join('..','README.md'), 'w') as file:
         file.write('\n'.join(doc_short_lines))
 
 if __name__ == '__main__':
