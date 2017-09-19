@@ -80,6 +80,10 @@ the calibration range.
  the wrapped equation to return the scaling for 10, its nearest calibration
  point.
 
+TODO: consider switching these equations to calculate scaling factors
+instead of raw values. This requires changes in the calling code, but
+will make the equations more stable against large value overflows.
+
 '''
 class Scaling_Function():
     '''

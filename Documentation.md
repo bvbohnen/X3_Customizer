@@ -1,5 +1,5 @@
 
-X3 Customizer v2.0
+X3 Customizer v2.01
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -67,6 +67,8 @@ Change Log:
    - Restructuring of project for general use, isolating individual
      transforms, separating out transform calls, adding robustness.
      Filling out documentation generation.
+ * 2.01:
+   - Added beam to bullet conversion.
 
 ***
 
@@ -537,6 +539,25 @@ Transform List:
           Default is filled out similar to the standalone colored sectors mod.
       
 
+ * Convert_Beams_To_Bullets
+  
+    Requires: TBullets.txt
+  
+      Converts beam weapons to bullet weapons, to help with game slowdown
+      when beams are fired at large ships and stations. Bullet speed will 
+      be set based on sampling other bullets of similar damage.
+  
+      beams_not_converted:
+          List of bullet names for weapons not to be converted.
+          Default includes repair and tug lasers.
+      speed_samples:
+          Int, the number of similar DPS weapons to sample when setting the
+          bullet speed. Default 4.
+      sample_type:
+          String, one of ['min','avg'], if the minimum or average of speed
+          ratio of sampled similar DPS weapons should be used. Default 'min'.
+      
+
  * Convert_Weapon_To_Ammo
   
     Requires: TBullets.txt
@@ -634,7 +655,7 @@ Transform List:
   
       Removes the weapon drain flag from any weapons.
       May also stop equipment damage being applied through shielding
-      for these weapons. Note: not yet verified.
+      for these weapons.
       
 
  * Remove_Weapon_Shot_Sound

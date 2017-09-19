@@ -1,5 +1,5 @@
 
-X3 Customizer v2.0
+X3 Customizer v2.01
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -67,6 +67,8 @@ Change Log:
    - Restructuring of project for general use, isolating individual
      transforms, separating out transform calls, adding robustness.
      Filling out documentation generation.
+ * 2.01:
+   - Added beam to bullet conversion.
 
 Full documentation found in Documentation.md.
 
@@ -107,6 +109,7 @@ Transform List:
  * Boost_Truelight_Seeker_Shield_Reactor
  * Clear_Weapon_Flag
  * Color_Sector_Names
+ * Convert_Beams_To_Bullets
  * Convert_Weapon_To_Ammo
  * Convert_Weapon_To_Energy
  * Convoys_made_of_race_ships

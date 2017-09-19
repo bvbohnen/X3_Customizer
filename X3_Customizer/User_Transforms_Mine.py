@@ -442,7 +442,15 @@ if Vanilla:
         
 
 if XRM:
-    
+
+    #Try out a beam to bullet conversion, since cap ship combat in
+    # XRM suffers terrible lag due to high numbers of beam weapons
+    # against high poly models.
+    #Note: some beam changes are present below, but will just do nothing
+    # if bullet conversion happens first.
+    Convert_Beams_To_Bullets()
+        
+
     #Adjust weapon damage, to increase it in general.
     '''
     It is unclear how best to go about this, since the XRM nerfs are not a 

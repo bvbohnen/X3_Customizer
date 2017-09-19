@@ -87,34 +87,39 @@ from File_Manager import *
 import Flags
 import Scaling_Equations
 from collections import OrderedDict
+import math
 
+#The hull to shield dps equivelence factor. Many weapons have this
+# around 5-6. This is used to set the scaling equation for hull dps,
+# where the above metrics were aimed at shield dps.
+#May also be used in other transforms, so set it here for all.
+Hull_to_shield_factor = 6
 
 ##########################################################################################
 
 
-#Support function.
 #Record which bullets spawn which child bullets, to help with figuring out
 # all bullets spawned by a laser indirectly.
 #This is keyed by parent bullet index, value is fragment index.
 Bullet_parent_to_child_dict = {}
-Bullet_parent_to_child_dict_initialized = False
+def _Initialize_Bullet_parent_to_child_dict():
+    #Loop over all bullets.
+    for index, this_dict in enumerate(Load_File('TBullets.txt')):
+        flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+        #Check if this bullet fragments.
+        if flags_dict['fragmentation']:
+            #Record the pairing.
+            Bullet_parent_to_child_dict[index] = int(this_dict['fragment_bullet'])
+            
 def Get_Laser_Bullets(laser_dict):
     '''
     Determine the bullets created by this laser, directly or indirectly.
     Eg. a fragmentation chain may result in multiple bullets (eg. cluster flak).
     Returns a list of integers, the bullet indices in tbullets.
     '''
-    #On first call, initialized the bullet parent/child dict.
-    global Bullet_parent_to_child_dict_initialized
-    if not Bullet_parent_to_child_dict_initialized:
-        Bullet_parent_to_child_dict_initialized = True
-        #Loop over all bullets.
-        for index, this_dict in enumerate(Load_File('TBullets.txt')):
-            flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
-            #Check if this bullet fragments.
-            if flags_dict['fragmentation']:
-                #Record the pairing.
-                Bullet_parent_to_child_dict[index] = int(this_dict['fragment_bullet'])
+    #On first call, initialize the bullet parent/child dict.
+    if not Bullet_parent_to_child_dict:
+        _Initialize_Bullet_parent_to_child_dict()
 
     #Get the index of the bullet this laser creates.
     this_bullet_index = int(laser_dict['bullet'])
@@ -132,6 +137,33 @@ def Get_Laser_Bullets(laser_dict):
         current_bullet = Bullet_parent_to_child_dict[current_bullet]
     return bullet_list
 
+
+#Record which lasers spawn which bullets.
+#If multiple lasers spawn a bullet, the first laser will be returned.
+#This is keyed by parent bullet name, value is a laser dict.
+Bullet_to_laser_dict = {}
+def _Initialize_Bullet_to_laser_dict():
+
+    #Set up a dict which tracks seen bullets, to prevent a bullet
+    # being recorded more than once by different lasers.
+    bullet_indices_seen_list = []
+    tbullets_dict_list = Load_File('TBullets.txt')
+
+    #Loop over all lasers.
+    for laser_dict in Load_File('TLaser.txt'):
+        #Loop over the bullets created by this laser.
+        for bullet_index in Get_Laser_Bullets(laser_dict):
+            #Look up the bullet.
+            bullet_dict = tbullets_dict_list[bullet_index]
+                
+            #Skip if this bullet was already seen.
+            if bullet_index in bullet_indices_seen_list:
+                continue
+            #Add this bullet to the seen list.
+            bullet_indices_seen_list.append(bullet_index)
+            #Record the laser.
+            Bullet_to_laser_dict[bullet_dict['name']] = laser_dict
+    return
 
 
 
@@ -184,6 +216,8 @@ def Adjust_Weapon_Fire_Rate(
     #Set up a dict which tracks modified bullets, to prevent a bullet
     # being modded more than once by different lasers.
     bullet_indices_seen_list = []
+    #TODO: update this code to make use of Bullet_to_laser_dict, since
+    # there is some redundancy now.
 
     #Step through each laser.
     for this_dict in Load_File('TLaser.txt'):            
@@ -536,7 +570,7 @@ def Adjust_Weapon_Shot_Speed(
         #Unpack the flags.
         flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
 
-        #Always skip beam weapons, including zigzag
+        #Always skip beam weapons, including zigzag.
         if flags_dict['beam'] or flags_dict['zigzag']:
             continue
 
@@ -547,9 +581,8 @@ def Adjust_Weapon_Shot_Speed(
         if skip_flak and flags_dict['flak']:
             continue
                 
-        #Get original speed and lifetime.
+        #Get original speed.
         speed    = int(this_dict['speed'])
-        lifetime = int(this_dict['lifetime'])
                 
         #Skip if bullet has no speed (eg. frag children bullets).
         if speed == 0:
@@ -570,20 +603,11 @@ def Adjust_Weapon_Shot_Speed(
         else:
             #Skip this bullet.
             continue
+
+        #Use a shared function to apply the speed change, keeping
+        # range constant.
+        _Update_Bullet_Speed(this_dict, new_speed)
                 
-        #Round speed to nearest 10 for nicer looking number in game.
-        new_speed = round(new_speed/10)*10           
-
-        #Calculate a new lifetime so that range remains unchanged.
-        #Ranges in game are not generally rounded, so don't bother with
-        # making that look nice here.
-        new_lifetime = lifetime * speed / new_speed
-
-        #Put them back, rounded.
-        this_dict['speed'] = str(int(new_speed))
-        this_dict['lifetime'] = str(int(new_lifetime))
-
-
         #Debug printout.
         if print_changes:        
             #Give bullet name, old and new speed,
@@ -598,6 +622,29 @@ def Adjust_Weapon_Shot_Speed(
                 ))
 
 
+def _Update_Bullet_Speed(bullet_dict, new_speed):
+    '''
+    Support function to modify a bullet to have a new speed, while
+    keeping range constant through a lifetime adjustment.
+    '''
+    #Look up the original lifetime and speed.
+    speed    = int(bullet_dict['speed'])
+    lifetime = int(bullet_dict['lifetime'])
+
+    #Round speed to nearest 10 for nicer looking number in game.
+    #Round up in case a bullet is really slow.
+    #Bullet speeds are in units of 500 ticks per meter, so
+    # would need to round to nearest 5000 to get this to-10 effect.
+    new_speed = math.ceil(new_speed/5000)*5000         
+
+    #Calculate a new lifetime so that range remains unchanged.
+    #Ranges in game are not generally rounded, so don't bother with
+    # making that look nice here.
+    new_lifetime = lifetime * speed / new_speed
+
+    #Put them back, rounded.
+    bullet_dict['speed'] = str(int(new_speed))
+    bullet_dict['lifetime'] = str(int(new_lifetime))
 
             
 @Check_Dependencies('TBullets.txt', 'TLaser.txt')
@@ -656,12 +703,7 @@ def Adjust_Weapon_DPS(
         If True, speed adjustments are printed to the summary file.  
     '''
     tbullets_dict_list = Load_File('TBullets.txt')
-
-    #The hull to shield dps equivelence factor. Many weapons have this
-    # around 5-6. This is used to set the scaling equation for hull dps,
-    # where the above metrics were aimed at shield dps.
-    Hull_to_shield_factor = 6
-
+    
     if print_changes:
         Write_Summary_Line('\nDamage adjustments:')
         
@@ -904,7 +946,54 @@ def Adjust_Beam_Weapon_Duration(
         this_dict['lifetime'] = str(int(new_lifetime))
         this_dict['speed']    = str(int(speed))
 
-                
+              
+#-Removed, had no performance benefit.
+#TODO: consider a general transform to change bullet length, since it
+# might be neat visually. Could limit bullet length based on fire
+# rate and speed to ensure bullets aren't longer than their spacing.
+#@Check_Dependencies('TBullets.txt')
+#def Adjust_Beam_Weapon_Bullet_Length(
+#    scaling_factor = 10,
+#    beams_not_converted = [
+#        #Don't adjust repair lasers or tractor laser.
+#        'SS_BULLET_TUG',
+#        'SS_BULLET_REPAIR',
+#        'SS_BULLET_REPAIR2',
+#        ]
+#    ):
+#    '''
+#    Adjusts the length of beam weapon bullets. Goal is to improve
+#    performance by forming beams from fewer bullet objects, on
+#    the theory that few bullets do fewer collision checks.
+#
+#    scaling_factor:
+#        Multiplier on existing bullet length.
+#    beams_not_converted:
+#        List of bullet names for weapons not to be modified.
+#    '''
+#    #TODO: make into a generic transform with a bullet dict, and key
+#    # off of a flag match.
+#    for this_dict in Load_File('TBullets.txt'):
+#        flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+#
+#        #Skip non-beams.
+#        if not flags_dict['beam']:
+#            continue
+#        
+#        #Skip skipped bullets.
+#        if this_dict['name'] in beams_not_converted:
+#            continue
+#
+#        value = float(this_dict['box_length'])
+#        #Typical values are around 4 or so.
+#        #Try out a super long length.
+#        value *= scaling_factor
+#        #Floor at 0.1 to be safe.
+#        value = max(0.1, value)
+#        #Put it back, with 1 decimal place.
+#        this_dict['box_length'] = '{0:.1f}'.format(value)
+
+
                 
 @Check_Dependencies('TBullets.txt')
 def Adjust_Beam_Weapon_Width(
@@ -951,6 +1040,206 @@ def Adjust_Beam_Weapon_Width(
                 value = min(value, max_val)
             #Put it back, with 1 decimal place.
             this_dict[field] = '{0:.1f}'.format(value)
+            
+
+#Replace beams with normal shots.
+#Beam weapons in general, while cool looking, can be bad for the gameplay,
+# both due to performance issues/slowdown and due to balance issues with them
+# being too accurate, plus a general problem with player controlled beams
+# being able to be always-on, increasing dps potentially drastically.
+#This will need some thought for shot speed, as well as picking the bullet
+# effect to use (the laser bullet may not be well suited to standalone
+# bullets).
+@Check_Dependencies('TBullets.txt')
+def Convert_Beams_To_Bullets(
+    beams_not_converted = [
+        #Don't adjust repair lasers or tractor laser.
+        'SS_BULLET_TUG',
+        'SS_BULLET_REPAIR',
+        'SS_BULLET_REPAIR2',
+        ],
+    speed_samples = 4,
+    sample_type = 'min'
+    ):
+    '''
+    Converts beam weapons to bullet weapons, to help with game slowdown
+    when beams are fired at large ships and stations. Bullet speed will 
+    be set based on sampling other bullets of similar damage.
+
+    beams_not_converted:
+        List of bullet names for weapons not to be converted.
+        Default includes repair and tug lasers.
+    speed_samples:
+        Int, the number of similar DPS weapons to sample when setting the
+        bullet speed. Default 4.
+    sample_type:
+        String, one of ['min','avg'], if the minimum or average of speed
+        ratio of sampled similar DPS weapons should be used. Default 'min'.
+    '''
+    for this_dict in Load_File('TBullets.txt'):
+        flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+
+        #Skip non-beams.
+        if not flags_dict['beam']:
+            continue
+
+        #Skip skipped bullets.
+        if this_dict['name'] in beams_not_converted:
+            continue
+        
+        #-Removed; bullet length doesn't actually affect the visual
+        # at all.
+        ##For visual similarity, try lengthening the shots a bunch.
+        ##This would be more like star wars lasers.
+        #value = float(this_dict['box_length'])
+        ##Typical values are around 4 or so.
+        ##Try out a super long length.
+        #value *= 10
+        ##Put it back, with 1 decimal place.
+        #this_dict['box_length'] = '{0:.1f}'.format(value)
+
+        #How much should shot speed be adjusted?
+        #Originally, speed was only used for determining range
+        # based on lifetime.
+        #Often, lifetime is much shorter on beams than it is on
+        # comperable weapons, eg. ppc lifetime is around 10x that
+        # of capital beams. This trend may not hold with weaker
+        # beams, though.
+        #Just fit to similar bullets based on damage for now.
+        new_speed = _Get_Bullet_Speed_By_Damage(this_dict,
+                                                speed_samples,
+                                                sample_type)
+
+        #Apply the speed update, keeping range constant.
+        _Update_Bullet_Speed(this_dict, new_speed)
+        
+        #Clear the beam flag.
+        #Do this after the above, so a beam isn't included in the
+        # bullet to speed analysis.
+        flags_dict['beam'] = False
+        this_dict['flags'] = Flags.Pack_Flags(flags_dict)
+
+
+def _Get_Average_Damage(bullet_dict):
+    '''
+    Support funcion to return average of hull and shield damage 
+    for a bullet, scaling hull damage by Hull_to_shield_factor.
+    '''
+    return (int(bullet_dict['hull_damage']) * Hull_to_shield_factor 
+            + int(bullet_dict['shield_damage'])) /2
+
+
+#Cached sorted list for the function below.
+_Bullet_damage_range_tuples = []
+def _Get_Bullet_Speed_By_Damage(bullet_dict, speed_samples, sample_type):
+    '''
+    Support function to estimate the speed of a bullet based on its
+    damage value and other similar bullets.
+    '''
+    #Goal is to match eg. capital ship tier bullets to other cap
+    # ship bullets.
+    #This can be awkward in some cases, such as with flak, which
+    # may be outliers for damage and speed.
+    #Instead of doing a match-to-nearest-damage, aim to smooth out the
+    # estimation a bit to balance outliers better.
+    #Also want something simple for now, so that it is easy to set up.
+    #A full linear fit across all bullets may fail to capture any
+    # nonlinearities, eg. if bullets slow by half going from small
+    # to medium, then slow by another quarter going medium to large.
+    #Best approach may be to do a local fit, where the nearest
+    # X bullets are found, and a linear fit or maybe a simple averaging
+    # is done.
+    #Want to avoid numpy/similar and stick to standard packages, so
+    # go with the local average idea.
+    
+    #Init the bullet to laser dict if needed.
+    if not Bullet_to_laser_dict:
+        _Initialize_Bullet_to_laser_dict()
+
+    #Select the scaling metric to use.
+    def Get_Scaling_Metric(bullet_dict):
+
+        #Start with bullet damage.
+        damage = _Get_Average_Damage(bullet_dict)
+
+        #This should be based on DPS and not bullet damage.
+        #Look up the laser's fire delay.
+        laser_dict = Bullet_to_laser_dict[bullet_dict['name']]
+
+        #Grab the fire delay, in milliseconds.
+        this_fire_delay = int(laser_dict['fire_delay'])
+        #Scaling will be damage/delay.
+        return damage / this_fire_delay
+
+    #On first call, fill out a sorted list of bullet tuples of
+    # (scaling_metric, speed*scaling_metric, speed).
+    #The multiplier simply makes range calculation later easier, since it
+    # will be focused on how speed scales with damage rather than raw speed
+    # (to be more robust), and a multiplier gives a steadier returned value
+    # since speed goes down as damage goes up.
+    #The extra speed argument is simply for debug checking that results
+    # make sense.
+
+    #Check if the dict is initialized yet.
+    if not _Bullet_damage_range_tuples:
+        for this_dict in Load_File('TBullets.txt'):
+
+            #Skip beams.
+            flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+            if flags_dict['beam']:
+                continue
+
+            #Skip bullets that don't have associated lasers.
+            if this_dict['name'] not in Bullet_to_laser_dict:
+                continue
+
+            #Skip some special stuff like mining lasers.
+            if this_dict['name'] in ['SS_BULLET_MINING']:
+                continue
+
+            #Get the scaling meetric.
+            metric = Get_Scaling_Metric(this_dict)
+
+            #Add the tuple.
+            _Bullet_damage_range_tuples.append((
+                metric,
+                int(this_dict['speed']) * metric,
+                int(this_dict['speed'])
+                ))
+        
+    #Skip bullets that don't have associated lasers.
+    #This showed up on a Dummy beam laser in xrm.
+    if bullet_dict['name'] not in Bullet_to_laser_dict:
+        #Return speed unmodified.
+        return int(bullet_dict['speed'])
+
+    #There are different ways to find the nearest elements.
+    #The simplest appears to be resorting the list based on how far
+    # away each tuple is from the input metric, then just take the
+    # nearst some number of elements.
+    new_metric = Get_Scaling_Metric(bullet_dict)
+    resorted_list = sorted(_Bullet_damage_range_tuples, 
+                           key = lambda x: abs(x[0] - new_metric))
+
+    #Average the nearest some number of items.
+    #This will get the speed*metric values averaged, so is somewhat robust
+    # if the new bullet it outside the normal range of the list.
+    if sample_type == 'avg':
+        speed_x_metric = sum(x[1] for x in resorted_list[:speed_samples]) / speed_samples
+    #The above wasn't working very well because of flak and similar.
+    #Instead, take the minimum from the nearest elements, filtering
+    # out flak, and also somewhat offsetting a beam weapon's damage
+    # becoming concentrated in one ball by making it harder to hit.
+    elif sample_type == 'min':
+        speed_x_metric = min(x[1] for x in resorted_list[:speed_samples])
+    else:
+        raise Exception('Speed sample type {} not understood'.format(sample_type))
+
+    #Can now calculate and return a speed.
+    new_speed = speed_x_metric / new_metric
+    return new_speed
+
+
 
         
 @Check_Dependencies('TBullets.txt')
@@ -1166,26 +1455,11 @@ def Remove_Weapon_Drain_Flag():
     '''
     Removes the weapon drain flag from any weapons.
     May also stop equipment damage being applied through shielding
-    for these weapons. Note: not yet verified.
+    for these weapons.
     '''
-    #TODO: verify this in game to see if equipment is no longer destroyed.
+    #TODO: doubly verify this works. Gameplay since making this
+    # change has not seen equipment destroyed by Xenon cap ship
+    # weapons in XRM, which were the motivation for this change.
     Clear_Weapon_Flag('weapon_drain')
 
 
-#TODO   
-#Replace beams with normal shots.
-#Beam weapons in general, while cool looking, can be bad for the gameplay,
-# both due to performance issues/slowdown and due to balance issues with them
-# being too accurate, plus a general problem with player controlled beams
-# being able to be always-on, increasing dps potentially drastically.
-#TODO: not implemented  yet.
-#This will need some thought for shot speed, as well as picking the bullet
-# effect to use (the laser bullet may not be well suited to standalone
-# bullets).
-if 0:
-    Beams_not_converted = [
-        #Don't adjust repair lasers or tractor laser.
-        'SS_BULLET_TUG',
-        'SS_BULLET_REPAIR',
-        'SS_BULLET_REPAIR2',
-        ]
