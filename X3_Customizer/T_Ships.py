@@ -38,10 +38,10 @@ def Adjust_Ship_Hull(
     ships to 100% hull. Alternatively, ship hulls will be updated as 
     ships die and respawn.
 
-    scaling_factor:
-        Multiplier to apply to any ship type not found in adjustment_factors_dict.
-    adjustment_factors_dict:
-        Dict keyed by ship type, holding a scaling factor to be applied.
+    * scaling_factor:
+      - Multiplier to apply to any ship type not found in adjustment_factors_dict.
+    * adjustment_factors_dict:
+      - Dict keyed by ship type, holding a scaling factor to be applied.
     '''
     for this_dict in Load_File('TShips.txt'):
         if this_dict['subtype'] in adjustment_factors_dict or scaling_factor != 1:
@@ -77,10 +77,10 @@ def Adjust_Ship_Speed(
     '''
     Adjust ship speeds. Does not affect acceleration.
     
-    scaling_factor:
-        Multiplier to apply to any ship type not found in adjustment_factors_dict.
-    adjustment_factors_dict:
-        Dict keyed by ship type, holding a scaling factor to be applied.
+    * scaling_factor:
+      - Multiplier to apply to any ship type not found in adjustment_factors_dict.
+    * adjustment_factors_dict:
+      - Dict keyed by ship type, holding a scaling factor to be applied.
     '''
     #Approach could be to set a target average speed for each tier of ship, calculate the
     # existing average of that tier, and use the ratio as a multiplier to bring the average
@@ -115,10 +115,10 @@ def Adjust_Ship_Laser_Recharge(
     '''
     Adjust ship laser regeneration rate.
     
-    scaling_factor:
-        Multiplier to apply to any ship type not found in adjustment_factors_dict.
-    adjustment_factors_dict:
-        Dict keyed by ship type, holding a scaling factor to be applied.
+    * scaling_factor:
+      - Multiplier to apply to any ship type not found in adjustment_factors_dict.
+    * adjustment_factors_dict:
+      - Dict keyed by ship type, holding a scaling factor to be applied.
     '''
     for this_dict in Load_File('TShips.txt'):
         if this_dict['subtype'] in adjustment_factors_dict or scaling_factor != 1:
@@ -144,10 +144,10 @@ def Adjust_Ship_Pricing(
     '''
     Adjust ship pricing.
 
-    The adjustment_factors_dict is a dict keyed by ship type, holding a scaling
-     factor to be applied.
-    The flat scaling_factor will be applied to any ship type not found in
-     adjustment_factors_dict.
+    * scaling_factor:
+      - Multiplier for any ship not matched in adjustment_factors_dict.
+    * adjustment_factors_dict:
+      - Dict keyed by ship type, holding a scaling factor to be applied.
     '''
     for this_dict in Load_File('TShips.txt'):
         if this_dict['subtype'] in adjustment_factors_dict or scaling_factor != 1:
@@ -176,11 +176,11 @@ def Adjust_Ship_Shield_Regen(
     '''
     Adjust ship shield regeneration rate.
     
-    scaling_factor:
-        Multiplier to apply to all ship types on top of those present
+    * scaling_factor:
+      - Multiplier to apply to all ship types on top of those present
         in adjustment_factors_dict.
-    adjustment_factors_dict:
-        Dict keyed by ship type, holding a  tuple of 
+    * adjustment_factors_dict:
+      - Dict keyed by ship type, holding a tuple of 
         (targeted_recharge_rate, reduction_factor, max_rate)
         where any recharges above targeted_recharge_rate will have the 
         reduction_factor applied to the difference in original and target 
@@ -229,10 +229,11 @@ def Adjust_Ship_Shield_Slots(
      equipped, or ships may lack enough shield inventory to fill
      up added slots.
     
-    The adjustment_factors_dict is a dict keyed by ship type, holding a
-     tuple of (targeted_total_shielding, reduction_factor), where any ships 
-     with shield above targeted_total_shielding will have reduction_factor
-     applied to their shield amount above the target.
+    * adjustment_factors_dict:
+      - Dict keyed by ship type, holding a tuple of 
+        (targeted_total_shielding, reduction_factor), where any ships 
+        with shields above targeted_total_shielding will have reduction_factor
+        applied to their shield amount above the target.
     '''
     #TODO: maybe support increasing shielding.
     for this_dict in Load_File('TShips.txt'):
@@ -333,8 +334,8 @@ def Simplify_Engine_Trails(
     This will switch to effect 1 for medium and light ships 
      and 0 for heavy ships, as in vanilla AP.
 
-    remove_trails:
-        If True, this will remove trails from all ships.
+    * remove_trails:
+      - If True, this will remove trails from all ships.
     '''
     #Classify the light ships to get a basic trail.
     light_ships = [

@@ -17,17 +17,17 @@ def Standardize_Tunings(
     '''
     If the number of randomized tuning creates at gamestart should be
      de-randomized into a standard number of tunings.
-    Note: vanilla has 3.5 average tunings per crate, 8 crates total.
-    Default args here reach this average, biasing slightly toward engine tunings.
+    Note: vanilla has 2-5 average tunings per crate, 8 crates total.
+    Default args here reach this average, biasing toward engine tunings.
 
-    enging_tuning_crates:
-        Int, the number of engine tuning crates to spawn.
-    rudder_tuning_crates:
-        Int, the number of rudder tuning crates to spawn.
-    engine_tunings_per_crate:
-        Int, the number of tunings in each engine crate.
-    rudder_tunings_per_crate:
-        Int, the number of tunings in each rudder crate.
+    * enging_tuning_crates:
+      - Int, the number of engine tuning crates to spawn. Default 4.
+    * rudder_tuning_crates:
+      - Int, the number of rudder tuning crates to spawn. Default 4.
+    * engine_tunings_per_crate:
+      - Int, the number of tunings in each engine crate. Default 4.
+    * rudder_tunings_per_crate:
+      - Int, the number of tunings in each rudder crate. Default 3.
 
     '''
     #Make sure the input is an integer.
@@ -167,8 +167,8 @@ def Standardize_Start_Plot_Overtunings(
     Set the starting plots with overtuned ships to have their tunings
      standardized instead of being random.
 
-    fraction_of_max:
-        Float, typically between 0 and 1, the fraction of the max overtuning
+    * fraction_of_max:
+      - Float, typically between 0 and 1, the fraction of the max overtuning
         to use. A value of 0 will remove overtunings, and 1 will give max 
         overtuning that is available in vanilla.
         Default of 0.7 is set to mimic moderate game reloading results.

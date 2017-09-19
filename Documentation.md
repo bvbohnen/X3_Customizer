@@ -78,20 +78,20 @@ Setup methods:
    
        Sets the pathing to be used for file loading and writing.
    
-       path_to_addon_folder:
-           Path to the X3 AP addon folder, containing the source_folder.
+       * path_to_addon_folder:
+         - Path to the X3 AP addon folder, containing the source_folder.
            Output files will be written relative to here.
-           If this is not the addon folder, a warning will be printed but
+         - If this is not the addon folder, a warning will be printed but
            operation will continue, writing files to this folder, though
            files will need to be moved to the proper addon folder to be
            applied to the game. Some generated files may be placed in
            the directory above this folder, eg. the expected TC directory.
    
-       source_folder:
-           Subfolder in the addon directory containing unmodified files, 
+       * source_folder:
+         - Subfolder in the addon directory containing unmodified files, 
            internally having the same folder structure as addon to be
            used when writing out transform results.
-           (eg. output to addon	ypes will source from input in
+         - (eg. output to addon	ypes will source from input in
             addon\source_folder	ypes).
        
 
@@ -113,12 +113,12 @@ Transform List:
       Note: this does not affect fire rate, so multiple beams may become
        active at the same time.
   
-      bullet_name_adjustment_dict:
-          Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with options to
+      * bullet_name_adjustment_dict:
+        - Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with options to
           apply, as a tuple of (min, factor, max), where min and max are
           given in seconds.
-          None may be entered for min or max to disable those limits.
-          '*' entry will match all beam weapons not otherwise named.
+        - None may be entered for min or max to disable those limits.
+        - '*' entry will match all beam weapons not otherwise named.
       
 
  * Adjust_Beam_Weapon_Width
@@ -131,11 +131,11 @@ Transform List:
       widths have much wider variety. This can be used to nerf anti-fighter
       defense of capital ships with beam mounts.
   
-      bullet_name_adjustment_dict:
-          Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with options to
+      * bullet_name_adjustment_dict:
+        - Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with options to
           apply, as a tuple of (min, factor, max), applied to height and width.
-          None may be entered for min or max to disable those limits.
-          '*' entry will match all beam weapons not otherwise named.
+        - None may be entered for min or max to disable those limits.
+        - '*' entry will match all beam weapons not otherwise named.
       
 
  * Adjust_Fade_Start_End_Gap
@@ -146,14 +146,14 @@ Transform List:
       quickly objects will fade in.
       This will never affect fade_start, only fade_end.
   
-      fade_gap_min_func, fade_gap_max_func:
-          Functions which take fade_start as the argument, in km, and return
+      * fade_gap_min_func, fade_gap_max_func:
+        - Functions which take fade_start as the argument, in km, and return
           the min and max gap allowed.
-          Example: 
-              Set fade gap to be as much as fade start:
-                  fade_gap_min_func = lambda start: start*1
-              Require the fade gap be no longer than 20 km:
-                  fade_gap_max_func = lambda start: 20
+        - Example: 
+          - Set fade gap to be as much as fade start:
+            - fade_gap_min_func = lambda start: start*1
+          - Require the fade gap be no longer than 20 km:
+            - fade_gap_max_func = lambda start: 20
       
 
  * Adjust_Global
@@ -162,40 +162,42 @@ Transform List:
   
       Adjust a global flag by the given multiplier.
       Generic transform works on any named global field.
+  
+      * field_name:
+        - String, name of the field in Globals.txt
+      * scaling_factor:
+        - Multiplier to apply to the existing value.
       
 
  * Adjust_Job_Count
   
     Requires: Jobs.txt
   
-      Adjusts job counts using a multiplier.
-      These will always have a minimum of 1.
-       new_count = max(1, old_counter * factor)
+      Adjusts job counts using a multiplier. These will always have a minimum of 1.
   
-      job_count_factors:
-          List of tuples pairing an identifier key with the adjustment value to apply.
+      * job_count_factors:
+        - List of tuples pairing an identifier key with the adjustment value to apply.
           The first match will be used.
-          Key will try to match an boolean field in the jobs file (see File_Fields
+        - Key will try to match an boolean field in the jobs file (see File_Fields
           for field names), or failing that will try to do a job name match (partial
           match supported) based on the name in the jobs file.
-          '*' will match all jobs not otherwise matched.
+        - '*' will match all jobs not otherwise matched.
       
 
  * Adjust_Job_Respawn_Time
   
     Requires: Jobs.txt
   
-      Adjusts job respawn times, using an adder and multiplier on
-       the existing respawn time.
-          new_time = old_time * multiplier + adder
+      Adjusts job respawn times, using an adder and multiplier on the 
+      existing respawn time.
   
-      time_adder_list, time_multiplier_list:
-          Lists of tuples pairing an identifier key with the adjustment value to apply.
+      * time_adder_list, time_multiplier_list:
+        - Lists of tuples pairing an identifier key with the adjustment value to apply.
           The first match will be used.
-          Key will try to match an boolean field in the jobs file (see File_Fields
+        - Key will try to match an boolean field in the jobs file (see File_Fields
           for field names), or failing that will try to do a job name match (partial
           match supported) based on the name in the jobs file.
-          '*' will match all jobs not otherwise matched.
+        - '*' will match all jobs not otherwise matched.
       
 
  * Adjust_Missile_Damage
@@ -206,12 +208,12 @@ Transform List:
       The scaling_factor is applied prior to the diminishing returns
        formula.
   
-      use_diminishing_returns:
-          If True, a hardcoded diminishing returns formula is applied 
+      * use_diminishing_returns:
+        - If True, a hardcoded diminishing returns formula is applied 
           which reduces heavy missile damage by up to ~80%,
           while keeping small missiles unchanged.
-      print_changes:
-          If True, speed adjustments are printed to the summary file.
+      * print_changes:
+        - If True, speed adjustments are printed to the summary file.
       
 
  * Adjust_Missile_Hulls
@@ -220,6 +222,9 @@ Transform List:
   
       Adjust the hull value for all missiles by the scaling factor.
       Does not affect boarding pod hulls.
+  
+      * scaling_factor:
+        - Multiplier on missile hull values.
       
 
  * Adjust_Missile_Range
@@ -230,16 +235,16 @@ Transform List:
       This is particularly effective for the re-lock missiles like flail,
        to reduce their ability to just keep retargetting across a system,
        instead running out of fuel from the zigzagging.
-  
-      If use_diminishing_returns == True, this will attempt to adjust
-       missiles with a range near target_range_to_adjust_km by the scaling_factor,
-       while missiles with a range near range_to_keep_static_km will be
-       kept largely unchanged.
-       Otherwise, scaling_factor is applied to all missiles.
-      target_range_to_adjust_km, range_to_keep_static_km:
-          Equation tuning values, in kilometers.
-      print_changes:
-          If True, speed adjustments are printed to the summary file.
+       
+      * use_diminishing_returns:
+        - If True, this will attempt to adjust missiles with a range near 
+        target_range_to_adjust_km by the scaling_factor, while missiles with a 
+        range near range_to_keep_static_km will be kept largely unchanged.
+        Otherwise, scaling_factor is applied to all missiles.
+      * target_range_to_adjust_km, range_to_keep_static_km:
+        - Equation tuning values, in kilometers.
+      * print_changes:
+        - If True, speed adjustments are printed to the summary file.
       
 
  * Adjust_Missile_Speed
@@ -248,15 +253,15 @@ Transform List:
   
       Adjust missile speeds.
   
-      If use_diminishing_returns == True, this will attempt to adjust
-       missiles with a speed near target_speed_to_adjust by the scaling_factor,
-       while missiles with a speed near speed_to_keep_static will be
-       kept largely unchanged.
-       Otherwise, scaling_factor is applied to all missiles.
-      target_speed_to_adjust, speed_to_keep_static:
-          Equation tuning values, in m/s.
-      print_changes:
-          If True, speed adjustments are printed to the summary file.
+      * use_diminishing_returns:
+        - If True, this will attempt to adjust missiles with a speed near 
+        target_speed_to_adjust by the scaling_factor, while missiles with a 
+        speed near speed_to_keep_static will be kept largely unchanged.
+        Otherwise, scaling_factor is applied to all missiles.
+      * target_speed_to_adjust, speed_to_keep_static:
+        - Equation tuning values, in m/s.
+      * print_changes:
+        - If True, speed adjustments are printed to the summary file.
       
 
  * Adjust_Particle_Count
@@ -267,11 +272,11 @@ Transform List:
       Default game is 100, mods often set to 0, but can keep some small number
        for a feeling of speed.
   
-      base_count:
-          The base number of particles to use in all sectors.
+      * base_count:
+        - The base number of particles to use in all sectors.
           Default is 10, or 10% of the vanilla particle count.
-      fog_factor:
-          The portion of sector fog to add as additional particles.
+      * fog_factor:
+        - The portion of sector fog to add as additional particles.
           Eg. a fog factor of 0.5 will add 25 more particles in heavy fog.
       
 
@@ -285,10 +290,10 @@ Transform List:
       ships to 100% hull. Alternatively, ship hulls will be updated as 
       ships die and respawn.
   
-      scaling_factor:
-          Multiplier to apply to any ship type not found in adjustment_factors_dict.
-      adjustment_factors_dict:
-          Dict keyed by ship type, holding a scaling factor to be applied.
+      * scaling_factor:
+        - Multiplier to apply to any ship type not found in adjustment_factors_dict.
+      * adjustment_factors_dict:
+        - Dict keyed by ship type, holding a scaling factor to be applied.
       
 
  * Adjust_Ship_Laser_Recharge
@@ -297,10 +302,10 @@ Transform List:
   
       Adjust ship laser regeneration rate.
       
-      scaling_factor:
-          Multiplier to apply to any ship type not found in adjustment_factors_dict.
-      adjustment_factors_dict:
-          Dict keyed by ship type, holding a scaling factor to be applied.
+      * scaling_factor:
+        - Multiplier to apply to any ship type not found in adjustment_factors_dict.
+      * adjustment_factors_dict:
+        - Dict keyed by ship type, holding a scaling factor to be applied.
       
 
  * Adjust_Ship_Pricing
@@ -309,10 +314,10 @@ Transform List:
   
       Adjust ship pricing.
   
-      The adjustment_factors_dict is a dict keyed by ship type, holding a scaling
-       factor to be applied.
-      The flat scaling_factor will be applied to any ship type not found in
-       adjustment_factors_dict.
+      * scaling_factor:
+        - Multiplier for any ship not matched in adjustment_factors_dict.
+      * adjustment_factors_dict:
+        - Dict keyed by ship type, holding a scaling factor to be applied.
       
 
  * Adjust_Ship_Shield_Regen
@@ -321,11 +326,11 @@ Transform List:
   
       Adjust ship shield regeneration rate.
       
-      scaling_factor:
-          Multiplier to apply to all ship types on top of those present
+      * scaling_factor:
+        - Multiplier to apply to all ship types on top of those present
           in adjustment_factors_dict.
-      adjustment_factors_dict:
-          Dict keyed by ship type, holding a  tuple of 
+      * adjustment_factors_dict:
+        - Dict keyed by ship type, holding a tuple of 
           (targeted_recharge_rate, reduction_factor, max_rate)
           where any recharges above targeted_recharge_rate will have the 
           reduction_factor applied to the difference in original and target 
@@ -344,10 +349,11 @@ Transform List:
        equipped, or ships may lack enough shield inventory to fill
        up added slots.
       
-      The adjustment_factors_dict is a dict keyed by ship type, holding a
-       tuple of (targeted_total_shielding, reduction_factor), where any ships 
-       with shield above targeted_total_shielding will have reduction_factor
-       applied to their shield amount above the target.
+      * adjustment_factors_dict:
+        - Dict keyed by ship type, holding a tuple of 
+          (targeted_total_shielding, reduction_factor), where any ships 
+          with shields above targeted_total_shielding will have reduction_factor
+          applied to their shield amount above the target.
       
 
  * Adjust_Ship_Speed
@@ -356,10 +362,10 @@ Transform List:
   
       Adjust ship speeds. Does not affect acceleration.
       
-      scaling_factor:
-          Multiplier to apply to any ship type not found in adjustment_factors_dict.
-      adjustment_factors_dict:
-          Dict keyed by ship type, holding a scaling factor to be applied.
+      * scaling_factor:
+        - Multiplier to apply to any ship type not found in adjustment_factors_dict.
+      * adjustment_factors_dict:
+        - Dict keyed by ship type, holding a scaling factor to be applied.
       
 
  * Adjust_Strafe
@@ -367,12 +373,12 @@ Transform List:
     Requires: Globals.txt
   
       Strafe adjustment factor.
-      Note: this does not appear to have any effect.
+      Note: this does not appear to have any effect during brief testing.
       
-      small_ship_factor:
-          Multiplier on small ship strafe.
-      big_ship_factor:
-          Multiplier on big ship strafe.
+      * small_ship_factor:
+        - Multiplier on small ship strafe.
+      * big_ship_factor:
+        - Multiplier on big ship strafe.
       
 
  * Adjust_Weapon_DPS
@@ -384,31 +390,31 @@ Transform List:
       be used for DPS calculation.
       Energy efficiency will remain constant, changing energy/second.
   
-      scaling_factor:
-          The base multiplier to apply to shot speeds.
-      use_scaling_equation:
-          If True, a scaling formula will be applied, such
+      * scaling_factor:
+        - The base multiplier to apply to shot speeds.
+      * use_scaling_equation:
+        - If True, a scaling formula will be applied, such
           that shots near damage_to_adjust_kdps see the full scaling_factor,
           and shots near damage_to_keep_static_kdps remain largely unchanged.
-      damage_to_adjust_kdps, damage_to_keep_static_kdps:
-          Equation tuning values, in units of kdps, eg. 1 for 1000 damage/second.
+      * damage_to_adjust_kdps, damage_to_keep_static_kdps:
+        - Equation tuning values, in units of kdps, eg. 1 for 1000 damage/second.
           Scaling values are for shield DPS; hull DPS will be scaled at a
           rate of 1/6 of shield DPS.
-      bullet_name_adjustment_dict:
-          Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with the
+      * bullet_name_adjustment_dict:
+        - Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with the
           multiplier to apply. This also supports matching to bullet
           flags using a 'flag_' prefix, eg. 'flag_beam' will match
           to beam weapons. Flag matches are lower priority than
           name matches.
-          If multiple flag matches are found, the first flag will
+        - If multiple flag matches are found, the first flag will
           be used if the input is an OrderedDict, otherwise any
           Python default is used (likely equivelent to ordereddict
           in Python 3.6).
-          '*' entry will match all weapons not otherwise matched,
+        - '*' entry will match all weapons not otherwise matched,
           equivelent to setting scaling_factor and not using the
           scaling equation.
-      print_changes:
-          If True, speed adjustments are printed to the summary file.  
+      * print_changes:
+        - If True, speed adjustments are printed to the summary file.  
       
 
  * Adjust_Weapon_Energy_Usage
@@ -417,10 +423,10 @@ Transform List:
   
       Adjusts weapon energy usage by the given multiplier.
   
-      scaling_factor:
-          Multiplier to apply to all weapons without specific settings.
-      bullet_name_energy_dict:
-          Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the
+      * scaling_factor:
+        - Multiplier to apply to all weapons without specific settings.
+      * bullet_name_energy_dict:
+        - Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the
           multiplier to apply. This will override scaling_factor for
           this weapon.
       
@@ -436,16 +442,16 @@ Transform List:
       If a bullet is used by multiple lasers, the first laser will
        be used for fire rate damage and energy adjustment.
   
-      scaling_factor:
-          The base multiplier to apply to fire rate.
-      laser_name_adjustment_dict:
-          Dict, keyed by laser name (eg. 'SS_LASER_HEPT'), with the
+      * scaling_factor:
+        - The base multiplier to apply to fire rate.
+      * laser_name_adjustment_dict:
+        - Dict, keyed by laser name (eg. 'SS_LASER_HEPT'), with the
           multiplier to apply instead of using the scaling_factor.     
-      fire_rate_floor:
-          Int, the floor below which fire rate will not be reduced, 
+      * fire_rate_floor:
+        - Int, the floor below which fire rate will not be reduced, 
           in shots per minute. Eg. 60 for 1/second.
-      skip_ammo_weapons:
-          If True, the fire rate change will ignore ammo weapons, since there is 
+      * skip_ammo_weapons:
+        - If True, the fire rate change will ignore ammo weapons, since there is 
           no good way to adjust ammo consumption.
       
 
@@ -457,8 +463,8 @@ Transform List:
        combat evaluation, at the potential drawback of stalemates when shield
        regeneration outperforms damage.
   
-      scaling_factor:
-          The base multiplier to apply to OOS damage.
+      * scaling_factor:
+        - The base multiplier to apply to OOS damage.
       
 
  * Adjust_Weapon_Range
@@ -469,10 +475,10 @@ Transform List:
       To modify range, consider that range = speed * lifetime.
        Eg. 1.2 * 1.2 = 44% range increase.
   
-      lifetime_scaling_factor:
-          Multiplier to apply to all bullet lifetimes.
-      speed_scaling_factor:
-          Multiplier to apply to all bullet speeds.
+      * lifetime_scaling_factor:
+        - Multiplier to apply to all bullet lifetimes.
+      * speed_scaling_factor:
+        - Multiplier to apply to all bullet speeds.
       
 
  * Adjust_Weapon_Shot_Speed
@@ -482,27 +488,27 @@ Transform List:
       Adjust weapon shot speeds. Range will remain constant.
       Beam weapons will not be affected.
   
-      scaling_factor:
-          The base multiplier to apply to shot speeds.
-      use_scaling_equation:
-          If True, a scaling formula will be applied, such
+      * scaling_factor:
+        - The base multiplier to apply to shot speeds.
+      * use_scaling_equation:
+        - If True, a scaling formula will be applied, such
           that shots near target_speed_to_adjust see the full scaling_factor,
           and shots near speed_to_keep_static remain largely unchanged.
-      target_speed_to_adjust, speed_to_keep_static:
-          Equation tuning values, in meters/second.
-      bullet_name_adjustment_dict:
-          Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with the
+      * target_speed_to_adjust, speed_to_keep_static:
+        - Equation tuning values, in meters/second.
+      * bullet_name_adjustment_dict:
+        - Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with the
           multiplier to apply.
-          '*' entry will match all weapons not otherwise named,
+        - '*' entry will match all weapons not otherwise named,
           equivelent to setting scaling_factor and not using the
           scaling equation.
-      skip_areal:
-          If True, areal weapons (eg. PD and PSG) are skipped, since their
+      * skip_areal:
+        - If True, areal weapons (eg. PD and PSG) are skipped, since their
           damage delivery may be partially dependent on shot speed.
-      skip_flak: 
-          If True, flak weapons are skipped.
-      print_changes:
-          If True, speed adjustments are printed to the summary file.
+      * skip_flak: 
+        - If True, flak weapons are skipped.
+      * print_changes:
+        - If True, speed adjustments are printed to the summary file.
       
 
  * Boost_Truelight_Seeker_Shield_Reactor
@@ -521,6 +527,9 @@ Transform List:
     Requires: TBullets.txt
   
       Clears the specified flag from all weapons.
+  
+      * flag_name:
+        - Bullet property flag name, as found in Flags.py.
       
 
  * Color_Sector_Names
@@ -534,8 +543,8 @@ Transform List:
       Note: searching sectors by typing a name will no longer work
        except on uncolored sectors, eg. unknown sectors.
   
-      race_color_letters:
-          Dict matching race id to the color code to be used.
+      * race_color_letters:
+        - Dict matching race id string to the color code string to be used.
           Default is filled out similar to the standalone colored sectors mod.
       
 
@@ -547,14 +556,14 @@ Transform List:
       when beams are fired at large ships and stations. Bullet speed will 
       be set based on sampling other bullets of similar damage.
   
-      beams_not_converted:
-          List of bullet names for weapons not to be converted.
+      * beams_not_converted:
+        - List of bullet names for weapons not to be converted.
           Default includes repair and tug lasers.
-      speed_samples:
-          Int, the number of similar DPS weapons to sample when setting the
+      * speed_samples:
+        - Int, the number of similar DPS weapons to sample when setting the
           bullet speed. Default 4.
-      sample_type:
-          String, one of ['min','avg'], if the minimum or average of speed
+      * sample_type:
+        - String, one of ['min','avg'], if the minimum or average of speed
           ratio of sampled similar DPS weapons should be used. Default 'min'.
       
 
@@ -565,15 +574,15 @@ Transform List:
       Converts the given weapons, determined by bullet type, to use ammo
       instead of ammunition.
   
-      bullet_name_energy_dict:
-          Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the ammo
+      * bullet_name_energy_dict:
+        - Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the ammo
           type to use in the replacement.
           Ammo type is given by a ware id value, or by a preconfigured string
           name.
           Currently supported ammo names:
-              'Mass Driver Ammunition'
-      energy_reduction_factor:
-          Multiplier on existing weapon energy, such that after ammo conversion
+              ['Mass Driver Ammunition']
+      * energy_reduction_factor:
+        - Multiplier on existing weapon energy, such that after ammo conversion
           the weapon will still use a small energy amount.
           Default will cut energy use by 90%, which is roughly the Vanilla 
           difference between MD and PAC energy.
@@ -587,8 +596,8 @@ Transform List:
       instead of ammunition. Ammo type may support general wares, and
       will reduce a ware by 1 per 200 shots.
   
-      bullet_name_energy_dict:
-          Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the energy
+      * bullet_name_energy_dict:
+        - Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the energy
           value to use in the replacement.
       
 
@@ -628,14 +637,12 @@ Transform List:
       which use it. Fade is removed from sectors which will not have their
       stars removed.
       
-      fog_requirement:
-          The fog requirement for star removal; all backgrounds affected need a
-           fog above this much.
-          This is not as important as fade distance in general, it seems.
-           Set to 12, which is used by a background that shares images with the
-            background used by Maelstrom, which should be faded.
-      fade_distance_requirement_km:
-          The highest fade distance to allow; all backgrounds affected need a
+      * fog_requirement:
+        - The fog requirement for star removal; all backgrounds affected need a
+           fog above this much. Default of 12 is set for matching the Maelstrom 
+           background.
+      * fade_distance_requirement_km:
+        - The highest fade distance to allow; all backgrounds affected need a
            fade_start under this value (to prevent star removal in high visibility
            sectors). In km.
       
@@ -673,11 +680,11 @@ Transform List:
       Replaces shot effects to possibly reduce lag.
       This appears to have little to no benefit in brief testing.
   
-      impact_replacement:
-          Int, the effect to use for impacts. Eg. 19 for mass driver effect.
+      * impact_replacement:
+        - Int, the effect to use for impacts. Eg. 19 for mass driver effect.
           Avoid using 0, else sticky white lights have been observed.
-      launch_replacement:
-          Int, the effect to use for weapon launch.
+      * launch_replacement:
+        - Int, the effect to use for weapon launch.
       
 
  * Restore_Aldrin_rock
@@ -689,29 +696,39 @@ Transform List:
       Note: only works on a new game.
       
 
+ * Restore_Heavy_Missile_Trail
+  
+    Requires: TMissiles.txt
+  
+      Minor transform to set heavy missile trails to those in vanilla AP.
+      
+
  * Restore_Hub_Music
   
     Requires: x3_universe.xml
   
-      If Hub music should be restored (XRM breaks it by setting the track to 0).
+      If Hub sector (13,8) music should be restored to that in AP.
+      (XRM sets the track to 0.)
       Note: editing x3_universe only works on a new game.
   
-      apply_to_existing_save:
-       If True, makes a drop-in director script that will fire once
-       and change the music for an existing save game.
+      * apply_to_existing_save:
+        - If True, makes a drop-in director script that will fire once
+          and change the music for an existing save game. This is not reversable
+          at this time.
       
 
  * Restore_M148_Music
   
     Requires: x3_universe.xml
   
-      If Argon Sector M148 music should be restored to that in AP.
+      If Argon Sector M148 (14,8) music should be restored to that in AP.
        (XRM changes this to the argon prime music.)
       Note: editing x3_universe only works on a new game.
-  
-      apply_to_existing_save:
-       If True, makes a drop-in director script that will fire once
-       and change the music for an existing save game.
+      
+      * apply_to_existing_save:
+        - If True, makes a drop-in director script that will fire once
+          and change the music for an existing save game. This is not reversable
+          at this time.
       
 
  * Restore_Vanilla_Tuning_Pricing
@@ -722,18 +739,14 @@ Transform List:
       used in vanilla AP.
       
 
- * Restore_heavy_missile_trail
-  
-    Requires: TMissiles.txt
-  
-      Minor transform to set heavy missile trails to those in vanilla AP.
-      
-
  * Set_Communication_Distance
   
     Requires: Globals.txt
   
       Set max distance for opening communications with factories and ships.
+  
+      * distance_in_km
+        - Int, max communication distance.
       
 
  * Set_Complex_Connection_Distance
@@ -743,6 +756,9 @@ Transform List:
       Set max range between factories in a complex.
       With complex cleaner and tubeless complexes, this can practically be anything, 
        particularly useful when connecting up distant asteroids.
+  
+      * distance_in_km
+        - Int, max connection distance.
       
 
  * Set_Dock_Storage_Capacity
@@ -751,12 +767,12 @@ Transform List:
   
       Change the capacity of storage docks: equipment docks, trading posts, etc.
   
-      player_factor:
-          Multiplier for player docks. Vanilla default is 3.
-      npc_factor:
-          Multiplier for npc docks. Vanilla default is 1.
-      hub_factor:
-          Multiplier for the Hub. Vanilla default is 6.
+      * player_factor:
+        - Int, multiplier for player docks. Vanilla default is 3.
+      * npc_factor:
+        - Int, multiplier for npc docks. Vanilla default is 1.
+      * hub_factor:
+        - Int, multiplier for the Hub. Vanilla default is 6.
       
 
  * Set_Global
@@ -765,6 +781,11 @@ Transform List:
   
       Set a global flag to the given value.
       Generic transform works on any named global field.
+  
+      * field_name:
+        - String, name of the field in Globals.txt
+      * value:
+        - Int, the value to set.
       
 
  * Set_Minimum_Fade_Distance
@@ -778,8 +799,8 @@ Transform List:
        it would otherwise be lower. Recommend following this with a
        call to Adjust_Fade_Start_End_Gap.
   
-      distance_in_km : 
-          Minimum fade distance, in km.
+      * distance_in_km : 
+        - Minimum fade distance, in km.
       
 
  * Set_Missile_Swarm_Count
@@ -788,6 +809,9 @@ Transform List:
   
       Set the number of submissiles fired by swarm missiles.
       Submissile damage is adjusted accordingly to maintain overall damage.
+  
+      * swarm_count:
+        - Int, the number of missiles per swarm.
       
 
  * Set_Ware_Pricing
@@ -799,11 +823,11 @@ Transform List:
       the game pricing.
       Currently only works on tech wares in TWareT.txt.
   
-      name_price_dict:
-          Dict keyed by ware name (eg. SS_WARE_TECH213), holding the
+      * name_price_dict:
+        - Dict keyed by ware name (eg. 'SS_WARE_TECH213'), holding the
           flat value to apply for its T file price.
-      name_price_factor_dict:
-          As above, except holding a multiplier to apply to the existing
+      * name_price_factor_dict:
+        - As above, except holding a multiplier to apply to the existing
           price for the ware.
           Applies after name_price_dict if an item is in both dicts.
       
@@ -816,8 +840,8 @@ Transform List:
       This will switch to effect 1 for medium and light ships 
        and 0 for heavy ships, as in vanilla AP.
   
-      remove_trails:
-          If True, this will remove trails from all ships.
+      * remove_trails:
+        - If True, this will remove trails from all ships.
       
 
  * Standardize_Start_Plot_Overtunings
@@ -827,8 +851,8 @@ Transform List:
       Set the starting plots with overtuned ships to have their tunings
        standardized instead of being random.
   
-      fraction_of_max:
-          Float, typically between 0 and 1, the fraction of the max overtuning
+      * fraction_of_max:
+        - Float, typically between 0 and 1, the fraction of the max overtuning
           to use. A value of 0 will remove overtunings, and 1 will give max 
           overtuning that is available in vanilla.
           Default of 0.7 is set to mimic moderate game reloading results.
@@ -840,17 +864,17 @@ Transform List:
   
       If the number of randomized tuning creates at gamestart should be
        de-randomized into a standard number of tunings.
-      Note: vanilla has 3.5 average tunings per crate, 8 crates total.
-      Default args here reach this average, biasing slightly toward engine tunings.
+      Note: vanilla has 2-5 average tunings per crate, 8 crates total.
+      Default args here reach this average, biasing toward engine tunings.
   
-      enging_tuning_crates:
-          Int, the number of engine tuning crates to spawn.
-      rudder_tuning_crates:
-          Int, the number of rudder tuning crates to spawn.
-      engine_tunings_per_crate:
-          Int, the number of tunings in each engine crate.
-      rudder_tunings_per_crate:
-          Int, the number of tunings in each rudder crate.
+      * enging_tuning_crates:
+        - Int, the number of engine tuning crates to spawn. Default 4.
+      * rudder_tuning_crates:
+        - Int, the number of rudder tuning crates to spawn. Default 4.
+      * engine_tunings_per_crate:
+        - Int, the number of tunings in each engine crate. Default 4.
+      * rudder_tunings_per_crate:
+        - Int, the number of tunings in each rudder crate. Default 3.
   
       
 

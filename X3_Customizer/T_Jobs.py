@@ -44,17 +44,15 @@ def Adjust_Job_Count(
     job_count_factors = [('*', 1)]
     ):
     '''
-    Adjusts job counts using a multiplier.
-    These will always have a minimum of 1.
-     new_count = max(1, old_counter * factor)
+    Adjusts job counts using a multiplier. These will always have a minimum of 1.
 
-    job_count_factors:
-        List of tuples pairing an identifier key with the adjustment value to apply.
+    * job_count_factors:
+      - List of tuples pairing an identifier key with the adjustment value to apply.
         The first match will be used.
-        Key will try to match an boolean field in the jobs file (see File_Fields
+      - Key will try to match an boolean field in the jobs file (see File_Fields
         for field names), or failing that will try to do a job name match (partial
         match supported) based on the name in the jobs file.
-        '*' will match all jobs not otherwise matched.
+      - '*' will match all jobs not otherwise matched.
     '''
     #Loop over the jobs.
     for this_dict in Load_File('Jobs.txt'):
@@ -83,17 +81,16 @@ def Adjust_Job_Respawn_Time(
     time_multiplier_list = [('*', 1)]
     ):
     '''
-    Adjusts job respawn times, using an adder and multiplier on
-     the existing respawn time.
-        new_time = old_time * multiplier + adder
+    Adjusts job respawn times, using an adder and multiplier on the 
+    existing respawn time.
 
-    time_adder_list, time_multiplier_list:
-        Lists of tuples pairing an identifier key with the adjustment value to apply.
+    * time_adder_list, time_multiplier_list:
+      - Lists of tuples pairing an identifier key with the adjustment value to apply.
         The first match will be used.
-        Key will try to match an boolean field in the jobs file (see File_Fields
+      - Key will try to match an boolean field in the jobs file (see File_Fields
         for field names), or failing that will try to do a job name match (partial
         match supported) based on the name in the jobs file.
-        '*' will match all jobs not otherwise matched.
+      - '*' will match all jobs not otherwise matched.
     '''
     #Loop over the jobs.
     for this_dict in Load_File('Jobs.txt'):

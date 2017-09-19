@@ -22,20 +22,20 @@ def Set_Path(
     '''
     Sets the pathing to be used for file loading and writing.
 
-    path_to_addon_folder:
-        Path to the X3 AP addon folder, containing the source_folder.
+    * path_to_addon_folder:
+      - Path to the X3 AP addon folder, containing the source_folder.
         Output files will be written relative to here.
-        If this is not the addon folder, a warning will be printed but
+      - If this is not the addon folder, a warning will be printed but
         operation will continue, writing files to this folder, though
         files will need to be moved to the proper addon folder to be
         applied to the game. Some generated files may be placed in
         the directory above this folder, eg. the expected TC directory.
 
-    source_folder:
-        Subfolder in the addon directory containing unmodified files, 
+    * source_folder:
+      - Subfolder in the addon directory containing unmodified files, 
         internally having the same folder structure as addon to be
         used when writing out transform results.
-        (eg. output to addon\types will source from input in
+      - (eg. output to addon\types will source from input in
          addon\source_folder\types).
     '''
     global Path_to_addon_folder

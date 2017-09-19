@@ -21,6 +21,9 @@ def Set_Missile_Swarm_Count(
     '''
     Set the number of submissiles fired by swarm missiles.
     Submissile damage is adjusted accordingly to maintain overall damage.
+
+    * swarm_count:
+      - Int, the number of missiles per swarm.
     '''
     for this_dict in Load_File('Globals.txt'):
         if this_dict['name'] == 'SG_MISSILE_SWARM_COUNT':
@@ -72,6 +75,9 @@ def Adjust_Missile_Hulls(
     '''
     Adjust the hull value for all missiles by the scaling factor.
     Does not affect boarding pod hulls.
+
+    * scaling_factor:
+      - Multiplier on missile hull values.
     '''
     for this_dict in Load_File('Globals.txt'):
         #Look for any of the missile hull fields.
@@ -101,6 +107,9 @@ def Set_Communication_Distance(
     ):
     '''
     Set max distance for opening communications with factories and ships.
+
+    * distance_in_km
+      - Int, max communication distance.
     '''
     #Give range in meters.
     Set_Global('SG_MAX_DISTANCE_COMM', distance_in_km * 1000)
@@ -114,6 +123,9 @@ def Set_Complex_Connection_Distance(
     Set max range between factories in a complex.
     With complex cleaner and tubeless complexes, this can practically be anything, 
      particularly useful when connecting up distant asteroids.
+
+    * distance_in_km
+      - Int, max connection distance.
     '''
     #Give range in meters.
     Set_Global('SG_MAX_DISTANCE_BUILDCOMPLEX', distance_in_km * 1000)
@@ -128,12 +140,12 @@ def Set_Dock_Storage_Capacity(
     '''
     Change the capacity of storage docks: equipment docks, trading posts, etc.
 
-    player_factor:
-        Multiplier for player docks. Vanilla default is 3.
-    npc_factor:
-        Multiplier for npc docks. Vanilla default is 1.
-    hub_factor:
-        Multiplier for the Hub. Vanilla default is 6.
+    * player_factor:
+      - Int, multiplier for player docks. Vanilla default is 3.
+    * npc_factor:
+      - Int, multiplier for npc docks. Vanilla default is 1.
+    * hub_factor:
+      - Int, multiplier for the Hub. Vanilla default is 6.
     '''
     Set_Global('SG_DOCK_STORAGE_FACTOR', player_factor)
     Set_Global('SG_NPC_DOCK_STORAGE_FACTOR', npc_factor)
@@ -150,12 +162,12 @@ def Adjust_Strafe(
     ):
     '''
     Strafe adjustment factor.
-    Note: this does not appear to have any effect.
+    Note: this does not appear to have any effect during brief testing.
     
-    small_ship_factor:
-        Multiplier on small ship strafe.
-    big_ship_factor:
-        Multiplier on big ship strafe.
+    * small_ship_factor:
+      - Multiplier on small ship strafe.
+    * big_ship_factor:
+      - Multiplier on big ship strafe.
     '''
     #Appears to use an integer value which may be in the standard
     # 2 meters / ms metric.
@@ -170,6 +182,11 @@ def Set_Global(field_name, value):
     '''
     Set a global flag to the given value.
     Generic transform works on any named global field.
+
+    * field_name:
+      - String, name of the field in Globals.txt
+    * value:
+      - Int, the value to set.
     '''
     for this_dict in Load_File('Globals.txt'):
         if this_dict['name'] == field_name:
@@ -183,6 +200,11 @@ def Adjust_Global(field_name, scaling_factor):
     '''
     Adjust a global flag by the given multiplier.
     Generic transform works on any named global field.
+
+    * field_name:
+      - String, name of the field in Globals.txt
+    * scaling_factor:
+      - Multiplier to apply to the existing value.
     '''
     #Can return early if just multiplying by 1.
     if multiplier == 1:

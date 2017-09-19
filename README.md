@@ -121,10 +121,10 @@ Transform List:
  * Remove_Weapon_Shot_Sound
  * Replace_Weapon_Shot_Effects
  * Restore_Aldrin_rock
+ * Restore_Heavy_Missile_Trail
  * Restore_Hub_Music
  * Restore_M148_Music
  * Restore_Vanilla_Tuning_Pricing
- * Restore_heavy_missile_trail
  * Set_Communication_Distance
  * Set_Complex_Connection_Distance
  * Set_Dock_Storage_Capacity

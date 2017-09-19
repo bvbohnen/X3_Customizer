@@ -185,16 +185,16 @@ def Adjust_Weapon_Fire_Rate(
     If a bullet is used by multiple lasers, the first laser will
      be used for fire rate damage and energy adjustment.
 
-    scaling_factor:
-        The base multiplier to apply to fire rate.
-    laser_name_adjustment_dict:
-        Dict, keyed by laser name (eg. 'SS_LASER_HEPT'), with the
+    * scaling_factor:
+      - The base multiplier to apply to fire rate.
+    * laser_name_adjustment_dict:
+      - Dict, keyed by laser name (eg. 'SS_LASER_HEPT'), with the
         multiplier to apply instead of using the scaling_factor.     
-    fire_rate_floor:
-        Int, the floor below which fire rate will not be reduced, 
+    * fire_rate_floor:
+      - Int, the floor below which fire rate will not be reduced, 
         in shots per minute. Eg. 60 for 1/second.
-    skip_ammo_weapons:
-        If True, the fire rate change will ignore ammo weapons, since there is 
+    * skip_ammo_weapons:
+      - If True, the fire rate change will ignore ammo weapons, since there is 
         no good way to adjust ammo consumption.
     '''
     #TODO: adjust secondary effects: energy drain, etc.
@@ -349,8 +349,8 @@ def Adjust_Weapon_OOS_Damage(
      combat evaluation, at the potential drawback of stalemates when shield
      regeneration outperforms damage.
 
-    scaling_factor:
-        The base multiplier to apply to OOS damage.
+    * scaling_factor:
+      - The base multiplier to apply to OOS damage.
     '''
     #Step through the bullets and scale their OOS numbers.
     for this_dict in Load_File('TBullets.txt'):
@@ -506,27 +506,27 @@ def Adjust_Weapon_Shot_Speed(
     Adjust weapon shot speeds. Range will remain constant.
     Beam weapons will not be affected.
 
-    scaling_factor:
-        The base multiplier to apply to shot speeds.
-    use_scaling_equation:
-        If True, a scaling formula will be applied, such
+    * scaling_factor:
+      - The base multiplier to apply to shot speeds.
+    * use_scaling_equation:
+      - If True, a scaling formula will be applied, such
         that shots near target_speed_to_adjust see the full scaling_factor,
         and shots near speed_to_keep_static remain largely unchanged.
-    target_speed_to_adjust, speed_to_keep_static:
-        Equation tuning values, in meters/second.
-    bullet_name_adjustment_dict:
-        Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with the
+    * target_speed_to_adjust, speed_to_keep_static:
+      - Equation tuning values, in meters/second.
+    * bullet_name_adjustment_dict:
+      - Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with the
         multiplier to apply.
-        '*' entry will match all weapons not otherwise named,
+      - '*' entry will match all weapons not otherwise named,
         equivelent to setting scaling_factor and not using the
         scaling equation.
-    skip_areal:
-        If True, areal weapons (eg. PD and PSG) are skipped, since their
+    * skip_areal:
+      - If True, areal weapons (eg. PD and PSG) are skipped, since their
         damage delivery may be partially dependent on shot speed.
-    skip_flak: 
-        If True, flak weapons are skipped.
-    print_changes:
-        If True, speed adjustments are printed to the summary file.
+    * skip_flak: 
+      - If True, flak weapons are skipped.
+    * print_changes:
+      - If True, speed adjustments are printed to the summary file.
     '''
 
     #-Removed, unused.
@@ -676,31 +676,31 @@ def Adjust_Weapon_DPS(
     be used for DPS calculation.
     Energy efficiency will remain constant, changing energy/second.
 
-    scaling_factor:
-        The base multiplier to apply to shot speeds.
-    use_scaling_equation:
-        If True, a scaling formula will be applied, such
+    * scaling_factor:
+      - The base multiplier to apply to shot speeds.
+    * use_scaling_equation:
+      - If True, a scaling formula will be applied, such
         that shots near damage_to_adjust_kdps see the full scaling_factor,
         and shots near damage_to_keep_static_kdps remain largely unchanged.
-    damage_to_adjust_kdps, damage_to_keep_static_kdps:
-        Equation tuning values, in units of kdps, eg. 1 for 1000 damage/second.
+    * damage_to_adjust_kdps, damage_to_keep_static_kdps:
+      - Equation tuning values, in units of kdps, eg. 1 for 1000 damage/second.
         Scaling values are for shield DPS; hull DPS will be scaled at a
         rate of 1/6 of shield DPS.
-    bullet_name_adjustment_dict:
-        Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with the
+    * bullet_name_adjustment_dict:
+      - Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with the
         multiplier to apply. This also supports matching to bullet
         flags using a 'flag_' prefix, eg. 'flag_beam' will match
         to beam weapons. Flag matches are lower priority than
         name matches.
-        If multiple flag matches are found, the first flag will
+      - If multiple flag matches are found, the first flag will
         be used if the input is an OrderedDict, otherwise any
         Python default is used (likely equivelent to ordereddict
         in Python 3.6).
-        '*' entry will match all weapons not otherwise matched,
+      - '*' entry will match all weapons not otherwise matched,
         equivelent to setting scaling_factor and not using the
         scaling equation.
-    print_changes:
-        If True, speed adjustments are printed to the summary file.  
+    * print_changes:
+      - If True, speed adjustments are printed to the summary file.  
     '''
     tbullets_dict_list = Load_File('TBullets.txt')
     
@@ -897,12 +897,12 @@ def Adjust_Beam_Weapon_Duration(
     Note: this does not affect fire rate, so multiple beams may become
      active at the same time.
 
-    bullet_name_adjustment_dict:
-        Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with options to
+    * bullet_name_adjustment_dict:
+      - Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with options to
         apply, as a tuple of (min, factor, max), where min and max are
         given in seconds.
-        None may be entered for min or max to disable those limits.
-        '*' entry will match all beam weapons not otherwise named.
+      - None may be entered for min or max to disable those limits.
+      - '*' entry will match all beam weapons not otherwise named.
     '''
     for this_dict in Load_File('TBullets.txt'):
         flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
@@ -1006,11 +1006,11 @@ def Adjust_Beam_Weapon_Width(
     widths have much wider variety. This can be used to nerf anti-fighter
     defense of capital ships with beam mounts.
 
-    bullet_name_adjustment_dict:
-        Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with options to
+    * bullet_name_adjustment_dict:
+      - Dict, keyed by bullet name (eg. 'SS_BULLET_PBC'), with options to
         apply, as a tuple of (min, factor, max), applied to height and width.
-        None may be entered for min or max to disable those limits.
-        '*' entry will match all beam weapons not otherwise named.
+      - None may be entered for min or max to disable those limits.
+      - '*' entry will match all beam weapons not otherwise named.
     '''
     #TODO: consider length increases, which may have performance benefit at the
     # drawback of beams maybe visually going through small targets slightly.
@@ -1066,14 +1066,14 @@ def Convert_Beams_To_Bullets(
     when beams are fired at large ships and stations. Bullet speed will 
     be set based on sampling other bullets of similar damage.
 
-    beams_not_converted:
-        List of bullet names for weapons not to be converted.
+    * beams_not_converted:
+      - List of bullet names for weapons not to be converted.
         Default includes repair and tug lasers.
-    speed_samples:
-        Int, the number of similar DPS weapons to sample when setting the
+    * speed_samples:
+      - Int, the number of similar DPS weapons to sample when setting the
         bullet speed. Default 4.
-    sample_type:
-        String, one of ['min','avg'], if the minimum or average of speed
+    * sample_type:
+      - String, one of ['min','avg'], if the minimum or average of speed
         ratio of sampled similar DPS weapons should be used. Default 'min'.
     '''
     for this_dict in Load_File('TBullets.txt'):
@@ -1251,11 +1251,11 @@ def Replace_Weapon_Shot_Effects(
     Replaces shot effects to possibly reduce lag.
     This appears to have little to no benefit in brief testing.
 
-    impact_replacement:
-        Int, the effect to use for impacts. Eg. 19 for mass driver effect.
+    * impact_replacement:
+      - Int, the effect to use for impacts. Eg. 19 for mass driver effect.
         Avoid using 0, else sticky white lights have been observed.
-    launch_replacement:
-        Int, the effect to use for weapon launch.
+    * launch_replacement:
+      - Int, the effect to use for weapon launch.
     '''
     for this_dict in Load_File('TBullets.txt'):
         if impact_replacement != None:
@@ -1286,10 +1286,10 @@ def Adjust_Weapon_Range(
     To modify range, consider that range = speed * lifetime.
      Eg. 1.2 * 1.2 = 44% range increase.
 
-    lifetime_scaling_factor:
-        Multiplier to apply to all bullet lifetimes.
-    speed_scaling_factor:
-        Multiplier to apply to all bullet speeds.
+    * lifetime_scaling_factor:
+      - Multiplier to apply to all bullet lifetimes.
+    * speed_scaling_factor:
+      - Multiplier to apply to all bullet speeds.
     '''
     #TODO: maybe add per-bullet support.
     #Stop early if factors are at defaults.
@@ -1316,10 +1316,10 @@ def Adjust_Weapon_Energy_Usage(
     '''
     Adjusts weapon energy usage by the given multiplier.
 
-    scaling_factor:
-        Multiplier to apply to all weapons without specific settings.
-    bullet_name_energy_dict:
-        Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the
+    * scaling_factor:
+      - Multiplier to apply to all weapons without specific settings.
+    * bullet_name_energy_dict:
+      - Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the
         multiplier to apply. This will override scaling_factor for
         this weapon.
     '''
@@ -1355,8 +1355,8 @@ def Convert_Weapon_To_Energy(
     instead of ammunition. Ammo type may support general wares, and
     will reduce a ware by 1 per 200 shots.
 
-    bullet_name_energy_dict:
-        Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the energy
+    * bullet_name_energy_dict:
+      - Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the energy
         value to use in the replacement.
     '''
     for this_dict in Load_File('TBullets.txt'):
@@ -1383,15 +1383,15 @@ def Convert_Weapon_To_Ammo(
     Converts the given weapons, determined by bullet type, to use ammo
     instead of ammunition.
 
-    bullet_name_energy_dict:
-        Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the ammo
+    * bullet_name_energy_dict:
+      - Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the ammo
         type to use in the replacement.
         Ammo type is given by a ware id value, or by a preconfigured string
         name.
         Currently supported ammo names:
-            'Mass Driver Ammunition'
-    energy_reduction_factor:
-        Multiplier on existing weapon energy, such that after ammo conversion
+            ['Mass Driver Ammunition']
+    * energy_reduction_factor:
+      - Multiplier on existing weapon energy, such that after ammo conversion
         the weapon will still use a small energy amount.
         Default will cut energy use by 90%, which is roughly the Vanilla 
         difference between MD and PAC energy.
@@ -1426,6 +1426,9 @@ def Convert_Weapon_To_Ammo(
 def Clear_Weapon_Flag(flag_name):
     '''
     Clears the specified flag from all weapons.
+
+    * flag_name:
+      - Bullet property flag name, as found in Flags.py.
     '''
     for this_dict in Load_File('TBullets.txt'):
         #Look up the flag, and set to False.

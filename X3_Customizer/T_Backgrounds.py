@@ -112,8 +112,8 @@ def Set_Minimum_Fade_Distance(distance_in_km = 3):
      it would otherwise be lower. Recommend following this with a
      call to Adjust_Fade_Start_End_Gap.
 
-    distance_in_km : 
-        Minimum fade distance, in km.
+    * distance_in_km : 
+      - Minimum fade distance, in km.
     '''
     #Loop over the backgrounds.
     for this_dict in Load_File('TBackgrounds.txt'):
@@ -140,14 +140,14 @@ def Adjust_Fade_Start_End_Gap(
     quickly objects will fade in.
     This will never affect fade_start, only fade_end.
 
-    fade_gap_min_func, fade_gap_max_func:
-        Functions which take fade_start as the argument, in km, and return
+    * fade_gap_min_func, fade_gap_max_func:
+      - Functions which take fade_start as the argument, in km, and return
         the min and max gap allowed.
-        Example: 
-            Set fade gap to be as much as fade start:
-                fade_gap_min_func = lambda start: start*1
-            Require the fade gap be no longer than 20 km:
-                fade_gap_max_func = lambda start: 20
+      - Example: 
+        - Set fade gap to be as much as fade start:
+          - fade_gap_min_func = lambda start: start*1
+        - Require the fade gap be no longer than 20 km:
+          - fade_gap_max_func = lambda start: 20
     '''
     for this_dict in Load_File('TBackgrounds.txt'):
         #Look up existing fade.
@@ -182,11 +182,11 @@ def Adjust_Particle_Count(
     Default game is 100, mods often set to 0, but can keep some small number
      for a feeling of speed.
 
-    base_count:
-        The base number of particles to use in all sectors.
+    * base_count:
+      - The base number of particles to use in all sectors.
         Default is 10, or 10% of the vanilla particle count.
-    fog_factor:
-        The portion of sector fog to add as additional particles.
+    * fog_factor:
+      - The portion of sector fog to add as additional particles.
         Eg. a fog factor of 0.5 will add 25 more particles in heavy fog.
     '''
     for this_dict in Load_File('TBackgrounds.txt'):
@@ -219,14 +219,12 @@ def Remove_Stars_From_Foggy_Sectors(
     which use it. Fade is removed from sectors which will not have their
     stars removed.
     
-    fog_requirement:
-        The fog requirement for star removal; all backgrounds affected need a
-         fog above this much.
-        This is not as important as fade distance in general, it seems.
-         Set to 12, which is used by a background that shares images with the
-          background used by Maelstrom, which should be faded.
-    fade_distance_requirement_km:
-        The highest fade distance to allow; all backgrounds affected need a
+    * fog_requirement:
+      - The fog requirement for star removal; all backgrounds affected need a
+         fog above this much. Default of 12 is set for matching the Maelstrom 
+         background.
+    * fade_distance_requirement_km:
+      - The highest fade distance to allow; all backgrounds affected need a
          fade_start under this value (to prevent star removal in high visibility
          sectors). In km.
     '''

@@ -63,11 +63,11 @@ def Set_Ware_Pricing(
     the game pricing.
     Currently only works on tech wares in TWareT.txt.
 
-    name_price_dict:
-        Dict keyed by ware name (eg. SS_WARE_TECH213), holding the
+    * name_price_dict:
+      - Dict keyed by ware name (eg. 'SS_WARE_TECH213'), holding the
         flat value to apply for its T file price.
-    name_price_factor_dict:
-        As above, except holding a multiplier to apply to the existing
+    * name_price_factor_dict:
+      - As above, except holding a multiplier to apply to the existing
         price for the ware.
         Applies after name_price_dict if an item is in both dicts.
     '''    

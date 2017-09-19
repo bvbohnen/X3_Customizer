@@ -210,8 +210,8 @@ def Color_Sector_Names(
     Note: searching sectors by typing a name will no longer work
      except on uncolored sectors, eg. unknown sectors.
 
-    race_color_letters:
-        Dict matching race id to the color code to be used.
+    * race_color_letters:
+      - Dict matching race id string to the color code string to be used.
         Default is filled out similar to the standalone colored sectors mod.
     '''
     import re
@@ -362,12 +362,14 @@ def Restore_Hub_Music(
     _cleanup = False
     ):
     '''
-    If Hub music should be restored (XRM breaks it by setting the track to 0).
+    If Hub sector (13,8) music should be restored to that in AP.
+    (XRM sets the track to 0.)
     Note: editing x3_universe only works on a new game.
 
-    apply_to_existing_save:
-     If True, makes a drop-in director script that will fire once
-     and change the music for an existing save game.
+    * apply_to_existing_save:
+      - If True, makes a drop-in director script that will fire once
+        and change the music for an existing save game. This is not reversable
+        at this time.
     '''
     #Pick a queue name for this; also use as file name.
     queue_name = 'X3_Customizer_Restore_Hub_Music'
@@ -412,13 +414,14 @@ def Restore_M148_Music(
     _cleanup = False
     ):
     '''
-    If Argon Sector M148 music should be restored to that in AP.
+    If Argon Sector M148 (14,8) music should be restored to that in AP.
      (XRM changes this to the argon prime music.)
     Note: editing x3_universe only works on a new game.
-
-    apply_to_existing_save:
-     If True, makes a drop-in director script that will fire once
-     and change the music for an existing save game.
+    
+    * apply_to_existing_save:
+      - If True, makes a drop-in director script that will fire once
+        and change the music for an existing save game. This is not reversable
+        at this time.
     '''
     #Pick a queue name for this; also use as file name.
     queue_name = 'X3_Customizer_Restore_M148_Music'
@@ -500,8 +503,8 @@ def Make_Director_Shell(queue_name, body_text = None, _cleanup = False):
 <?xml-stylesheet href="director.xsl" type="text/xsl" ?>
 <director name="template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="director.xsd">
     <documentation>
-    <author name="name" alias="username" contact="contact details" />
-    <content reference="hello" name="Hello World" description="Simple 'hello world' template" />
+    <author name="X3_Customizer" alias="..." contact="..." />
+    <content reference="X3_Customizer" name="X3_Customizer generated" description="Director command injector." />
     <version number="0.0" date="today" status="testing" />
     </documentation>
     <cues>

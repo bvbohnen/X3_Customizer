@@ -49,12 +49,12 @@ def Adjust_Missile_Damage(
     The scaling_factor is applied prior to the diminishing returns
      formula.
 
-    use_diminishing_returns:
-        If True, a hardcoded diminishing returns formula is applied 
+    * use_diminishing_returns:
+      - If True, a hardcoded diminishing returns formula is applied 
         which reduces heavy missile damage by up to ~80%,
         while keeping small missiles unchanged.
-    print_changes:
-        If True, speed adjustments are printed to the summary file.
+    * print_changes:
+      - If True, speed adjustments are printed to the summary file.
     '''
     #TODO: support setting the scaling equation tuning factors.
     
@@ -163,7 +163,7 @@ def Enhance_Mosquito_Missiles():
 
         
 @Check_Dependencies('TMissiles.txt')
-def Restore_heavy_missile_trail():
+def Restore_Heavy_Missile_Trail():
     '''
     Minor transform to set heavy missile trails to those in vanilla AP.
     '''
@@ -198,15 +198,15 @@ def Adjust_Missile_Speed(
     '''
     Adjust missile speeds.
 
-    If use_diminishing_returns == True, this will attempt to adjust
-     missiles with a speed near target_speed_to_adjust by the scaling_factor,
-     while missiles with a speed near speed_to_keep_static will be
-     kept largely unchanged.
-     Otherwise, scaling_factor is applied to all missiles.
-    target_speed_to_adjust, speed_to_keep_static:
-        Equation tuning values, in m/s.
-    print_changes:
-        If True, speed adjustments are printed to the summary file.
+    * use_diminishing_returns:
+      - If True, this will attempt to adjust missiles with a speed near 
+      target_speed_to_adjust by the scaling_factor, while missiles with a 
+      speed near speed_to_keep_static will be kept largely unchanged.
+      Otherwise, scaling_factor is applied to all missiles.
+    * target_speed_to_adjust, speed_to_keep_static:
+      - Equation tuning values, in m/s.
+    * print_changes:
+      - If True, speed adjustments are printed to the summary file.
     '''
     if print_changes:
         Write_Summary_Line('\nMissile speed adjustments:')
@@ -283,16 +283,16 @@ def Adjust_Missile_Range(
     This is particularly effective for the re-lock missiles like flail,
      to reduce their ability to just keep retargetting across a system,
      instead running out of fuel from the zigzagging.
-
-    If use_diminishing_returns == True, this will attempt to adjust
-     missiles with a range near target_range_to_adjust_km by the scaling_factor,
-     while missiles with a range near range_to_keep_static_km will be
-     kept largely unchanged.
-     Otherwise, scaling_factor is applied to all missiles.
-    target_range_to_adjust_km, range_to_keep_static_km:
-        Equation tuning values, in kilometers.
-    print_changes:
-        If True, speed adjustments are printed to the summary file.
+     
+    * use_diminishing_returns:
+      - If True, this will attempt to adjust missiles with a range near 
+      target_range_to_adjust_km by the scaling_factor, while missiles with a 
+      range near range_to_keep_static_km will be kept largely unchanged.
+      Otherwise, scaling_factor is applied to all missiles.
+    * target_range_to_adjust_km, range_to_keep_static_km:
+      - Equation tuning values, in kilometers.
+    * print_changes:
+      - If True, speed adjustments are printed to the summary file.
     '''
     if print_changes:
         Write_Summary_Line('\nMissile range adjustments:')

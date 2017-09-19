@@ -750,7 +750,8 @@ if XRM:
     #Restore the trail effect on the bomber missiles,
     # which XRM removed but were good for seeing where the dangerous
     # missiles are.
-    Restore_heavy_missile_trail()
+    #TODO: play around with this to see if it helpful.
+    Restore_Heavy_Missile_Trail()
 
     #Make missiles a little easier to shoot down.
     Adjust_Missile_Hulls(0.5)
