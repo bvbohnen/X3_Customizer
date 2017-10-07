@@ -83,6 +83,14 @@ Convoys_made_of_race_ships()
 Standardize_Start_Plot_Overtunings(
     fraction_of_max = 0.70)
 
+#Reduce odds of non-fight missions, or increase odds of fight missions.
+Adjust_Generic_Missions({
+    'Trade': 0.3,
+    'Build': 0.3,
+    'Think': 0.3,
+    #Reduce dual convoy.
+    'L2M183': 0.2,
+    })
 
 #####################################################
 #Gates
@@ -448,7 +456,14 @@ if XRM:
     # against high poly models.
     #Note: some beam changes are present below, but will just do nothing
     # if bullet conversion happens first.
-    Convert_Beams_To_Bullets()
+    Convert_Beams_To_Bullets([
+        #Leave lasertowers alone.
+        'SS_BULLET_GPBC',
+        #Also leave light khaak weapons alone for now.
+        'SS_BULLET_KH_ALPHA',
+        #'SS_BULLET_KH_BETA',
+        #'SS_BULLET_KH_GAMMA',
+        ])
         
 
     #Adjust weapon damage, to increase it in general.
@@ -750,8 +765,9 @@ if XRM:
     #Restore the trail effect on the bomber missiles,
     # which XRM removed but were good for seeing where the dangerous
     # missiles are.
-    #TODO: play around with this to see if it helpful.
-    Restore_Heavy_Missile_Trail()
+    #TODO: play around with this to see if it helpful. It doesn't seem to
+    # do quite what was hoped.
+    #Restore_Heavy_Missile_Trail()
 
     #Make missiles a little easier to shoot down.
     Adjust_Missile_Hulls(0.5)

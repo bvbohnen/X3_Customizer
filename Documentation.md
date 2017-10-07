@@ -68,7 +68,11 @@ Change Log:
      transforms, separating out transform calls, adding robustness.
      Filling out documentation generation.
  * 2.01:
-   - Added beam to bullet conversion.
+   - Added Convert_Beams_To_Bullets.
+ * 2.02:
+   - Added Adjust_Generic_Missions.
+   - Added new arguments to Enhance_Mosquito_Missiles.
+   - Adjusted default ignored weapons for Convert_Beams_To_Bullets.
 
 ***
 
@@ -154,6 +158,59 @@ Transform List:
             - fade_gap_min_func = lambda start: start*1
           - Require the fade gap be no longer than 20 km:
             - fade_gap_max_func = lambda start: 20
+      
+
+ * Adjust_Generic_Missions
+  
+    Requires: 3.01 Generic Missions.xml
+  
+      Adjust the spawn chance of various generic mission types, relative
+      to each other. Note: decreasing chance on unwanted missions seems
+      to work better than increasing chance on wanted missions.
+  
+      * adjustment_dict:
+        - Dict keyed by mission identifiers or preset categories, holding
+          the chance multiplier.
+        - Keys may be cue names, eg. 'L2M104A', or categories, eg. 'Fight'.
+          Specific cue names will override categories.
+        - Categories and cue names for the vanilla AP are as follows, where
+          the term after the category is the base mission chance shared by
+          all missions in that category, as used in the game files.
+        - Trade (TXXX)
+          - L2M104A : Deliver Wares to Station in need
+          - L2M104B : Deliver Illegal Wares to Pirate Station
+          - L2M104C : Deliver Illegal Wares to Trading Station
+          - L2M116  : Transport Cargo
+          - L2M130  : Passenger Transport
+          - L2M150a : Buy Used Ship
+        - Fight (XFXX)
+          - L2M101  : Assassination
+          - L2M108  : Xenon Invasion
+          - L2M119  : Escort Convoy
+          - L2M127  : Destroy Convoy
+          - L2M134  : Generic Patrol
+          - L2M135  : Defend Object
+          - L2M183  : Dual Convoy
+        - Build (XXBX)
+          - L2M122  : Build Station    
+        - Think (XXXT)
+          - L2M103  : Transport Passenger
+          - L2M105  : Return Ship
+          - L2M113  : Follow Ship
+          - L2M129  : Deliver Matching Ship
+          - L2M133  : Freight Scan
+          - L2M145  : Scan Asteroids
+          - L2M180  : Repair Station
+          - L2M181  : Multiple Transport
+          - L2M182  : Tour Of A Lifetime
+          - L2M136  : Notoriety Hack
+          - L2M144  : Buy Asteroid Survey
+          - L2M147  : Buy Sector Data
+          - L2M161  : Buy Blueprints
+          - DPL2M186: Sell Blueprints
+      * cap_at_100:
+        - Bool, if True then mission chance adjustment will cap at 100, the
+          typical highest in vanilla AP. Default False.
       
 
  * Adjust_Global
@@ -558,7 +615,7 @@ Transform List:
   
       * beams_not_converted:
         - List of bullet names for weapons not to be converted.
-          Default includes repair and tug lasers.
+          Repair and tug lasers are added to this list by default.
       * speed_samples:
         - Int, the number of similar DPS weapons to sample when setting the
           bullet speed. Default 4.
@@ -613,8 +670,17 @@ Transform List:
   
     Requires: TMissiles.txt
   
-      Makes mosquito missiles more maneuverable, generally by doubling
-      the turn rate, to make anti-missile abilities more reliable.
+      Makes mosquito missiles more maneuverable, generally by increasing
+      the turn rate or adding blast radius, to make anti-missile 
+      abilities more reliable.
+  
+      * acceleration_factor:
+        - Multiplier to the mosquito's acceleration.
+      * turn_rate_factor:
+        - Multiplier to the mosquito's turn rate.
+      * proximity_meters:
+        - If not 0, adds a proximity fuse with the given distance.
+          For comparison, vanilla Silkworm missiles have a 200 meter radius.
       
 
  * Fix_Pericles_Pricing
@@ -862,7 +928,7 @@ Transform List:
   
     Requires: 3.08 Sector Management.xml
   
-      If the number of randomized tuning creates at gamestart should be
+      Set the number of randomized tuning creates at gamestart to be
        de-randomized into a standard number of tunings.
       Note: vanilla has 2-5 average tunings per crate, 8 crates total.
       Default args here reach this average, biasing toward engine tunings.

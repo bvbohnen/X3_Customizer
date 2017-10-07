@@ -68,7 +68,11 @@ Change Log:
      transforms, separating out transform calls, adding robustness.
      Filling out documentation generation.
  * 2.01:
-   - Added beam to bullet conversion.
+   - Added Convert_Beams_To_Bullets.
+ * 2.02:
+   - Added Adjust_Generic_Missions.
+   - Added new arguments to Enhance_Mosquito_Missiles.
+   - Adjusted default ignored weapons for Convert_Beams_To_Bullets.
 
 Full documentation found in Documentation.md.
 
@@ -85,6 +89,7 @@ Transform List:
  * Adjust_Beam_Weapon_Duration
  * Adjust_Beam_Weapon_Width
  * Adjust_Fade_Start_End_Gap
+ * Adjust_Generic_Missions
  * Adjust_Global
  * Adjust_Job_Count
  * Adjust_Job_Respawn_Time

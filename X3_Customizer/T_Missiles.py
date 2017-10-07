@@ -130,10 +130,23 @@ def Adjust_Missile_Damage(
             
             
 @Check_Dependencies('TMissiles.txt')
-def Enhance_Mosquito_Missiles():
+def Enhance_Mosquito_Missiles(
+    acceleration_factor = 5,
+    turn_rate_factor = 10,
+    proximity_meters = 30
+    ):
     '''
-    Makes mosquito missiles more maneuverable, generally by doubling
-    the turn rate, to make anti-missile abilities more reliable.
+    Makes mosquito missiles more maneuverable, generally by increasing
+    the turn rate or adding blast radius, to make anti-missile 
+    abilities more reliable.
+
+    * acceleration_factor:
+      - Multiplier to the mosquito's acceleration.
+    * turn_rate_factor:
+      - Multiplier to the mosquito's turn rate.
+    * proximity_meters:
+      - If not 0, adds a proximity fuse with the given distance.
+        For comparison, vanilla Silkworm missiles have a 200 meter radius.
     '''
     #TODO: maybe also add a damage boost option, so they can kill
     # fighter drones properly in XRM, where for some reason it takes
@@ -149,15 +162,23 @@ def Enhance_Mosquito_Missiles():
             #Can either aim to improve turning, or try to add a proximity fuse
             # with a blast radius.
             #Acceleration may also help depending on how the game handles max
-            # speed turning.
-            #For now just bump acceleration and rotation, revisit if not sufficient.
-            adjustment_factor = 2
-            acceleration = int(this_dict['acceleration']) * adjustment_factor
-            rotation_x   = float(this_dict['rotation_x']) * adjustment_factor
-            rotation_y   = float(this_dict['rotation_y']) * adjustment_factor
+            # speed turning. Update: acceleration probably does nothing.
+            acceleration = int(this_dict['acceleration']) * acceleration_factor
             this_dict['acceleration'] = str(int(acceleration))
-            this_dict['rotation_x']   = str(rotation_x)
-            this_dict['rotation_y']   = str(rotation_y)
+            for field in ['rotation_x','rotation_x']:
+                value = float(this_dict[field]) * turn_rate_factor
+                this_dict[field]   = str(value)
+
+            if proximity_meters != 0:
+                #Get the flags.
+                flags_dict = Flags.Unpack_Tmissiles_flags(this_dict['flags'])
+                #Turn on proximity detonation.
+                flags_dict['proximity'] = True
+                this_dict['flags'] = Flags.Pack_Flags(flags_dict)
+                #Set the proximity distance.
+                #This is in 500 units per meter.
+                this_dict['blast_radius'] = str(int(proximity_meters * 500))
+
             return
 
 

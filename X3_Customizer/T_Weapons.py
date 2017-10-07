@@ -1052,12 +1052,7 @@ def Adjust_Beam_Weapon_Width(
 # bullets).
 @Check_Dependencies('TBullets.txt')
 def Convert_Beams_To_Bullets(
-    beams_not_converted = [
-        #Don't adjust repair lasers or tractor laser.
-        'SS_BULLET_TUG',
-        'SS_BULLET_REPAIR',
-        'SS_BULLET_REPAIR2',
-        ],
+    beams_not_converted = None,
     speed_samples = 4,
     sample_type = 'min'
     ):
@@ -1068,7 +1063,7 @@ def Convert_Beams_To_Bullets(
 
     * beams_not_converted:
       - List of bullet names for weapons not to be converted.
-        Default includes repair and tug lasers.
+        Repair and tug lasers are added to this list by default.
     * speed_samples:
       - Int, the number of similar DPS weapons to sample when setting the
         bullet speed. Default 4.
@@ -1076,6 +1071,16 @@ def Convert_Beams_To_Bullets(
       - String, one of ['min','avg'], if the minimum or average of speed
         ratio of sampled similar DPS weapons should be used. Default 'min'.
     '''
+    if beams_not_converted == None:
+        beams_not_converted = []
+    #Add tractor beam and repair lasers to ignored list.
+    #Put there here instead of at input arg, so the user doesn't have to
+    # add them if they just want to skip some other weapon.
+    beams_not_converted += [
+        'SS_BULLET_TUG',
+        'SS_BULLET_REPAIR',
+        'SS_BULLET_REPAIR2',]
+
     for this_dict in Load_File('TBullets.txt'):
         flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
 

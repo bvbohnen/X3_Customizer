@@ -58,13 +58,13 @@ T_file_name_field_dict_dict = {
         2  : 'rotation_x',     #rpm = 60 * this value
         3  : 'rotation_y',
         4  : 'rotation_z',    #Appears to be 0 normally.
-        7  : 'speed',        #In meters per 500 seconds
+        7  : 'speed',        #In meters per 500 seconds, or 1/500 meters per second.
         8  : 'acceleration', #In meters per 500 seconds per second
         9  : 'launch_sound',     #Int, an index
         10 : 'ambient_sound',    #Int, an index
         11 : 'collision_type',   #Int, appears to be 1 or 2.
         12 : 'damage',
-        13 : 'blast_radius',  #Likely in meters
+        13 : 'blast_radius',  #In 1/500ths of meters.
         14 : 'lifetime',      #In milliseconds
         15 : 'trail_effect',     #Int, an index
         16 : 'glow_effect',      #Int, an index

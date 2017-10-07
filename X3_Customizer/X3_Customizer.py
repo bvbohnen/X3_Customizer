@@ -1,5 +1,5 @@
 '''
-X3 Customizer v2.01
+X3 Customizer v2.02
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -68,7 +68,11 @@ Change Log:
      transforms, separating out transform calls, adding robustness.
      Filling out documentation generation.
  * 2.01:
-   - Added beam to bullet conversion.
+   - Added Convert_Beams_To_Bullets.
+ * 2.02:
+   - Added Adjust_Generic_Missions.
+   - Added new arguments to Enhance_Mosquito_Missiles.
+   - Adjusted default ignored weapons for Convert_Beams_To_Bullets.
 '''
 #TODO: maybe remove version tag from title, just leave in change log.
 #Note: the above comment gets printed to the markdown file, so avoid
