@@ -15,3 +15,4 @@ from T_Jobs import *
 from T_Director import *
 from T_Globals import *
 from T_Universe import *
+from T_Shields import *

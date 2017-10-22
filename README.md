@@ -1,5 +1,5 @@
 
-X3 Customizer v2.01
+X3 Customizer v2.03
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -15,6 +15,8 @@ Usage:
      directory, to specify the path to the AP directory, the folder
      containing the source files to be modified, and the transforms
      to be run. See User_Transforms_Example.py for an example.
+     Defaults to running 'User_Transforms.py' if an argument is 
+     not provided.
  * "Make_Documentation.py"
    - Generates documentation for this project.
 
@@ -73,6 +75,15 @@ Change Log:
    - Added Adjust_Generic_Missions.
    - Added new arguments to Enhance_Mosquito_Missiles.
    - Adjusted default ignored weapons for Convert_Beams_To_Bullets.
+ * 2.03:
+   - Added Add_Ship_Life_Support.
+   - Added Adjust_Shield_Regen.
+   - Added Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio.
+   - Added Standardize_Ship_Tunings.
+   - New options added for Adjust_Weapon_DPS.
+   - New option for Adjust_Ship_Hull to scale repair lasers as well.
+   - Several weapon transforms now ignore repair lasers by default.
+   - Command line call defaults to User_Transforms.py if a file not given.
 
 Full documentation found in Documentation.md.
 
@@ -86,6 +97,7 @@ Setup methods:
 
 Transform List:
 
+ * Add_Ship_Life_Support
  * Adjust_Beam_Weapon_Duration
  * Adjust_Beam_Weapon_Width
  * Adjust_Fade_Start_End_Gap
@@ -98,6 +110,7 @@ Transform List:
  * Adjust_Missile_Range
  * Adjust_Missile_Speed
  * Adjust_Particle_Count
+ * Adjust_Shield_Regen
  * Adjust_Ship_Hull
  * Adjust_Ship_Laser_Recharge
  * Adjust_Ship_Pricing
@@ -137,7 +150,9 @@ Transform List:
  * Set_Minimum_Fade_Distance
  * Set_Missile_Swarm_Count
  * Set_Ware_Pricing
+ * Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio
  * Simplify_Engine_Trails
+ * Standardize_Ship_Tunings
  * Standardize_Start_Plot_Overtunings
  * Standardize_Tunings
  * Swap_Standard_Gates_To_Terran_Gates

@@ -668,6 +668,18 @@ def Adjust_Weapon_DPS(
     #The damage to pin in place on the low end.
     damage_to_keep_static_kdps = 3,
 
+    #If laser energy efficiency should be modified or not.
+    maintain_energy_efficiency = True,
+
+    #Options to change only hull or shield dps.
+    adjust_hull_damage_only     = False,
+    adjust_shield_damage_only   = False,
+
+    #Don't modify repair lasers, mainly to avoid having to put this
+    # in every transform call individually, since normally these don't
+    # need modification.
+    ignore_repair_lasers = True,
+    
     print_changes = False
     ):
     '''
@@ -678,6 +690,10 @@ def Adjust_Weapon_DPS(
 
     * scaling_factor:
       - The base multiplier to apply to shot speeds.
+    * adjust_hull_damage_only:
+      - Bool, if True only hull damage is modified. Default False.
+    * adjust_shield_damage_only:
+      - Bool, if True only shield damage is modified. Default False.
     * use_scaling_equation:
       - If True, a scaling formula will be applied, such
         that shots near damage_to_adjust_kdps see the full scaling_factor,
@@ -699,6 +715,12 @@ def Adjust_Weapon_DPS(
       - '*' entry will match all weapons not otherwise matched,
         equivelent to setting scaling_factor and not using the
         scaling equation.
+    * maintain_energy_efficiency:
+      - Bool, if True (default) then weapon energy usage will be scaled to
+        keep the same damage/energy ratio, otherwise damage is adjusted but
+        energy is unchanged.
+    * ignore_repair_lasers:
+      - Bool, if True (default) then repair lasers will be ignored.
     * print_changes:
       - If True, speed adjustments are printed to the summary file.  
     '''
@@ -772,6 +794,10 @@ def Adjust_Weapon_DPS(
 
             #Unpack the flags.
             flags_dict = Flags.Unpack_Tbullets_flags(bullet_dict['flags'])
+
+            #If ignoring repair lasers, and this is a repair weapon, skip.
+            if flags_dict['repair'] and ignore_repair_lasers:
+                continue
                 
             #There are two options here:
             # 1) Handle shield and hull damage together, combining them into a
@@ -803,6 +829,13 @@ def Adjust_Weapon_DPS(
             for field, oos_field, scaling_func in [
                         ('hull_damage'  , 'hull_damage_oos'  , hull_scaling_func),
                         ('shield_damage', 'shield_damage_oos', shield_scaling_func)]:
+
+                #Skip hull or shield changes as requested.
+                if adjust_hull_damage_only and field == 'shield_damage':
+                    continue
+                elif adjust_shield_damage_only and field == 'hull_damage':
+                    continue
+
                 #Look up the IS damage, and calculate dps.
                 damage = int(bullet_dict[field])
                 overall_dps = damage   * fire_rate
@@ -877,15 +910,53 @@ def Adjust_Weapon_DPS(
             # they will only be used against shields, it makes the most sense
             # to adjust energy based on the biggest factor (the main use case
             # for the weapon).
-            max_factor = max(scaling_factor_dict.values())
-            value = int(bullet_dict['energy_used'])
-            bullet_dict['energy_used'] = str(int(value * max_factor))
+            if maintain_energy_efficiency:
+                max_factor = max(scaling_factor_dict.values())
+                value = int(bullet_dict['energy_used'])
+                bullet_dict['energy_used'] = str(int(value * max_factor))
+
+
+@Check_Dependencies('TBullets.txt')
+def Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio(
+    minimum_ratio = 1/20,
+    ):
+    '''
+    Increases hull damage on weapons to achieve a specified hull:shield
+    damage ratio requirement. Typical weapons are around a 1/6 ratio, 
+    though some weapons can be 1/100 or lower, such as ion weaponry.
+    This transform can be used to give such weapons a viable hull damage amount.
+
+    * minimum_ratio:
+      - Float, the required ratio. Recommend something below 1/6 to avoid
+        significant changes to most weapons. Default 1/20.
+    '''
+    for this_dict in Load_File('TBullets.txt'):        
+        #Pull the hull/shield damage.
+        hull_damage       = int(this_dict['hull_damage'])
+        hull_damage_oos   = int(this_dict['hull_damage_oos'])
+        shield_damage     = int(this_dict['shield_damage'])
+
+        #Set an adjustment ratio if the hull damage is too low.
+        if hull_damage < minimum_ratio * shield_damage:
+            ratio = minimum_ratio * shield_damage / hull_damage
+
+            #Apply the ratio to IS and OOS damage.            
+            #Modify and round, minimum of 1.
+            hull_damage     = round(hull_damage     * ratio)
+            hull_damage_oos = round(hull_damage_oos * ratio)
+            #Put back.
+            this_dict['hull_damage']       = str(int( hull_damage ))
+            this_dict['hull_damage_oos']   = str(int( hull_damage_oos ))
 
            
 
 @Check_Dependencies('TBullets.txt')
 def Adjust_Beam_Weapon_Duration(
-    bullet_name_adjustment_dict = {}
+    bullet_name_adjustment_dict = {},
+    #Don't modify repair lasers, mainly to avoid having to put this
+    # in every transform call individually, since normally these don't
+    # need modification.
+    ignore_repair_lasers = True,
     ):
     '''
     Adjusts the duration of beam weapons.
@@ -903,12 +974,18 @@ def Adjust_Beam_Weapon_Duration(
         given in seconds.
       - None may be entered for min or max to disable those limits.
       - '*' entry will match all beam weapons not otherwise named.
+    * ignore_repair_lasers:
+      - Bool, if True (default) then repair lasers will be ignored.
     '''
     for this_dict in Load_File('TBullets.txt'):
         flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
          
         #Skip if this isn't a beam.
         if not flags_dict['beam']:
+            continue
+        
+        #If ignoring repair lasers, and this is a repair weapon, skip.
+        if flags_dict['repair'] and ignore_repair_lasers:
             continue
 
         #This will need to adjust the lifetime and speed again, to keep
@@ -1076,10 +1153,9 @@ def Convert_Beams_To_Bullets(
     #Add tractor beam and repair lasers to ignored list.
     #Put there here instead of at input arg, so the user doesn't have to
     # add them if they just want to skip some other weapon.
-    beams_not_converted += [
-        'SS_BULLET_TUG',
-        'SS_BULLET_REPAIR',
-        'SS_BULLET_REPAIR2',]
+    #TODO: special way to identify tug lasers, if there is one, to be
+    # adaptable to mods.  Repair lasers can check their flag dict.
+    beams_not_converted += ['SS_BULLET_TUG']
 
     for this_dict in Load_File('TBullets.txt'):
         flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
@@ -1090,6 +1166,10 @@ def Convert_Beams_To_Bullets(
 
         #Skip skipped bullets.
         if this_dict['name'] in beams_not_converted:
+            continue
+        
+        #If this is a repair weapon, skip.
+        if flags_dict['repair']:
             continue
         
         #-Removed; bullet length doesn't actually affect the visual
@@ -1316,7 +1396,12 @@ def Adjust_Weapon_Range(
 @Check_Dependencies('TBullets.txt')
 def Adjust_Weapon_Energy_Usage(
     scaling_factor = 1,
-    bullet_name_multiplier_dict = {}
+    bullet_name_multiplier_dict = {},
+    #Don't modify repair lasers, mainly to avoid having to put this
+    # in every transform call individually, since normally these don't
+    # need modification.
+    ignore_repair_lasers = True,
+    
     ):
     '''
     Adjusts weapon energy usage by the given multiplier.
@@ -1327,15 +1412,26 @@ def Adjust_Weapon_Energy_Usage(
       - Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the
         multiplier to apply. This will override scaling_factor for
         this weapon.
+    * ignore_repair_lasers:
+      - Bool, if True (default) then repair lasers will be ignored.
     '''
     for this_dict in Load_File('TBullets.txt'):
+        
         if this_dict['name'] in bullet_name_multiplier_dict or scaling_factor != 1:
+
+            #If ignoring repair lasers, and this is a repair weapon, skip.
+            flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+            if flags_dict['repair'] and ignore_repair_lasers:
+                continue
+
             energy = int(this_dict['energy_used'])
+
             #Pick the table or default multiplier.
             if this_dict['name'] in bullet_name_multiplier_dict:
                 multiplier = bullet_name_multiplier_dict[this_dict['name']]
             else:
                 multiplier = scaling_factor
+
             new_energy = energy * multiplier
             this_dict['energy_used'] = str(int(new_energy))
                         

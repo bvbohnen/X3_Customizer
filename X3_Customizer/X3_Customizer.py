@@ -1,5 +1,5 @@
 '''
-X3 Customizer v2.02
+X3 Customizer v2.03
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -15,6 +15,8 @@ Usage:
      directory, to specify the path to the AP directory, the folder
      containing the source files to be modified, and the transforms
      to be run. See User_Transforms_Example.py for an example.
+     Defaults to running 'User_Transforms.py' if an argument is 
+     not provided.
  * "Make_Documentation.py"
    - Generates documentation for this project.
 
@@ -73,6 +75,15 @@ Change Log:
    - Added Adjust_Generic_Missions.
    - Added new arguments to Enhance_Mosquito_Missiles.
    - Adjusted default ignored weapons for Convert_Beams_To_Bullets.
+ * 2.03:
+   - Added Add_Ship_Life_Support.
+   - Added Adjust_Shield_Regen.
+   - Added Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio.
+   - Added Standardize_Ship_Tunings.
+   - New options added for Adjust_Weapon_DPS.
+   - New option for Adjust_Ship_Hull to scale repair lasers as well.
+   - Several weapon transforms now ignore repair lasers by default.
+   - Command line call defaults to User_Transforms.py if a file not given.
 '''
 #TODO: maybe remove version tag from title, just leave in change log.
 #Note: the above comment gets printed to the markdown file, so avoid
@@ -95,10 +106,14 @@ def Run(args):
     #If only one arg available, it is the autofilled file name,
     # so user gave nothing.
     if len(args) == 1:
-        #Print some semi-informative message.
-        print('Please provide the name of a transform specification module.')
+        #Set the module to User_Transforms.py by default.
+        args.append('User_Transforms.py')
 
-    elif len(args) > 2:
+        #Print some semi-informative message.
+        #-Removed in favor of default.
+        #print('Please provide the name of a transform specification module.')
+
+    if len(args) > 2:
         print('Error: expecting 1 argument, 2 were given.')
 
     #Check for a help request.
@@ -122,6 +137,14 @@ def Run(args):
 
         if not user_module_name.endswith('.py'):
             print('Error: expecting the name of a python module, ending in .py.')
+            return
+
+        #Check for file existence.
+        if not os.path.exists(user_module_name):
+            print('Error: {} not found.'.format(user_module_name))
+            return
+
+        print('Attempting to run {}'.format(user_module_name))
       
         #Attempt to load the module.
         #This will kick off all of the transforms as a result.
@@ -140,6 +163,8 @@ def Run(args):
     #Everything should now be done.
     #Can open most output files in X3 Editor to verify results.
     File_Manager.Write_Files()
+
+    print('Transforms complete')
     
 if __name__ == '__main__':
     Run(sys.argv)

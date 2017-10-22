@@ -85,11 +85,21 @@ Standardize_Start_Plot_Overtunings(
 
 #Reduce odds of non-fight missions, or increase odds of fight missions.
 Adjust_Generic_Missions({
-    'Trade': 0.3,
-    'Build': 0.3,
-    'Think': 0.3,
+    #'Trade': 0.3,
+    #'Build': 0.3,
+    #'Think': 0.3,
     #Reduce dual convoy.
-    'L2M183': 0.2,
+    'L2M183': 0.5,
+    #Disable sector info, as it is generally useless.
+    'L2M147': 0,
+    #Disable return ship missions, as they are generally impossible
+    # when playing without jump drives, and the temptation to keep
+    # ships is too great. (A shame, since these are fun.)
+    'L2M105': 0,
+    #Disable factory defense, since the AI doesn't defend itself
+    # properly for these missions (just focuses on the factory
+    # while getting picked off).
+    'L2M135': 0,
     })
 
 #####################################################
@@ -150,17 +160,20 @@ if XRM:
         job_count_factors = [
             #Too many khaak invaders (eg. 15 TM led groups).
             ('owner_khaak', 1/5),
+
+            #-Removed pirate/yaki/xenon reductions; leave them alone
+            # but with longer respawn timers.
             #Cut down pirates by a bit less.
             #Maybe go down to 1/4; 2/3 was not enough (pirate sectors still flooded.)
             #(This may not work well, as there appears to be many dedicated pirate
             # jobs for patrolling each pirate sector. Try to adjust respawn timers
             # instead.)
-            ('owner_pirate', 2/3),
+            #('owner_pirate', 2/3),
             #Similar redunction in yaki.
-            ('owner_yaki', 2/3),
+            #('owner_yaki', 2/3),
             #Cut down xenon a little bit while here, though they might
             # be a little more okay (haven't noticed flooding yet).
-            ('owner_xenon', 2/3),
+            #('owner_xenon', 2/3),
 
             #Can generally limit flavor drones by a bit (default is 10 per sector).
             #('Freight Drones', 2/3),
@@ -169,6 +182,14 @@ if XRM:
             #('classification_civilian', 2/3),
             #Can reduce trade ships in general by a bit, if needed.
             #('classification_trader', 2/3),
+
+            #Reduce privateers from XRM, since they don't work well when standard
+            # races are hostile to the player (they can shoot the player ships,
+            # but fighting back causes other allied forces to turn on the player
+            # in the same sector instead of the privateer).
+            #This will still leave 1 job by default.
+            #-Removed for now, if main races are friendly.
+            #('Privateer', 0),
 
             #Everything else gets this factor.
             ('*', 1),
@@ -183,238 +204,14 @@ if XRM:
             ('*', 15),
             ],
         time_multiplier_list = [
+            #Large increase on privateer respawns.
+            #-Removed for now.
+            #('Privateer', 10),
             #Generic boost.
             ('*', 2),
             ]
         )
     
-#####################################################
-#Ships
-
-if Vanilla:
-    Fix_Pericles_Pricing()
-    Boost_Truelight_Seeker_Shield_Reactor()
-    Adjust_Ship_Speed(
-        adjustment_factors_dict = {
-            #Bump up interceptors about 30%, to better distinguish their role from
-            # fighters (which otherwise have a lot of speed overlap).
-            #Could also bump up to 50% and still be in about the right range.
-            'SG_SH_M4': 1.3,
-            })
-
-
-if XRM:
-    #Can remove engine trails if they cause slowdown.
-    #Simplify_Engine_Trails()
-
-    Adjust_Ship_Pricing(
-        #The XRM costs include eg. a 2-4x upscale on scouts, which combined with scouts being
-        # easier to shoot down (due to laser changes) makes them even more terrible.
-        #The rescale would bring costs in line with vanilla, which had pretty reasonable
-        # prices.
-        #This may only be applied to scouts themselves; other ships are more in line with
-        # their usefulness.
-        adjustment_factors_dict = {
-            #A vanilla disco is 0.13x the price of a buster; in xrm this is 0.37x.
-            #Can multiply by 0.35 to roughly bring scout prices in line, but a more conservative
-            # 0.5 should do okay as well.
-            'SG_SH_M5': 1/2,
-        })
-    
-
-    #Increase laser recharge on corvettes in XRM, which uses TC style low values about
-    # 1/2 of AP. Can use a generalized table for all ship subtypes for future scaling,
-    # similar to what is done for hull and speed.
-    Adjust_Ship_Laser_Recharge(
-        adjustment_factors_dict = {
-            #Recharge and capacitor have somewhat different scalings vanilla to Xrm.
-            #This will just apply to the recharge factor.
-            #AP centaurs have 0.6x the capacitor and 2.1x the recharge of Xrm centaurs.
-            #Note: there is some overlap between this transform and reducing the
-            # energy usage of weapons. See X3_Weapons for some notes on that.
-            # The general decision is to adjust ships recharge for bigger ships to
-            # account for XRM giving big weapons severe efficiency penalties compared
-            # to vanilla, eg. 1/3 efficiency for PPC being balanced by 3x recharge
-            # for capital ships.
-            #Generally, can adjust these based on the energy efficiency ratio of
-            # vanilla vs XRM for the typical best weapon of the ship class.
-            
-            #Ratios will be given as (vanilla damage / energy) / (xrm damage / energy),
-            # eg. if vanilla is 2x more efficient, boost xrm ship laser recharge by 2x.
-            #A second ratio will be (vanilla ship recharge / xrm ship recharge) for a
-            # typical ship of the class.
-            #This should bring xrm in line with vanilla overall.
-        
-            #M5 will use IRE, discoverer. -40%.
-            'SG_SH_M5': (220/4) / (180/2) * (25 / 25),
-            #M4 will use PAC, buster. -20%.
-            'SG_SH_M4': (1155/23) / (640/10) * (51 / 51),
-            #M3 will use HEPT, nova. -10%.
-            'SG_SH_M3': (1995/40) / (1330/26) * (140 / 155),
-            #Leave bombers alone for now.
-            #'SG_SH_M8': 1.0,
-            #M6 will use CIG, centaur. +30%.
-            'SG_SH_M6': (7845/246) / (8050/153) * (1050 / 493),
-            #M7 will use IBL, cerberus. +200%.
-            # This may be too high with IBL, or too low with CIG.
-            # Try averaging the two, for +95%.
-            'SG_SH_M7': ((50860/526) / (14400/400)
-                         #Cig damage/energy from above.
-                         +(7845/246) / (8050/153))/2 * (2200 / 1925),
-            #M2 will use PPC, titan. +150%.
-            'SG_SH_M2': (63778/536) / (27000/900) * (4145 / 6581),
-            #M1 will use PPC, colossus. +125%.
-            'SG_SH_M1': (63778/536) / (27000/900) * (797 / 2817),
-            #M0 will use PPC, megalodan. +450%.
-            # TODO: Does any ship really use M0 classification?
-            'SG_SH_M0': (63778/536) / (27000/900) * (7500 / 5405),
-            #Transports will be left alone for now.
-            #These could use a general buff to make them more capable of
-            # defending themselves.
-            #'SG_SH_TS': 1.0,
-            #'SG_SH_TM': 1.0,
-            #'SG_SH_TP': 1.0,
-            #'SG_SH_TL': 1.0,
-            #'SG_SH_GO': 1.0,
-        })
-    
-    Adjust_Ship_Shield_Regen(    
-        #Xrm makes many transports too tough, such that pirate/xenon groups cannot crack
-        # their shields and just sit there pecking away forever as the transport
-        # flies in circles without energy to use its guns.
-        #The fix can be a mixture of reducing shield recharge rates on the buffed
-        # transports (which are normally closer to 600, but in xrm go up to 2000+), and
-        # reducing their total shields (in Adjust_shield_slots below). 
-        #-For transport ships should have their shield recharge nerfed.
-        #-Also needed for capital ships, otherwise they can't break shields on OOS combat
-        # with the weak XRM weaponry.
-        adjustment_factors_dict = {        
-            #Ignore lighter ships for now. TODO: special scouts might have too much shield
-            # regen, eg. Arrow has more than M3s.
-            #'SG_SH_M5': (0, 1, None),
-            #'SG_SH_M4': (0, 1, None),
-            #'SG_SH_M3': (0, 1, None),
-            #'SG_SH_M8': (0, 1, None),
-            #M6s appear lightly buffed, around 15%-20%.
-            # For a centaur, 2500 in vanilla and 3000 in xrm, if assuming
-            #  a 1k base, then (2.5k-1k)/(3k-1k) = 0.75 to adjust it back.
-            'SG_SH_M6': (1000, 0.75, None),
-            #M7 are often unchanged. In the skirnir case, it was actually cut in about half.
-            #'SG_SH_M7': (0, 1, None),
-            #M2s were buffed by 21% on the low end (titan, 14400 in vanilla).
-            # Megalodan is buffed 44% (14200 in vanilla), which might be okay.
-            # Phoenix is buffed 112%, 8k to 17k, though it was oddly low in vanilla.
-            # Assuming 10k base, then (14.4k-10k)/(14.4k*1.21-10k) = 0.6 to adjust
-            #  the titan back to vanilla.
-            'SG_SH_M2': (10000, 0.6, None),
-            #M1s were buffed by 25% on the low end (colossus, 8200 in vanilla).
-            # Assuming 5k base, then (8.2k-5k)/(8.2k*1.25-5k) = 0.6 to adjust the
-            #  colossus back to vanilla, treating similar M1s the same but buffer M1s
-            #  with a bigger nerf.
-            # OWPs are classified as M1 and were buffed by 10x, and could use a big nerf.
-            # Apply a max of ~25k for limit OWPs.
-            'SG_SH_M1': (5000, 0.6, 20000),
-            #'SG_SH_M0': (0, 1, None),
-            #Greatly reduce transports, and personel transports, which were increased by
-            # up to ~10x in some cases. Assumg vanilla base regen is around 500 for
-            # trade ships and 400 for personel transports, and just go with a 90% reduction
-            # on anything above that.
-            'SG_SH_TS': (500, 0.1, None),
-            'SG_SH_TP': (400, 0.1, None),
-            #Military transports appear largely unchanged.
-            #'SG_SH_TM': (0, 1, None),
-            #Big transports were buffed by ~25%; can probably leave this alone, though they
-            # may need a shield slot reduction (since they are overshielded).
-            #'SG_SH_TL': (0, 1, None),
-            #'SG_SH_GO': (0, 1, None),
-        })
-    
-    #Reduce all shield regen by a global factor, in addition to what
-    # is given above. This is applied after other adjustments.
-    Adjust_Ship_Shield_Regen(scaling_factor = 0.5)
-
-    Adjust_Ship_Shield_Slots(
-        adjustment_factors_dict = {
-            #For over-shielded transports, in addition to reducing recharge rates,
-            # the other part of the fix is to reduce shielding,
-            # particularly those that were given multiple 200 mj shields.
-            #They can likely just have their shield slots dropped down to 1-2, from
-            # the 5-6 currently.
-            'SG_SH_TS': (200, 0.2),
-            'SG_SH_TP': (200, 0.2),
-            #Big transports were given a ~5x increase in shield slots;
-            # drop them down as well, closer to 1 GJ.
-            #This is a little dull since they will all end up at 1 GJ, but there
-            # is no good way around that without swapping them to 200 mj shields.
-            #Some transports had 6GJ of shields; a factor >0.1 should round them
-            # up to 2GJ, to add a little variety at least.
-            'SG_SH_TL': (1000, 0.12),
-        })
-    
-    Adjust_Ship_Speed(
-        #In XRM, many ships were greatly sped up in the m4-6 tiers, which has a general
-        # effect of making the universe feel smaller, as well as making scouts less
-        # distinctive when m4s can reach 400+.
-        #Generally apply slowdowns, though keep some speed boosts selectively.
-        adjustment_factors_dict = {
-            #Bring scouts back down based on kestrel (drop 715 to 600).
-            'SG_SH_M5': 600 / 715,
-            #Bring intercepters back down based on buster, but still keeping a boost
-            # over vanilla.  Go with 40% boost.
-            'SG_SH_M4': 175 / 301 * 1.4,
-            #Bring fighters down based on nova, and retain about half the boost
-            # of the intercepter.
-            'SG_SH_M3': 150 / 237 * 1.2,
-            #Bombers are often unchanged.
-            #'SG_SH_M8': 1.0,
-            #Base corvette speed on skiron. Centaur seems sped up more than others,
-            # so don't use it as base point.
-            #Keep modest boost, to try to stay ahead of the faster frigates.
-            'SG_SH_M6': 149 / 214 * 1.15,
-            #Some M7s are exceptionally fast (faster than many vanilla corvettes), but
-            # many were unchanged, so a global reduction isn't safe.
-            #'SG_SH_M7': 1.0,
-            #Capital ships are often unchanged.
-            #'SG_SH_M2': 1.0,
-            #'SG_SH_M1': 1.0,
-            #'SG_SH_M0': 1.0,
-            #Transports are often unchanged.
-            #'SG_SH_TS': 1.0,
-            #'SG_SH_TM': 1.0,
-            #'SG_SH_TP': 1.0,
-            #'SG_SH_TL': 1.0,
-            #Goner classifier appears unused (goner ships given other subtypes).
-            #'SG_SH_GO': 1.0,
-        })
-
-    Adjust_Ship_Hull(
-        #Do a custom ship hull multiplier instead of using XRM's hull packs, for finer
-        # control (eg. 2x fighters, 10x capitals).
-        #Save games may need a script to update existing hull values if this is changed
-        # mid game (can use the script from the xrm hull pack).
-        adjustment_factors_dict = {
-            #Base XRM hulls are generally from TC style values.
-            #Use the TC to AP ratio for each class of ship for this scaling, generally
-            # using basic argon ships from the wiki.
-            'SG_SH_M5': 2,
-            'SG_SH_M4': 2,
-            'SG_SH_M3': 2,
-            #Bombers were added in AP, and XRM uses roughly the AP hull already, so no change.
-            #'SG_SH_M8': 1,
-            'SG_SH_M6': 4,
-            'SG_SH_M7': 4,
-            'SG_SH_M2': 10,
-            'SG_SH_M1': 10,
-            'SG_SH_M0': 10,
-            'SG_SH_TS': 3,
-            #Military transports are like bombers, with no change.
-            #'SG_SH_TM': 1,
-            'SG_SH_TP': 3,
-            'SG_SH_TL': 10,
-            #Goner classifier appears unused (goner ships given other subtypes).
-            #'SG_SH_GO': 1,
-        })
-
 
 #####################################################
 #Weapons
@@ -487,7 +284,8 @@ if XRM:
     TODO: use a scaling equation which gives a bigger boost to capital tier weapons,
      since otherwise capital combat takes ages (and doesn't resolve OOS against shield
      recharge rates).
-    '''    
+    '''
+    #Boost heavy weapon damage.
     Adjust_Weapon_DPS(
         #Goal is to boost the high end, where XRM PPC has a base dps
         # of 9000 vs shields, when the vanilla PPC is closer to 46k.
@@ -506,25 +304,50 @@ if XRM:
         #The damage to pin in place on the low end.
         damage_to_keep_static_kdps = 3,
         
-        #Special dict entries will override the above formula and factor.
-        bullet_name_adjustment_dict = {
-            #Tractor bullet should do little damage.
-            'SS_BULLET_TUG': 1,
-            #Don't adjust repair lasers.
-            'SS_BULLET_REPAIR': 1,
-            'SS_BULLET_REPAIR2': 1,
-        },
         print_changes = True
         )
 
-    #A flat factor to use for damage adjustment.
+
+    #Adjust XRM damage in general back to roughly AP levels.
     #This is applied after the scaling equation below, so that that
     # equation can be configured to the base xrm numbers.
     #Go with 2.5 to be conservative, or even 2 since some ships have more
     # turret gun mounts than in vanilla.
     #This helps bring up energy drain as well.
-    Flat_damage_adjustment_factor = 2.5
-    Adjust_Weapon_DPS(scaling_factor = Flat_damage_adjustment_factor)
+    XRM_damage_correction_factor = 2.0
+    Adjust_Weapon_DPS(scaling_factor = XRM_damage_correction_factor)
+
+    #Apply another flat adjustment to taste, to make combat a bit
+    # longer. Shield recharge will be adjusted accordingly further
+    # below.
+    #For the extra scaling, don't update the energy usage; just want to
+    # scale bullet damage while keeping ship laser recharge balance
+    # unchanged.
+    Extra_damage_adjustment_factor = 0.75
+    Adjust_Weapon_DPS(scaling_factor = Extra_damage_adjustment_factor,
+                      maintain_energy_efficiency = False)
+
+    #Apply further adjustments to hull damage separately.
+    #Reducing hull damage is a more dynamic way to make combat last longer
+    # without dealing with needing to update ship hull values.
+    #Increasing hull damage can make it easier to balance weapons, making
+    # shield and hull damage more similar, though ship hull values are
+    # increased further below based on a 6:1 shield:hull weapon damage
+    # ratio, so that needs to be taken into consideration if adjusting
+    # values here.
+    Adjust_Weapon_DPS(
+        #Go with a modest boost for now.
+        scaling_factor = 1.5,
+        adjust_hull_damage_only = True,
+        maintain_energy_efficiency = False
+        )
+
+    #Don't apply unique shield adjustment for now; if using this, need to
+    # preferably change shield regen as well.
+    #Adjust_Weapon_DPS(scaling_factor = 1,
+    #                  adjust_shield_damage_only = True,
+    #                  maintain_energy_efficiency = False)
+    
 
     #Extra scaling to apply to beam weapons, on top of the above factor
     # or equation scaling, to bring beam power back down.
@@ -538,49 +361,68 @@ if XRM:
     # beam weapons, since many ships are very constrained on weapon choice 
     # such that their only long range weapon is a beam weapon,
     # which they will be stuck using at those ranges.
+    #Note: this isn't as important if beams were converted to bullets.
+    #Note: beam weapon hull damage is similar to other cap weapons, but shield
+    # damage is often lower (while energy efficiency higher), which may be
+    # worth considering here.
     Adjust_Weapon_DPS(
         bullet_name_adjustment_dict = {
             #Give other beams a nerf.
-            #Try out a 40% beam reduction.
-            'flag_beam': 0.6,
-            #XRM has an extra nerfed mass driver, probably because it uses
-            # the TC damage when AP increased it 4x. XRM MD is about 1/7th of vanilla.
-            #Drop an extra 2x on this (2*2.5=5x), to put back in about the right
-            # ballpark, but don't buff too much because it is no longer ammo limited.
-            'SS_BULLET_MASS': 2,
-            #Give IREs a smaller boost, since they are a bit too close to PACs and similar,
-            # and they are too strong on fighter drones when OOS.
-            #(Note: IREs also have much higher hull damage than vanilla, but leave that
-            # alone for now.) TODO: maybe split into separate transform step.
-            'SS_BULLET_IRE': .5,
-            #An oddity exists with GPBC, in that it has a dps value far higher than
-            # anything else (4x of PPC), which gets ballooned up due to the scaling
-            # equation. TODO: tweak the scaling equation to not baloon this, but
-            # otherwise leave the relative damage buff.
-            #This is the lasertower beam weapon.
-            #'SS_BULLET_GPBC': 1,
-            #Don't adjust repair lasers.
-            'SS_BULLET_REPAIR': 1,
-            'SS_BULLET_REPAIR2': 1,
+            #Try out a 20% beam reduction.
+            'flag_beam': 0.8,
             #Leave the Khaak weapons without the beam nerf, to keep them scary.
             'SS_BULLET_KH_ALPHA': 1,
             'SS_BULLET_KH_BETA': 1,
             'SS_BULLET_KH_GAMMA': 1,
             })
     
+    #Misc changes.
+    Adjust_Weapon_DPS(
+        bullet_name_adjustment_dict = {
+            #XRM has an extra nerfed mass driver, probably because it uses
+            # the TC damage when AP increased it 4x. XRM MD is about 1/7th of vanilla.
+            #Scale this up by 7 / XRM_damage_correction_factor, to bring it back in
+            # line with vanilla AP.
+            'SS_BULLET_MASS': 7 / XRM_damage_correction_factor,
 
-    #Rescale OOS damage values to reflects actual weapon DPS, and adjust
-    # the damage in general.
+            #Give IREs a smaller boost, since they are a bit too close to PACs and similar,
+            # and they are too strong on fighter drones when OOS.
+            #(Note: IREs also have much higher hull damage than vanilla, but leave that
+            # alone for now.)
+            #-Removed; stronger ires are kinda nice, as the basic ones aren't worth
+            # using in general.
+            #'SS_BULLET_IRE': .5,
+
+            #An oddity exists with GPBC, in that it has a dps value far higher than
+            # anything else (4x of PPC).
+            #This is the lasertower beam weapon.
+            #Reduce it down a bit; in game, a single laser tower can kill off a
+            # frigate handily, which is a bit too much.
+            'SS_BULLET_GPBC': 0.5
+            }
+        )
+
+    #Boost hull damage on all ion weapons, since xrm heavy ships
+    # often rely solely on ion weapons and have trouble killing targets.
+    #IONC has around 1/20th the damage/energy of PPC against hull.
+    #Even a 5x boost is probably a decent idea.
+    #Use the special transform which brings up hull damage for high
+    # shield damage. Can use the default 1/15 ratio.
+    Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio(1/15)
+    
+
+    #Rescale OOS damage values.
     #XRM has much weaker weapons in general than vanilla, such that this needs to be
     # increased, otherwise issues with perpetual OOS combat that doesn't break shielding
     # has been observed.
     #The XRM oos damage values are around 1/4 of vanilla, so if
     # vanilla needs a 0.6 factor, then xrm needs a 4 * 0.6 = 2.4x factor.
+    # Can ignore this aspect since the xrm correction was already applied.
     #Since the weapon damage adjustment may have been applied in general, affecting
     # OOS damage as well, that should be included here as a correction.
     #After the correction, apply a scaling similar to that used in vanilla,
     # eg. around 40% reduction.
-    Adjust_Weapon_OOS_Damage(scaling_factor = 0.6 * 2.4 / Flat_damage_adjustment_factor)
+    Adjust_Weapon_OOS_Damage(scaling_factor = 0.6 / Extra_damage_adjustment_factor)
 
     
 
@@ -705,16 +547,14 @@ if XRM:
         })
     
 
-    #XRM bullets are already quite fast and decent range.
-    #Maybe give a range bump anyway.
-    Adjust_Weapon_Range(
-        lifetime_scaling_factor = 1.2,
-        speed_scaling_factor = 1.0,
-        )
+    #XRM bullets are already quite fast and good range.
+    #Adjust_Weapon_Range(
+    #    lifetime_scaling_factor = 1.0,
+    #    speed_scaling_factor = 1.0,
+    #    )
     
-    #XRM already seems to address problems with beam weapon slowdown, so nothing
-    # to adjust here for now.
-    #Maybe retool Split beams, which have very high fire rates.
+    #XRM already slows down a lot of fire rates, and beam weapons don't
+    # need a special reduction when removed.
     #Adjust_Weapon_Fire_Rate(scaling_factor = 0.5)
     
 
@@ -749,13 +589,14 @@ if XRM:
         )
     
     Adjust_Missile_Speed(
-        #The adjustment factor. -25% felt like too little, so try -50%.
-        scaling_factor = 0.5,
+        #The adjustment factor. -25% felt like too little, -50% is a bit
+        # too much; try -35%.
+        scaling_factor = 0.65,
         #If diminishing returns should be used, so that short range
         # missiles are less affected.
         use_diminishing_returns = True,
         #Set the tuning points.
-        #The target speed to adjust, in dps. About 700+ on fast missiles.
+        #The target speed to adjust, in mps. About 700+ on fast missiles.
         target_speed_to_adjust = 700,
         #The speed to pin in place on the low end.
         speed_to_keep_static = 150,
@@ -772,10 +613,356 @@ if XRM:
     #Make missiles a little easier to shoot down.
     Adjust_Missile_Hulls(0.5)
 
+    
+#####################################################
+#Ships
+
+if Vanilla:
+    Fix_Pericles_Pricing()
+    Boost_Truelight_Seeker_Shield_Reactor()
+    Adjust_Ship_Speed(
+        adjustment_factors_dict = {
+            #Bump up interceptors about 30%, to better distinguish their role from
+            # fighters (which otherwise have a lot of speed overlap).
+            #Could also bump up to 50% and still be in about the right range.
+            'SG_SH_M4': 1.3,
+            })
+    
+    #Nerf the Aldrin ship speeds.
+    #This can go as far as 50% and these ships will still be decent,
+    # eg. springblossom will still be faster than other fast corvettes (and
+    # with frigate tier turrets with a large cargo hold, probably still
+    # stronger in a fight).
+    Adjust_Ship_Speed({
+        'SS_SH_LOST_M6H': 0.5,
+        'SS_SH_LOST_M3H': 0.5,
+        })
+
+
+if XRM:
+    #Can remove engine trails if they cause slowdown.
+    #Simplify_Engine_Trails()
+
+    #Add life support to cap ships. This includes TLs by default,
+    # and may have effects on other transports (can check in game
+    # if that feels like a problem).
+    Add_Ship_Life_Support()
+
+    #Set all ships to have the same tuning count.
+    #Go with 10, a decent number, which can double a ship's base speed
+    # for its max speed.  Note: overtuning start plot ships may be a little
+    # stronger, but that's probably okay since it would affect fighters, 
+    # which still aren't overly fast for those plots.
+    Standardize_Ship_Tunings(
+        engine_tunings = 10,
+        rudder_tunings = 10
+        )
+
+    Adjust_Ship_Pricing(
+        #The XRM costs include eg. a 2-4x upscale on scouts, which combined with scouts being
+        # easier to shoot down (due to laser changes) makes them even more terrible.
+        #The rescale would bring costs in line with vanilla, which had pretty reasonable
+        # prices.
+        #This may only be applied to scouts themselves; other ships are more in line with
+        # their usefulness.
+        adjustment_factors_dict = {
+            #A vanilla disco is 0.13x the price of a buster; in xrm this is 0.37x.
+            #Can multiply by 0.35 to roughly bring scout prices in line, but a more conservative
+            # 0.5 should do okay as well.
+            'SG_SH_M5': 1/2,
+        })
+    
+
+    #Increase laser recharge on corvettes in XRM, which uses TC style low values about
+    # 1/2 of AP. Can use a generalized table for all ship subtypes for future scaling,
+    # similar to what is done for hull and speed.
+    #A flat adjustment can be done after this per-ship adjustment.
+    #TODO: consider if there is a better (less clumsy) way to go about this, such
+    # as by not rescaling energy usage when adjust xrm weapon dps values.
+    Adjust_Ship_Laser_Recharge(
+        adjustment_factors_dict = {
+            #Recharge and capacitor have somewhat different scalings vanilla to Xrm.
+            #This will just apply to the recharge factor.
+            #AP centaurs have 0.6x the capacitor and 2.1x the recharge of Xrm centaurs.
+            #Note: there is some overlap between this transform and reducing the
+            # energy usage of weapons. See X3_Weapons for some notes on that.
+            # The general decision is to adjust ships recharge for bigger ships to
+            # account for XRM giving big weapons severe efficiency penalties compared
+            # to vanilla, eg. 1/3 efficiency for PPC being balanced by 3x recharge
+            # for capital ships.
+            #Generally, can adjust these based on the energy efficiency ratio of
+            # vanilla vs XRM for the typical best weapon of the ship class.
+            
+            #Ratios will be given as (vanilla damage / energy) / (xrm damage / energy),
+            # eg. if vanilla is 2x more efficient, boost xrm ship laser recharge by 2x.
+            #A second ratio will be (vanilla ship recharge / xrm ship recharge) for a
+            # typical ship of the class.
+            #This should bring xrm in line with vanilla overall.
+        
+            #M5 will use IRE, discoverer. -40%.
+            'SG_SH_M5': (220/4) / (180/2) * (25 / 25),
+            #M4 will use PAC, buster. -20%.
+            'SG_SH_M4': (1155/23) / (640/10) * (51 / 51),
+            #M3 will use HEPT, nova. -10%.
+            'SG_SH_M3': (1995/40) / (1330/26) * (140 / 155),
+            #Leave bombers alone for now.
+            #'SG_SH_M8': 1.0,
+            #M6 will use CIG, centaur. +30%.
+            'SG_SH_M6': (7845/246) / (8050/153) * (1050 / 493),
+            #M7 will use IBL, cerberus. +200%.
+            # This may be too high with IBL, or too low with CIG.
+            # Try averaging the two, for +95%.
+            'SG_SH_M7': ((50860/526) / (14400/400)
+                         #Cig damage/energy from above.
+                         +(7845/246) / (8050/153))/2 * (2200 / 1925),
+            #M2 will use PPC, titan. +150%.
+            'SG_SH_M2': (63778/536) / (27000/900) * (4145 / 6581),
+            #M1 will use PPC, colossus. +125%.
+            'SG_SH_M1': (63778/536) / (27000/900) * (797 / 2817),
+            #M0 will use PPC, megalodan. +450%.
+            # TODO: Does any ship really use M0 classification?
+            'SG_SH_M0': (63778/536) / (27000/900) * (7500 / 5405),
+            #Transports can be left alone for now.
+            #These could use a general buff to make them more capable of
+            # defending themselves.
+            #Try a 2x buff for a bit.
+            'SG_SH_TS': 2.0,
+            'SG_SH_TM': 2.0,
+            'SG_SH_TP': 2.0,
+            'SG_SH_TL': 2.0,
+            #'SG_SH_GO': 1.0,
+        })
+
+    #Additional adjustments to taste.
+    #The above adjustments leave recharge often too low to feel good,
+    # when considered in light of any damage boosts.
+    #Try a global +25%.
+    Adjust_Ship_Laser_Recharge(scaling_factor = 1.25)
+    
+
+    #Xrm makes many transports too tough, such that pirate/xenon groups cannot crack
+    # their shields and just sit there pecking away forever as the transport
+    # flies in circles without energy to use its guns.
+    #The fix can be a mixture of reducing shield recharge rates on the buffed
+    # transports (which are normally closer to 600, but in xrm go up to 2000+), and
+    # reducing their total shields (in Adjust_shield_slots below). 
+    #-For transport ships should have their shield recharge nerfed.
+    #-Also needed for capital ships, otherwise they can't break shields on OOS combat
+    # with the weak XRM weaponry.
+    #This problem appears to partly trace back to XRM having weakened weapons, and
+    # partly to XRM having boosted shield regen efficiency by 2.5x in TShields.
+    #Reducing ship shield generators has the general effect of a ship with few
+    # shield slots filled regenerating as fast as if all were filled, since it
+    # doesn't have a reactor capable of powering all shields together.
+    #Changing the TShields directly is probably more intuitive for reducing
+    # ship shield regen.
+    #Correct the XRM shield regen efficiency buff.
+    Adjust_Shield_Regen(1/2.5)
+    #Also do some per-ship adjustments.
+    Adjust_Ship_Shield_Regen(    
+        adjustment_factors_dict = {        
+            #Ignore lighter ships for now. TODO: special scouts might have too much shield
+            # regen, eg. Arrow has more than M3s.
+            #'SG_SH_M5': (0, 1, None),
+            #'SG_SH_M4': (0, 1, None),
+            #'SG_SH_M3': (0, 1, None),
+            #'SG_SH_M8': (0, 1, None),
+            #M6s appear lightly buffed, around 15%-20%.
+            # For a centaur, 2500 in vanilla and 3000 in xrm, if assuming
+            #  a 1k base, then (2.5k-1k)/(3k-1k) = 0.75 to adjust it back.
+            'SG_SH_M6': (1000, 0.75, None),
+            #M7 are often unchanged. In the skirnir case, it was actually cut in about half.
+            #'SG_SH_M7': (0, 1, None),
+            #M2s were buffed by 21% on the low end (titan, 14400 in vanilla).
+            # Megalodan is buffed 44% (14200 in vanilla), which might be okay.
+            # Phoenix is buffed 112%, 8k to 17k, though it was oddly low in vanilla.
+            # Assuming 10k base, then (14.4k-10k)/(14.4k*1.21-10k) = 0.6 to adjust
+            #  the titan back to vanilla.
+            'SG_SH_M2': (10000, 0.6, None),
+            #M1s were buffed by 25% on the low end (colossus, 8200 in vanilla).
+            # Assuming 5k base, then (8.2k-5k)/(8.2k*1.25-5k) = 0.6 to adjust the
+            #  colossus back to vanilla, treating similar M1s the same but buffer M1s
+            #  with a bigger nerf.
+            # OWPs are classified as M1 and were buffed by 10x, and could use a big nerf.
+            # Apply a max of ~25k for limit OWPs.
+            'SG_SH_M1': (5000, 0.6, 20000),
+            #'SG_SH_M0': (0, 1, None),
+            #Greatly reduce transports, and personel transports, which were increased by
+            # up to ~10x in some cases. Assumg vanilla base regen is around 500 for
+            # trade ships and 400 for personel transports, and just go with a 90% reduction
+            # on anything above that.
+            'SG_SH_TS': (500, 0.1, None),
+            'SG_SH_TP': (400, 0.1, None),
+            #Military transports appear largely unchanged.
+            #'SG_SH_TM': (0, 1, None),
+            #Big transports were buffed by ~25%; can probably leave this alone, though they
+            # may need a shield slot reduction (since they are overshielded).
+            #'SG_SH_TL': (0, 1, None),
+            #'SG_SH_GO': (0, 1, None),
+        })
+
+    
+
+    #Reduce all shield regen by a global factor, in addition to what
+    # is given above. This is applied after other adjustments.
+    #Add a general 1/2 factor, and also scale with the weapon damage boost, 
+    # eg. lower damage should have lower shield regen.
+    Adjust_Ship_Shield_Regen(scaling_factor = Extra_damage_adjustment_factor / 2)
+
+
+    #Adjust total shielding on some ships.
+    Adjust_Ship_Shield_Slots(
+        adjustment_factors_dict = {
+            #For over-shielded transports, in addition to reducing recharge rates,
+            # the other part of the fix is to reduce shielding,
+            # particularly those that were given multiple 200 mj shields.
+            #They can likely just have their shield slots dropped down to 1-2, from
+            # the 5-6 currently.
+            'SG_SH_TS': (200, 0.2),
+            'SG_SH_TP': (200, 0.2),
+            #Big transports were given a ~5x increase in shield slots;
+            # drop them down as well, closer to 1 GJ.
+            #This is a little dull since they will all end up at 1 GJ, but there
+            # is no good way around that without swapping them to 200 mj shields.
+            #Some transports had 6GJ of shields; a factor >0.1 should round them
+            # up to 2GJ, to add a little variety at least.
+            'SG_SH_TL': (1000, 0.12),
+        })
+    
+    Adjust_Ship_Speed(
+        #In XRM, many ships were greatly sped up in the m4-6 tiers, which has a general
+        # effect of making the universe feel smaller, as well as making scouts less
+        # distinctive when m4s can reach 400+.
+        #Generally apply slowdowns, though keep some speed boosts selectively.
+        adjustment_factors_dict = {
+            #Bring scouts back down based on kestrel (drop 715 to 600).
+            'SG_SH_M5': 600 / 715,
+            #Bring intercepters back down based on buster, but still keeping a boost
+            # over vanilla.  Go with 50% boost.
+            'SG_SH_M4': 175 / 301 * 1.5,
+            #Bring fighters down based on nova, and retain about half the boost
+            # of the intercepter.
+            'SG_SH_M3': 150 / 237 * 1.25,
+            #Bombers are often unchanged.
+            #'SG_SH_M8': 1.0,
+            #Base corvette speed on skiron. Centaur seems sped up more than others,
+            # so don't use it as base point.
+            #Keep modest boost, to try to stay ahead of the faster frigates.
+            'SG_SH_M6': 149 / 214 * 1.15,
+            #Some M7s are exceptionally fast (faster than many vanilla corvettes), but
+            # many were unchanged, so a global reduction isn't safe.
+            #'SG_SH_M7': 1.0,
+            #Capital ships are often unchanged.
+            #'SG_SH_M2': 1.0,
+            #'SG_SH_M1': 1.0,
+            #'SG_SH_M0': 1.0,
+            #Transports are often unchanged.
+            #'SG_SH_TS': 1.0,
+            #'SG_SH_TM': 1.0,
+            #'SG_SH_TP': 1.0,
+            #'SG_SH_TL': 1.0,
+            #Goner classifier appears unused (goner ships given other subtypes).
+            #'SG_SH_GO': 1.0,
+        })
+
+    #Nerf the Aldrin ships a bit.
+    #This doesn't need as big a change in XRM since it left these alone when
+    # speeding up other ships, but 30% should still be a safe reduction
+    # while leaving these fast.
+    Adjust_Ship_Speed(adjustment_factors_dict = {
+        'SS_SH_LOST_M6H': 0.7,
+        'SS_SH_LOST_M3H': 0.7,
+        })
+
+
+    #Do a custom ship hull multiplier instead of using XRM's hull packs, for finer
+    # control.
+    #Save games may need a script to update existing hull values if this is changed
+    # mid game (can use the script from the xrm hull pack).
+    '''
+    The base XRM hulls are roughly matched to TC, while AP boosted hulls by
+    around 2x for fighters to 10x for capitals.
+
+    In practice, the AP boost is probably a bit too much on the high end, where
+    kill heavy capitals can take excessively long.
+
+    Some of this plays into missile and weapon hull damage modifications, so the
+    main concern is to get a good balance between shield and hull values (for
+    better missile balance), adjust relative hulls between ship classes, then
+    to rely on weapon changes for the rest.
+
+    XRM shield to hull ratio samples:
+    Valhalla m2: 12GJ shields, 950k hull.  12.6 : 1 ratio
+    Aamon    m3: 150MJ shields, 10k hull.  15.0 : 1 ratio
+    Buster   m4: 15MJ shields, 3.3k hull.   4.5 : 1 ratio
+
+    This massive difference makes missiles excessively strong against hulls 
+    compared to shields.
+    Lasers, in general, have a 6:1 ratio on shield:hull damage.
+
+    To get a better balance, aim for at least 2x hull in general.
+    Going up to 10x will give better missile balance, though requires boosting
+    laser hull damage to keep up.
+
+    To keep things simpler here, just use the AP adjustments, but without as
+    strong a capital ship boost.
+    '''
+    Adjust_Ship_Hull(
+        adjustment_factors_dict = {
+            #Base XRM hulls are generally from TC style values.
+            #Use the TC to AP ratio for each class of ship for this scaling, generally
+            # using basic argon ships from the wiki.
+            'SG_SH_M5': 2,
+            'SG_SH_M4': 2,
+            'SG_SH_M3': 2,
+            #Bombers were added in AP, and XRM uses roughly the AP hull already, so no change.
+            #'SG_SH_M8': 1,
+            'SG_SH_M6': 4,
+            'SG_SH_M7': 4,
+            'SG_SH_M2': 8,
+            'SG_SH_M1': 8,
+            'SG_SH_M0': 8,
+            'SG_SH_TS': 3,
+            #Military transports are like bombers, with no change.
+            #'SG_SH_TM': 1,
+            'SG_SH_TP': 3,
+            'SG_SH_TL': 6,
+            #Goner classifier appears unused (goner ships given other subtypes).
+            #'SG_SH_GO': 1,
+        })
+
+    ##Adjustment factors from AP. Unused.
+    #Adjust_Ship_Hull(
+    #    adjustment_factors_dict = {
+    #        #Base XRM hulls are generally from TC style values.
+    #        #Use the TC to AP ratio for each class of ship for this scaling, generally
+    #        # using basic argon ships from the wiki.
+    #        'SG_SH_M5': 2,
+    #        'SG_SH_M4': 2,
+    #        'SG_SH_M3': 2,
+    #        #Bombers were added in AP, and XRM uses roughly the AP hull already, so no change.
+    #        #'SG_SH_M8': 1,
+    #        'SG_SH_M6': 4,
+    #        'SG_SH_M7': 4,
+    #        'SG_SH_M2': 10,
+    #        'SG_SH_M1': 10,
+    #        'SG_SH_M0': 10,
+    #        'SG_SH_TS': 3,
+    #        #Military transports are like bombers, with no change.
+    #        #'SG_SH_TM': 1,
+    #        'SG_SH_TP': 3,
+    #        'SG_SH_TL': 10,
+    #        #Goner classifier appears unused (goner ships given other subtypes).
+    #        #'SG_SH_GO': 1,
+    #    })
+
 
 #####################################################
 #Wares
 if XRM:
     #Restore tuning prices such that they have increasing cost again,
-    #by just resetting to vanilla pricing.
-    Restore_Vanilla_Tuning_Pricing()
+    # by just resetting to vanilla pricing.
+    #-Removed; even though the increasing price is odd, the higher
+    # investment feels good in a way.
+    #Restore_Vanilla_Tuning_Pricing()
+    pass

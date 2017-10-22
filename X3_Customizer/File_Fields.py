@@ -103,6 +103,7 @@ T_file_name_field_dict_dict = {
         27 : 'rudder_tunings', #Note: may actually have 27/28 reversed.
         28 : 'cargo_min',
         29 : 'cargo_max',
+        30 : 'ware_list', #Integer, index in warelists.txt for built-in wares.
         46 : 'hull_strength',
         49 : 'particle_effect', #Integer, corresponds to particles3 file?, engine trail
         51 : 'angular_acceleration',
@@ -114,6 +115,15 @@ T_file_name_field_dict_dict = {
         -6 : 'production_value_player',
         #Name is the last field before the newline.
         -2 : 'name',
+        },
+    'TShields.txt': {
+        'min_data_entries': 5,
+        0: 'model_file',  #Int.
+        5: 'subtype',  #Int, appears to go from 0 for 1MJ to 5 for 2GJ.
+        7: 'power_drain', #Int, the power draw of the shield, in kW. eg. 33 to 2500.
+        8: 'capacity', #Int, the size of the shield in kW, eg. 1000 for 1MJ.
+        10: 'efficiency', #Float, recharge efficiency of the shield, eg. 0.85.
+        -2: 'name',
         },
     'TGates.txt' : {
         'min_data_entries': 5,
@@ -184,6 +194,21 @@ T_file_name_field_dict_dict = {
         10: 'price_modifier_2',
         12: 'relative_value_player',
         -2: 'name',
+        },
+    'WareLists.txt':{
+        #Empty entries may just be a count (0) and their slash_index (includes newline).
+        #Note that this is small enough to match the header, so expect the
+        # header line to be returned to any calling code.
+        'min_data_entries': 2,
+        #Int, the number of wares in the list, prior to the index.
+        #Adjust this if changing ware count.
+        0 : 'ware_count',
+        #String, a forward slash followed by the integer index, and then a
+        # newline (combined, since there is no semicolon at the end like with
+        # other files). May include a random comment before the newline, and
+        # is probably just a comment in general.
+        # Indices appear to always be in order, starting from 0.
+        -1: 'slash_index_comment',  
         },
 }
 

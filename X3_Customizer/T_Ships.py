@@ -29,7 +29,8 @@ import math
 @Check_Dependencies('TShips.txt')
 def Adjust_Ship_Hull(
     scaling_factor = 1,
-    adjustment_factors_dict = {}
+    adjustment_factors_dict = {},
+    adjust_repair_lasers = True
     ):
     '''
     Adjust ship hull values. When applied to a existing save, ship hulls will
@@ -42,6 +43,9 @@ def Adjust_Ship_Hull(
       - Multiplier to apply to any ship type not found in adjustment_factors_dict.
     * adjustment_factors_dict:
       - Dict keyed by ship type, holding a scaling factor to be applied.
+    * adjust_repair_lasers:
+      - Bool, if True (default) repair lasers will be scaled by the M6 
+        hull scaling (if given), to avoid large changes in repair times.
     '''
     for this_dict in Load_File('TShips.txt'):
         if this_dict['subtype'] in adjustment_factors_dict or scaling_factor != 1:
@@ -68,6 +72,27 @@ def Adjust_Ship_Hull(
             this_dict['hull_strength'] = str(new_value)
 
 
+    #Upscale repair lasers if M3 scaling given.
+    #This could work on m3 or m6 hull scaling, though needs to pick one
+    # or the other to be safe against multiple transform calls.
+    #Eg. if averaging m3 and m6 by x2 and x4, then the average is x3
+    # if this is done in one call. But over two calls, the averages
+    # will be 3/2 and 5/2, for 15/4 or 3.75, which is not the same.
+    #The latter case would work okay if bonuses were tracked and added
+    # from multiple calls, then applied during cleanup, but that is
+    # probably more effort than wanted right now.
+    #Go with M6 to be more player friendly, since repairs are most likely
+    # to be attempted but get frustrating on an M6.
+    if adjust_repair_lasers and 'SG_SH_M6' in adjustment_factors_dict:
+        laser_scaling = adjustment_factors_dict['SG_SH_M6']
+        #Call the dps adjustment transform to handle this.
+        import T_Weapons
+        T_Weapons.Adjust_Weapon_DPS(
+            bullet_name_adjustment_dict = {'flag_repair': laser_scaling},
+            maintain_energy_efficiency = False
+        )
+
+
             
 @Check_Dependencies('TShips.txt')
 def Adjust_Ship_Speed(
@@ -80,7 +105,7 @@ def Adjust_Ship_Speed(
     * scaling_factor:
       - Multiplier to apply to any ship type not found in adjustment_factors_dict.
     * adjustment_factors_dict:
-      - Dict keyed by ship type, holding a scaling factor to be applied.
+      - Dict keyed by ship type or name, holding a scaling factor to be applied.
     '''
     #Approach could be to set a target average speed for each tier of ship, calculate the
     # existing average of that tier, and use the ratio as a multiplier to bring the average
@@ -90,17 +115,21 @@ def Adjust_Ship_Speed(
     #Note: while acceleration could also be changed, since it was buffed to a lesser extent
     # as well, it should be safe to leave it alone for now.
     for this_dict in Load_File('TShips.txt'):
+
+        #Determine the scaling factor.
+        this_scaling_factor = scaling_factor
+        #Check for specific ship name.
+        if this_dict['name'] in adjustment_factors_dict:
+            this_scaling_factor = adjustment_factors_dict[this_dict['name']]
+        #Check for ship type.
+        elif this_dict['subtype'] in adjustment_factors_dict:
+            this_scaling_factor = adjustment_factors_dict[this_dict['subtype']]
+
         #Adjust speed.
-        if this_dict['subtype'] in adjustment_factors_dict or scaling_factor != 1:
+        if this_scaling_factor != 1:
             #Only really need to adjust base speed itself, not tuning count.
             value = int(this_dict['speed'])
-
-            #Pick the table scaling factor, or the default.
-            if this_dict['subtype'] in adjustment_factors_dict:
-                new_value = value * adjustment_factors_dict[this_dict['subtype']]
-            else:
-                new_value = value * scaling_factor
-
+            new_value = value * this_scaling_factor
             #Round it off.
             new_value = round(new_value)
             #Put it back.
@@ -131,7 +160,6 @@ def Adjust_Ship_Laser_Recharge(
             else:
                 new_value = value * scaling_factor
 
-            new_value = value * adjustment_factors_dict[this_dict['subtype']]
             this_dict['weapon_recharge_factor'] = str(new_value)
 
             
@@ -361,4 +389,256 @@ def Simplify_Engine_Trails(
         else:
             this_dict['particle_effect'] = '0'
                 
+
+
+@Check_Dependencies('TShips.txt')
+def Standardize_Ship_Tunings(
+        engine_tunings = None,
+        rudder_tunings = None,
+    ):
+    '''
+    Standardize max engine or rudder tuning amounts across all ships.
+    Eg. instead of scouts having 25 and carriers having 5 engine
+    runings, both will have some fixed number.
+    Maximum ship speed and turn rate is kept constant, but minimum
+    will change.
+    If applied to an existing save, existing ships may end up overtuned;
+    this is recommended primarily for new games, pending inclusion of
+    a modification script which can recap ships to max tunings.
+
+    * engine_tunings:
+      - Int, the max engine tunings to set.
+    * rudder_tunings:
+      - Int, the max rudder tunings to set.
+    '''
+    #TODO: maybe provide a script to run which resets ships to their
+    # max tunings if they went over (though would mess with overtuned
+    # ships that may exist).
+    for this_dict in Load_File('TShips.txt'):
+
+        #Loop over the engine and rudder tunings, to share code.
+        for tuning_amount, tuning_field, scaled_field_list in zip(
+                [engine_tunings, rudder_tunings],
+                ['speed_tunings', 'rudder_tunings'],
+                #TODO: should angular acceleration be modified as well?
+                [['speed','acceleration'],
+                 ['yaw','pitch','roll']]
+            ):
+            #Skip if unspecified.
+            if tuning_amount == None:
+                continue
+
+            #Get the base max tunings.
+            max_tunings = int(this_dict[tuning_field])
+            #Get the scaling factor to apply to the scaled fields.
+            #Tunings provide 10% each, so the old max was
+            # (1 + max_tunings / 10), and the new max will be
+            # (1 + new_tunings / 10), so the scaling
+            # will be the ratio of these.
+            #Put new tunings on bottom; if tuning count is being reduced,
+            # then the bottom term will be smaller, leading to a >1 scaling
+            # to make up for the smaller tuning amount.
+            # Eg. if max_tunings were 10, the tuning_amount is 0, then the
+            # scaling will be x2 to make up for the loss of tunings.
+            scaling = (1 + max_tunings / 10) / (1 + tuning_amount / 10)
+
+            #Loop over the scaled fields.
+            for scaled_field in scaled_field_list:
+                #Unfortunately, the speed terms are int while rudder terms
+                # are float, so need to parse based on type.
+                if tuning_field == 'speed_tunings':
+                    value = int(this_dict[scaled_field])
+                    new_value = value * scaling
+                    #Round it off.
+                    new_value = round(new_value)
+                    #Put it back.
+                    this_dict[scaled_field] = str(new_value)
+                else:
+                    value = float(this_dict[scaled_field])
+                    new_value = value * scaling
+                    #Put it back, with 6 decimal places. Some existing
+                    # terms had up to ~7 or so (suggests single precision float),
+                    # and some terms can get down to the 4th decimal place for
+                    # slow turning ships.
+                    this_dict[scaled_field] = str('{0:.6f}'.format(new_value))
+
+            #Update the tuning amount.
+            this_dict[tuning_field] = str(tuning_amount)
+
+            
+@Check_Dependencies('TShips.txt', 'WareLists.txt')
+def Add_Ship_Life_Support(
+        ship_types = [
+            'SG_SH_M1',
+            'SG_SH_M2',
+            'SG_SH_M6',
+            'SG_SH_M7',
+            'SG_SH_TM',
+            'SG_SH_TL',
+            ]
+    ):
+    '''
+    Adds life support as a built-in ware for select ship classes.
+    Note: switches ships to a matching ware list with life support included
+    when possible, else adds life support to the existing ware list. Some
+    non-capital ships may be affected if they share an edited list.
+
+    * ship_types:
+      - List of ship types to add life support to, eg. ['SG_SH_M2'].
+        By default, this includes M6, M7, M2, M1, TL, TM.
+    '''
+    #Ship built-in wares are specified in a two step process:
+    # 1) The ship gives an index of a ware list.
+    # 2) The warelist file at that index has a list of wares to include.
+    #The approach here will be to determine all ware list ids used by
+    # capital ships, then either find a replacement list which has the
+    # same wares but including life support (to be swapped to), or to
+    # edit the ware lists to include life support.
+    #Life support is assumed to always be 'SS_WARE_LIFESUPPORT', not changed
+    # by mods. If this is ever a problem, it could potentially be deduced from
+    # TP ware lists.
+
+    #Get a set of ware list ids for capital ships being modified.
+    cap_ware_list_ids = set()
+    #Loop over all ships.
+    for this_dict in Load_File('TShips.txt'):
+
+        #Skip if this is not a ship to add life support to.
+        if this_dict['subtype'] not in ship_types:
+            continue
+
+        #Record the list.
+        this_ware_list_id = int(this_dict['ware_list'])
+        cap_ware_list_ids.add(this_ware_list_id)
+
+
+    #Go through all ware lists and parse their actual wares.
+    ware_list_list = []
+    for index, this_dict in enumerate(Load_File('WareLists.txt')):
+
+        #Note: an oddity with the warelist is that the data lines and the
+        # header line can be the same size (2), so that header line will
+        # need to be pruned here manually.
+        #Can identify the header as having 2 entries, the second being just
+        # a newline.
+        if len(this_dict) == 2 and this_dict['slash_index_comment'] == '\n':
+            #This should be the first item.
+            assert index == 0
+            continue
+
+        #Get the wares, as a list of strings.
+        #Skip the first entry (count) and last entry (slash_index+newline).
+        this_ware_list = list(this_dict.values())[1:-1]
+
+        #Verify the right count.
+        assert len(this_ware_list) == int(this_dict['ware_count'])
+
+        #Record the ware list.
+        ware_list_list.append(this_ware_list)
+
+
+    #Prune out the cap ship wares that already have life support.
+    for id in list(cap_ware_list_ids):
+        if 'SS_WARE_LIFESUPPORT' in ware_list_list[id]:
+            cap_ware_list_ids.remove(id)
+
+    #Try to match the remaining lists to an existing list with the same
+    # contents but including life support.
+    #This occurs in XRM for TLs, which have the TS ware list, but there
+    # is a cruiseliner list that has life support and the TS trade ware
+    # which can be swapped to without adding life support to all traders.
+    #When replacements found, the original id will be removed from
+    # the cap_ware_list_ids set.
+    #Any valid replacements go in this dict.
+    ware_list_id_replacement_dict = {}
+    for id in list(cap_ware_list_ids):
+
+        #Grab the original wares as a set, for easy superset checks.
+        original_list = set(ware_list_list[id])
+        #Calculate the expected size of a replacement list; should only
+        # be +1 for life support.
+        replacement_list_size = len(original_list) +1
+
+        #Loop over all ware lists.
+        for other_list_id, other_ware_list in enumerate(ware_list_list):
+            #Probably safe to check against self, so don't bother skipping
+            # that case.
+            #No match if the other list is not the original list +1 in size.
+            if len(other_ware_list) != replacement_list_size:
+                continue
+
+            #Not a match if the other list doesn't have life support.
+            if 'SS_WARE_LIFESUPPORT' not in other_ware_list:
+                continue
+
+            #Not a match if the other list is not a superset.
+            if not original_list <= set(other_ware_list):
+                continue
+
+            #When here, this is a match.
+            ware_list_id_replacement_dict[id] = other_list_id
+            cap_ware_list_ids.remove(id)
+            break
+
+
+    #If replacements were found, go back through tships and change the
+    # ware list ids as needed.
+    if ware_list_id_replacement_dict:    
+        for this_dict in Load_File('TShips.txt'):    
+            #Skip if this is not a ship to add life support to.
+            if this_dict['subtype'] not in ship_types:
+                continue
+
+            #Skip if the ship's ware list doesn't need replacement.
+            this_ware_list_id = int(this_dict['ware_list'])
+            if this_ware_list_id not in ware_list_id_replacement_dict:
+                continue
+
+            #Apply the replacement.
+            this_dict['ware_list'] = str(ware_list_id_replacement_dict[this_ware_list_id])
+
+
+    #If ware list ids are left that couldn't be replaced, edit in
+    # list support for them.
+    if cap_ware_list_ids:
+        #Note that since the header line gets returned, the actual ware
+        # list index is 1 less than the enumerated value.
+        for index_p1, this_dict in enumerate(Load_File('WareLists.txt')):
+            
+            #Note: an oddity with the warelist is that the data lines and the
+            # header line can be the same size (2), so that header line will
+            # need to be pruned here manually.
+            #Can identify the header as having 2 entries, the second being just
+            # a newline.
+            if len(this_dict) == 2 and this_dict['slash_index_comment'] == '\n':
+                #This should be the first item.
+                assert index_p1 == 0
+                continue
+            #Adjust to get the proper index.
+            index = index_p1 -1
+
+            #Skip if this is not a list to add life support to.
+            if index not in cap_ware_list_ids:
+                continue
+
+            #Grab the original ware list, parsed above.
+            #this_ware_list = ware_list_list[index]
+
+            #Put life support in it, at the front for now since that is where
+            # it shows up in some sampled lines.
+            #this_ware_list.insert(0, 'SS_WARE_LIFESUPPORT')
+
+            #The entire dict will need its indices adjusted to make
+            # room for the new ware.
+            #It should be safe to just pop off the last item, put in life
+            # support, and put the last item back (the slash_index_comment).
+            slash_index_comment = this_dict['slash_index_comment']
+            del(this_dict['slash_index_comment'])
+            this_dict[len(this_dict)] = 'SS_WARE_LIFESUPPORT'
+            this_dict['slash_index_comment'] = slash_index_comment
+
+            #Adjust the ware count.
+            this_dict['ware_count'] = str(int(this_dict['ware_count']) +1)
+
+    return
 

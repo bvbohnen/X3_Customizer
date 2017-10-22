@@ -39,7 +39,7 @@ TBullets_flag_bits = {
     5: 'ignore_shields',
     #Value 64 = ammo usage, hence bit 6
     6: 'use_ammo',
-    #Presumed; repair beams
+    #Repair beams
     7: 'repair',
     #256 for flak
     8: 'flak',

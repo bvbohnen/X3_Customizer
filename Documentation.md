@@ -1,5 +1,5 @@
 
-X3 Customizer v2.01
+X3 Customizer v2.03
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -15,6 +15,8 @@ Usage:
      directory, to specify the path to the AP directory, the folder
      containing the source files to be modified, and the transforms
      to be run. See User_Transforms_Example.py for an example.
+     Defaults to running 'User_Transforms.py' if an argument is 
+     not provided.
  * "Make_Documentation.py"
    - Generates documentation for this project.
 
@@ -73,6 +75,15 @@ Change Log:
    - Added Adjust_Generic_Missions.
    - Added new arguments to Enhance_Mosquito_Missiles.
    - Adjusted default ignored weapons for Convert_Beams_To_Bullets.
+ * 2.03:
+   - Added Add_Ship_Life_Support.
+   - Added Adjust_Shield_Regen.
+   - Added Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio.
+   - Added Standardize_Ship_Tunings.
+   - New options added for Adjust_Weapon_DPS.
+   - New option for Adjust_Ship_Hull to scale repair lasers as well.
+   - Several weapon transforms now ignore repair lasers by default.
+   - Command line call defaults to User_Transforms.py if a file not given.
 
 ***
 
@@ -104,6 +115,20 @@ Setup methods:
 
 Transform List:
 
+ * Add_Ship_Life_Support
+  
+    Requires: TShips.txt, WareLists.txt
+  
+      Adds life support as a built-in ware for select ship classes.
+      Note: switches ships to a matching ware list with life support included
+      when possible, else adds life support to the existing ware list. Some
+      non-capital ships may be affected if they share an edited list.
+  
+      * ship_types:
+        - List of ship types to add life support to, eg. ['SG_SH_M2'].
+          By default, this includes M6, M7, M2, M1, TL, TM.
+      
+
  * Adjust_Beam_Weapon_Duration
   
     Requires: TBullets.txt
@@ -123,6 +148,8 @@ Transform List:
           given in seconds.
         - None may be entered for min or max to disable those limits.
         - '*' entry will match all beam weapons not otherwise named.
+      * ignore_repair_lasers:
+        - Bool, if True (default) then repair lasers will be ignored.
       
 
  * Adjust_Beam_Weapon_Width
@@ -337,6 +364,16 @@ Transform List:
           Eg. a fog factor of 0.5 will add 25 more particles in heavy fog.
       
 
+ * Adjust_Shield_Regen
+  
+    Requires: TShields.txt
+  
+      Adjust shield regeneration rate by changing efficiency values.
+      
+      * scaling_factor:
+        - Multiplier to apply to all shield types.
+      
+
  * Adjust_Ship_Hull
   
     Requires: TShips.txt
@@ -351,6 +388,9 @@ Transform List:
         - Multiplier to apply to any ship type not found in adjustment_factors_dict.
       * adjustment_factors_dict:
         - Dict keyed by ship type, holding a scaling factor to be applied.
+      * adjust_repair_lasers:
+        - Bool, if True (default) repair lasers will be scaled by the M6 
+          hull scaling (if given), to avoid large changes in repair times.
       
 
  * Adjust_Ship_Laser_Recharge
@@ -422,7 +462,7 @@ Transform List:
       * scaling_factor:
         - Multiplier to apply to any ship type not found in adjustment_factors_dict.
       * adjustment_factors_dict:
-        - Dict keyed by ship type, holding a scaling factor to be applied.
+        - Dict keyed by ship type or name, holding a scaling factor to be applied.
       
 
  * Adjust_Strafe
@@ -449,6 +489,10 @@ Transform List:
   
       * scaling_factor:
         - The base multiplier to apply to shot speeds.
+      * adjust_hull_damage_only:
+        - Bool, if True only hull damage is modified. Default False.
+      * adjust_shield_damage_only:
+        - Bool, if True only shield damage is modified. Default False.
       * use_scaling_equation:
         - If True, a scaling formula will be applied, such
           that shots near damage_to_adjust_kdps see the full scaling_factor,
@@ -470,6 +514,12 @@ Transform List:
         - '*' entry will match all weapons not otherwise matched,
           equivelent to setting scaling_factor and not using the
           scaling equation.
+      * maintain_energy_efficiency:
+        - Bool, if True (default) then weapon energy usage will be scaled to
+          keep the same damage/energy ratio, otherwise damage is adjusted but
+          energy is unchanged.
+      * ignore_repair_lasers:
+        - Bool, if True (default) then repair lasers will be ignored.
       * print_changes:
         - If True, speed adjustments are printed to the summary file.  
       
@@ -486,6 +536,8 @@ Transform List:
         - Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the
           multiplier to apply. This will override scaling_factor for
           this weapon.
+      * ignore_repair_lasers:
+        - Bool, if True (default) then repair lasers will be ignored.
       
 
  * Adjust_Weapon_Fire_Rate
@@ -898,6 +950,20 @@ Transform List:
           Applies after name_price_dict if an item is in both dicts.
       
 
+ * Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio
+  
+    Requires: TBullets.txt
+  
+      Increases hull damage on weapons to achieve a specified hull:shield
+      damage ratio requirement. Typical weapons are around a 1/6 ratio, 
+      though some weapons can be 1/100 or lower, such as ion weaponry.
+      This transform can be used to give such weapons a viable hull damage amount.
+  
+      * minimum_ratio:
+        - Float, the required ratio. Recommend something below 1/6 to avoid
+          significant changes to most weapons. Default 1/20.
+      
+
  * Simplify_Engine_Trails
   
     Requires: TShips.txt
@@ -908,6 +974,25 @@ Transform List:
   
       * remove_trails:
         - If True, this will remove trails from all ships.
+      
+
+ * Standardize_Ship_Tunings
+  
+    Requires: TShips.txt
+  
+      Standardize max engine or rudder tuning amounts across all ships.
+      Eg. instead of scouts having 25 and carriers having 5 engine
+      runings, both will have some fixed number.
+      Maximum ship speed and turn rate is kept constant, but minimum
+      will change.
+      If applied to an existing save, existing ships may end up overtuned;
+      this is recommended primarily for new games, pending inclusion of
+      a modification script which can recap ships to max tunings.
+  
+      * engine_tunings:
+        - Int, the max engine tunings to set.
+      * rudder_tunings:
+        - Int, the max rudder tunings to set.
       
 
  * Standardize_Start_Plot_Overtunings
