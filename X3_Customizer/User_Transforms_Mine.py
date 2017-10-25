@@ -21,7 +21,6 @@ elif XRM:
         source_folder = 'xrm_source'
     )
 
-    
 
 
 #####################################################
@@ -657,6 +656,7 @@ if XRM:
         engine_tunings = 10,
         rudder_tunings = 10
         )
+    
 
     Adjust_Ship_Pricing(
         #The XRM costs include eg. a 2-4x upscale on scouts, which combined with scouts being
@@ -672,6 +672,31 @@ if XRM:
             'SG_SH_M5': 1/2,
         })
     
+    #Nerf the Aldrin ships a bit.
+    #This doesn't need as big a change in XRM since it left these alone when
+    # speeding up other ships, but 30% should still be a safe reduction
+    # while leaving these fast.
+    Adjust_Ship_Speed(adjustment_factors_dict = {
+        'SS_SH_LOST_M6H': 0.7,
+        'SS_SH_LOST_M3H': 0.7,
+        })
+    
+    #Add in variant ships.
+    #Do this after any ship specific modifications, so those get represented
+    # in the variants.
+    #Start by fixing a problematic medusa vanguard (hand named).
+    XRM_Standardize_Medusa_Vanguard()
+    Add_Ship_Trade_Variants(print_variant_modifiers = True, 
+                            print_variant_count = True)
+    Add_Ship_Combat_Variants(
+        blacklist = [
+            #Maybe blacklist the hand-named medusa vanguard.
+            #This isn't needed if the vanguard was standardized.
+            #'SS_SH_P_M3P2',
+            ],
+        print_variant_count = True
+        )
+
 
     #Increase laser recharge on corvettes in XRM, which uses TC style low values about
     # 1/2 of AP. Can use a generalized table for all ship subtypes for future scaling,
@@ -800,14 +825,14 @@ if XRM:
             #'SG_SH_TL': (0, 1, None),
             #'SG_SH_GO': (0, 1, None),
         })
-
-    
+       
 
     #Reduce all shield regen by a global factor, in addition to what
     # is given above. This is applied after other adjustments.
-    #Add a general 1/2 factor, and also scale with the weapon damage boost, 
-    # eg. lower damage should have lower shield regen.
-    Adjust_Ship_Shield_Regen(scaling_factor = Extra_damage_adjustment_factor / 2)
+    #Scale with the weapon damage boost, eg. lower damage should have lower shield regen.
+    Adjust_Ship_Shield_Regen(scaling_factor = Extra_damage_adjustment_factor)
+    #Maybe consider an extra reduction factor, though it doesn't feel needed
+    # now that the xrm shield efficiency has been dialed back.
 
 
     #Adjust total shielding on some ships.
@@ -863,15 +888,6 @@ if XRM:
             #'SG_SH_TL': 1.0,
             #Goner classifier appears unused (goner ships given other subtypes).
             #'SG_SH_GO': 1.0,
-        })
-
-    #Nerf the Aldrin ships a bit.
-    #This doesn't need as big a change in XRM since it left these alone when
-    # speeding up other ships, but 30% should still be a safe reduction
-    # while leaving these fast.
-    Adjust_Ship_Speed(adjustment_factors_dict = {
-        'SS_SH_LOST_M6H': 0.7,
-        'SS_SH_LOST_M3H': 0.7,
         })
 
 

@@ -313,13 +313,15 @@ def Load_Folder(folder_name):
         return_list.append(Load_File(file_name))
 
 
-def Load_File(file_name):
+def Load_File(file_name, return_t_file = False):
     '''
     Returns the contents of the given file, either raw text for XML
     or a dictionary for T files.
     If the file has not been loaded yet, reads from the expected
     source file.
     If the file is not found, raises an exception.
+    If return_t_file == True, returns the T_File object instead of just
+    the trimmed dict of data lines.
     '''
     #On the first call, do some extra setup.
     if First_call:
@@ -416,7 +418,10 @@ def Load_File(file_name):
             raise Exception('File type for {} not understood.'.format(file_name))
                 
     #Return the file contents.
-    return File_dict[file_name].Read_Data()
+    if not return_t_file:
+        return File_dict[file_name].Read_Data()
+    else:
+        return File_dict[file_name]
 
             
 def Find_encoding(file_path):

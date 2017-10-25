@@ -1,5 +1,5 @@
 
-X3 Customizer v2.03
+X3 Customizer v2.04
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -84,6 +84,10 @@ Change Log:
    - New option for Adjust_Ship_Hull to scale repair lasers as well.
    - Several weapon transforms now ignore repair lasers by default.
    - Command line call defaults to User_Transforms.py if a file not given.
+ * 2.04:
+   - Added Add_Ship_Equipment.
+   - Added XRM_Standardize_Medusa_Vanguard.
+   - Added Add_Ship_Variants, Add_Ship_Combat_Variants, Add_Ship_Trade_Variants.
 
 ***
 
@@ -115,18 +119,128 @@ Setup methods:
 
 Transform List:
 
+ * Add_Ship_Combat_Variants
+  
+    Requires: TShips.txt, WareLists.txt, TWareT.txt
+  
+      Adds combat variants for combat ships. This is a convenience function
+      which calls Add_Ship_Variants with variants [vanguard, sentinel, raider,
+      hauler], for ship types [M0-M8].
+  
+      * blacklist:
+        - List of names of ships not to generate variants for.
+      * include_advanced_ships:
+        - Bool, if True then existing heavy ships (variation 20) and other 
+          non-basic ships will have variants added. This may result in some
+          redundancies, eg. variants of Mercury and Advanced Mercury.
+          In some cases, the existing ship will be reclassified as a basic
+          version, eg. Hyperion Vanguard will become a base Hyperion from
+          which a vanguard and other variants are generated.
+          Default True.
+      * print_variant_modifiers:
+        - Bool, if True then the calculated attributes used for variants will 
+          be printed, given as multipliers on base attributes for various ship
+          attributes. Default False.
+      
+
+ * Add_Ship_Equipment
+  
+    Requires: TShips.txt, WareLists.txt
+  
+      Adds equipment as built-in wares for select ship classes.
+  
+      * ship_types:
+        - List of ship names or types to add equipment to, 
+          eg. ['SS_SH_OTAS_M2', 'SG_SH_M1'].
+          
+      * equipment_list:
+        - List of equipment names from the ware files, 
+          eg. ['SS_WARE_LIFESUPPORT'].
+      
+
  * Add_Ship_Life_Support
   
     Requires: TShips.txt, WareLists.txt
   
       Adds life support as a built-in ware for select ship classes.
-      Note: switches ships to a matching ware list with life support included
-      when possible, else adds life support to the existing ware list. Some
-      non-capital ships may be affected if they share an edited list.
+      This is a convenience transform which calls Add_Ship_Equipment.
   
       * ship_types:
         - List of ship types to add life support to, eg. ['SG_SH_M2'].
           By default, this includes M6, M7, M2, M1, TL, TM.
+      
+
+ * Add_Ship_Trade_Variants
+  
+    Requires: TShips.txt, WareLists.txt, TWareT.txt
+  
+      Adds trade variants for trade ships. This is a convenience function
+      which calls Add_Ship_Variants with variants [hauler, miner, tanker (xl),
+      super freighter (xl)], for ship types [TS,TP,TM,TL].
+      
+      * blacklist:
+        - List of names of ships not to generate variants for.
+      * include_advanced_ships:
+        - Bool, if True then existing heavy ships (variation 20) and other 
+          non-basic ships will have variants added. This may result in some
+          redundancies, eg. variants of Mercury and Advanced Mercury. Default True.
+      * print_variant_modifiers:
+        - Bool, if True then the calculated attributes used for variants will 
+          be printed, given as multipliers on base attributes for various ship
+          attributes. Default False.
+      
+
+ * Add_Ship_Variants
+  
+    Requires: TShips.txt, WareLists.txt, TWareT.txt
+  
+      Adds variants for various ships.  The new variant ships may be spawned
+      by jobs where they match the job criteria.  New ships are added to
+      shipyards in the x3_universe file, though require a new game to show
+      up.
+      Variant attribute modifiers are based on the average differences between
+      existing variants and their basic ship, where only M3,M4,M5 are
+      analyzed for combat variants, and only TS,TP are analyzed for trade variants,
+      with Hauler being considered both a combat and trade variant.
+      Special attributes, such as turret count and weapon compatibitities, are not
+      considered.
+      Variants are added base on ship name and race; pirate variants are handled
+      separately from standard variants.
+      Ships without extensions or cargo are ignored (eg. drones, weapon platforms).
+  
+      * ship_types:
+        - List of ship names or types to add variants for,
+          eg. ['SS_SH_OTAS_M2', 'SG_SH_M1'].
+      * variant_types:
+        - List of variant types to add. Variant names are given as strings, and
+          support the following list:
+             ['vanguard',
+              'sentinel',
+              'raider',
+              'hauler',
+              'miner',
+              'tanker',
+              'tanker xl',
+              'super freighter',
+              'super freighter xl']
+      * blacklist:
+        - List of names of ships not to generate variants for.
+      * race_types:
+        - List of race names whose ships will have variants added. By default,
+          the following are included: [Argon, Boron, Split, Paranid, Teladi, 
+          Xenon, Khaak, Pirates, Goner, ATF, Terran, Yaki].
+      * include_advanced_ships:
+        - Bool, if True then existing heavy ships (variation 20) and other 
+          non-basic ships will have variants added. This may result in some
+          redundancies, eg. variants of Mercury and Advanced Mercury.
+          In some cases, the existing ship will be reclassified as a basic
+          version to remove their suffix, eg. Hyperion Vanguard will become 
+          a base Hyperion from which a vanguard and other variants are generated.
+          Default True.
+      * print_variant_modifiers:
+        - Bool, if True then the calculated attributes used for variants will 
+          be printed, given as multipliers on base attributes for various ship
+          attributes. Default False.
       
 
  * Adjust_Beam_Weapon_Duration
@@ -988,6 +1102,7 @@ Transform List:
       If applied to an existing save, existing ships may end up overtuned;
       this is recommended primarily for new games, pending inclusion of
       a modification script which can recap ships to max tunings.
+      Ships with 0 tunings will remain unedited.
   
       * engine_tunings:
         - Int, the max engine tunings to set.
@@ -1035,6 +1150,16 @@ Transform List:
   
       Changes standard gates into Terran gates, possibly helping reduce
       large ship suicides when entering a system.
+      
+
+ * XRM_Standardize_Medusa_Vanguard
+  
+    Requires: TShips.txt
+  
+      Convert the XRM Medusa Vanguard into a standard variant, instead of
+      a custom named ship. This is meant to be run prior to adding ship
+      variants, to avoid the non-standard medusa vanguard generating its
+      own sub-variants.
       
 
 

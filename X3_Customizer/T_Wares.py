@@ -90,3 +90,17 @@ def Set_Ware_Pricing(
                 value *= name_price_factor_dict[this_dict['name']]
                 this_dict[field] = str(int(value))
 
+
+    
+def Get_Ware_Cost(ware_list):
+    '''
+    Returns the estimated cost of wares in a given list.
+    All wares should be in TWaresT.
+    Cost is given as estimated credits.
+    '''
+    total_cost = 0
+    for this_dict in Load_File('TWareT.txt'):
+        if this_dict['name'] in ware_list:
+            total_cost += int(this_dict['relative_value_npc'])
+    #Apply scaling and return.    
+    return total_cost * Flags.Value_to_credits_ratio_dict['TWareT']

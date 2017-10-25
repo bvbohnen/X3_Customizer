@@ -7,6 +7,7 @@ available to user transform modules easily.
 from File_Manager import Set_Path
 from T_Missiles import *
 from T_Ships import *
+from T_Ships_Variants import *
 from T_Weapons import *
 from T_Gates import *
 from T_Wares import *

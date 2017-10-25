@@ -23,6 +23,43 @@ Shield_type_size_dict = {
     5: 2000,
     }
 
+#The races associated with the race tags in tships and maybe elsewhere.
+Race_code_name_dict = {
+    #Give some default for 0, an unspecified race.
+    0  : 'None',
+    1  : 'Argon',
+    2  : 'Boron',
+    3  : 'Split',
+    4  : 'Paranid',
+    5  : 'Teladi',
+    6  : 'Xenon',
+    7  : 'Khaak',
+    8  : 'Pirates',
+    9  : 'Goner',
+    10 : 'Player',
+    11 : 'Enemy Race',
+    12 : 'Neutral Race',
+    13 : 'Friendly Race',
+    14 : 'Unknown',
+    15 : 'Race 1',
+    16 : 'Independent',
+    17 : 'ATF',
+    18 : 'Terran',
+    19 : 'Yaki',
+    }
+#Convenience reverse direction lookup dict.
+Race_name_code_dict = {x:y for y,x in Race_code_name_dict.items()}
+
+
+#Price adjustments, from relative value to credits.
+#This might vary by item type; organize by tfile.
+Value_to_credits_ratio_dict = {
+    'TLasers' : 64,
+    'TWaresT' : 28,
+    'TShips'  : 66,
+    }
+
+
 
 #Known flags in the 1-hot flag values for some t files.
 #Key is the bit position, value is the field name.

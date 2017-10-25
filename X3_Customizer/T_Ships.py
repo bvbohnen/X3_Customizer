@@ -4,6 +4,8 @@ Similar to X3_Weapons, this will open the Tships file and perform systematic edi
 from File_Manager import *
 import Flags
 import math
+#from collections import defaultdict
+import copy
 
 
 #TODO:
@@ -327,6 +329,40 @@ def Fix_Pericles_Pricing():
                 this_dict['production_value_npc'] = this_dict['production_value_player']
             break
 
+        
+@Check_Dependencies('TShips.txt')
+def XRM_Standardize_Medusa_Vanguard():
+    '''
+    Convert the XRM Medusa Vanguard into a standard variant, instead of
+    a custom named ship. This is meant to be run prior to adding ship
+    variants, to avoid the non-standard medusa vanguard generating its
+    own sub-variants.
+    '''
+    #Find the standard medusa name id.
+    for this_dict in Load_File('TShips.txt'):
+        if this_dict['name'] == 'SS_SH_P_M3P':
+            name_id = this_dict['name_id']
+            break
+
+    #Search to verify no vanguard exists already, else error.
+    #This may occur if variant addition was already run.
+    from T_Ships_Variants import variant_type_index_dict
+    for this_dict in Load_File('TShips.txt'):
+        if (this_dict['name_id'] == name_id 
+        and int(this_dict['variation_index']) == variant_type_index_dict['vanguard']):
+            print('Error in XRM_Standardize_Medusa_Vanguard,'
+                 'a standard vanguard variant already present.')
+            return
+
+    #Find the problem ship.
+    for this_dict in Load_File('TShips.txt'):
+        if this_dict['name'] == 'SS_SH_P_M3P2':
+            #Set the name to that of the medusa.
+            this_dict['name_id'] = name_id
+            #Set the variant to standard vanguard.
+            this_dict['variation_index'] = str(variant_type_index_dict['vanguard'])
+            break
+
                 
 @Check_Dependencies('TShips.txt')
 def Boost_Truelight_Seeker_Shield_Reactor():
@@ -405,6 +441,7 @@ def Standardize_Ship_Tunings(
     If applied to an existing save, existing ships may end up overtuned;
     this is recommended primarily for new games, pending inclusion of
     a modification script which can recap ships to max tunings.
+    Ships with 0 tunings will remain unedited.
 
     * engine_tunings:
       - Int, the max engine tunings to set.
@@ -430,6 +467,11 @@ def Standardize_Ship_Tunings(
 
             #Get the base max tunings.
             max_tunings = int(this_dict[tuning_field])
+
+            #Skip if the ship had 0 tunings; don't add them.
+            if max_tunings == 0:
+                continue
+
             #Get the scaling factor to apply to the scaled fields.
             #Tunings provide 10% each, so the old max was
             # (1 + max_tunings / 10), and the new max will be
@@ -466,8 +508,9 @@ def Standardize_Ship_Tunings(
             this_dict[tuning_field] = str(tuning_amount)
 
             
+
 @Check_Dependencies('TShips.txt', 'WareLists.txt')
-def Add_Ship_Life_Support(
+def Add_Ship_Equipment(
         ship_types = [
             'SG_SH_M1',
             'SG_SH_M2',
@@ -475,17 +518,20 @@ def Add_Ship_Life_Support(
             'SG_SH_M7',
             'SG_SH_TM',
             'SG_SH_TL',
+            ],
+        equipment_list = [
             ]
     ):
     '''
-    Adds life support as a built-in ware for select ship classes.
-    Note: switches ships to a matching ware list with life support included
-    when possible, else adds life support to the existing ware list. Some
-    non-capital ships may be affected if they share an edited list.
+    Adds equipment as built-in wares for select ship classes.
 
     * ship_types:
-      - List of ship types to add life support to, eg. ['SG_SH_M2'].
-        By default, this includes M6, M7, M2, M1, TL, TM.
+      - List of ship names or types to add equipment to, 
+        eg. ['SS_SH_OTAS_M2', 'SG_SH_M1'].
+        
+    * equipment_list:
+      - List of equipment names from the ware files, 
+        eg. ['SS_WARE_LIFESUPPORT'].
     '''
     #Ship built-in wares are specified in a two step process:
     # 1) The ship gives an index of a ware list.
@@ -494,9 +540,6 @@ def Add_Ship_Life_Support(
     # capital ships, then either find a replacement list which has the
     # same wares but including life support (to be swapped to), or to
     # edit the ware lists to include life support.
-    #Life support is assumed to always be 'SS_WARE_LIFESUPPORT', not changed
-    # by mods. If this is ever a problem, it could potentially be deduced from
-    # TP ware lists.
 
     #Get a set of ware list ids for capital ships being modified.
     cap_ware_list_ids = set()
@@ -504,7 +547,9 @@ def Add_Ship_Life_Support(
     for this_dict in Load_File('TShips.txt'):
 
         #Skip if this is not a ship to add life support to.
-        if this_dict['subtype'] not in ship_types:
+        #Check against both name and subtype.
+        if (this_dict['subtype'] not in ship_types 
+        and this_dict['name'] not in ship_types):
             continue
 
         #Record the list.
@@ -513,7 +558,9 @@ def Add_Ship_Life_Support(
 
 
     #Go through all ware lists and parse their actual wares.
+    #Also record the line dicts, for copying later if needed.
     ware_list_list = []
+    ware_line_dict_list = []
     for index, this_dict in enumerate(Load_File('WareLists.txt')):
 
         #Note: an oddity with the warelist is that the data lines and the
@@ -535,18 +582,20 @@ def Add_Ship_Life_Support(
 
         #Record the ware list.
         ware_list_list.append(this_ware_list)
+        ware_line_dict_list.append(this_dict)
 
 
-    #Prune out the cap ship wares that already have life support.
+    #Prune out the ware lists that already have the new equipment.
     for id in list(cap_ware_list_ids):
-        if 'SS_WARE_LIFESUPPORT' in ware_list_list[id]:
+        if all(x in ware_list_list[id] for x in equipment_list):
             cap_ware_list_ids.remove(id)
 
+
     #Try to match the remaining lists to an existing list with the same
-    # contents but including life support.
-    #This occurs in XRM for TLs, which have the TS ware list, but there
-    # is a cruiseliner list that has life support and the TS trade ware
-    # which can be swapped to without adding life support to all traders.
+    # contents but including the new equipment.
+    #This occurs in XRM for TLs + life support, which have the TS ware list,
+    # but there is a cruiseliner list that has life support and the TS trade
+    # ware which can be swapped to without adding life support to all traders.
     #When replacements found, the original id will be removed from
     # the cap_ware_list_ids set.
     #Any valid replacements go in this dict.
@@ -567,8 +616,8 @@ def Add_Ship_Life_Support(
             if len(other_ware_list) != replacement_list_size:
                 continue
 
-            #Not a match if the other list doesn't have life support.
-            if 'SS_WARE_LIFESUPPORT' not in other_ware_list:
+            #Not a match if the other list doesn't have an equipment piece.
+            if any(x not in other_ware_list for x in equipment_list):
                 continue
 
             #Not a match if the other list is not a superset.
@@ -581,25 +630,97 @@ def Add_Ship_Life_Support(
             break
 
 
-    #If replacements were found, go back through tships and change the
-    # ware list ids as needed.
-    if ware_list_id_replacement_dict:    
-        for this_dict in Load_File('TShips.txt'):    
-            #Skip if this is not a ship to add life support to.
-            if this_dict['subtype'] not in ship_types:
-                continue
+    #Any ware lists needing updates (not valid for direct replacement)
+    # could either be modified directly (easy), or copied into new lists
+    # that can then be used as replacements (hard, safer).
+    #Go with the second option, to make this transform generally robust
+    # against accidentally adding equipment to ships not flagged for
+    # the addition.
+    #However, to avoid over-proliferation of new lists across multiple
+    # transform calls, can check if any ware lists being changed are used
+    # purely by the ships having equipment added.
+    #Any such lists can be edited directly safely.
+    #This will show up if multiple calls are made to add equipment to the
+    # same classes of ships, since the first call will end up doing any
+    # list uniquification.
 
-            #Skip if the ship's ware list doesn't need replacement.
-            this_ware_list_id = int(this_dict['ware_list'])
-            if this_ware_list_id not in ware_list_id_replacement_dict:
-                continue
+    #Go through tships again, this time searching for non-selected ships
+    # which use a ware list to be updated.
+    #Move any such conflicts to a second list.
+    cap_ware_list_ids_to_uniquify = []
+    #Loop over all ships.
+    for this_dict in Load_File('TShips.txt'):
 
-            #Apply the replacement.
-            this_dict['ware_list'] = str(ware_list_id_replacement_dict[this_ware_list_id])
+        #Skip the ships being edited; only want to check the others.
+        if (this_dict['subtype'] in ship_types 
+        or this_dict['name'] in ship_types):
+            continue
+
+        #Check if a cap_ware_list_ids item is shared by this ship.
+        this_ware_list_id = int(this_dict['ware_list'])
+        if this_ware_list_id in cap_ware_list_ids:
+            #Move the ware between lists.
+            cap_ware_list_ids.remove(this_ware_list_id)
+            cap_ware_list_ids_to_uniquify.append(this_ware_list_id)
 
 
-    #If ware list ids are left that couldn't be replaced, edit in
-    # list support for them.
+
+    #Uniquify the needed ware lists.
+    #Keep track of the new ones to stick in the warelist file later.
+    new_ware_line_dicts_list = []
+    for ware_list_id in cap_ware_list_ids_to_uniquify:
+
+        #Copy the line dict.
+        new_ware_line_dict = copy.copy(ware_line_dict_list[ware_list_id])
+
+        #Get the index this will use.
+        new_ware_list_id = len(ware_line_dict_list)
+        #Add as comment at end of the line.
+        new_ware_line_dict['slash_index_comment'] = '/{}\n'.format(new_ware_list_id)
+
+        #Flag the ships using the old index to do a replacement.
+        ware_list_id_replacement_dict[ware_list_id] = new_ware_list_id
+
+        #Record the new line dict for use later.
+        ware_line_dict_list.append(new_ware_line_dict)
+        new_ware_line_dicts_list.append(new_ware_line_dict)
+
+        #Note: this new list will still need the equipment added.
+        #Put its index in cap_ware_list_ids so it gets updated below,
+        # after being added back to the warelists file.
+        cap_ware_list_ids.add(new_ware_list_id)
+
+
+    #Update the warelists file with any new lines.
+    if new_ware_line_dicts_list:
+        #All new lists will be put at the bottom of the dict_list.
+        #This will require that the header be modified to account for the
+        # new lines.
+        t_file = Load_File('WareLists.txt', return_t_file = True)
+
+        #Add the new lists.
+        #These need to go in both the data and line lists, data for future
+        # visibility to this and other transforms, lines to be seen at
+        # writeout.
+        t_file.data_dict_list += new_ware_line_dicts_list
+        t_file.line_dict_list += new_ware_line_dicts_list
+
+        #Find the header line.
+        for line_dict in t_file.line_dict_list:
+            #Looking for the first non-comment line; it should have
+            # 2 entries (with newline).
+            if not list(line_dict.values())[0].strip().startswith('/') and len(line_dict) == 2:
+                #The first field is the list count.
+                line_dict['ware_count'] = str(int(line_dict['ware_count']) 
+                                              + len(new_ware_line_dicts_list))
+                break
+            
+            #Error if hit a data line.
+            assert line_dict is not t_file.data_dict_list[0]
+
+
+    #If ware list ids are still in need of updating with equipment,
+    # handle that now.
     if cap_ware_list_ids:
         #Note that since the header line gets returned, the actual ware
         # list index is 1 less than the enumerated value.
@@ -620,25 +741,69 @@ def Add_Ship_Life_Support(
             #Skip if this is not a list to add life support to.
             if index not in cap_ware_list_ids:
                 continue
-
-            #Grab the original ware list, parsed above.
-            #this_ware_list = ware_list_list[index]
-
-            #Put life support in it, at the front for now since that is where
-            # it shows up in some sampled lines.
-            #this_ware_list.insert(0, 'SS_WARE_LIFESUPPORT')
-
+            
             #The entire dict will need its indices adjusted to make
             # room for the new ware.
-            #It should be safe to just pop off the last item, put in life
-            # support, and put the last item back (the slash_index_comment).
+            #It should be safe to just pop off the last item, put in new
+            # equipment, and put the last item back (the slash_index_comment).
             slash_index_comment = this_dict['slash_index_comment']
             del(this_dict['slash_index_comment'])
-            this_dict[len(this_dict)] = 'SS_WARE_LIFESUPPORT'
+            for equipment in equipment_list:
+                this_dict[len(this_dict)] = equipment
             this_dict['slash_index_comment'] = slash_index_comment
 
             #Adjust the ware count.
-            this_dict['ware_count'] = str(int(this_dict['ware_count']) +1)
+            this_dict['ware_count'] = str(int(this_dict['ware_count']) 
+                                          + len(equipment_list))
+            
+
+    #If replacements were found, go back through tships and change the
+    # ware list ids as needed.
+    if ware_list_id_replacement_dict:    
+        for this_dict in Load_File('TShips.txt'):    
+            #Skip if this is not a ship to add equipment to.
+            if (this_dict['subtype'] not in ship_types 
+            and this_dict['name'] not in ship_types):
+                continue
+
+            #Skip if the ship's ware list doesn't need replacement.
+            this_ware_list_id = int(this_dict['ware_list'])
+            if this_ware_list_id not in ware_list_id_replacement_dict:
+                continue
+
+            #Apply the replacement.
+            this_dict['ware_list'] = str(ware_list_id_replacement_dict[this_ware_list_id])
+
 
     return
 
+
+
+@Check_Dependencies('TShips.txt', 'WareLists.txt')
+def Add_Ship_Life_Support(
+        ship_types = [
+            'SG_SH_M1',
+            'SG_SH_M2',
+            'SG_SH_M6',
+            'SG_SH_M7',
+            'SG_SH_TM',
+            'SG_SH_TL',
+            ]
+    ):
+    '''
+    Adds life support as a built-in ware for select ship classes.
+    This is a convenience transform which calls Add_Ship_Equipment.
+
+    * ship_types:
+      - List of ship types to add life support to, eg. ['SG_SH_M2'].
+        By default, this includes M6, M7, M2, M1, TL, TM.
+    '''
+    #Life support is assumed to always be 'SS_WARE_LIFESUPPORT', not changed
+    # by mods. If this is ever a problem, it could potentially be deduced from
+    # TP ware lists.
+    Add_Ship_Equipment(
+        ship_types = ship_types,
+        equipment_list = [
+            'SS_WARE_LIFESUPPORT'
+            ]
+        )

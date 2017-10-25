@@ -529,10 +529,6 @@ def Adjust_Weapon_Shot_Speed(
       - If True, speed adjustments are printed to the summary file.
     '''
 
-    #-Removed, unused.
-    #The price of a laser in game is this factor times the npc relative value.
-    #Laser_price_scaling_factor = 66
-
     if print_changes:
         Write_Summary_Line('\nShot speed adjustments:')
 

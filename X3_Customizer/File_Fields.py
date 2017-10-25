@@ -86,6 +86,7 @@ T_file_name_field_dict_dict = {
         3 : 'pitch',
         4 : 'roll',
         5 : 'subtype',      #Specific if eg. 'SG_SH_TS' for transport ship
+        6 : 'name_id',      #Int, the id of the in-game ship name.
         7 : 'speed',        #In meters per 500 seconds
         8 : 'acceleration', #In meters per 500 seconds per second
         #Power for recharging shields.
@@ -104,8 +105,11 @@ T_file_name_field_dict_dict = {
         28 : 'cargo_min',
         29 : 'cargo_max',
         30 : 'ware_list', #Integer, index in warelists.txt for built-in wares.
+        44 : 'cargo_size', #Int, 0-5, the size of cargo that can be held, 0 for S, 5 for ST.
+        45 : 'race',  #Int, the race this ship type is associated with.
         46 : 'hull_strength',
         49 : 'particle_effect', #Integer, corresponds to particles3 file?, engine trail
+        50 : 'variation_index', #Int, the variation type of the ship, eg. 1 for vanguard.
         51 : 'angular_acceleration',
         #Production values are a little unclear.
         #Often these are set to the same number.
@@ -169,6 +173,23 @@ T_file_name_field_dict_dict = {
         40: 'manufacturer_atf', 
         41: 'manufacturer_terran', 
         42: 'manufacturer_yaki', 
+        43: 'variant_basic',       #0 or 1
+        43: 'variant_vanguard',
+        43: 'variant_sentinel',
+        43: 'variant_raider',
+        43: 'variant_hauler',
+        43: 'variant_miner',
+        43: 'variant_super_freighter',
+        43: 'variant_tanker',
+        43: 'variant_mk1',
+        43: 'variant_9',
+        43: 'variant_10',
+        43: 'variant_11',
+        43: 'variant_12',
+        43: 'variant_13',
+        43: 'variant_tanker_xl',
+        43: 'variant_super_freighter_xl',
+        43: 'variant_advanced',
         84: 'owner_argon',         #0 or 1
         85: 'owner_boron', 
         86: 'owner_split', 

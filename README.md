@@ -1,5 +1,5 @@
 
-X3 Customizer v2.03
+X3 Customizer v2.04
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -84,6 +84,10 @@ Change Log:
    - New option for Adjust_Ship_Hull to scale repair lasers as well.
    - Several weapon transforms now ignore repair lasers by default.
    - Command line call defaults to User_Transforms.py if a file not given.
+ * 2.04:
+   - Added Add_Ship_Equipment.
+   - Added XRM_Standardize_Medusa_Vanguard.
+   - Added Add_Ship_Variants, Add_Ship_Combat_Variants, Add_Ship_Trade_Variants.
 
 Full documentation found in Documentation.md.
 
@@ -97,7 +101,11 @@ Setup methods:
 
 Transform List:
 
+ * Add_Ship_Combat_Variants
+ * Add_Ship_Equipment
  * Add_Ship_Life_Support
+ * Add_Ship_Trade_Variants
+ * Add_Ship_Variants
  * Adjust_Beam_Weapon_Duration
  * Adjust_Beam_Weapon_Width
  * Adjust_Fade_Start_End_Gap
@@ -156,6 +164,7 @@ Transform List:
  * Standardize_Start_Plot_Overtunings
  * Standardize_Tunings
  * Swap_Standard_Gates_To_Terran_Gates
+ * XRM_Standardize_Medusa_Vanguard
 
 ***
 
