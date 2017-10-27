@@ -329,39 +329,78 @@ def Fix_Pericles_Pricing():
                 this_dict['production_value_npc'] = this_dict['production_value_player']
             break
 
-        
+       
 @Check_Dependencies('TShips.txt')
-def XRM_Standardize_Medusa_Vanguard():
+def Patch_Ship_Variant_Inconsistencies(
+        include_xrm_fixes = False
+    ):
     '''
-    Convert the XRM Medusa Vanguard into a standard variant, instead of
-    a custom named ship. This is meant to be run prior to adding ship
-    variants, to avoid the non-standard medusa vanguard generating its
-    own sub-variants.
+    Applies some fixes to some select inconsistencies in ship variants.
+    Modified ships include the Baldric Miner and XRM Medusa Vanguard,
+    both manually named instead of using the variant system.
+    This is meant to be run prior to Add_Ship_Variants, to avoid the 
+    non-standard ships creating their own sub-variants.
+
+    * include_xrm_fixes
+      - Bool, if True then the Medusa Vanguard is patched if found and
+        in the form set by XRM. Default True.
     '''
-    #Find the standard medusa name id.
-    for this_dict in Load_File('TShips.txt'):
-        if this_dict['name'] == 'SS_SH_P_M3P':
-            name_id = this_dict['name_id']
-            break
+    #Make a general patch specification dict.
+    #Each ship will specify the base type, the type to patch, and
+    # the variant it is.
+    #These will be simple tuples of:
+    # (target ship id, base ship id, variant type)
+    ship_patch_tuple_list = [
+        ('SS_SH_USC_TS_1', 'SS_SH_USC_TS', 'miner'),
+        ]
+    if include_xrm_fixes:
+        ship_patch_tuple_list += [
+            ('SS_SH_P_M3P2', 'SS_SH_P_M3P', 'vanguard'),
+            ]
+    #Convenience import for variant name to id conversion.
+    from T_Ships_Variants import variant_name_index_dict
 
-    #Search to verify no vanguard exists already, else error.
-    #This may occur if variant addition was already run.
-    from T_Ships_Variants import variant_type_index_dict
-    for this_dict in Load_File('TShips.txt'):
-        if (this_dict['name_id'] == name_id 
-        and int(this_dict['variation_index']) == variant_type_index_dict['vanguard']):
-            print('Error in XRM_Standardize_Medusa_Vanguard,'
-                 'a standard vanguard variant already present.')
-            return
+    #Loop over the patches to apply.
+    for patch_ship_name, base_ship_name, variant in ship_patch_tuple_list:
 
-    #Find the problem ship.
-    for this_dict in Load_File('TShips.txt'):
-        if this_dict['name'] == 'SS_SH_P_M3P2':
-            #Set the name to that of the medusa.
-            this_dict['name_id'] = name_id
-            #Set the variant to standard vanguard.
-            this_dict['variation_index'] = str(variant_type_index_dict['vanguard'])
-            break
+        #Find the standard name id from the base ship.
+        name_id = None
+        for this_dict in Load_File('TShips.txt'):
+            if this_dict['name'] == base_ship_name:
+                name_id = this_dict['name_id']
+                break
+
+        #If the base name was not found for some reason, skip ahead,
+        # since the target ship may not be from this mod state.
+        if name_id == None:
+            continue
+
+        #-Removed; this check probably isn't needed, and causes problems
+        # with repeat calls of this transform.
+        ##Search to verify no variant exists already, else error.
+        ##This may occur if variant addition was already run.
+        #error = False
+        #for this_dict in Load_File('TShips.txt'):
+        #    if (this_dict['name_id'] == name_id 
+        #    and int(this_dict['variation_index']) == variant_name_index_dict[variant]):
+        #        print('Error in Patch_Ship_Variant_Inconsistencies,'
+        #             'a standard variant already present.')
+        #        error = True
+        #        break
+        ##On error, skip to the next ship to patch.
+        #if error:
+        #    continue
+
+        #Find the problem ship.
+        #Note: this should be safe across multiple transform calls, just
+        # writing the same fields each time.
+        for this_dict in Load_File('TShips.txt'):
+            if this_dict['name'] == patch_ship_name:
+                #Set the name to that of the base ship.
+                this_dict['name_id'] = name_id
+                #Set the variant using the standard field.
+                this_dict['variation_index'] = str(variant_name_index_dict[variant])
+                break
 
                 
 @Check_Dependencies('TShips.txt')

@@ -1,5 +1,5 @@
 
-X3 Customizer v2.04
+X3 Customizer v2.05
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -88,6 +88,10 @@ Change Log:
    - Added Add_Ship_Equipment.
    - Added XRM_Standardize_Medusa_Vanguard.
    - Added Add_Ship_Variants, Add_Ship_Combat_Variants, Add_Ship_Trade_Variants.
+ * 2.05:
+   - Updates to Add_Ship_Variants to refine is behavior and options.
+   - Added in-game script for adding generated variants to shipyards.
+   - XRM_Standardize_Medusa_Vanguard replaced with Patch_Ship_Variant_Inconsistencies.
 
 Full documentation found in Documentation.md.
 
@@ -141,6 +145,7 @@ Transform List:
  * Convoys_made_of_race_ships
  * Enhance_Mosquito_Missiles
  * Fix_Pericles_Pricing
+ * Patch_Ship_Variant_Inconsistencies
  * Remove_Stars_From_Foggy_Sectors
  * Remove_Weapon_Charge_Up
  * Remove_Weapon_Drain_Flag
@@ -164,7 +169,6 @@ Transform List:
  * Standardize_Start_Plot_Overtunings
  * Standardize_Tunings
  * Swap_Standard_Gates_To_Terran_Gates
- * XRM_Standardize_Medusa_Vanguard
 
 ***
 

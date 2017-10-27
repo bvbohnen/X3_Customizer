@@ -62,6 +62,13 @@
     <Compile Include="Flags.py" />
     <Compile Include="X3_Customizer.py" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="scripts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="scripts\a.temp.x3c.add.shipyard.variants.txt" />
+    <Content Include="scripts\a.x3customizer.add.variants.to.shipyards.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
        Visual Studio and specify your pre- and post-build commands in

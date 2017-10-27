@@ -1,5 +1,5 @@
 '''
-X3 Customizer v2.04
+X3 Customizer v2.05
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -88,6 +88,10 @@ Change Log:
    - Added Add_Ship_Equipment.
    - Added XRM_Standardize_Medusa_Vanguard.
    - Added Add_Ship_Variants, Add_Ship_Combat_Variants, Add_Ship_Trade_Variants.
+ * 2.05:
+   - Updates to Add_Ship_Variants to refine is behavior and options.
+   - Added in-game script for adding generated variants to shipyards.
+   - XRM_Standardize_Medusa_Vanguard replaced with Patch_Ship_Variant_Inconsistencies.
 '''
 #TODO: maybe remove version tag from title, just leave in change log.
 #Note: the above comment gets printed to the markdown file, so avoid

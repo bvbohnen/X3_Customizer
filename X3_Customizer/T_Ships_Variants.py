@@ -1,5 +1,12 @@
 '''
 Split off file from T_Ships, holding the variant ship generation code.
+
+TODO: make more robust across mods that play with the variants, since
+this is mostly tuned for xrm. Perhaps use a pre-config block that
+can swap out variant names and indices, as well as variants to ignore
+and other such flags, tuned to a particular mod setup.
+At the very least, remove the xl tank/freighter from the defaults,
+since those are xrm variants only.
 '''
 from File_Manager import *
 import Flags
@@ -28,6 +35,10 @@ From looking at random ships in xrm:
         a heavy version of a ship, m3+, m2+, etc., but this doesn't seem to
         match the XRM files very consistently. Vanilla files somewhat match
         this, however.
+    25: explorer, in xrm, special addition. Vanilla AP stops at 20.
+        There is a gap in text strings from 21-24, so supporting above
+        20 would be messy here (eg. an ingame script to read suffixes
+        would need to be conditionalized on not finding a suffix).
 
 The jobs file seems to clean this up a bit, with check boxes having various
 labels (some being unlabelled).
@@ -39,16 +50,18 @@ labels (some being unlabelled).
     5 : miner
     6 : super freighter
     7 : tanker
-    8 : mk 1
-    9 : unlabelled, couger in xrm
-    10 : unlabelled, hyperion in xrm, also a hand-named 'medusa vanguard' which
-                     may need blacklisting.
-    11 : unlabelled, talon in xrm
-    12 : unlabelled
-    13 : unlabelled
+    8 : tug, mk 1 in xrm.
+    9 : luxury cruiser, xrm overwrites this suffix in the 0001 text file 
+                          to have no suffix.
+    10 : slave transport, empty in xrm.
+    11 : military transporter, maybe empty in xrm.
+    12 : XL, maybe empty in xrm.
+    13 : extended, empty in xrm.
     14 : tanker xl
     15 : super freighter xl
     16 : vanguard, used by Hyperion and kite (an actual variant of base kite).
+    17 : sentinel, unused?
+    18 : raider, unused?
     19 : hauler (used for griffon, panther, colossus; editor recognizes this 
          as adding the hauler suffix, though it never has stat variation from
          a base type (griffon/panther have no base, colossus has same stats)).
@@ -57,6 +70,10 @@ labels (some being unlabelled).
          If a hauler is auto-added for tag 4, it will have the same name as
          with tag 19.
     20?: advanced
+
+These seem to correspond with the 0001 language file, where ids 10001 to
+10019 match to variants, and have suffixes. The above are filled in from
+there for defaults.
 
 If adding new variants programmatically, some issues to consider:
 
@@ -103,32 +120,13 @@ If adding new variants programmatically, some issues to consider:
 
 @Check_Dependencies('TShips.txt', 'WareLists.txt', 'TWareT.txt')
 def Add_Ship_Combat_Variants(
-        include_advanced_ships = True,
-        print_variant_modifiers = False,
-        print_variant_count = False,
-        blacklist = None,
+        **kwargs
         ):
     '''
     Adds combat variants for combat ships. This is a convenience function
     which calls Add_Ship_Variants with variants [vanguard, sentinel, raider,
-    hauler], for ship types [M0-M8].
-
-    * blacklist:
-      - List of names of ships not to generate variants for.
-    * include_advanced_ships:
-      - Bool, if True then existing heavy ships (variation 20) and other 
-        non-basic ships will have variants added. This may result in some
-        redundancies, eg. variants of Mercury and Advanced Mercury.
-        In some cases, the existing ship will be reclassified as a basic
-        version, eg. Hyperion Vanguard will become a base Hyperion from
-        which a vanguard and other variants are generated.
-        Default True.
-    * print_variant_count:
-      - Bool, if True then the number of new variants added will be printed.
-    * print_variant_modifiers:
-      - Bool, if True then the calculated attributes used for variants will 
-        be printed, given as multipliers on base attributes for various ship
-        attributes. Default False.
+    hauler], for ship types [M0-M8]. See Add_Ship_Variants documentation
+    for other parameters.
     '''
     Add_Ship_Variants(
         ship_types = [
@@ -148,36 +146,18 @@ def Add_Ship_Combat_Variants(
             'raider',
             'hauler',
             ],
-        blacklist = blacklist,
-        include_advanced_ships = include_advanced_ships,
-        print_variant_modifiers = print_variant_modifiers,
-        print_variant_count = print_variant_count
+        **kwargs
         )
     
 @Check_Dependencies('TShips.txt', 'WareLists.txt', 'TWareT.txt')
 def Add_Ship_Trade_Variants(
-        include_advanced_ships = True,
-        print_variant_modifiers = False,
-        print_variant_count = False,
-        blacklist = None,
+        **kwargs
         ):
     '''
     Adds trade variants for trade ships. This is a convenience function
     which calls Add_Ship_Variants with variants [hauler, miner, tanker (xl),
-    super freighter (xl)], for ship types [TS,TP,TM,TL].
-    
-    * blacklist:
-      - List of names of ships not to generate variants for.
-    * include_advanced_ships:
-      - Bool, if True then existing heavy ships (variation 20) and other 
-        non-basic ships will have variants added. This may result in some
-        redundancies, eg. variants of Mercury and Advanced Mercury. Default True.
-    * print_variant_count:
-      - Bool, if True then the number of new variants added will be printed.
-    * print_variant_modifiers:
-      - Bool, if True then the calculated attributes used for variants will 
-        be printed, given as multipliers on base attributes for various ship
-        attributes. Default False.
+    super freighter (xl)], for ship types [TS,TP,TM,TL]. See Add_Ship_Variants 
+    documentation for other parameters.    
     '''
     Add_Ship_Variants(
         ship_types = [
@@ -190,19 +170,18 @@ def Add_Ship_Trade_Variants(
             'hauler',
             'miner',
             'tanker',
-            'tanker xl',
             'super freighter',
+            'tanker xl',
             'super freighter xl',
             ],
-        blacklist = blacklist,
-        include_advanced_ships = include_advanced_ships,
-        print_variant_modifiers = print_variant_modifiers,
-        print_variant_count = print_variant_count
+        **kwargs
         )
 
     
 #Set up a dict matching variant names to their indices in tships.
-variant_type_index_dict = {
+#This is used to parse transform input args; most logic should use
+# indices to stay generic.
+variant_name_index_dict = {
     'basic'              : 0,
     'vanguard'           : 1,
     'sentinel'           : 2,
@@ -213,15 +192,17 @@ variant_type_index_dict = {
     'tanker'             : 7,
     'tanker xl'          : 14,
     'super freighter xl' : 15,
+    #TODO: maybe include other variants from the base files, but
+    # they are not common enough to really generate ships for.
     }
-#For convenience, build the reverse lookup dict.
-variant_index_type_dict = {x:y for y,x in variant_type_index_dict.items()}
+#For convenience, build the reverse lookup dict. -Removed.
+variant_index_type_dict = {x:y for y,x in variant_name_index_dict.items()}
 
 
 #Keep a global dict with the varient modifiers.
 #This is only calculated on the first call, to avoid generated variants
 # from being seen in the analysis in later calls.
-variant_field_ratios_dict_dict = None
+variant_id_field_ratios_dict_dict = None
 
 
 @Check_Dependencies('TShips.txt', 'WareLists.txt', 'TWareT.txt')
@@ -253,10 +234,24 @@ def Add_Ship_Variants(
             'super freighter xl',
             ],
         race_types = None,
+        price_multiplier = 1,
         blacklist = None,
+        #Set the variants to ignore.
+        #These will not be used in analysis, will not be used as base ships,
+        # and will generally be skipped.
+        variant_indices_to_ignore = [
+            #Avoid mk 1 ships, so as not to make variants of them, as that
+            # gets confusing. Eg. 'colossus mk 1' becomes 'colossus raider'
+            # because the variant flag gets overwritten.
+            #This is mostly for xrm.
+            8,
+            ],
         include_advanced_ships = True,
+        add_mining_equipment = True,
         print_variant_modifiers = False,
         print_variant_count = False,
+        prepatch_ship_variant_inconsistencies = True,
+        _cleanup = False
     ):
     '''
     Adds variants for various ships.  The new variant ships may be spawned
@@ -273,21 +268,32 @@ def Add_Ship_Variants(
     separately from standard variants.
     Ships without extensions or cargo are ignored (eg. drones, weapon platforms).
 
+    After variants are created, a script may be manually run in game from the
+    script editor which will add variants to all shipyards that sell the base
+    ship. Run 'a.x3customizer.add.variants.to.shipyards.xml', no input args.
+    Note: this will add all stock variants as well, as it currently has no
+    way to distinguish the new ships from existing ones.
+
     * ship_types:
       - List of ship names or types to add variants for,
         eg. ['SS_SH_OTAS_M2', 'SG_SH_M1'].
     * variant_types:
-      - List of variant types to add. Variant names are given as strings, and
-        support the following list:
-           ['vanguard',
-            'sentinel',
-            'raider',
-            'hauler',
-            'miner',
-            'tanker',
-            'tanker xl',
-            'super freighter',
-            'super freighter xl']
+      - List of variant types to add. Variant names are given as strings or
+        as integers (1-19). The default list, with supported names and
+        corresponding integers in parentheses, is:
+           ['vanguard' (1),
+            'sentinel' (2),
+            'raider' (3),
+            'hauler' (4),
+            'miner' (5),
+            'super freighter' (6),
+            'tanker' (7) ,
+            'tanker xl' (14),
+            'super freighter xl' (15)
+            ]
+    * price_multiplier:
+      - Float, extra scaling to apply to pricing for the new variants,
+        on top of standard variant modifiers.
     * blacklist:
       - List of names of ships not to generate variants for.
     * race_types:
@@ -302,6 +308,17 @@ def Add_Ship_Variants(
         version to remove their suffix, eg. Hyperion Vanguard will become 
         a base Hyperion from which a vanguard and other variants are generated.
         Default True.
+    * variant_indices_to_ignore:
+      - List of integers, any existing variants to be ignored for analysis
+        and variant generation. Default list includes 8, XRM Mk.1 ships.
+    * add_mining_equipment:
+      - Bool, if True mining equipment will be added to Miner variants. 
+        Default True.
+    * prepatch_ship_variant_inconsistencies:
+      - Bool, if True then Patch_Ship_Variant_Inconsistencies will be run
+        prior to this transform, to avoid some spurious variant generation.
+        Default True with XRM fixes enabled; this should be safe to apply
+        to vanilla AP.
     * print_variant_count:
       - Bool, if True then the number of new variants added will be printed.
     * print_variant_modifiers:
@@ -309,10 +326,59 @@ def Add_Ship_Variants(
         be printed, given as multipliers on base attributes for various ship
         attributes. Default False.
     '''
+    if prepatch_ship_variant_inconsistencies:
+        #Include the xrm fixes as well, by default.
+        Patch_Ship_Variant_Inconsistencies(include_xrm_fixes = True)
+
+    #To add the variants to shipyards in game, a script has been set
+    # up for running from the game script editor.
+    #Copy the script to the scripts directory, to make it available.
+    #Do this here to share the path with cleanup, which runs early.
+    import shutil
+    dest_path = os.path.join('scripts','a.x3customizer.add.variants.to.shipyards.xml')
+    #The file is present here in scripts, so can reuse the dest_path.
+    this_dir = os.path.normpath(os.path.dirname(__file__))
+    source_path = os.path.join(this_dir, dest_path)
+    shutil.copy(source_path, dest_path)
+    
+    #If in cleanup mode, check for the file and delete it if found.
+    if _cleanup:
+        if os.path.exists(dest_path):
+            os.remove(dest_path)
+        return
+
 
     #Make an empty blacklist list if needed.
     if blacklist == None:
         blacklist = []
+
+
+    #Translate the input variant names to indices.
+    for index, input_arg in enumerate(variant_types):
+        error = False
+
+        #Check for a string.
+        if isinstance(input_arg, str):
+            #Error if this is not a name in the table.
+            if input_arg not in variant_name_index_dict:
+                error = True
+            else:
+                #Replace with the table value.
+                variant_types[index] = variant_name_index_dict[input_arg]
+
+        else:
+            #Verify this is in the 1-19 range.
+            if not isinstance(input_arg , int) or input_arg < 1 or input_arg > 19:
+                error = True
+
+        #Common error catch.
+        if error:
+            print('Add_Ship_Variants Error, variant type {} not understood.'.format(
+                input_arg))
+            return
+
+    #Rename to clarify these as indices.
+    variant_indices_to_generate = variant_types
 
 
     #Suffixes to use for generated ship naming.
@@ -320,29 +386,35 @@ def Add_Ship_Variants(
     # xl entries to distinguish them, while keeping suffixes short
     # and expressive.
     #Names are generally uppercase, so maintain that here.
-    #Avoid ever changing these, since they will break ships in an
-    # existing save game using the old name.
     #Limitations on ship names are unknown; there seems to be room
     # for a moderate number of letters.  Try to limit to ~6 here.
     #Stick an underscore, since that is common in existing names.
-    variant_suffix_dict = {
-        'basic'              : '_BASIC',
-        'vanguard'           : '_VAN',
-        'sentinel'           : '_SENT',
-        'raider'             : '_RAID',
-        'hauler'             : '_HAUL',
-        'miner'              : '_MINE',
-        'super freighter'    : '_SFR',
-        'tanker'             : '_TANK',
-        'tanker xl'          : '_TANKXL',
-        'super freighter xl' : '_SFRXL',
-        }
+    #These should cover all possible variants 1-19, in case mods
+    # add new ones in that range.
+    variant_index_suffix_dict = {
+        #Set up some nice names for basic variants.
+        variant_name_index_dict['basic']              : '_BASIC',
+        variant_name_index_dict['vanguard']           : '_VAN',
+        variant_name_index_dict['sentinel']           : '_SENT',
+        variant_name_index_dict['raider']             : '_RAID',
+        variant_name_index_dict['hauler']             : '_HAUL',
+        variant_name_index_dict['miner']              : '_MINE',
+        variant_name_index_dict['super freighter']    : '_SFR',
+        variant_name_index_dict['tanker']             : '_TANK',
+        variant_name_index_dict['tanker xl']          : '_TANKXL',
+        variant_name_index_dict['super freighter xl'] : '_SFRXL',
+    }
+    #Fill out with generics for the rest.
+    for i in range(20):
+        if i not in variant_index_suffix_dict:
+            variant_index_suffix_dict[i] = '_VAR{}'.format(i)
 
     #Set up a list of mining equipment to add to mining variants.
-    #TODO: look this up dynamically, to also account for its value when
-    # checking ship cost adjustments.
     #Goal is to correct the cost adjustment to subtract off mining gear,
     # then add it back later.
+    #TODO: look this up dynamically, in case mods swap miners around,
+    # or other custom equipment needs to be captured.
+    # For now, miners are a special case.
     mining_equipment = [
         #For now, hardcode these.
         'SS_WARE_ORECOLLECTOR',
@@ -355,16 +427,20 @@ def Add_Ship_Variants(
     # added at purchase time, so don't worry about it here.
     #miner_cost_adjustment = Get_Ware_Cost(mining_equipment)
 
+
     #Note the variation indices belonging to some of the redundantly
     # suffixed ships, eg. hyperion vanguard and notus hauler.
     #These can get replaced with 0 when no basic version is available
     # and the base ship used had one of that variant ids.
     #The main goal is to avoid having eg. two Hyperion Vaguard ships,
     # one with id 16 and one with the normal id.
-    redundant_variant_indices = [
-        16, #Vanguard
-        19, #Hauler
-        ]
+    #redundant_variant_indices = [
+    #    16, #Vanguard
+    #    19, #Hauler
+    #    ]
+    #Update: this is not consistent across mods. Switch to just allowing
+    # any ship not in the user variant list to be selected as a new
+    # base (with preference for variant 20).
 
 
     #Set the ship types that will be used for analysis of each
@@ -372,6 +448,14 @@ def Add_Ship_Variants(
     #The main goal here is to omit some outliers, such as the sentinel
     # varients in xrm for transports and corvettes which involves heavy
     # modifications to turrets/etc. which aren't easily captured.
+    #Note: this isn't super safe across heavy modding, but it is 
+    # probably good for the general case to improve results, 
+    # eg. have more reasonable sentinels.
+    #TODO: maybe swap to checking which ship type is most common
+    # for each variant, and using that instead (or maybe the
+    # 2 most common). This might backfire for eg. xrm sentinels,
+    # though, if they are more numerous than any individual
+    # fighter type, so fighters would need to be lumped together.
     analysis_combat_ship_types = [
         #Focus on fighters, the main ship type with variants.
         'SG_SH_M3',
@@ -385,27 +469,25 @@ def Add_Ship_Variants(
         ]
     #Build a convenience dict matching variants to ship types.
     variant_analysis_ship_type_list_dict = {
-        'vanguard'           : analysis_combat_ship_types,
-        'sentinel'           : analysis_combat_ship_types,
-        'raider'             : analysis_combat_ship_types,
-        #Hauler will compare against combat and trade ships.
-        'hauler'             : analysis_combat_ship_types + analysis_trade_ship_types,
-        'miner'              : analysis_trade_ship_types,
-        'super freighter'    : analysis_trade_ship_types,
-        'tanker'             : analysis_trade_ship_types,
-        'tanker xl'          : analysis_trade_ship_types,
-        'super freighter xl' : analysis_trade_ship_types,
+        variant_name_index_dict['vanguard']           : analysis_combat_ship_types,
+        variant_name_index_dict['sentinel']           : analysis_combat_ship_types,
+        variant_name_index_dict['raider']             : analysis_combat_ship_types,
+        #Hauler will compare against combat and/or trade ships.
+        #In practice, trade ships in xrm have too big a buff from
+        # the hauler suffix (mostly in massive shield boosts), which
+        # doesn't map well to combat ships (where shields get super
+        # important).
+        #Scale using only combat ships for this, which feels much
+        # better (balanced and thematic, with haulers getting more
+        # cargo and a small shield buff for penalties most elsewhere).
+        variant_name_index_dict['hauler']             : analysis_combat_ship_types,
+        variant_name_index_dict['miner']              : analysis_trade_ship_types,
+        variant_name_index_dict['super freighter']    : analysis_trade_ship_types,
+        variant_name_index_dict['tanker']             : analysis_trade_ship_types,
+        variant_name_index_dict['tanker xl']          : analysis_trade_ship_types,
+        variant_name_index_dict['super freighter xl'] : analysis_trade_ship_types,
         }
 
-    #Set the variants to ignore.
-    #These will not be used in analysis, will not be used as base ships,
-    # and will generally be skipped.
-    variant_indices_to_ignore = [
-        #Avoid mk 1 ships, so as not to make variants of them, as that
-        # gets confusing. Eg. 'colossus mk 1' becomes 'colossus raider'
-        # because the variant flag gets overwritten.
-        8,
-        ]
 
     #Define the race ships which will be analyzed for setting modifiers.
     races_for_modifiers = [
@@ -441,9 +523,9 @@ def Add_Ship_Variants(
     # be named above (eg. heavy/advanced variants).
     #To distinguish ships of the same general type, the name_id will be used,
     # and race is appended to distinguish pirate variants from others.
-    # Eg. all Mercury variants use the same name_id, despite having different
-    # internal names, so this will gather all Mercuries together (maybe 
-    # ignoring the advanced mercury).
+    # Eg. all standard Mercury variants use the same name_id, despite
+    # having different internal names, so this will gather all Mercuries 
+    # together.
     name_variant_id_ship_dict_dict_dict = defaultdict(dict)
     for ship_dict in Load_File('TShips.txt'):
 
@@ -472,9 +554,11 @@ def Add_Ship_Variants(
 
         #If not including advanced/misc variants as base, ignore
         # them here.
-        if (not include_advanced_ships 
-        and variation_index not in variant_index_type_dict):
-            continue
+        #This will only prune out the 20 variant.
+        #-Removed, unnecessary, skipping is handled later.
+        #if not include_advanced_ships and variation_index == 20:
+        #and variation_index not in variant_index_type_dict):
+        #    continue
 
         #Determine the name tuple for this ship.
         #Combine name_id with race.
@@ -530,40 +614,41 @@ def Add_Ship_Variants(
     #Can now gather the variation statistics.
     #Check if the global dict has these already.  If not, need to calculate
     # them on the first call.
-    global variant_field_ratios_dict_dict
-    if variant_field_ratios_dict_dict == None:
+    global variant_id_field_ratios_dict_dict
+    if variant_id_field_ratios_dict_dict == None:
+
+        #Note that some variant ship lists may be very sparse, maybe
+        # only one entry for special cases. This code should work in
+        # those cases regardless.
     
         #Goal is to build a list of ratios for each variant type and each
-        # variant field. Eg. ['raider']['speed'] = [1.1, 1.15]
+        # variant field. Eg. ['raider']['speed'] = [1.1, 1.15], from
+        # which averages can be calculated later.
         #Populate this with initial entries for all variants.
-        variant_field_ratios_list_dict_dict = defaultdict(lambda: defaultdict(list))
+        variant_id_field_ratios_list_dict_dict = defaultdict(lambda: defaultdict(list))
 
-        #Loop over the ship names.
-        #Each gets considered separately.
-        for variant_id_ship_dict_dict in name_variant_id_ship_dict_dict_dict.values():
+        #Loop over the ship names and their variants.
+        for ship_name, variant_id_ship_dict_dict in name_variant_id_ship_dict_dict_dict.items():
 
             #If there is no base variant to compare against, skip.
             #This occurs for heavy ships or similar.
-            if variant_type_index_dict['basic'] not in variant_id_ship_dict_dict:
+            if 0 not in variant_id_ship_dict_dict:
                 continue
-            basic_dict = variant_id_ship_dict_dict[variant_type_index_dict['basic']]
-
-            #Skip if the basic variant was an added ship.
+            basic_dict = variant_id_ship_dict_dict[0]
+            
 
             #Loop over all variants, not just those being added.
             #Since this is only run once, it needs to gather everything
             # needed for any future transform calls.
-            for variant_type in variant_type_index_dict:
-                #Skip the basic variant.
-                if variant_type == 'basic':
-                    continue
-                #Get the index of this variant type.
-                variant_index = variant_type_index_dict[variant_type]
+            #Cover everything from 1-19.
+            for variant_index in range(1,20):
 
                 #Skip if this ship type is not being used in analysis of this
                 # variant type.
-                if basic_dict['subtype'] not in variant_analysis_ship_type_list_dict[variant_type]:
-                    continue
+                #When a type list is not available, all types are allowed.
+                if variant_index in variant_analysis_ship_type_list_dict:
+                    if basic_dict['subtype'] not in variant_analysis_ship_type_list_dict[variant_index]:
+                        continue
 
                 #Skip if this variant not present for this ship.
                 if variant_index not in variant_id_ship_dict_dict:
@@ -623,8 +708,7 @@ def Add_Ship_Variants(
                     #    #Subtract off the mining equipment pricing from
                     #    # the variant.
                     #    ...
-
-
+                    
                     else:
                         #Grab the field values directly.
                         #Might be int or float, try both.
@@ -653,20 +737,54 @@ def Add_Ship_Variants(
                         stop = 1
 
                     #Calculate the ratio and store it.
-                    variant_field_ratios_list_dict_dict[variant_type][field].append(ratio)
+                    variant_id_field_ratios_list_dict_dict[variant_index][field].append(ratio)
+
+                #TODO:
+                #Gather ship ware lists, and look for differences.
+                #Eg. miner variants should have extra mining equipment.
 
 
         #From the lists, can now calculate average ratios.
-        #This is kinda clumsy with dict comprehensions, but try it out.
-        variant_field_ratios_dict_dict = {
-            #Outer dict needs to make an inner dict.
-            variant : {
-                #Calculate the average.
-                field : sum(ratio_list) / len(ratio_list) 
-                for field, ratio_list in field_ratios_list_dict.items()
-                }
-            for variant, field_ratios_list_dict in variant_field_ratios_list_dict_dict.items()
-            }
+        variant_id_field_ratios_dict_dict = {}
+        #Loop over the variants.
+        for variant_index, field_ratios_list_dict in variant_id_field_ratios_list_dict_dict.items():
+            #Set up a dict for this variant.
+            variant_id_field_ratios_dict_dict[variant_index] = {}
+
+            #Prune any outliers.
+            #XRM, for instance, has sentinel versions of transports that
+            # have very large ratios on weapon energy (>200x or so).
+            #Anything that varies by more than 10x, either direction, will
+            # get pruned. Some super freighters and such can vary by
+            # 6x or so on shields or cost.
+            outlier_max = 10
+            outlier_min = 1/outlier_max
+
+            #To determine the ships to ignore, get the indices, so that
+            # all field lists can skip the right entries.
+            indices_to_skip = set()
+            #Loop over the fields and ratios to check them.
+            for field, ratio_list in field_ratios_list_dict.items():
+
+                #Special case: allow price outliers.
+                if field == 'price':
+                    continue
+
+                for ratio_index, ratio in enumerate(ratio_list):
+                    #Skip if this is an outlier.
+                    if ratio > outlier_max or ratio < outlier_min:
+                        indices_to_skip.add(ratio_index)
+
+
+            #Loop over the fields and ratio lists again.
+            for field, ratio_list in field_ratios_list_dict.items():
+                #Get all entries that are not being skipped.
+                ratios_to_average = [x 
+                                     for i,x in enumerate(ratio_list) 
+                                     if i not in indices_to_skip]
+                ratio = sum(ratios_to_average) / len(ratios_to_average)
+                variant_id_field_ratios_dict_dict[variant_index][field] = ratio
+
 
 
         #Apply a special fix for cargo min/max, unifying the ratios so
@@ -676,7 +794,7 @@ def Add_Ship_Variants(
         # eg. if min changes a lot and max does not, this will result in
         # an excessive boost to max.
         #For now, just apply the max ratio to the min.
-        for field_ratios_dict in variant_field_ratios_dict_dict.values():
+        for field_ratios_dict in variant_id_field_ratios_dict_dict.values():
             #cargo_ratio = field_ratios_dict['cargo_min'] + field_ratios_dict['cargo_max']/2
             field_ratios_dict['cargo_min'] = field_ratios_dict['cargo_max']
                 
@@ -684,8 +802,14 @@ def Add_Ship_Variants(
     #Print these out if desired.
     if print_variant_modifiers:
         print('Variant modifiers:')
-        for variant, field_ratios_dict in variant_field_ratios_dict_dict.items():
-            print('  Variant {}'.format(variant))
+        for variant_id, field_ratios_dict in sorted(variant_id_field_ratios_dict_dict.items()):
+            print('  Variant {} ({})'.format(
+                variant_id,
+                #Give the variant name as well, if known.
+                variant_index_type_dict[variant_id] 
+                if variant_id in variant_index_type_dict 
+                else ''
+                ))
             for field, ratio in field_ratios_dict.items():
                 print('    {: <30} : {:.3f}'.format(field, ratio))
 
@@ -710,43 +834,86 @@ def Add_Ship_Variants(
         if 0 in variant_id_ship_dict_dict:
             basic_dict = variant_id_ship_dict_dict[0]
 
-        #Looking up non-standard variants is kinda tricky to do programmatically.
-        #Can convert the variant type keys into sets, and look for difference.
-        elif set(variant_id_ship_dict_dict) - set(variant_index_type_dict):
+        #If not allowing advanced ships to act as a base, skip variants
+        # for this ship.
+        elif not include_advanced_ships:
+            continue
 
-            #Find the first non-standard variant.
-            #To ensure this is the same on every run (in case there are
-            # several to pick from), sort by variant index.
+        #Favor the 20 case as an alternative.
+        elif 20 in variant_id_ship_dict_dict:
+            #Do not need to reclassify this as variant 0; it shouldn't
+            # have a suffix (the 0001 test file doesn't go high enough
+            # for a 20 suffix).
+            basic_dict = variant_id_ship_dict_dict[20]
+
+        #Two options here: find any existing variant, or try to find
+        # a variant not being added in this call.
+        #The latter might work, and was tried before, but the former is
+        # probably more straightforward.
+        else:
+            #Pick the highest variant index in general.
             basic_dict = None
-            for variant_index, basic_dict in sorted(variant_id_ship_dict_dict.items()):
-                if variant_index not in variant_index_type_dict:
+            for test_index in range(19,0,-1):
+                if test_index in variant_id_ship_dict_dict:
+                    basic_dict = variant_id_ship_dict_dict[test_index]
                     break
-            #Error check.
-            assert basic_dict != None
-            #This shouldn't occur unless advanced ships were included.
-            assert include_advanced_ships
 
-            #If this has a redundant variant index, can assign it to 0 to
-            # avoid a generated variant having overlap with the redundant
-            # name, or possibly to 20 to clarify it as special.
-            # Go with 0 for now.
+            #If here, it is possible a mod added ships with higher
+            # variants, eg. explorers in xrm being variant 25.
+            #Just skip these cases.
+            if basic_dict == None:
+                continue
+                
+            #Reclassify this as variant 0, the base.
+            #This will also stip off redundant suffixes from some ships.
             #Eg. if basing off Hyperion Vanguard, change it to Hyperion
             # before making variants.
-            if int(basic_dict['variation_index']) in redundant_variant_indices:
-                basic_dict['variation_index'] = str(0)
-                del(variant_id_ship_dict_dict[variant_index])
-                variant_id_ship_dict_dict[0] = basic_dict
+            basic_dict['variation_index'] = str(0)
+            #Update the variant_id_ship_dict_dict to reflect this change,
+            # in case it matters ever.
+            del(variant_id_ship_dict_dict[test_index])
+            variant_id_ship_dict_dict[0] = basic_dict
 
-        else:
-            #Nothing was found for the base type.
-            #Here, a base will need to be generated be downscaling an existing
-            # variant.
-            #TODO. Just print a quick warning for now and skip ahead.
-            # This did not come up during testing, but may occur for some
-            # mod combo out there.
-            print('Warning, no basic version found for {}, skipping'.format
-                  (name_id))
-            continue
+
+        #-Removed; this method tried to find a ship not having a variant
+        # generated to use as the base.
+        ##Looking up non-standard variants is kinda tricky to do programmatically.
+        ##Can convert the variant type keys into sets, and look for difference.
+        #elif set(variant_id_ship_dict_dict) - set(variant_index_type_dict):
+        #
+        #    #Find the first non-standard variant.
+        #    #To ensure this is the same on every run (in case there are
+        #    # several to pick from), sort by variant index.
+        #    basic_dict = None
+        #    for variant_index, basic_dict in sorted(variant_id_ship_dict_dict.items()):
+        #        if variant_index not in variant_index_type_dict:
+        #            break
+        #    #Error check.
+        #    assert basic_dict != None
+        #    #This shouldn't occur unless advanced ships were included.
+        #    assert include_advanced_ships
+        #
+        #    #If this has a redundant variant index, can assign it to 0 to
+        #    # avoid a generated variant having overlap with the redundant
+        #    # name, or possibly to 20 to clarify it as special.
+        #    # Go with 0 for now.
+        #    #Eg. if basing off Hyperion Vanguard, change it to Hyperion
+        #    # before making variants.
+        #    if int(basic_dict['variation_index']) in redundant_variant_indices:
+        #        basic_dict['variation_index'] = str(0)
+        #        del(variant_id_ship_dict_dict[variant_index])
+        #        variant_id_ship_dict_dict[0] = basic_dict
+        #
+        #else:
+        #    #Nothing was found for the base type.
+        #    #Here, a base will need to be generated be downscaling an existing
+        #    # variant.
+        #    #TODO. Just print a quick warning for now and skip ahead.
+        #    # This did not come up during testing, but may occur for some
+        #    # mod combo out there.
+        #    print('Warning, no basic version found for {}, skipping'.format
+        #          (name_id))
+        #    continue
 
 
         #TODO:
@@ -761,6 +928,9 @@ def Add_Ship_Variants(
         #The problem with this is that some of these special variants don't
         # actually exist in game, resulting in a gap in the generated
         # variants needlessly, eg. with the colossus hauler.
+        #The other problem is that in some cases the variant is excessively
+        # powerful and probably best ignored if possible, eg. with the kite
+        # vanguard.
         #For now, just allow redundancies.
         
 
@@ -772,11 +942,15 @@ def Add_Ship_Variants(
 
         #With the base type selected, can now start filling in the variants.
         #Loop over the variants being added.
-        for variant_type in variant_types:
-            varient_index = variant_type_index_dict[variant_type]
+        for variant_index in variant_indices_to_generate:
 
             #Can skip this if the variant already exists.
-            if varient_index in variant_id_ship_dict_dict:
+            if variant_index in variant_id_ship_dict_dict:
+                continue
+
+            #Need to skip if there is no scaling information for the
+            # requested variant.
+            if variant_index not in variant_id_field_ratios_dict_dict:
                 continue
 
             #Make a copy of the basic_dict.
@@ -787,7 +961,7 @@ def Add_Ship_Variants(
 
             #Need to edit the name.
             #Add the predefined suffix for the variant type.
-            new_name = new_ship_dict['name'] + variant_suffix_dict[variant_type]
+            new_name = new_ship_dict['name'] + variant_index_suffix_dict[variant_index]
             #Toss an error if the name is taken; it shouldn't be, but be safe.
             if new_name in ship_names_list:
                 raise Exception('Variant name {} already taken.'.format(new_name))
@@ -795,7 +969,7 @@ def Add_Ship_Variants(
 
             #Record the variant index for this ship, for recognition in game
             # and also in future transform calls.
-            new_ship_dict['variation_index'] = str(varient_index)
+            new_ship_dict['variation_index'] = str(variant_index)
 
             #For modifiers, shields should be edited first, since the amount of
             # shielding actually modified will be used to adjust the speed
@@ -813,7 +987,7 @@ def Add_Ship_Variants(
                 # The typical high shield counts are around 6 in game.
 
                 #Grab the shield ratio.
-                ratio = variant_field_ratios_dict_dict[variant_type]['shielding']
+                ratio = variant_id_field_ratios_dict_dict[variant_index]['shielding']
 
                 #Look up the starting slots and size.
                 shield_slots = int(new_ship_dict['max_shields'])
@@ -956,7 +1130,7 @@ def Add_Ship_Variants(
 
 
             #Loop over the modifiers.
-            for field, ratio in variant_field_ratios_dict_dict[variant_type].items():
+            for field, ratio in variant_id_field_ratios_dict_dict[variant_index].items():
 
                 #Skip shielding; it was already handled.
                 if field == 'shielding':
@@ -974,6 +1148,10 @@ def Add_Ship_Variants(
                         # then add back the 1.
                         actual_ratio = (ratio -1) * amount_of_shield_ratio_applied +1
                         value *= actual_ratio
+
+                    #Support an additional scaling on price.
+                    elif field in ['production_value_npc','production_value_player']:
+                        value *= ratio * price_multiplier
 
                     else:
                         #Direct ratio application.
@@ -1039,7 +1217,9 @@ def Add_Ship_Variants(
             # should be ready.
             new_ships_list.append(new_ship_dict)
             #Record miners.
-            if variant_type == 'miner':
+            #TODO: maybe generalize this to record variants per type, and
+            # then in a later step add in generic wares.
+            if variant_index == variant_name_index_dict['miner']:
                 new_miners_list.append(new_ship_dict)
 
 
@@ -1074,9 +1254,265 @@ def Add_Ship_Variants(
 
 
     #Add miner equipment.
-    Add_Ship_Equipment(
-        ship_types = [x['name'] for x in new_miners_list],
-        equipment_list = mining_equipment )
+    if add_mining_equipment:
+        Add_Ship_Equipment(
+            ship_types = [x['name'] for x in new_miners_list],
+            equipment_list = mining_equipment )
+
 
     return
 
+'''
+Phase 2 is to generate a script which will add the new variants to the
+shipyards for an ongoing game.
+
+Through a callable script:
+    A script would be manually called by the player when needing to
+    update shipyards. This may be bothersome if something like the xrm
+    roaming shipyards need the script rerun each time they move.
+
+    Page ~62 on the msci scripting code reference has station commands.
+    The main commands of interest are:
+        <RetVar/IF><RefObj> uses ware <Var/Ware> as product
+        <RefObj> add product to factory or dock: <Var/Ware>
+        <RetVar> = get station array: of race <Var/Race> class/type =<Value>
+        <RetVar> = get station array: product =<Var/Ware> include empty =<Var/Boolean>
+
+    The thread has a simple example of using a couple of the above, once the
+    ship and station are selected:
+        https://forum.egosoft.com/viewtopic.php?p=3671990
+
+    The general approach could be to:
+    -For every base ship + variants (many expand out)
+        -Get array of stations producing a given base ship.
+        -Add every generated variant as factory products.
+
+    The base ship loop might be hundreds of ships, leading to a large
+    generated line count.
+
+    X scripts are stored in a compiled form, where raw text, semi-encoded
+    text, and compiled nodes are all dropped into sections of the xml.
+    Auto-generating raw text is easy, but the encoded and compiled versions
+    get to be much more of a mess.
+
+    One possible option is to code up the shell manually, with the outer
+    loops and a manually done test ship + variants added.
+    The code lines for the ship+variants could then be analyzed, pattern
+    found, and then repeated across all ships actually being handled.
+
+    This is a bit clumsy, but workable.
+
+
+    Alternatively, base ships and variants can be put in a file somehow,
+    read in in-game, and parsed by a generic script looping over them.
+    This avoids the hassle of special encoding/compilation, since the
+    base script is written once.
+
+    The file could be one of the xml language t files, holding the
+    ship information needed, with counts for how many ships or similar.
+    This would require requesting a reserved t file number, but that
+    shouldn't be a big deal (check the mod forum for free numbers).
+    Such files need to be made for every language supported, which is
+    rather meh.
+
+    There appears to be no other method for general file loading.
+
+
+    Another alternative is to write a generic script that can pull all
+    ship variants from the game files.
+    The goal would be to find all shipyards, loop over all ships offered,
+    get the name_id, then loop over all ships in existence filtering for
+    those with the matched name_id, and adding those to the shipyard.
+    It would be a lot of loops, but might be fine for a 1-shot script.
+
+
+Through the mission director:
+    Could be set to autocall itself once, though once the cue has fired
+    it will need to reset it somehow.  A timed reset and rerun would be
+    clumsy.
+    Perhaps have two cues and alternate them, each one clearing the other,
+    swapping between cues on runs of the customizer, but this will mean
+    redundant calls on the next game load when variants have not changed.
+
+    File formatting is easy, though, with the director approach, and the
+    user could potentially manually call the director script by mucking
+    around in-game with cues (note: this option hasn't been explored).
+
+    Command to find shipyards:
+    <find_station group="CUE_name.Shipyards" class="shipyard"/>
+    ?
+
+    There appears to be no way to add wares to an existing station.
+    Creation of a new station is possible, but this would be a
+    horrible solution, unless custom stations are added just for
+    selling the new variant ships.
+
+    While use custom stations is an interesting thought, it is generally
+    clumsy, doesn't mesh well with mods that might organize ship sell
+    locations (eg. xrm with trade ships at different docks), requires
+    excessive stations to make variants as accessible as normal ships,
+    etc.
+
+
+Testing:
+    Attempts to use the command:
+     <RetVar> = get station array: product =<Var/Ware> include empty =<Var/Boolean>
+
+        Some oddities involved.  Primary problem: no good way to specify
+        the produce ware.
+        The game heavily relies on using a ship name for the
+        ingame editor (IE), or the ship race+name+name_id in exscriptor (EX).
+        IE doesn't even offer ships as inputs, only EX does.
+
+        Test with an Atlas, and printing the result to the player logbook,
+        prints null.
+        Trying with 1GJ shield, it prints out an ARRAY() of stations, so it
+        seems this command doesn't work with ships, at least not the way
+        exscriptor specifies ships.
+        In the compiled code, 1GJ shield is just 589828, which doesn't have
+        any apparent meaning (the shield id is SS_SHIELD_E, name_id is 7853).
+        For comparison, a Buster is 458769.
+
+        In general, this is confusing.
+
+
+    The ship browser mod has some reference code that might be useful.
+
+        It uses a generic ship type lookup command:
+            $ship.array = get ship type array: maker race=null class=$$wanted.class
+
+            Though that script has null for race, in game testing of this command
+            required race to be filled in, and class (object type M2 or similar)
+            alone wasn't sufficient.
+            Class isn't needed for the command, though.
+            Potentially, all ship types can be obtained by running this command
+            on each individual race.
+            This appears to return actual live ships, though, not classes.
+
+        Ship class may be obtained with:
+            $ship.array = get ship type array: maker race=null class=$wanted.class
+            If doing this, the printed array is of recognizable ship class names,
+            albeit with suffixes added for variants.
+
+        Stations are looked up by race as well.
+            $station.list = get station array: of race $ship.race class/type={Shipyard 2037}
+            There is a slight caveat that terran stations can sell atf ships,
+            but that might not matter if brute forcing checks on all races.
+
+        Arrays are joined like so:
+            $station.list = [THIS]->call script '!lib.array.join' : a.arr1=$station.list  a.arr2=$station.list.2
+
+        Using these, can get a full array of all ship types, and a full array
+        of all shipyards.
+
+        A station's product list is gotten with:
+            $station.product.list = $station->get tradeable ware array from station
+        Can search for a given ship at the station with:
+            if find $ship.ware in array: $station.product.list
+            
+
+    For variant filling, can use these commands:
+        
+        <RetVar> get ship variation: subtype =<Var/Number> 
+            On ship type: 
+                works correctly (mercury tanker returns 7)
+            On ship:
+                returns 0
+
+        <RetVar> = <RefObj> get ship variation 
+            On ship type: 
+                returns 0
+            On ship:
+                works correctly (mercury tanker returns 7)
+
+        https://forum.egosoft.com/viewtopic.php?t=396298 has an example
+        of using the command. Maybe look into it.
+
+        Even with variant detection, if there is no way to match variants
+        of a given ship with each other, this doesn't help.
+        Eg. how to match Titans or similar.
+        
+
+    One possibility would be to create a ship, run some of these commands
+    on it, then destroy the ship, but this is not expected to be too useful,
+    at most giving a string name of the ship that should be obtainable by
+    other methods and isn't language safe anyway.
+
+
+    Other commands tried:
+
+        <RetVar> = <RefObj> get ID code
+            On ship type, tested on Mammoth: 
+                ID code is CLASS458752, presumably an awkward prefix and the
+                actual class code of interest.
+            On ship:
+                ID code is the in-game generated id.
+
+        <RetVar> = <RefObj> get name
+            On ship type, tested on Mammoth: 
+                Name is an invalid readtext gibberish line, and not useful.
+            On ship:
+                Name is the full in-game name, eg. Jonferco Security Buster Mk. 1.
+                For created ships, this is the default name, eg. Mercury Tanker.
+                
+        <RetVar/IF><RefObj> get object class
+            On ship type:
+                Returns null
+            On ship:
+                Returns general class, eg. TS, which is not too useful.
+
+
+        <RetVar/IF><RefObj> get ware type code of object
+            On ship type:
+                Returns unknown object
+            On ship:
+                Returns eg. Mercury Tanker, presumably the ship type.
+                Not too useful, since a ship was generated from a type.
+
+        <RetVar> get ship class from subtype: <Var/Number>
+            On ship type:
+                Returns general class, eg. TS, which is not too useful.
+            On ship:
+                Note tried.
+
+
+    From these tests, the only useful bits are:
+        -Obtain a ship type variant code.
+        -Obtain a ship type name with variant suffix.
+    Want to know the base name without the variant, if possible.
+
+    If the variant suffix can be read from a language file, it can potentially
+    be removed from the name using:
+        <RetVar> = substitute in string <Var/String>: pattern <Var/String> with <Var/String>
+    This mod may have an example of pulling the variant names:
+        https://forum.egosoft.com/viewtopic.php?t=307684
+    The above didn't help, though a simple check of 0001-l044.xml found it:
+    
+    <page id="300017" title="Boardcomp. objects" descr="" voice="yes">
+        <t id="10001">Vanguard</t>
+        <t id="10002">Sentinel</t>
+        <t id="10003">Raider</t>
+        <t id="10004">Hauler</t>
+        <t id="10005">Miner</t>
+        <t id="10006">Super Freighter</t>
+        <t id="10007">Tanker</t>
+        <t id="10012">XL</t>
+
+    General approach to get a ship base name:
+        Look up the variant type.
+        Get the variant suffix from the text file, adding spaces and XL.
+        Convert the ship type to a string name (has suffix).
+        Replace the suffix with an empty string.
+    The above is tested and works.
+
+    One pass over a list of ship types can generate an annotation array
+    with the base names.
+    By pulling ship types from a shipyard, and getting their base names,
+    can then compare that name to all those in the above array, pulling
+    out the index to know the corresponding ship types, and then add
+    those types to the shipyard.
+
+    Further work done in the script file, found in /scripts.
+    In general, it is working well, though had some oddities.
+        
+'''

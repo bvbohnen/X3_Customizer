@@ -682,18 +682,12 @@ if XRM:
         })
     
     #Add in variant ships.
-    #Do this after any ship specific modifications, so those get represented
-    # in the variants.
-    #Start by fixing a problematic medusa vanguard (hand named).
-    XRM_Standardize_Medusa_Vanguard()
+    #This will autopatch some problems in tships to avoid excess variants
+    # for ships that sidestepped the variant system and gave manual names,
+    # eg. Baldic Miner.
     Add_Ship_Trade_Variants(print_variant_modifiers = True, 
                             print_variant_count = True)
     Add_Ship_Combat_Variants(
-        blacklist = [
-            #Maybe blacklist the hand-named medusa vanguard.
-            #This isn't needed if the vanguard was standardized.
-            #'SS_SH_P_M3P2',
-            ],
         print_variant_count = True
         )
 

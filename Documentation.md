@@ -1,5 +1,5 @@
 
-X3 Customizer v2.04
+X3 Customizer v2.05
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -88,6 +88,10 @@ Change Log:
    - Added Add_Ship_Equipment.
    - Added XRM_Standardize_Medusa_Vanguard.
    - Added Add_Ship_Variants, Add_Ship_Combat_Variants, Add_Ship_Trade_Variants.
+ * 2.05:
+   - Updates to Add_Ship_Variants to refine is behavior and options.
+   - Added in-game script for adding generated variants to shipyards.
+   - XRM_Standardize_Medusa_Vanguard replaced with Patch_Ship_Variant_Inconsistencies.
 
 ***
 
@@ -125,22 +129,8 @@ Transform List:
   
       Adds combat variants for combat ships. This is a convenience function
       which calls Add_Ship_Variants with variants [vanguard, sentinel, raider,
-      hauler], for ship types [M0-M8].
-  
-      * blacklist:
-        - List of names of ships not to generate variants for.
-      * include_advanced_ships:
-        - Bool, if True then existing heavy ships (variation 20) and other 
-          non-basic ships will have variants added. This may result in some
-          redundancies, eg. variants of Mercury and Advanced Mercury.
-          In some cases, the existing ship will be reclassified as a basic
-          version, eg. Hyperion Vanguard will become a base Hyperion from
-          which a vanguard and other variants are generated.
-          Default True.
-      * print_variant_modifiers:
-        - Bool, if True then the calculated attributes used for variants will 
-          be printed, given as multipliers on base attributes for various ship
-          attributes. Default False.
+      hauler], for ship types [M0-M8]. See Add_Ship_Variants documentation
+      for other parameters.
       
 
  * Add_Ship_Equipment
@@ -176,18 +166,8 @@ Transform List:
   
       Adds trade variants for trade ships. This is a convenience function
       which calls Add_Ship_Variants with variants [hauler, miner, tanker (xl),
-      super freighter (xl)], for ship types [TS,TP,TM,TL].
-      
-      * blacklist:
-        - List of names of ships not to generate variants for.
-      * include_advanced_ships:
-        - Bool, if True then existing heavy ships (variation 20) and other 
-          non-basic ships will have variants added. This may result in some
-          redundancies, eg. variants of Mercury and Advanced Mercury. Default True.
-      * print_variant_modifiers:
-        - Bool, if True then the calculated attributes used for variants will 
-          be printed, given as multipliers on base attributes for various ship
-          attributes. Default False.
+      super freighter (xl)], for ship types [TS,TP,TM,TL]. See Add_Ship_Variants 
+      documentation for other parameters.    
       
 
  * Add_Ship_Variants
@@ -208,21 +188,32 @@ Transform List:
       separately from standard variants.
       Ships without extensions or cargo are ignored (eg. drones, weapon platforms).
   
+      After variants are created, a script may be manually run in game from the
+      script editor which will add variants to all shipyards that sell the base
+      ship. Run 'a.x3customizer.add.variants.to.shipyards.xml', no input args.
+      Note: this will add all stock variants as well, as it currently has no
+      way to distinguish the new ships from existing ones.
+  
       * ship_types:
         - List of ship names or types to add variants for,
           eg. ['SS_SH_OTAS_M2', 'SG_SH_M1'].
       * variant_types:
-        - List of variant types to add. Variant names are given as strings, and
-          support the following list:
-             ['vanguard',
-              'sentinel',
-              'raider',
-              'hauler',
-              'miner',
-              'tanker',
-              'tanker xl',
-              'super freighter',
-              'super freighter xl']
+        - List of variant types to add. Variant names are given as strings or
+          as integers (1-19). The default list, with supported names and
+          corresponding integers in parentheses, is:
+             ['vanguard' (1),
+              'sentinel' (2),
+              'raider' (3),
+              'hauler' (4),
+              'miner' (5),
+              'super freighter' (6),
+              'tanker' (7) ,
+              'tanker xl' (14),
+              'super freighter xl' (15)
+              ]
+      * price_multiplier:
+        - Float, extra scaling to apply to pricing for the new variants,
+          on top of standard variant modifiers.
       * blacklist:
         - List of names of ships not to generate variants for.
       * race_types:
@@ -237,6 +228,19 @@ Transform List:
           version to remove their suffix, eg. Hyperion Vanguard will become 
           a base Hyperion from which a vanguard and other variants are generated.
           Default True.
+      * variant_indices_to_ignore:
+        - List of integers, any existing variants to be ignored for analysis
+          and variant generation. Default list includes 8, XRM Mk.1 ships.
+      * add_mining_equipment:
+        - Bool, if True mining equipment will be added to Miner variants. 
+          Default True.
+      * prepatch_ship_variant_inconsistencies:
+        - Bool, if True then Patch_Ship_Variant_Inconsistencies will be run
+          prior to this transform, to avoid some spurious variant generation.
+          Default True with XRM fixes enabled; this should be safe to apply
+          to vanilla AP.
+      * print_variant_count:
+        - Bool, if True then the number of new variants added will be printed.
       * print_variant_modifiers:
         - Bool, if True then the calculated attributes used for variants will 
           be printed, given as multipliers on base attributes for various ship
@@ -859,6 +863,21 @@ Transform List:
       Does nothing if the existing npc and player prices are matched.
       
 
+ * Patch_Ship_Variant_Inconsistencies
+  
+    Requires: TShips.txt
+  
+      Applies some fixes to some select inconsistencies in ship variants.
+      Modified ships include the Baldric Miner and XRM Medusa Vanguard,
+      both manually named instead of using the variant system.
+      This is meant to be run prior to Add_Ship_Variants, to avoid the 
+      non-standard ships creating their own sub-variants.
+  
+      * include_xrm_fixes
+        - Bool, if True then the Medusa Vanguard is patched if found and
+          in the form set by XRM. Default True.
+      
+
  * Remove_Stars_From_Foggy_Sectors
   
     Requires: TBackgrounds.txt
@@ -1150,16 +1169,6 @@ Transform List:
   
       Changes standard gates into Terran gates, possibly helping reduce
       large ship suicides when entering a system.
-      
-
- * XRM_Standardize_Medusa_Vanguard
-  
-    Requires: TShips.txt
-  
-      Convert the XRM Medusa Vanguard into a standard variant, instead of
-      a custom named ship. This is meant to be run prior to adding ship
-      variants, to avoid the non-standard medusa vanguard generating its
-      own sub-variants.
       
 
 

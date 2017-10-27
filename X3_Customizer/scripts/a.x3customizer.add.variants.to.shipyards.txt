@@ -1,0 +1,424 @@
+* X3_Customizer script for adding generated ship variants to shipyards.
+* Note: this is primarily edited as a .txt file.
+* Copy the basic txt version into exscriptor to get a proper xml version
+* in this folder; the Add_Ship_Variants will move the script to the game
+* script folder.
+
+
+* Flags to turn on debug prints to the given log file.
+$debug = 0
+$logfile = 100
+
+* Make the log file, using an empty write in non-append mode.
+if $debug
+	write to log file $logfile append = 0 printf: fmt ='X3 Customizer log for adding ship variants', null, null, null, null, null
+end
+	
+* To balance the script between speed and avoiding lag, each main
+* ship name analysis loop can pause every X ships, where up to 
+* this many ships are handled per game frame.
+$int.ships.between.waits = 5
+	
+	
+* Run init.
+gosub Func.Init
+
+* To reduce run time a bit, and recognizing that races shouldn't stock ships of
+* other races, the inner functions will run on one race at a time.
+* A special case may be made for terran/atf, which will be merged under terran.
+$race = {Argon}
+gosub Func.Main.Routine
+$race = {Boron}
+gosub Func.Main.Routine
+$race = {Split}
+gosub Func.Main.Routine
+$race = {Paranid}
+gosub Func.Main.Routine
+$race = {Teladi}
+gosub Func.Main.Routine
+$race = {Terran}
+gosub Func.Main.Routine
+$race = {Pirates}
+gosub Func.Main.Routine
+$race = {Yaki}
+gosub Func.Main.Routine
+$race = {Xenon}
+gosub Func.Main.Routine
+
+
+return null
+
+
+* Function to run the main routine, finding shipyards and ships and adding
+* buyable variants, for a given race.
+* Input:
+*	$race
+* Output:
+*	None
+Func.Main.Routine:
+
+	* Get a list of shipyards.
+	$array.shipyards = get station array: of race $race class/type={Shipyard 2037}
+
+	* Get a list of ship types.
+	$array.class.ship.type = get ship type array: maker race=$race class=null
+	
+	* If this is terran, include atf shipyards and ships.
+	if $race == {Terran}
+		$race2 = {ATF 17}
+		gosub Func.Add.Second.Race.Shipyards.Ships		
+	end
+
+	* If this is argon, include goners.
+	if $race == {Argon}
+		$race2 = {Goner}
+		gosub Func.Add.Second.Race.Shipyards.Ships		
+	end
+
+	* Generate a list of ship type base names.
+	gosub Func.Parse.Ship.Names
+	
+	* Handle the shipyard additions.
+	gosub Func.Shipyard.Add.Variants
+	
+endsub
+
+
+
+* Function to parse ship base names.
+* Input:
+*	$array.class.ship.type
+* Output:
+*	$array.str.ship.type.name.base
+Func.Parse.Ship.Names:
+
+	* Make an array of the same size as the ship type array.
+	$int.ship.count = size of array $array.class.ship.type
+	$array.str.ship.type.name.base = array alloc: size=$int.ship.count
+	
+	if $debug
+		write to log file $logfile  append = 1 printf: fmt ='%s ship count %s', $race, $int.ship.count, null, null, null
+	end
+	
+	* Keep a rolling count of ships until the next wait point,
+	* used to prevent overlagging the game.
+	* This will start at the high count and go down to 0.
+	$int.ships.until.wait = $int.ships.between.waits
+	
+	* Loop over the ship types.
+	* Other scripts like to do countdowns to 0, so keep that style here,
+	* filling names from last to first.
+	while $int.ship.count
+	
+		* Count down; this also brings the index in range.
+		dec $int.ship.count =
+		
+		* Get the next ship type.
+		$class.ship.type = $array.class.ship.type[$int.ship.count]
+		
+		* Do a debug print.
+		*if $debug
+		*	write to log file $logfile append = 1 printf: fmt ='Ship %s, index %s', $class.ship.type, $int.ship.count, null, null, null
+		*end
+		
+		* Get its base name.
+		gosub Func.Get.Ship.Type.Base.Name
+		
+		* Store the base name.
+		$array.str.ship.type.name.base[$int.ship.count] = $str.ship.type.name.base
+		
+		* Count down to the next wait point, and see if it is reached.
+		dec $int.ships.until.wait =
+		if $int.ships.until.wait == 0
+
+			* This might be slow and can lock up a game while running.
+			* To make more friendly, put in a message and a wait.
+			* Throw up the current race, and how many ships still need processing.
+			$msg = sprintf: fmt='Parsing %s ships: %s', $race, $int.ship.count, null, null, null
+			* It is unclear on if a subtitle can be given extra time and the next
+			* will just overwrite it, or if they queue up, or what.
+			* Play it a little safe and give 10 ms, with 10 ms waits.
+			display subtitle text: text=$msg duration=10 ms
+			* 1ms will wait until the next screen update.
+			* Note: this needs a return arg for some reason; don't set null or exscriptor/x3
+			* sets it to $debug for some reason.
+			@ $temp = wait 1 ms
+				
+			$int.ships.until.wait = $int.ships.between.waits
+		end
+	end	
+endsub
+
+
+
+* Function to add variants to shipyards.
+* Input:
+*	$array.shipyards
+*	$array.class.ship.type
+*	$array.str.ship.type.name.base
+* Output:
+*	None.
+Func.Shipyard.Add.Variants:
+	
+	* Loop over the shipyards.
+	$int.shipyard = size of array $array.shipyards
+	while $int.shipyard
+		dec $int.shipyard =
+	
+		* Grab the next shipyard.
+		$shipyard = $array.shipyards[$int.shipyard]
+		
+		* Get the shipyard wares list.
+		$array.shipyard.products = $shipyard -> get products
+		*if $debug
+		*	write to log file $logfile append = 1 value= $shipyard
+		*	write to log file $logfile append = 1 value= $array.shipyard.products
+		*end
+		
+		* Loop over the wares.
+		$int.ware = size of array $array.shipyard.products
+		while $int.ware
+			dec $int.ware =
+			
+			* Grab the next ware.
+			$ware = $array.shipyard.products[$int.ware]
+			
+			* Want to determine if this is a ship type.
+			* Unclear on how best to do this, but easiest would probably be to
+			* check if the ware is in the ship type array.
+			if find $ware in array: $array.class.ship.type
+			
+				* Know that this is a ship type, and it is one of those being
+				* looked for.
+				* Two options here: 
+				* Can get the base name of the ship, and use that for
+				* finding variants, which would mean all shipyards with one
+				* variant will pick up them all;
+				* Or can use the full name of the ship with suffix, skip it if it
+				* is not in the base name array, and then search the array for
+				* matches, which would mean only shipyards with the base ship
+				* type will pick up variants.
+				* The latter is probably good enough for most cases, and might run
+				* faster, so try it for now.
+				
+				* Get the ship name.
+				$str.ship.type.name.full = sprintf: fmt='%s', $ware, null, null, null, null
+				* Despace it if needed, to get proper matching.				
+				$str.to.despace = $str.ship.type.name.full
+				gosub Func.Remove.Trailing.Space
+				$str.ship.type.name.full = $str.to.despace.out
+				
+				if $debug
+					write to log file $logfile append = 1 printf: fmt ='Checking product %s', $str.ship.type.name.full, null, null, null, null
+				end
+				
+				* Check if it is in the base names list.
+				if find $str.ship.type.name.full in array: $array.str.ship.type.name.base
+				
+					* Loop over every ship.type/name combo.
+					$int.ships = size of array $array.class.ship.type
+					while $int.ships
+						dec $int.ships =
+						
+						* Do a name match to see if the ware is the same.
+						$str.sample.ship.type.name.base = $array.str.ship.type.name.base[$int.ships]
+						if $str.ship.type.name.full == $str.sample.ship.type.name.base
+						
+							* On a match, grab the ship type being sampled.
+							$class.sample.ship.type = $array.class.ship.type[$int.ships]
+							
+							* Skip if it is a shipyard product already.
+							if find $class.sample.ship.type in array: $array.shipyard.products
+							else
+								
+								* Add it as a product.
+								$shipyard -> add product to factory or dock: $class.sample.ship.type
+								
+								if $debug
+									write to log file $logfile append = 1 printf: fmt ='Shipyard %s adding ship %s', $shipyard, $class.sample.ship.type, null, null, null
+								end								
+							end						
+						end						
+					end
+				end	
+			end
+			
+			* This might be slow and can lock up a game while running.
+			* To make more friendly, put in a message and a wait.
+			* Could potentially put this on a counter to play with it, but
+			* every loop seems to work okay in testing.
+			* Throw up the current race, and how many factories still need processing.
+			$msg = sprintf: fmt='Updating %s shipyards: %s', $race, $int.shipyard, null, null, null
+			display subtitle text: text=$msg duration=10 ms
+			@ $temp = wait 1 ms
+		end		
+	end	
+endsub
+
+
+*Function to initialize some variables.
+*Put here to avoid misc warnings during compile, so that these vars
+* are known to be visible.
+*Outputs:
+* $array.str.variant.suffixes
+* $str.empty
+Func.Init:
+
+	* Set up an empty string, for doing replacements of the suffixes with none.
+	$str.empty = sprintf: fmt='', null, null, null, null, null
+	
+	*Preread the xml file for variant suffixes.
+	* Get the text block with variant names. This is all in file 0001.
+	*-Removed; this should already be loaded, and if reloading it then its text
+	* will overwrite any later text files, causing oddities until a game reload.
+	* load text: id=0001
+	
+	* Get the different variant suffix components.
+	* Page is 300017, but the prefix 30 is presumably added automatically for
+	* AP, so just give the 17 as page.
+	* Suffixes go from 10001 to 10019, and should be usable as-is.
+	
+	* Make the array. Keep items for 20 variants.
+	* (Note: actual variant ids may go higher).
+	$array.str.variant.suffixes = array alloc: size=20
+	* First entry will just be blank.
+	$array.str.variant.suffixes[0] = $str.empty
+	
+	* Loop from 1 to 20.
+	$loop.iter = 1
+	while $loop.iter <= 20
+	
+		* Calculate the text offset.
+		$text.id = $loop.iter + 10000
+		* Look up the text.
+		$temp = read text: page=17 id = $text.id
+		* Add a space to the prefix.
+		$temp = sprintf: fmt=' %s', $temp, null, null, null, null
+		* Store it.
+		$array.str.variant.suffixes[$loop.iter] = $temp
+	
+		inc $loop.iter =
+	end
+		
+endsub
+
+
+* Function to take a ship type and determine the base name.
+* Input:
+*	$class.ship.type
+* Output:
+*	$str.ship.type.name.base
+Func.Get.Ship.Type.Base.Name:
+
+	* Get the variant index.
+	$int.ship.type.variant = get ship variation: subtype=$class.ship.type
+	
+	* Note when a suffix needs removal. Default true.
+	$bool.suffix.present = 1
+	
+	* Look up the suffix for the variant.
+	* Set special cases for variant 0 (no suffix) or over 20 (unsupported
+	* by the lookup array).
+	if $int.ship.type.variant == 0 OR $int.ship.type.variant > 20
+	
+		* Treat as unsuffixed, even if there is a special suffix
+		* (eg. 'explorer' in xrm is variant 25).
+		* Set an empty string for the debug print clarity.
+		$str.variant.suffix = $str.empty
+		$bool.suffix.present = 0
+		* Note: because of the way xrm used some ship variants (eg. 10, 13, etc.)
+		* that used to have a suffix, but xrm overwrote the language file to blank
+		* the suffix, some ships will have a spurious space at the end of their
+		* name.
+		* This needs to be dealt with both here and when station products are
+		* being matched.		
+	else
+		* Do a straight lookup.
+		$str.variant.suffix = $array.str.variant.suffixes[$int.ship.type.variant]
+	end
+	
+	* Get the ship name, as a string.
+	* The sprintf function requires 5 inputs, always, but can set them to null when unused.
+	$str.ship.type.name.full = sprintf: fmt='%s', $class.ship.type, null, null, null, null
+	
+	* Strip off the variant suffix for the base name.
+	* Only do this when a suffix is present, else this will freeze the game.
+	if $bool.suffix.present
+		$str.ship.type.name.base = substitute in string $str.ship.type.name.full: pattern $str.variant.suffix with $str.empty
+	else
+		* Remove the trailing space. Somehow. If there is one.
+		$str.to.despace = $str.ship.type.name.full
+		gosub Func.Remove.Trailing.Space
+		$str.ship.type.name.base = $str.to.despace.out
+	end
+
+	* Do a debug print.
+	if $debug
+		write to log file $logfile append = 1 printf: fmt ='Ship %s, variant id %s, suffix %s, base name %s', $class.ship.type, $int.ship.type.variant, $str.variant.suffix, $str.ship.type.name.base, null
+	end
+
+endsub
+
+
+* Function to remove a space at the end of a string, if present.
+* Input:
+*	$str.to.despace
+* Output:
+*	$str.to.despace.out
+Func.Remove.Trailing.Space:
+	* Check for trailing space.
+	* Start with the string length, then grab the last char.
+	$int.length = get length of string $str.to.despace
+	$int.length.m1 = $int.length - 1
+	$str.last.char = get substring of $str.to.despace offset = $int.length.m1 length = 1
+		
+	* Compare to space.
+	if $str.last.char == ' '
+		* Slice the string to drop the last char.
+		$str.to.despace.out = get substring of $str.to.despace offset = 0 length = $int.length.m1
+	else
+		* No change.
+		$str.to.despace.out = $str.to.despace
+	end
+endsub
+
+
+* Function to add a second race's shipyards and ships to the current arrays.
+* Used for Terrans+ATF, Argon+Goners, maybe others.
+* Input:
+*   $race2
+*	$array.shipyards
+*	$array.class.ship.type
+* Output:
+*	$array.shipyards
+*	$array.class.ship.type
+Func.Add.Second.Race.Shipyards.Ships:			
+	* Get their shipyards and ships.
+	$array.shipyards.2 = get station array: of race $race2 class/type={Shipyard 2037}
+	$array.class.ship.type.2 = get ship type array: maker race=$race2 class=null
+
+	* Merge the arrays.
+	* It is not clear on how to do this easily. An append loop will be
+	* done here, though could also resize and then do a copy to new elements.
+	$int.index = size of array $array.shipyards.2
+	while $int.index		
+		* Count down; this also brings the index in range.
+		dec $int.index =
+		$temp = $array.shipyards.2[$int.index]
+		append $temp to array $array.shipyards
+	end
+		
+	$int.index = size of array $array.class.ship.type.2
+	while $int.index
+		dec $int.index =
+		$temp = $array.class.ship.type.2[$int.index]
+		append $temp to array $array.class.ship.type
+	end
+		
+endsub
+
+
+* It is unclear if this is needed at the end; 
+* some other scripts have it after subfunctions.
+return null
+
