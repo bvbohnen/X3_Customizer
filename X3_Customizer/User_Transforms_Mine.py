@@ -20,8 +20,7 @@ elif XRM:
         path_to_addon_folder = r'C:\Base\x3 terran conflict xrm\addon',
         source_folder = 'xrm_source'
     )
-
-
+    
 
 #####################################################
 #Background
@@ -211,6 +210,64 @@ if XRM:
             ]
         )
     
+    #Play around with the spawn locations.
+    #With the high amount of xrm combat, it is common to see ships doing
+    # a jump animation into the player sector, which is immersion breaking
+    # in general.
+    #Can either try to have ships start at a gate, docked (may not work well
+    # on caps), or at a shipyard (most balance affecting, and may not work
+    # on shipyardless races like khaak).
+    Set_Job_Spawn_Locations(
+        jobs_types = [
+            #Grab the standard race owners mainly.            
+            'owner_argon',
+            'owner_boron', 
+            'owner_split', 
+            'owner_paranid', 
+            'owner_teladi', 
+            'owner_atf', 
+            'owner_terran', 
+            'owner_goner', 
+            #Allow the hostile races to spawn more freely.
+            #'owner_xenon', 
+            #'owner_khaak', 
+            #'owner_yaki', 
+            #'owner_pirates',
+            ],
+        #Don't worry about sector selection for now on the global
+        # change. Civ traffic already has good restrictions, and sometimes
+        # mixed (eg. light traffic is core only, TLs are shipyard sectors,
+        # etc.).
+        #sector_flags_to_set = [
+        #    'select_owners_sector'
+        #    'select_not_enemy_sector'
+        #    'select_core_sector'
+        #    'select_border_sector'
+        #    'select_shipyard_sector'
+        #    'select_owner_station_sector'
+        #    ],
+        creation_flags_to_set = [
+            #Can try either shipyard or gate.
+            #Yaki/pirates/xenon will need to be able to spawn away
+            # from shipyards to do their raiding easily, so go with
+            # gate for now.
+            #Some main race sectors are far away from shipyards as well,
+            # eg. the top right sectors, which would make it hard for
+            # race ships to repopulate up there.
+            #Gate creation won't work for khaak in their home sectors,
+            # and may not work well for pirates flying in from sector
+            # edge.
+            #'create_in_shipyard'
+            'create_in_gate'
+            #Common case is creation inside sector, but move
+            # away from that.
+            #'create_inside_sector'
+            #'create_outside_sector'
+            ],
+        #Can try making ships start docked, to undock.
+        #This might only make sense when creating in sector and not gate.
+        #docked_chance = 99,
+        )
 
 #####################################################
 #Weapons
@@ -565,8 +622,13 @@ Enhance_Mosquito_Missiles()
 
 #Apply general missile damage nerfs.
 Adjust_Missile_Damage(
-    scaling_factor = 1,
-    use_diminishing_returns = True,
+    #Try a 50% reduction on the high end missiles.
+    scaling_factor = 0.5,
+    use_scaling_equation = True,
+    #Heavy missiles are in the 500k+ range or so.
+    target_damage_to_adjust = 500000,
+    #Keep fighter tier missiles roughly unchanged.
+    damage_to_keep_static = 50000,
     print_changes = True)
 
 if XRM:
@@ -578,7 +640,7 @@ if XRM:
         scaling_factor = 0.5,
         #If diminishing returns should be used, so that short range
         # missiles are less affected.
-        use_diminishing_returns = True,
+        use_scaling_equation = True,
         #Set the tuning points.
         #The target range to adjust, in km. About 50km+ and longer missiles.
         target_range_to_adjust_km = 50,
@@ -593,12 +655,12 @@ if XRM:
         scaling_factor = 0.65,
         #If diminishing returns should be used, so that short range
         # missiles are less affected.
-        use_diminishing_returns = True,
+        use_scaling_equation = True,
         #Set the tuning points.
         #The target speed to adjust, in mps. About 700+ on fast missiles.
         target_speed_to_adjust = 700,
         #The speed to pin in place on the low end.
-        speed_to_keep_static = 150,
+        speed_to_keep_static = 250,
         print_changes = True
         )
     
@@ -611,7 +673,14 @@ if XRM:
 
     #Make missiles a little easier to shoot down.
     Adjust_Missile_Hulls(0.5)
-
+    
+    #Increase missile compatibilities in various ways.
+    #Bombers get more missile options.
+    Expand_Bomber_Missiles()
+    #Terrans can use dropped commonwealth missiles.
+    Add_Ship_Cross_Faction_Missiles()
+    #Corvettes and up can fire boarding pods.
+    Add_Ship_Boarding_Pod_Support()
     
 #####################################################
 #Ships

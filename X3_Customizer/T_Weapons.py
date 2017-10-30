@@ -105,7 +105,7 @@ Bullet_parent_to_child_dict = {}
 def _Initialize_Bullet_parent_to_child_dict():
     #Loop over all bullets.
     for index, this_dict in enumerate(Load_File('TBullets.txt')):
-        flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+        flags_dict = Flags.Unpack_Tbullets_Flags(this_dict)
         #Check if this bullet fragments.
         if flags_dict['fragmentation']:
             #Record the pairing.
@@ -208,7 +208,7 @@ def Adjust_Weapon_Fire_Rate(
     #Loop over all bullets.
     for this_dict, index in enumerate(tbullets_dict_list):
         #Unpack the flags.
-        flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+        flags_dict = Flags.Unpack_Tbullets_Flags(this_dict)
         #If an ammo user, record its name.
         if flags_dict['use_ammo']:
             ammo_based_bullet_list.append(index)
@@ -403,7 +403,7 @@ def Adjust_Weapon_OOS_Damage(
     #        bullet_dict = tbullets_dict_list[bullet_index]
     #
     #        #Unpack the flags.
-    #        flags_dict = Flags.Unpack_Tbullets_flags(bullet_dict['flags'])
+    #        flags_dict = Flags.Unpack_Tbullets_Flags(bullet_dict)
     #            
     #        #Skip if this bullet was already seen.
     #        if bullet_index in bullet_indices_seen_list:
@@ -564,7 +564,7 @@ def Adjust_Weapon_Shot_Speed(
     for this_dict in Load_File('TBullets.txt'):
 
         #Unpack the flags.
-        flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+        flags_dict = Flags.Unpack_Tbullets_Flags(this_dict)
 
         #Always skip beam weapons, including zigzag.
         if flags_dict['beam'] or flags_dict['zigzag']:
@@ -608,7 +608,7 @@ def Adjust_Weapon_Shot_Speed(
         if print_changes:        
             #Give bullet name, old and new speed,
             # and the scaling factor.
-            Write_Summary_Line('{:<30} : {:>10} -> {:>10}, x{}'.format(
+            Write_Summary_Line('{:<30} : {:>10.1f} -> {:>10.1f}, x{:.2f}'.format(
                 this_dict['name'],
                 #Convert back to m/s
                 speed / 500,
@@ -789,7 +789,7 @@ def Adjust_Weapon_DPS(
             bullet_dict = tbullets_dict_list[bullet_index]
 
             #Unpack the flags.
-            flags_dict = Flags.Unpack_Tbullets_flags(bullet_dict['flags'])
+            flags_dict = Flags.Unpack_Tbullets_Flags(bullet_dict)
 
             #If ignoring repair lasers, and this is a repair weapon, skip.
             if flags_dict['repair'] and ignore_repair_lasers:
@@ -974,7 +974,7 @@ def Adjust_Beam_Weapon_Duration(
       - Bool, if True (default) then repair lasers will be ignored.
     '''
     for this_dict in Load_File('TBullets.txt'):
-        flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+        flags_dict = Flags.Unpack_Tbullets_Flags(this_dict)
          
         #Skip if this isn't a beam.
         if not flags_dict['beam']:
@@ -1047,7 +1047,7 @@ def Adjust_Beam_Weapon_Duration(
 #    #TODO: make into a generic transform with a bullet dict, and key
 #    # off of a flag match.
 #    for this_dict in Load_File('TBullets.txt'):
-#        flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+#        flags_dict = Flags.Unpack_Tbullets_Flags(this_dict)
 #
 #        #Skip non-beams.
 #        if not flags_dict['beam']:
@@ -1088,7 +1088,7 @@ def Adjust_Beam_Weapon_Width(
     #TODO: consider length increases, which may have performance benefit at the
     # drawback of beams maybe visually going through small targets slightly.
     for this_dict in Load_File('TBullets.txt'):
-        flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+        flags_dict = Flags.Unpack_Tbullets_Flags(this_dict)
 
         #Skip if this isn't a beam.
         if not flags_dict['beam']:
@@ -1154,7 +1154,7 @@ def Convert_Beams_To_Bullets(
     beams_not_converted += ['SS_BULLET_TUG']
 
     for this_dict in Load_File('TBullets.txt'):
-        flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+        flags_dict = Flags.Unpack_Tbullets_Flags(this_dict)
 
         #Skip non-beams.
         if not flags_dict['beam']:
@@ -1198,7 +1198,7 @@ def Convert_Beams_To_Bullets(
         #Do this after the above, so a beam isn't included in the
         # bullet to speed analysis.
         flags_dict['beam'] = False
-        this_dict['flags'] = Flags.Pack_Flags(flags_dict)
+        Flags.Pack_Tbullets_Flags(this_dict, flags_dict)
 
 
 def _Get_Average_Damage(bullet_dict):
@@ -1266,7 +1266,7 @@ def _Get_Bullet_Speed_By_Damage(bullet_dict, speed_samples, sample_type):
         for this_dict in Load_File('TBullets.txt'):
 
             #Skip beams.
-            flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+            flags_dict = Flags.Unpack_Tbullets_Flags(this_dict)
             if flags_dict['beam']:
                 continue
 
@@ -1400,7 +1400,8 @@ def Adjust_Weapon_Energy_Usage(
     
     ):
     '''
-    Adjusts weapon energy usage by the given multiplier.
+    Adjusts weapon energy usage by the given multiplier, globally or
+    for selected bullets.
 
     * scaling_factor:
       - Multiplier to apply to all weapons without specific settings.
@@ -1416,7 +1417,7 @@ def Adjust_Weapon_Energy_Usage(
         if this_dict['name'] in bullet_name_multiplier_dict or scaling_factor != 1:
 
             #If ignoring repair lasers, and this is a repair weapon, skip.
-            flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+            flags_dict = Flags.Unpack_Tbullets_Flags(this_dict)
             if flags_dict['repair'] and ignore_repair_lasers:
                 continue
 
@@ -1458,7 +1459,7 @@ def Convert_Weapon_To_Energy(
     '''
     for this_dict in Load_File('TBullets.txt'):
         if this_dict['name'] in bullet_name_ammo_dict:
-            flags_dict = Flags.Unpack_Tbullets_flags(bullet_dict['flags'])
+            flags_dict = Flags.Unpack_Tbullets_Flags(bullet_dict)
 
             #Clear the ammo flag.
             flags_dict['use_ammo'] = False
@@ -1467,7 +1468,7 @@ def Convert_Weapon_To_Energy(
             new_energy = bullet_name_ammo_dict[this_dict['name']]
 
             #Put new values back.
-            this_dict['flags'] = Flags.Pack_Flags(flags_dict)
+            Flags.Pack_Tbullets_Flags(this_dict, flags_dict)
             this_dict['energy_used'] = str(int(new_energy))
     
             
@@ -1477,8 +1478,8 @@ def Convert_Weapon_To_Ammo(
     energy_reduction_factor = 0.1
     ):
     '''
-    Converts the given weapons, determined by bullet type, to use ammo
-    instead of ammunition.
+    Converts the given weapons, determined by bullet type, to use ammunition
+    instead of energy.
 
     * bullet_name_energy_dict:
       - Dict, keyed by bullet name (eg. 'SS_BULLET_MASS'), with the ammo
@@ -1496,7 +1497,7 @@ def Convert_Weapon_To_Ammo(
     for this_dict in Load_File('TBullets.txt'):
 
         if this_dict['name'] in bullet_name_ammo_dict:
-            flags_dict = Flags.Unpack_Tbullets_flags(bullet_dict['flags'])
+            flags_dict = Flags.Unpack_Tbullets_Flags(bullet_dict)
             
             #Set the ammo flag.
             flags_dict['use_ammo'] = True
@@ -1514,7 +1515,7 @@ def Convert_Weapon_To_Ammo(
             this_dict['ammo_type'] = str(ammo_type)
 
             #Put new values back.
-            this_dict['flags'] = Flags.Pack_Flags(flags_dict)
+            Flags.Pack_Tbullets_Flags(this_dict, flags_dict)
             this_dict['energy_used'] = str(int(new_energy))
 
 
@@ -1522,25 +1523,25 @@ def Convert_Weapon_To_Ammo(
 @Check_Dependencies('TBullets.txt')
 def Clear_Weapon_Flag(flag_name):
     '''
-    Clears the specified flag from all weapons.
+    Clears a specified flag from all weapons.
 
     * flag_name:
-      - Bullet property flag name, as found in Flags.py.
+      - Bullet property flag name, as found in Flags.py. Eg. 'charged'.
     '''
     for this_dict in Load_File('TBullets.txt'):
         #Look up the flag, and set to False.
-        flags_dict = Flags.Unpack_Tbullets_flags(this_dict['flags'])
+        flags_dict = Flags.Unpack_Tbullets_Flags(this_dict)
         assert flag_name in flags_dict
         flags_dict[flag_name] = False
-        this_dict['flags'] = Flags.Pack_Flags(flags_dict)
+        Flags.Pack_Tbullets_Flags(this_dict, flags_dict)
         
         
 @Check_Dependencies('TBullets.txt')
 def Remove_Weapon_Charge_Up():
     '''
     Remove charge up from all weapons, to make PPCs and similar easier to use in
-     a manner consistent with the npcs (eg. hold trigger to just keep firing), as
-     charging is a player-only option.
+    a manner consistent with the npcs (eg. hold trigger to just keep firing), as
+    charging is a player-only option.
     '''
     Clear_Weapon_Flag('charged')
 

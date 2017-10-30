@@ -1,44 +1,55 @@
 '''
-X3 Customizer v2.05
+X3 Customizer v2.06
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
-and write the results back out.  Transforms will often perform complex
+and write the results back out. Transforms will often perform complex
 or repetitive tasks succinctly, avoiding the need for hand editing of
-source files.  Source files will generally support any prior modding.
+source files. Many transforms will also do analysis of game files, to
+intelligently select appropriate edits to perform.
+Source files will generally support any prior modding. Nearly all transforms 
+support input arguments to set parameters and adjust behavior, according 
+to user preferences. Most transforms will work on an existing save.
 
-This tool is written in Python, and tested on version 3.6.
+This tool is written in Python, and tested on version 3.6. To run this
+script, the user will need to install Python.
 
 Usage:
  * "X3_Customizer <user_transform_module.py>"
-   - Runs the customizer using the provided module, located in this
-     directory, to specify the path to the AP directory, the folder
+   - Runs the customizer, using the provided control module which
+     will specify the path to the AP directory, the folder
      containing the source files to be modified, and the transforms
      to be run. See User_Transforms_Example.py for an example.
      Defaults to running 'User_Transforms.py' if an argument is 
      not provided.
  * "Make_Documentation.py"
-   - Generates documentation for this project.
+   - Generates documentation for this project, as markdown
+     supporting files README.md and Documentation.md.
 
 Setup:
-  * Transforms will operate on source files which need to be set up
-  prior to running this tool. Source files can be extracted using
-  X2 Editor 2 if needed. Source files may be provided after any other 
-  mods have been applied.
+  * Transforms will operate on source files (eg. tships.txt) which
+  need to be set up prior to running this tool. Source files can be
+  extracted using X3 Editor 2 if needed. Source files may be provided
+  after any other mods have been applied.
 
   * Source files need to be located in a folder underneath the 
   specified AP addon directory, and will have an internal folder
   structure matching that of the files in the normal addon directory.
 
+  * The user must write a Python script which will specify paths
+  and control the customizer by calling transforms.
+
   * Output files will be generated in the addon directory matching
   the folder structure in the source folder. Non-transformed files
   will generate output files. Files which do not have a name matching
   the requirement of any transform will be ignored and not copied.
+  In some cases, files may be generated one directory up, in the
+  presumed Terran Conflict folder.
 
   * Warning: Generated output will overwrite any existing files.
 
   Example directory:
-
+  <code>
     <path to X3 installation>
         addon
             source_folder
@@ -49,10 +60,10 @@ Setup:
                     TLaser.txt
                     TShips.txt
                     TShips_backup.txt
-
+  </code>
    This will write to the following files, overwriting any
-   existing ones:
-
+   existing ones:   
+  <code>
     <path to X3 installation>
         addon
             maps
@@ -61,37 +72,8 @@ Setup:
                 TBullets.txt
                 TLaser.txt
                 TShips.txt
+  </code>
 
-Change Log:
- * 1.x :
-   - Original project development for private use.
- * 2.0 :
-   - Restructuring of project for general use, isolating individual
-     transforms, separating out transform calls, adding robustness.
-     Filling out documentation generation.
- * 2.01:
-   - Added Convert_Beams_To_Bullets.
- * 2.02:
-   - Added Adjust_Generic_Missions.
-   - Added new arguments to Enhance_Mosquito_Missiles.
-   - Adjusted default ignored weapons for Convert_Beams_To_Bullets.
- * 2.03:
-   - Added Add_Ship_Life_Support.
-   - Added Adjust_Shield_Regen.
-   - Added Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio.
-   - Added Standardize_Ship_Tunings.
-   - New options added for Adjust_Weapon_DPS.
-   - New option for Adjust_Ship_Hull to scale repair lasers as well.
-   - Several weapon transforms now ignore repair lasers by default.
-   - Command line call defaults to User_Transforms.py if a file not given.
- * 2.04:
-   - Added Add_Ship_Equipment.
-   - Added XRM_Standardize_Medusa_Vanguard.
-   - Added Add_Ship_Variants, Add_Ship_Combat_Variants, Add_Ship_Trade_Variants.
- * 2.05:
-   - Updates to Add_Ship_Variants to refine is behavior and options.
-   - Added in-game script for adding generated variants to shipyards.
-   - XRM_Standardize_Medusa_Vanguard replaced with Patch_Ship_Variant_Inconsistencies.
 '''
 #TODO: maybe remove version tag from title, just leave in change log.
 #Note: the above comment gets printed to the markdown file, so avoid

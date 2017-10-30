@@ -363,8 +363,8 @@ def Restore_Hub_Music(
     ):
     '''
     If Hub sector (13,8) music should be restored to that in AP.
-    (XRM sets the track to 0.)
-    Note: editing x3_universe only works on a new game.
+    (XRM sets the track to 0.) Applies to new games, and optionally to
+    an existing save.
 
     * apply_to_existing_save:
       - If True, makes a drop-in director script that will fire once
@@ -415,8 +415,8 @@ def Restore_M148_Music(
     ):
     '''
     If Argon Sector M148 (14,8) music should be restored to that in AP.
-     (XRM changes this to the argon prime music.)
-    Note: editing x3_universe only works on a new game.
+    (XRM changes this to the argon prime music.) Applies to new games, 
+    and optionally to an existing save.
     
     * apply_to_existing_save:
       - If True, makes a drop-in director script that will fire once

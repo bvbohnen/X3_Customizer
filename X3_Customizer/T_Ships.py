@@ -2,7 +2,7 @@
 Similar to X3_Weapons, this will open the Tships file and perform systematic edits.
 '''
 from File_Manager import *
-import Flags
+from Flags import *
 import math
 #from collections import defaultdict
 import copy
@@ -102,7 +102,7 @@ def Adjust_Ship_Speed(
     adjustment_factors_dict = {}
     ):
     '''
-    Adjust ship speeds. Does not affect acceleration.
+    Adjust ship speed and acceleration, globally or per ship class.
     
     * scaling_factor:
       - Multiplier to apply to any ship type not found in adjustment_factors_dict.
@@ -129,13 +129,16 @@ def Adjust_Ship_Speed(
 
         #Adjust speed.
         if this_scaling_factor != 1:
-            #Only really need to adjust base speed itself, not tuning count.
-            value = int(this_dict['speed'])
-            new_value = value * this_scaling_factor
-            #Round it off.
-            new_value = round(new_value)
-            #Put it back.
-            this_dict['speed'] = str(new_value)
+            #Change both speed and acceleration, so that faster ships
+            # are also more maneuverable.
+            for field in ['speed','acceleration']:
+                #Only really need to adjust base speed itself, not tuning count.
+                value = int(this_dict[field])
+                new_value = value * this_scaling_factor
+                #Round it off.
+                new_value = round(new_value)
+                #Put it back.
+                this_dict[field] = str(new_value)
 
             
 @Check_Dependencies('TShips.txt')
@@ -144,7 +147,7 @@ def Adjust_Ship_Laser_Recharge(
     adjustment_factors_dict = {}
     ):
     '''
-    Adjust ship laser regeneration rate.
+    Adjust ship laser regeneration rate, either globally or per ship class.
     
     * scaling_factor:
       - Multiplier to apply to any ship type not found in adjustment_factors_dict.
@@ -162,7 +165,8 @@ def Adjust_Ship_Laser_Recharge(
             else:
                 new_value = value * scaling_factor
 
-            this_dict['weapon_recharge_factor'] = str(new_value)
+            #Limit to 6 decimals.
+            this_dict['weapon_recharge_factor'] = str('{0:.6f}'.format(new_value))
 
             
             
@@ -172,7 +176,7 @@ def Adjust_Ship_Pricing(
     adjustment_factors_dict = {}
     ):
     '''
-    Adjust ship pricing.
+    Adjust ship pricing, either globally or per ship class.
 
     * scaling_factor:
       - Multiplier for any ship not matched in adjustment_factors_dict.
@@ -204,7 +208,9 @@ def Adjust_Ship_Shield_Regen(
     adjustment_factors_dict = {}
     ):
     '''
-    Adjust ship shield regeneration rate.
+    Adjust ship shield regeneration rate, either globally or per ship class.
+    This may have no effect beyond where all ship shields are powered at their
+    individual max rates.
     
     * scaling_factor:
       - Multiplier to apply to all ship types on top of those present
@@ -253,11 +259,11 @@ def Adjust_Ship_Shield_Slots(
     '''
     Adjust ship shielding by changing shield slot counts.
     Shield types will remain unchanged, and at least 1 shield slot will
-     be left in place.
+    be left in place.
     When applied to an existing save, ship shields will not be updated
-     automatically, as some ships may continue to have excess shields
-     equipped, or ships may lack enough shield inventory to fill
-     up added slots.
+    automatically, as some ships may continue to have excess shields
+    equipped, or ships may lack enough shield inventory to fill
+    up added slots.
     
     * adjustment_factors_dict:
       - Dict keyed by ship type, holding a tuple of 
@@ -276,7 +282,7 @@ def Adjust_Ship_Shield_Slots(
 
             #Get the original shield slots and the size of each shield.
             shield_slots = int(this_dict['max_shields'])
-            shield_size  = Flags.Shield_type_size_dict[int(this_dict['shield_type'])]
+            shield_size  = Shield_type_size_dict[int(this_dict['shield_type'])]
 
             #Calculate total shielding.
             total_shields = shield_size * shield_slots
@@ -310,13 +316,14 @@ def Adjust_Ship_Shield_Slots(
                 this_dict['max_shields'] = str(shield_slots)
                 
             
-                
+#TODO: maybe make this a general fix to ensure player and npc prices are the
+# same, though bugs outside the pericles haven't been noticed.
 @Check_Dependencies('TShips.txt')
 def Fix_Pericles_Pricing():
     '''
     Applies a bug fix to the enhanced pericles, which has its
-     npc value set to 1/10 of player value, causing it price to be 1/10
-     what it should be.
+    npc value set to 1/10 of player value, causing it price to be 1/10
+    what it should be.
     Does nothing if the existing npc and player prices are matched.
     '''
     for this_dict in Load_File('TShips.txt'):
@@ -335,11 +342,12 @@ def Patch_Ship_Variant_Inconsistencies(
         include_xrm_fixes = False
     ):
     '''
-    Applies some fixes to some select inconsistencies in ship variants.
+    Applies some patches to some select inconsistencies in ship variants.
     Modified ships include the Baldric Miner and XRM Medusa Vanguard,
     both manually named instead of using the variant system.
     This is meant to be run prior to Add_Ship_Variants, to avoid the 
     non-standard ships creating their own sub-variants.
+    There may be side effects if the variant inconsistencies were intentional.
 
     * include_xrm_fixes
       - Bool, if True then the Medusa Vanguard is patched if found and
@@ -408,9 +416,9 @@ def Boost_Truelight_Seeker_Shield_Reactor():
     '''
     Enhances the Truelight Seeker's shield reactor.
     In AP the TLS has a shield reactor only around 1/10 what is normal 
-     for similar ships; this applies a 10x increase.
+    for similar ships; this applies a 10x increase.
     If the TLS is already at least 1/5 of Centaur shielding, this
-     transform is not applied.
+    transform is not applied.
     '''
     #Look for the centaur.
     for this_dict in Load_File('TShips.txt'):
@@ -435,7 +443,7 @@ def Simplify_Engine_Trails(
     '''
     Change engine trail particle effects to basic or none.
     This will switch to effect 1 for medium and light ships 
-     and 0 for heavy ships, as in vanilla AP.
+    and 0 for heavy ships, as in vanilla AP.
 
     * remove_trails:
       - If True, this will remove trails from all ships.
@@ -465,11 +473,11 @@ def Simplify_Engine_Trails(
             this_dict['particle_effect'] = '0'
                 
 
-
 @Check_Dependencies('TShips.txt')
 def Standardize_Ship_Tunings(
         engine_tunings = None,
         rudder_tunings = None,
+        ship_types = None,
     ):
     '''
     Standardize max engine or rudder tuning amounts across all ships.
@@ -486,11 +494,20 @@ def Standardize_Ship_Tunings(
       - Int, the max engine tunings to set.
     * rudder_tunings:
       - Int, the max rudder tunings to set.
+    * ship_types:
+      - List of ship names or types to adjust tunings for.
+        If empty (default), all ships are adjusted.
     '''
     #TODO: maybe provide a script to run which resets ships to their
     # max tunings if they went over (though would mess with overtuned
     # ships that may exist).
     for this_dict in Load_File('TShips.txt'):
+        
+        #Skip if this is not a selected ship.
+        if ship_types:
+            if (this_dict['subtype'] not in ship_types 
+            and this_dict['name'] not in ship_types):
+                continue
 
         #Loop over the engine and rudder tunings, to share code.
         for tuning_amount, tuning_field, scaled_field_list in zip(
@@ -566,8 +583,7 @@ def Add_Ship_Equipment(
 
     * ship_types:
       - List of ship names or types to add equipment to, 
-        eg. ['SS_SH_OTAS_M2', 'SG_SH_M1'].
-        
+        eg. ['SS_SH_OTAS_M2', 'SG_SH_M1'].        
     * equipment_list:
       - List of equipment names from the ware files, 
         eg. ['SS_WARE_LIFESUPPORT'].
@@ -799,7 +815,7 @@ def Add_Ship_Equipment(
     #If replacements were found, go back through tships and change the
     # ware list ids as needed.
     if ware_list_id_replacement_dict:    
-        for this_dict in Load_File('TShips.txt'):    
+        for this_dict in Load_File('TShips.txt'):
             #Skip if this is not a ship to add equipment to.
             if (this_dict['subtype'] not in ship_types 
             and this_dict['name'] not in ship_types):
@@ -846,3 +862,219 @@ def Add_Ship_Life_Support(
             'SS_WARE_LIFESUPPORT'
             ]
         )
+    return
+
+
+
+@Check_Dependencies('TShips.txt', category = 'Missile')
+def Expand_Bomber_Missiles(
+    include_bombers = True,
+    include_frigates = True,
+    add_bomber_missiles_to_frigates = False
+    ):
+    '''
+    Allows bombers and missile frigates to use a wider variety of missiles.
+    Bombers will gain fighter tier missiles, while frigates will gain
+    corvette tier missiles. Terran ships will gain Terran missiles.
+    Note that AI ship loadouts may include any missile they can fire, such
+    that bombers will have fewer heavy missiles and more standard missiles.
+    
+    * include_bombers:
+      - Bool, if True ships supporting bomber type missiles are modified.
+        Default True.
+    * include_frigates:
+      - Bool, if True ships supporting missile frigate missiles are modified.
+        Default True.
+    * add_bomber_missiles_to_frigates:
+      - Bool, if True frigates will also gain bomber type missiles.
+        Default False. Low cargo volume of bomber missiles may be unbalanced
+        on frigates.
+    '''
+    for this_dict in Load_File('TShips.txt'):
+        #Unpack the missile flags.
+        missile_flags = Unpack_Tships_Missile_Flags(this_dict)
+        
+        #Check for the different bomber/frigate types based on being
+        # able to fire the corresponding missile type.
+        if include_bombers and missile_flags['SG_MISSILE_BOMBER']:
+            #Standard bomber.
+            #Set appropriate missile flags.
+            #Could loop over a list of names, but just expand out for now.
+            missile_flags['SG_MISSILE_DMBF'] = 1
+            missile_flags['SG_MISSILE_LIGHT'] = 1
+            missile_flags['SG_MISSILE_MEDIUM'] = 1
+            
+        if include_frigates and missile_flags['SG_MISSILE_TORP_CAPITAL']:
+            missile_flags['SG_MISSILE_DMBF'] = 1
+            missile_flags['SG_MISSILE_LIGHT'] = 1
+            missile_flags['SG_MISSILE_MEDIUM'] = 1
+            missile_flags['SG_MISSILE_HEAVY'] = 1
+            if add_bomber_missiles_to_frigates:
+                missile_flags['SG_MISSILE_BOMBER'] = 1
+
+        if include_bombers and missile_flags['SG_MISSILE_TR_BOMBER']:
+            missile_flags['SG_MISSILE_TR_LIGHT'] = 1
+            missile_flags['SG_MISSILE_TR_MEDIUM'] = 1
+            
+            
+        if include_frigates and missile_flags['SG_MISSILE_TR_TORP_CAPITAL']:
+            missile_flags['SG_MISSILE_TR_LIGHT'] = 1
+            missile_flags['SG_MISSILE_TR_MEDIUM'] = 1
+            missile_flags['SG_MISSILE_TR_HEAVY'] = 1
+            if add_bomber_missiles_to_frigates:
+                missile_flags['SG_MISSILE_TR_BOMBER'] = 1
+
+        #Repack the modified flags.
+        Pack_Tships_Missile_Flags(this_dict, missile_flags)
+
+    return
+
+
+
+@Check_Dependencies('TShips.txt', category = 'Missile')
+def Add_Ship_Cross_Faction_Missiles(
+    race_types = [
+        'Argon', 
+        'Boron', 
+        'Split', 
+        'Paranid', 
+        'Teladi', 
+        'Xenon', 
+        'Pirates', 
+        'Goner', 
+        'ATF', 
+        'Terran', 
+        'Yaki',
+        'Khaak', 
+        ]
+    ):
+    '''
+    Adds terran missile compatibility to commonwealth ships, and vice versa.
+    Missiles are added based on category matching, eg. a terran ship that can
+    fire light terran missiles will gain light commonwealth missiles.
+    Note that AI ship loadouts may include any missile they can fire.
+    
+    * race_types:
+      - List of race names whose ships will have missiles added. By default,
+        the following are included: [Argon, Boron, Split, Paranid, Teladi, 
+        Xenon, Pirates, Goner, ATF, Terran, Yaki].
+    '''
+    #Missiles needs to be cross-given based on what ships originally 
+    # supported. Eg. if a ship supported commonwealth light missiles,
+    # it will get terran light missiles.
+    #Build the pairings here, in both directions.
+    #Note: dumbfires need special handling, since they don't have a
+    # direct terran match.
+    #These pairings are a little verbose, but do a good job handling
+    # the dumbfire case.
+    missile_match_tuples = [
+        #Commonwealth to terran.
+        ('SG_MISSILE_AF_CAPITAL'   , 'SG_MISSILE_TR_AF_CAPITAL'  ),
+        ('SG_MISSILE_BOMBER'       , 'SG_MISSILE_TR_BOMBER'      ),
+        ('SG_MISSILE_HEAVY'        , 'SG_MISSILE_TR_HEAVY'       ),
+        ('SG_MISSILE_LIGHT'        , 'SG_MISSILE_TR_LIGHT'       ),
+        ('SG_MISSILE_MEDIUM'       , 'SG_MISSILE_TR_MEDIUM'      ),
+        ('SG_MISSILE_TORP_CAPITAL' , 'SG_MISSILE_TR_TORP_CAPITAL'),
+        #Terran to commonwealth.
+        ('SG_MISSILE_TR_AF_CAPITAL'   , 'SG_MISSILE_AF_CAPITAL'  ),
+        ('SG_MISSILE_TR_BOMBER'       , 'SG_MISSILE_BOMBER'      ),
+        ('SG_MISSILE_TR_HEAVY'        , 'SG_MISSILE_HEAVY'       ),
+        ('SG_MISSILE_TR_LIGHT'        , 'SG_MISSILE_LIGHT'       ),
+        #Also give dumbfire if supporting lights.
+        ('SG_MISSILE_TR_LIGHT'        , 'SG_MISSILE_DMBF'        ),
+        ('SG_MISSILE_TR_MEDIUM'       , 'SG_MISSILE_MEDIUM'      ),
+        ('SG_MISSILE_TR_TORP_CAPITAL' , 'SG_MISSILE_TORP_CAPITAL'),
+        ]
+
+    for this_dict in Load_File('TShips.txt'):
+        
+        #Skip races not being modified.
+        if Race_code_name_dict[int(this_dict['race'])] not in race_types:
+            continue
+
+        #Unpack the missile flags.
+        missile_flags = Unpack_Tships_Missile_Flags(this_dict)
+
+        #Loop over the matches.
+        missiles_to_add = []
+        for existing_missile, new_missile in missile_match_tuples:
+            #If this ship has the original missile, queue the
+            # paired missile for addition. Don't add it yet, else
+            # it might be matched later in this loop, which is
+            # probably safe but best avoided.
+            if missile_flags[existing_missile]:
+                missiles_to_add.append( new_missile )
+
+        #Add the queued missiles.
+        for missile in missiles_to_add:
+            missile_flags[missile] = 1
+                    
+        #Repack the modified flags.
+        Pack_Tships_Missile_Flags(this_dict, missile_flags)
+
+    return
+
+
+@Check_Dependencies('TShips.txt', category = 'Missile')
+def Add_Ship_Boarding_Pod_Support(
+    ship_types = [
+        'SG_SH_M1',
+        'SG_SH_M2',
+        'SG_SH_M6',
+        'SG_SH_M7',
+        ],
+    required_missiles = [        
+        'SG_MISSILE_HEAVY',
+        'SG_MISSILE_TR_HEAVY',
+        ],
+    ):
+    '''
+    Adds boarding pod launch capability to selected classes of
+    ships, eg. destroyers. Ships should support marines, so limit
+    to M1, M2, M7, M6, TL, TM, TP.
+    
+    * ship_types:
+      - List of ship names or types to add equipment to, 
+        eg. ['SS_SH_OTAS_M2', 'SG_SH_M1'].
+        Default includes M6,M7,M2,M1.
+    * required_missiles:
+      - List of missile types, a ship must support one of these
+        missiles before it will be given boarding pod support.
+        Default is ['SG_MISSILE_HEAVY','SG_MISSILE_TR_HEAVY'],
+        requiring ships to already support heavy missiles.
+    '''
+    for this_dict in Load_File('TShips.txt'):
+        
+        #Skip if this is not a ship to add the missile to.
+        if (this_dict['subtype'] not in ship_types 
+        and this_dict['name'] not in ship_types):
+            continue
+
+        #Skip if this is not a marine supporting subtype.
+        if this_dict['subtype'] not in [
+            'SG_SH_M1',
+            'SG_SH_M2',
+            'SG_SH_M6',
+            'SG_SH_M7',
+            'SG_SH_TP',
+            'SG_SH_TM',
+            'SG_SH_TL',
+            ]:
+            continue
+
+        #Unpack the missile flags.
+        missile_flags = Unpack_Tships_Missile_Flags(this_dict)
+
+        #Skip if a required_missile list given and the ship
+        # does not support the missile.
+        if required_missiles:
+            if not any(missile_flags[x] for x in required_missiles):
+                continue
+
+        #Add boarding pods.
+        missile_flags['SG_MISSILE_BOARDINGPOD'] = 1
+
+        #Repack the modified flags.
+        Pack_Tships_Missile_Flags(this_dict, missile_flags)
+
+    return

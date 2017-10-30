@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>f321f45f-39ee-4cc8-91e7-bfec28462c97</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>X3_Customizer.py</StartupFile>
+    <StartupFile>Make_Documentation.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -25,6 +25,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Change_Log.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Make_Documentation.py">
       <SubType>Code</SubType>
     </Compile>

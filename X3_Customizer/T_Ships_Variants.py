@@ -50,7 +50,7 @@ labels (some being unlabelled).
     5 : miner
     6 : super freighter
     7 : tanker
-    8 : tug, mk 1 in xrm.
+    8 : mk 1, though 'tug' in 0001 text file (maybe overwritten later)
     9 : luxury cruiser, xrm overwrites this suffix in the 0001 text file 
                           to have no suffix.
     10 : slave transport, empty in xrm.
@@ -254,26 +254,25 @@ def Add_Ship_Variants(
         _cleanup = False
     ):
     '''
-    Adds variants for various ships.  The new variant ships may be spawned
-    by jobs where they match the job criteria.  New ships are added to
-    shipyards in the x3_universe file, though require a new game to show
-    up.
+    Adds variants for various ships.
     Variant attribute modifiers are based on the average differences between
     existing variants and their basic ship, where only M3,M4,M5 are
     analyzed for combat variants, and only TS,TP are analyzed for trade variants,
-    with Hauler being considered both a combat and trade variant.
-    Special attributes, such as turret count and weapon compatibitities, are not
-    considered.
-    Variants are added base on ship name and race; pirate variants are handled
-    separately from standard variants.
-    Ships without extensions or cargo are ignored (eg. drones, weapon platforms).
-
+    with Hauler being considered both a combat variant.
     After variants are created, a script may be manually run in game from the
     script editor which will add variants to all shipyards that sell the base
     ship. Run 'a.x3customizer.add.variants.to.shipyards.xml', no input args.
     Note: this will add all stock variants as well, as it currently has no
     way to distinguish the new ships from existing ones.
+    Warning: it is unsafe to remove variants once they have been added to
+    an existing save.
 
+    Special attributes, such as turret count and weapon compatibitities, are not
+    considered.
+    Variants are added base on ship name and race; pirate variants are handled
+    separately from standard variants.
+    Ships without extensions or cargo are ignored (eg. drones, weapon platforms).
+    
     * ship_types:
       - List of ship names or types to add variants for,
         eg. ['SS_SH_OTAS_M2', 'SG_SH_M1'].
@@ -320,11 +319,10 @@ def Add_Ship_Variants(
         Default True with XRM fixes enabled; this should be safe to apply
         to vanilla AP.
     * print_variant_count:
-      - Bool, if True then the number of new variants added will be printed.
+      - If True, the number of new variants is printed to the summary file.
     * print_variant_modifiers:
-      - Bool, if True then the calculated attributes used for variants will 
-        be printed, given as multipliers on base attributes for various ship
-        attributes. Default False.
+      - If True  the calculated attributes used for variants will be printed
+        to the summary file, given as multipliers on base attributes.
     '''
     if prepatch_ship_variant_inconsistencies:
         #Include the xrm fixes as well, by default.
@@ -346,8 +344,8 @@ def Add_Ship_Variants(
         if os.path.exists(dest_path):
             os.remove(dest_path)
         return
-
-
+    
+    
     #Make an empty blacklist list if needed.
     if blacklist == None:
         blacklist = []
@@ -801,9 +799,10 @@ def Add_Ship_Variants(
 
     #Print these out if desired.
     if print_variant_modifiers:
-        print('Variant modifiers:')
+        Write_Summary_Line('\nShip variant modifiers:')
+
         for variant_id, field_ratios_dict in sorted(variant_id_field_ratios_dict_dict.items()):
-            print('  Variant {} ({})'.format(
+            Write_Summary_Line('  Variant {} ({})'.format(
                 variant_id,
                 #Give the variant name as well, if known.
                 variant_index_type_dict[variant_id] 
@@ -811,7 +810,7 @@ def Add_Ship_Variants(
                 else ''
                 ))
             for field, ratio in field_ratios_dict.items():
-                print('    {: <30} : {:.3f}'.format(field, ratio))
+                Write_Summary_Line('    {: <30} : {:.3f}'.format(field, ratio))
 
 
 
@@ -1250,7 +1249,7 @@ def Add_Ship_Variants(
 
     #Note how many ships were added.
     if print_variant_count:
-        print('Number of new variants added: {}'.format(len(new_ships_list)))
+        Write_Summary_Line('Number of new variants added: {}'.format(len(new_ships_list)))
 
 
     #Add miner equipment.

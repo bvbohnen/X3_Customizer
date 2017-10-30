@@ -79,7 +79,7 @@ def Run():
         this_range = speed * lifetime
 
         #Look up some fields.
-        flags_dict        = Flags.Unpack_Tbullets_flags(bullet_dict['flags'])     
+        flags_dict        = Flags.Unpack_Tbullets_Flags(bullet_dict)     
         hull_damage       = int(bullet_dict['hull_damage'])
         shield_damage     = int(bullet_dict['shield_damage'])
         energy_used       = int(bullet_dict['energy_used'])

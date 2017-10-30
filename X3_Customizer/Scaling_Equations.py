@@ -80,9 +80,11 @@ the calibration range.
  the wrapped equation to return the scaling for 10, its nearest calibration
  point.
 
-TODO: consider switching these equations to calculate scaling factors
-instead of raw values. This requires changes in the calling code, but
-will make the equations more stable against large value overflows.
+
+A problem exists with overflow in the fitting function when large values
+are present.  To help stabalize against this, input terms will be scaled
+to be close to 1, and the scaling term will be attached to the returned
+scaling function to be automatically applied during evaluation.
 
 '''
 class Scaling_Function():
@@ -91,12 +93,21 @@ class Scaling_Function():
     Records the base equation, coefficients, and valid range.
     May be called like a normal function, providing the input to scale.
     '''
-    def __init__(s, scaling_func, coefs, x_vec):
+    def __init__(s, scaling_func, coefs, x_vec, x_scaling, y_scaling):
+        #Record the input scaling factors for x and y.
+        #These are determined during function selection and fitting,
+        # and get applied during evaluation.
+        s.x_scaling = x_scaling
+        s.y_scaling = y_scaling
+        #Record the central scaling python function, and the
+        # coefs determined for it.
         s.scaling_func = scaling_func
         s.coefs = coefs
+        #Record the x input range.
         s.x_min = min(x_vec)
         s.x_max = max(x_vec)
-        #Record the min/max y points as well.
+        #Record the min/max y points as well, taken from the
+        # scaling function selected.
         s.y_min = s.scaling_func(s.x_min, *s.coefs)
         s.y_max = s.scaling_func(s.x_max, *s.coefs)
         #Record the min/max y/x ratios.
@@ -106,17 +117,26 @@ class Scaling_Function():
 
     #Provide the call wrapper.
     def __call__(s, x):
-        #Check for x out of the calibration bounds, and return
-        # the nearest bound if so.
+        #Apply the x_scaling to the input.
+        x = x * s.x_scaling
+        #Check for x out of the calibration bounds, and use
+        # the nearest bound's y/x ratio if so.
         if x > s.x_max:
             #Don't want to return the actual y_max, since the out of
             # range x should still be getting proportionally scaled.
             # Eg. if x = 2*x_max, and y_max = x_max, then want y = 2*x.
             #Multiply x by the max y/x ratio.
-            return x * s.yx_ratio_max
-        if x < s.x_min:
-            return x * s.yx_ratio_min
-        return s.scaling_func(x, *s.coefs)
+            y_scaled = x * s.yx_ratio_max
+        elif x < s.x_min:
+            y_scaled = x * s.yx_ratio_min
+        else:
+            #Run the scaling func on it.
+            y_scaled = s.scaling_func(x, *s.coefs)
+        #Unscale and return.
+        #(Could probably flip the y_scaling and just do a mult, but speed
+        # doesn't matter.)
+        y = y_scaled / s.y_scaling
+        return y
 
 #Fit function
 def Fit_equation(x, a,b,c):
@@ -142,7 +162,13 @@ def Get_Scaling_Fit(x_vec, y_vec, **kwargs):
      and increasing formula is used.
     If the largest changes occur near the low x, smallest
      changes at high x, a reversed scaling formula is used.
-    '''  
+    '''
+
+    #Rescale the inputs to place them close to 1.
+    #This can be done later, before fitting, but is easiest if
+    # done early always.
+    x_vec, x_scaling = Rescale_Vec(x_vec)
+    y_vec, y_scaling = Rescale_Vec(y_vec)
 
     #Do a test on the inputs to figure out if this is in diminishing or 
     # increasing returns mode.
@@ -193,13 +219,15 @@ def Get_Scaling_Fit(x_vec, y_vec, **kwargs):
         y_new = [fit_equation_to_use(x,*coefs) for x in x_vec]
                 
         #Aim to minimize the ratio differences in y.
-        #Get ratio in both directions, take the max of either.
-        #Eg. 1/2 and 2/1 will both evaluate to 2.
-        diffs = [max(y0/y1, y1/y0) for y0, y1 in zip(y_new, y_vec)]
-        #Could optionally increase the weight on large diffs, eg. by
-        # squaring.
-        diffs = [d**2 for d in diffs]
-        error = sum(diffs)
+        #-Removed in favor of SAD; also, this had a spurious divide
+        # by 0 warning (maybe for missile damage scaling).
+        ##Get ratio in both directions, take the max of either.
+        ##Eg. 1/2 and 2/1 will both evaluate to 2.
+        #diffs = [max(y0/y1, y1/y0) for y0, y1 in zip(y_new, y_vec)]
+        ##Could optionally increase the weight on large diffs, eg. by
+        ## squaring.
+        #diffs = [d**2 for d in diffs]
+        #error = sum(diffs)
 
         #Can also try sum of least squares style.
         sad = sum([(y0 - y1) **2 for y0, y1 in zip(y_new, y_vec)])
@@ -288,7 +316,8 @@ def Get_Scaling_Fit(x_vec, y_vec, **kwargs):
     coefs = optimize_result.x
 
     #Make the scaling function object.
-    this_func = Scaling_Function( fit_equation_to_use, coefs, x_vec)
+    this_func = Scaling_Function( 
+        fit_equation_to_use, coefs, x_vec, x_scaling, y_scaling)
 
     #Calculate the data points for debug check.
     final_y_vec = [this_func(x) for x in x_vec]
@@ -300,13 +329,27 @@ def Get_Scaling_Fit(x_vec, y_vec, **kwargs):
     return this_func
 
 
+def Rescale_Vec(vec):
+    'Scale a vector so that its values are centered around 1.'
+    #This can be based off of the average value in the input.
+    #return vec, 1 #Test return.
+    avg = sum(vec)/len(vec)
+    scaling = 1/avg
+    new_vec = [x*scaling for x in vec]
+    return new_vec, scaling
+
+
 def Plot_Fit(fit_equation):
     'Make a plot of this fit.'
     import matplotlib.pyplot
     import numpy
     #Plot over the full range, plus an extra 10% on each side to see
     # if the limiter is working.
-    x_spaced = numpy.linspace(fit_equation.x_min * 0.9, fit_equation.x_max * 1.1, 50)
+    #Treat the x inputs as original values to be scaled (eg. take the
+    # internal x_min/x_max and unscale them first).
+    x_spaced = numpy.linspace(fit_equation.x_min * 0.9 / fit_equation.x_scaling, 
+                              fit_equation.x_max * 1.1 / fit_equation.x_scaling, 
+                              50)
     y_spaced = [fit_equation(x) for x in x_spaced]
     plot = matplotlib.pyplot.plot(x_spaced, y_spaced)
     matplotlib.pyplot.show()

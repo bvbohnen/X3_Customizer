@@ -14,11 +14,15 @@ import inspect
 Path_to_addon_folder = None
 #Specify the path to the source folder, relative to the addon folder.
 Source_folder = None
+#Name a file to write detailed output messages to.
+Message_file_name = None
 
 #Make a convenience function to set these paths.
 def Set_Path(
     path_to_addon_folder,
-    source_folder):
+    source_folder,
+    summary_file = 'X3_Customizer_summary.txt',
+    ):
     '''
     Sets the pathing to be used for file loading and writing.
 
@@ -37,16 +41,21 @@ def Set_Path(
         used when writing out transform results.
       - (eg. output to addon\types will source from input in
          addon\source_folder\types).
+
+    * summary_file:
+      - Path and name for where a summary file will be written, with
+        any transform results. Defaults to 'X3_Customizer_summary.txt' 
+        in the addon directory.
     '''
     global Path_to_addon_folder
     global Source_folder
+    global Message_file_name
     Path_to_addon_folder = path_to_addon_folder
     Source_folder = source_folder
+    Message_file_name = summary_file
     return
 
 
-#Name a file to write detailed output messages to.
-Message_file_name = 'X3_Customizer_summary.txt'
 #Track the file object, to append to it on the fly.
 Message_file = None
 def Write_Summary_Line(line, no_newline = False):
@@ -225,8 +234,11 @@ class File_Missing_Exception(Exception):
 # decorator will accept the function as its arg.
 #To get the wrapped function's name and documentation preserved,
 # use the 'wraps' decorator from functools.
+#Update: this will also support a keyword 'category' argument, which
+# will be the documentation transform category override to use when
+# the automated category is unwanted.
 from functools import wraps
-def Check_Dependencies(*file_names):
+def Check_Dependencies(*file_names, category = None):
     #Record the required file names to a set for use elsewhere.
     Transform_required_file_names.update(file_names)
 
@@ -237,6 +249,10 @@ def Check_Dependencies(*file_names):
         # since they are only available on function definition at the
         # moment, and will be checked at run time.
         func._file_names = file_names
+        #Attach the override category to the function.
+        #TODO: maybe fill in the default category here, but for now
+        # it is done in Make_Documentation.
+        func._category = category
 
         #Record the transform function.
         Transform_list.append(func)
@@ -387,6 +403,21 @@ def Load_File(file_name, return_t_file = False):
                 #Create an ordered dict for this line.
                 this_dict = OrderedDict()
 
+                #Note: the line may be a tc format or ap format, in the
+                # case of the jobs file.
+                #If the fields_dict specifies a line count for an AP
+                # format, and that format is seen here, it will provide
+                # some special insertion points for new AP fields.
+                #The default field_dict is for the tc format in this
+                # case, with no extra lines.
+                if 'lines_ap' in field_dict:
+                    if len(data_list) == field_dict['lines_ap']:
+                        #Switch to the ap field dict.
+                        #This will only swap once; afterward there is no
+                        # 'lines_ap' field in field_dict, and these checks
+                        # are skipped.
+                        field_dict = T_file_name_field_dict_dict[field_dict['ap_name']]
+                        
                 #Step through the fields, with an index counter.
                 for index, field_string in enumerate(data_list):
 

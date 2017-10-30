@@ -35,31 +35,61 @@ from File_Manager import *
 import Scaling_Equations
 import Flags
 
-
+#TODO: switch to custom tuned damage scaling formula like other
+# transforms. Maybe add cargo volume adjustment, so that ships with
+# heavily weakened missiles get more of them to fire before running
+# out.
 @Check_Dependencies('Globals.txt', 'TMissiles.txt')
 def Adjust_Missile_Damage(
     scaling_factor = 1,
-    #If diminishing returns should be used, so that short range
+    #If diminishing returns should be used, so that low damage
     # missiles are less affected.
-    use_diminishing_returns = False,
+    use_scaling_equation = False,
+    #Set the tuning points.
+    #The target damage to adjust. About 1000000 for super heavy missiles.
+    target_damage_to_adjust = 1000000,
+    #The damage to pin in place on the low end, about 10000.
+    damage_to_keep_static = 10000,
     print_changes = False
     ):
     '''
-    Adjust missile damage values.
-    The scaling_factor is applied prior to the diminishing returns
-     formula.
-
-    * use_diminishing_returns:
-      - If True, a hardcoded diminishing returns formula is applied 
-        which reduces heavy missile damage by up to ~80%,
-        while keeping small missiles unchanged.
+    Adjust missile damage values, by a flat scaler or configured
+    scaling formula.
+    
+    * scaling_factor:
+      - The base multiplier to apply to missile damage.
+    * use_scaling_equation:
+      - If True, a scaling formula will be applied, such that missiles
+        near target_damage_to_adjust see the full scaling_factor,
+        and missiles near damage_to_keep_static remain largely unchanged.
+        Otherwise, scaling_factor is applied to all missiles.
+    * target_damage_to_adjust, damage_to_keep_static:
+      - Equation tuning values.
     * print_changes:
       - If True, speed adjustments are printed to the summary file.
     '''
-    #TODO: support setting the scaling equation tuning factors.
     
     if print_changes:
         Write_Summary_Line('\nMissile damage adjustments:')
+        
+    if use_scaling_equation:
+        #Create a set of points to be tuned against.
+        #The primary adjustment point.
+        x_main = target_damage_to_adjust
+        y_main = x_main * scaling_factor
+        #The secondary, static point, where x=y.
+        x_static = damage_to_keep_static
+        y_static = damage_to_keep_static
+            
+        #To encourage fitting the lower end more than the higher end, can represent
+        # low end values multiple times.
+        #Give two low points for now, the one provided and another nearby, to help
+        # stabalize the equation coefs.
+        x_vec   = [x_main, x_static, x_static * .8]
+        y_vec   = [y_main, y_static, y_static * .8]
+            
+        #Get the function.
+        scaling_func = Scaling_Equations.Get_Scaling_Fit(x_vec, y_vec)
 
     #Grab the number of missiles in each swarm volley, read from Globals.
     for this_dict in Load_File('Globals.txt'):
@@ -73,7 +103,7 @@ def Adjust_Missile_Damage(
         damage = int(this_dict['damage'])
 
         #Determine if this is a multishot missile.
-        flags_dict = Flags.Unpack_Tmissiles_flags(this_dict['flags'])
+        flags_dict = Flags.Unpack_Tmissiles_Flags(this_dict)
         multishot = flags_dict['fragmentation']
         
         #If damage is low, do not do adjustment.
@@ -82,27 +112,45 @@ def Adjust_Missile_Damage(
             new_damage_round = damage
 
         else:
-            #Rescale to the 1e3
-            damage_e3 = damage / 1000
+            #-Removed; use a proper scaling eq, and don't do the /1000 scaling
+            # since it shouldn't be needed. This also didn't handle the flat
+            # scaling factor well.
+            #if 0:
+            #    #Rescale to the 1e3
+            #    damage_e3 = damage / 1000
+            #
+            #    #Apply the scaling factor.
+            #    damage_e3 *= scaling_factor
+            #
+            #    #Apply the diminishing returns formula as requested.
+            #    if use_scaling_equation:
+            #        #Prebuff damage for multishot missiles.
+            #        if multishot:
+            #            damage_e3 *= num_multishot_missiles
+            #
+            #        #Run the formula.
+            #        pow = 10
+            #        ref = 25
+            #        damage_e3 = (damage_e3 / pow * ref) / ((damage_e3 / pow) + ref) * pow
+            #
+            #    #Remove the e3 scaling.
+            #    new_damage_old_style = damage_e3 * 1000
 
-            #Apply the scaling factor.
-            damage_e3 *= scaling_factor
-
-            #Apply the diminishing returns formula as requested.
-            if use_diminishing_returns:
+                
+            #Adjust the damage, using equation or flat factor.
+            if use_scaling_equation:
                 #Prebuff damage for multishot missiles.
+                multishot_damage = damage
                 if multishot:
-                    damage_e3 *= num_multishot_missiles
+                    multishot_damage *= num_multishot_missiles
+                #Run the scaling func.
+                new_damage = scaling_func(multishot_damage)
+                #Remove the multishot scaling.
+                if multishot:
+                    new_damage /= num_multishot_missiles
+            else:
+                new_damage = damage * scaling_factor
 
-                #Run the formula.
-                pow = 10
-                ref = 25
-                damage_e3 = (damage_e3 / pow * ref) / ((damage_e3 / pow) + ref) * pow
-
-            #Remove the e3 and multishot scalings.
-            new_damage = damage_e3 * 1000
-            if multishot:
-                new_damage /= num_multishot_missiles
 
             #Round to the nearest 1k if the missile is >=10k , else to nearest 100.
             if new_damage > 10000:
@@ -127,6 +175,7 @@ def Adjust_Missile_Damage(
                 round(new_damage_round / damage, 2)
                 ))
 
+    return
             
             
 @Check_Dependencies('TMissiles.txt')
@@ -171,10 +220,10 @@ def Enhance_Mosquito_Missiles(
 
             if proximity_meters != 0:
                 #Get the flags.
-                flags_dict = Flags.Unpack_Tmissiles_flags(this_dict['flags'])
+                flags_dict = Flags.Unpack_Tmissiles_Flags(this_dict)
                 #Turn on proximity detonation.
                 flags_dict['proximity'] = True
-                this_dict['flags'] = Flags.Pack_Flags(flags_dict)
+                Flags.Pack_Tmissiles_Flags(this_dict, flags_dict)
                 #Set the proximity distance.
                 #This is in 500 units per meter.
                 this_dict['blast_radius'] = str(int(proximity_meters * 500))
@@ -182,20 +231,23 @@ def Enhance_Mosquito_Missiles(
             return
 
 
-        
-@Check_Dependencies('TMissiles.txt')
-def Restore_Heavy_Missile_Trail():
-    '''
-    Minor transform to set heavy missile trails to those in vanilla AP.
-    '''
-    #Step through each missile.
-    for this_dict in Load_File('TMissiles.txt'):
-        #Check if this is a missile to restore.
-        if this_dict['name'] in ['SS_MISSILE_TORP_CAPITAL']:
-            #The vanilla game gives a trail effect of 167.
-            #TODO: verify this works.
-            this_dict['trail_effect'] = str(167)
-            break
+ 
+#-Removed for now; mostly just adds clutter, and didn't work well for
+# xrm, probably since trails were edited such that the original ap
+# trail isn't present at the original index.
+#@Check_Dependencies('TMissiles.txt')
+#def Restore_Heavy_Missile_Trail():
+#    '''
+#    Minor transform to set heavy missile trails to those in vanilla AP.
+#    '''
+#    #Step through each missile.
+#    for this_dict in Load_File('TMissiles.txt'):
+#        #Check if this is a missile to restore.
+#        if this_dict['name'] in ['SS_MISSILE_TORP_CAPITAL']:
+#            #The vanilla game gives a trail effect of 167.
+#            #TODO: verify this works.
+#            this_dict['trail_effect'] = str(167)
+#            break
             
 
 
@@ -208,7 +260,7 @@ def Adjust_Missile_Speed(
     scaling_factor = 0.5,
     #If diminishing returns should be used, so that short range
     # missiles are less affected.
-    use_diminishing_returns = False,
+    use_scaling_equation = False,
     #Set the tuning points.
     #The target speed to adjust, in dps. About 700+ on fast missiles.
     target_speed_to_adjust = 700,
@@ -217,13 +269,16 @@ def Adjust_Missile_Speed(
     print_changes = False
     ):
     '''
-    Adjust missile speeds.
-
-    * use_diminishing_returns:
-      - If True, this will attempt to adjust missiles with a speed near 
-      target_speed_to_adjust by the scaling_factor, while missiles with a 
-      speed near speed_to_keep_static will be kept largely unchanged.
-      Otherwise, scaling_factor is applied to all missiles.
+    Adjust missile speeds, by a flat scaler or configured
+    scaling formula.
+    
+    * scaling_factor:
+      - The base multiplier to apply to missile speeds.
+    * use_scaling_equation:
+      - If True, a scaling formula will be applied, such that missiles
+        near target_speed_to_adjust see the full scaling_factor,
+        and missiles near speed_to_keep_static remain largely unchanged.
+        Otherwise, scaling_factor is applied to all missiles.
     * target_speed_to_adjust, speed_to_keep_static:
       - Equation tuning values, in m/s.
     * print_changes:
@@ -232,7 +287,7 @@ def Adjust_Missile_Speed(
     if print_changes:
         Write_Summary_Line('\nMissile speed adjustments:')
 
-    if use_diminishing_returns:
+    if use_scaling_equation:
         #Create a set of points to be tuned against.
         #The primary adjustment point.
         x_main = target_speed_to_adjust
@@ -258,7 +313,7 @@ def Adjust_Missile_Speed(
         speed = int(this_dict['speed']) / 500
         
         #Adjust the range, using equation or flat factor.
-        if use_diminishing_returns:
+        if use_scaling_equation:
             new_speed = scaling_func(speed)
         else:
             new_speed = speed * scaling_factor
@@ -291,7 +346,7 @@ def Adjust_Missile_Range(
     scaling_factor = 0.5,
     #If diminishing returns should be used, so that short range
     # missiles are less affected.
-    use_diminishing_returns = False,
+    use_scaling_equation = False,
     #Set the tuning points.
     #The target range to adjust, in km. About 50km+ and longer missiles.
     target_range_to_adjust_km = 50,
@@ -300,16 +355,19 @@ def Adjust_Missile_Range(
     print_changes = False
     ):
     '''
-    Adjust missile range/lifetime.
+    Adjust missile range by changing lifetime, by a flat scaler or
+    configured scaling formula.
     This is particularly effective for the re-lock missiles like flail,
-     to reduce their ability to just keep retargetting across a system,
-     instead running out of fuel from the zigzagging.
+    to reduce their ability to keep retargetting across a system,
+    instead running out of fuel from the zigzagging.
      
-    * use_diminishing_returns:
-      - If True, this will attempt to adjust missiles with a range near 
-      target_range_to_adjust_km by the scaling_factor, while missiles with a 
-      range near range_to_keep_static_km will be kept largely unchanged.
-      Otherwise, scaling_factor is applied to all missiles.
+    * scaling_factor:
+      - The base multiplier to apply to missile range.
+    * use_scaling_equation:
+      - If True, a scaling formula will be applied, such that missiles
+        near target_range_to_adjust_km see the full scaling_factor,
+        and missiles near range_to_keep_static_km remain largely unchanged.
+        Otherwise, scaling_factor is applied to all missiles.
     * target_range_to_adjust_km, range_to_keep_static_km:
       - Equation tuning values, in kilometers.
     * print_changes:
@@ -318,7 +376,7 @@ def Adjust_Missile_Range(
     if print_changes:
         Write_Summary_Line('\nMissile range adjustments:')
         
-    if use_diminishing_returns:
+    if use_scaling_equation:
         #Create a set of points to be tuned against.
         #The primary adjustment point.
         x_main = target_range_to_adjust_km
@@ -349,7 +407,7 @@ def Adjust_Missile_Range(
         range_km = speed * lifetime / 500 / 1000 / 1000
 
         #Adjust the range, using equation or flat factor.
-        if use_diminishing_returns:
+        if use_scaling_equation:
             new_range_km = scaling_func(range_km)
         else:
             new_range_km = range_km * scaling_factor

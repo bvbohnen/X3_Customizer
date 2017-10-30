@@ -4,8 +4,6 @@ Transforms to globals.
 from File_Manager import *
 import Flags
 
-#Decrease missile hull strength.
-#TODO
 
 #Transporter distance adjustment.
 #TODO, SG_MAX_DISTANCE_BEAMING
@@ -14,7 +12,7 @@ import Flags
 #TODO, SG_MAX_VERTEXDIST_DOCKCOMPUTER
 
         
-@Check_Dependencies('Globals.txt', 'TMissiles.txt')
+@Check_Dependencies('TMissiles.txt', 'Globals.txt', category = 'Missile')
 def Set_Missile_Swarm_Count(
         swarm_count = 5
     ):
@@ -37,7 +35,7 @@ def Set_Missile_Swarm_Count(
             for missile_dict in Load_File('TMissiles.txt'):
 
                 #Skip if this is not a multishot missile.
-                flags_dict = Flags.Unpack_Tmissiles_flags(missile_dict['flags'])
+                flags_dict = Flags.Unpack_Tmissiles_Flags(missile_dict)
                 if not flags_dict['fragmentation']:
                     continue
                 #Adjust the damage.
@@ -68,7 +66,7 @@ def Set_Missile_Swarm_Count(
         
         
 
-@Check_Dependencies('Globals.txt')
+@Check_Dependencies('Globals.txt', category = 'Missile')
 def Adjust_Missile_Hulls(
     scaling_factor = 1
     ):
@@ -99,8 +97,6 @@ def Adjust_Missile_Hulls(
             this_dict['value'] = str(int(new_value))
 
 
-
-        
 @Check_Dependencies('Globals.txt')
 def Set_Communication_Distance(
         distance_in_km = 75

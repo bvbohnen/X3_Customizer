@@ -92,6 +92,7 @@ T_file_name_field_dict_dict = {
         #Power for recharging shields.
         #Exact recharge rate also depends on shield types and number.
         13 : 'shield_power',
+        18 : 'laser_compatibility_flags', #32-bit 1-hot flags for lasers equippable, signed.
         #Total weapon energy storable.
         #Called kW, even though that is not a unit of energy...
         20 : 'weapon_energy', 
@@ -100,6 +101,7 @@ T_file_name_field_dict_dict = {
         21 : 'weapon_recharge_factor', 
         22 : 'shield_type', #Integer, 0-5, where 0 is 1mj and 5 is 2gj
         23 : 'max_shields', #Integer, typically 1-5
+        24 : 'missile_compatibility_flags', #16-bit 1-hot flats for missiles
         26 : 'speed_tunings',
         27 : 'rudder_tunings', #Note: may actually have 27/28 reversed.
         28 : 'cargo_min',
@@ -151,8 +153,47 @@ T_file_name_field_dict_dict = {
         26: 'num_particles', #Integer, 0 or 100 seen, may be particles outside ship window
         -2: 'name',
         },
+    'TWareT.txt':{
+        'min_data_entries': 5,
+        7 : 'volume',
+        8 : 'relative_value_npc',
+        9 : 'price_modifier_1',
+        10: 'price_modifier_2',
+        12: 'relative_value_player',
+        -2: 'name',
+        },
+    'WareLists.txt':{
+        #Empty entries may just be a count (0) and their slash_index (includes newline).
+        #Note that this is small enough to match the header, so expect the
+        # header line to be returned to any calling code.
+        'min_data_entries': 2,
+        #Int, the number of wares in the list, prior to the index.
+        #Adjust this if changing ware count.
+        0 : 'ware_count',
+        #String, a forward slash followed by the integer index, and then a
+        # newline (combined, since there is no semicolon at the end like with
+        # other files). May include a random comment before the newline, and
+        # is probably just a comment in general.
+        # Indices appear to always be in order, starting from 0.
+        -1: 'slash_index_comment',  
+        },
+    #Note: it appears the jobs file has two formats, one (maybe for ap)
+    # which has 4 more fields inserted somewhere and throwing off later flags.
+    #The AP new fields are at: [70,105,123,128], and will shift down
+    # the TC values correspondingly.
+    #These offsets will be for the short/TC form (which xrm uses and seems
+    # to work okay), and the fluff entries will be noted and used when
+    # parsing if needed to shift entry names.
+    #Set an initial empty dict for the ap fields; build it further below.
+    'Jobs.txt.ap' : {
+        'min_data_entries': 5,
+        },
     'Jobs.txt' : {
         'min_data_entries': 5,
+        'lines_tc': 130,
+        'lines_ap': 134,
+        #Provide the replacement dict to use in the ap case.
+        'ap_name' : 'Jobs.txt.ap',
         0: 'id',                   #Integer
         1: 'name',                 #String, name of the job entry
         2: 'max_jobs',             #Integer
@@ -190,6 +231,33 @@ T_file_name_field_dict_dict = {
         43: 'variant_tanker_xl',
         43: 'variant_super_freighter_xl',
         43: 'variant_advanced',
+        #Hue/saturation are generally -1, sometimes 0, and may be unused.
+        #The spray shop supports 0-360 hue, -256 to 256 saturation.
+        #Could consider playing with this at some point, maybe randomizing,
+        # though given ships of a job will always be the same, and variation
+        # would only be across jobs.
+        60: 'hue',
+        61: 'saturation',
+        63: 'select_owners_sector',     #0 or 1
+        67: 'select_not_enemy_sector',
+        64: 'select_core_sector',
+        68: 'select_border_sector',
+        65: 'select_shipyard_sector',
+        66: 'select_owner_station_sector',
+        69: 'limit_to_x_universe_races',
+        70: 'invert_sector_flags', #Never seen used; unclear on effect.
+        71: 'sector_x', #Int, sector coordinates. -1,-1 used for dont case seemingly.
+        72: 'sector_y',
+        73: 'create_in_shipyard',
+        74: 'create_in_gate',
+        75: 'create_inside_sector',
+        76: 'create_outside_sector',
+        77: 'create_null',         #Never seen used.
+        78: 'docked_chance',       #Int, 0-100, percentage.
+        80: 'freight_extensions',  #Int, 0 to 100.
+        81: 'engine_tunings',      #Int, 0 to 100.
+        82: 'rudder_tunings',      #Int, 0 to 100.
+        83: 'rotation_acceleration_limit', #Int, 0 or -20 seen (on idle TLs)
         84: 'owner_argon',         #0 or 1
         85: 'owner_boron', 
         86: 'owner_split', 
@@ -202,37 +270,36 @@ T_file_name_field_dict_dict = {
         93: 'owner_terran', 
         94: 'owner_yaki', 
         95: 'owner_pirates',  #Oddly, different ordering from manufacturer
+        96: 'shield_level',  #Int, 0 to 100.
+        97: 'laser_level',   #Int, 0 to 100.
+        116: 'aggression',   #Int, 0 to 100.
+        117: 'moral',        #Int, 0 to 100.
+        118: 'fight_skill',  #Int, 0 to 100. May affect missile loadout.
+        120: 'set_invincible',
+        121: 'set_as_hidden_pirate',
+        122: 'destroy_out_of_sector',
+        123: 'rebuild_in_new_sector',
+        124: 'fly_average_speed',
         125: 'classification_military',  #0 or 1
         126: 'classification_trader',
         127: 'classification_civilian',
         128: 'classification_fighter',
-        },
-    'TWareT.txt':{
-        'min_data_entries': 5,
-        7 : 'volume',
-        8 : 'relative_value_npc',
-        9 : 'price_modifier_1',
-        10: 'price_modifier_2',
-        12: 'relative_value_player',
-        -2: 'name',
-        },
-    'WareLists.txt':{
-        #Empty entries may just be a count (0) and their slash_index (includes newline).
-        #Note that this is small enough to match the header, so expect the
-        # header line to be returned to any calling code.
-        'min_data_entries': 2,
-        #Int, the number of wares in the list, prior to the index.
-        #Adjust this if changing ware count.
-        0 : 'ware_count',
-        #String, a forward slash followed by the integer index, and then a
-        # newline (combined, since there is no semicolon at the end like with
-        # other files). May include a random comment before the newline, and
-        # is probably just a comment in general.
-        # Indices appear to always be in order, starting from 0.
-        -1: 'slash_index_comment',  
+        #129 is the last entry, seen to be a 0 with newline generally.
         },
 }
 
-
+#Build an ap-specific dict for the jobs file, with inserted lines.
+for tc_line_number, field in T_file_name_field_dict_dict['Jobs.txt'].items():
+    #Skip special entries.
+    if isinstance(tc_line_number, str):
+        continue
+    #Get the line number offset adjustment for ap.
+    ap_line_number = tc_line_number + sum(
+        #This will sum up all of the AP lines that the tc_line_number
+        # has reached. Eg. on tc reaching 70, an offset of 1 is applied;
+        # on tc reaching 105, an offset of 2 is applied.
+        [1 for x in [70,105,123,128] if tc_line_number >= x])
+    T_file_name_field_dict_dict['Jobs.txt.ap'][ap_line_number] = field
+    
 
 

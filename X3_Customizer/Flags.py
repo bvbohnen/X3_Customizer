@@ -4,8 +4,6 @@ This will also hold some misc values, for lack of a better place
 to put them.
 '''
 
-
-
 #How many game updates occur per minute, used to define fire delays in real time.
 Game_Ticks_Per_Minute = 1000*60
 
@@ -97,15 +95,126 @@ TMissiles_flag_bits = {
     #32 is proximity
     5: 'proximity',
     }
+#Lasers are categorized into hardcoded named groups.
+#In tlasers the names are used; in tships a flag mask is used
+# with a fixed mapping.
+#TODO: fill this out if ever needed, eg. adding repair lasers and
+# such compatibilities. Names filled in for now.
+#Note: the encoded flags are 32-bit signed, so the Kyon weapons
+# created a negative number. This is true in vanilla tships as well
+# as those out of x3_editor.
+#Note: 27, 30 unused.  Only 30 of 32 categories.
+Tships_laser_subtype_flag_bits = {
+     0  : 'SG_LASER_IRE'          ,
+     1  : 'SG_LASER_PAC'          ,
+     2  : 'SG_LASER_MASS'         ,
+     3  : 'SG_LASER_ARGON_LIGHT'  ,
+     4  : 'SG_LASER_TELADI_LIGHT' ,
+     5  : 'SG_LASER_PARANID_LIGHT',
+     6  : 'SG_LASER_HEPT'         ,
+     7  : 'SG_LASER_BORON_LIGHT'  ,
+     8  : 'SG_LASER_PBE'          ,
+     9  : 'SG_LASER_PIRATE_LIGHT' ,
+    10  : 'SG_LASER_TERRAN_LIGHT' ,
+    11  : 'SG_LASER_CIG'          ,
+    12  : 'SG_LASER_BORON_MEDIUM' ,
+    13  : 'SG_LASER_SPLIT_MEDIUM' ,
+    14  : 'SG_LASER_TERRAN_MEDIUM',
+    15  : 'SG_LASER_TELADI_AF'    ,
+	16  : 'SG_LASER_ARGON_AF'     ,
+    17  : 'SG_LASER_SPLIT_AF'     ,
+    18  : 'SG_LASER_PARANID_AF'   ,
+    19  : 'SG_LASER_TERRAN_AF'    ,
+    20  : 'SG_LASER_PPC'          ,
+    21  : 'SG_LASER_BORON_HEAVY'  ,
+    22  : 'SG_LASER_TELADI_HEAVY' ,
+    23  : 'SG_LASER_PIRATE_HEAVY' ,
+    24  : 'SG_LASER_TERRAN_HEAVY' ,
+    25  : 'SG_LASER_ARGON_BEAM'   ,
+    26  : 'SG_LASER_PARANID_BEAM' ,
+    #27 unused.
+    28  : 'SG_LASER_SPECIAL'      ,
+    29  : 'SG_LASER_UNKNOWN1'     ,
+    #30 unused.
+    31  : 'SG_LASER_KYON'         ,
+    }
+#Missiles work the same way with category names in tmissiles.
+Tships_missile_subtype_flag_bits = {
+     0 : 'SG_MISSILE_LIGHT'          ,
+     1 : 'SG_MISSILE_MEDIUM'         ,
+     2 : 'SG_MISSILE_HEAVY'          ,
+     3 : 'SG_MISSILE_TR_LIGHT'       ,
+     4 : 'SG_MISSILE_TR_MEDIUM'      ,
+     5 : 'SG_MISSILE_TR_HEAVY'       ,
+     6 : 'SG_MISSILE_KHAAK'          ,
+     7 : 'SG_MISSILE_BOMBER'         ,
+     8 : 'SG_MISSILE_TORP_CAPITAL'   ,
+     9 : 'SG_MISSILE_AF_CAPITAL'     ,
+    10 : 'SG_MISSILE_TR_BOMBER'      ,
+    11 : 'SG_MISSILE_TR_TORP_CAPITAL',
+    12 : 'SG_MISSILE_TR_AF_CAPITAL'  ,
+    13 : 'SG_MISSILE_BOARDINGPOD'    ,
+    14 : 'SG_MISSILE_DMBF'           ,
+    #Note: this flag does not appear to be used (and hence the
+    # total value may be signed). Instead, it is treated as
+    # true if any other flag is true, giving mosquitos to any
+    # ship which can fire missiles.
+    15 : 'SG_MISSILE_COUNTER'        ,
+    }
+
+
+#Convenience call functions for the different t files.
+#These will take a line dict and grab the correct field.
+def Unpack_Tbullets_Flags(bullet_dict):
+    return Unpack_Flags(TBullets_flag_bits, 
+                        bullet_dict['flags'])
+
+def Unpack_Tmissiles_Flags(missile_dict):
+    return Unpack_Flags(TMissiles_flag_bits, 
+                        missile_dict['flags'])
+
+#Tships laser field is 32-bit signed.
+def Unpack_Tships_Laser_Flags(ship_dict):
+    return Unpack_Flags(Tships_laser_subtype_flag_bits, 
+                        ship_dict['laser_compatibility_flags'], 
+                        negative_bit = 31)
+
+def Unpack_Tships_Missile_Flags(ship_dict):
+    return Unpack_Flags(Tships_missile_subtype_flag_bits, 
+                        ship_dict['missile_compatibility_flags'])
+    
+#Similar functions for calling Pack_Flags with the right options.
+#Most of these use unsigned numbers, so are handled the same way.
+#These will take the line dict and pack the correct field.
+def Pack_Tbullets_Flags(bullet_dict, flags_dict):
+    packed_flags = Pack_Flags(flags_dict)
+    bullet_dict['flags'] = packed_flags
+
+def Pack_Tmissiles_Flags(missile_dict, flags_dict):
+    packed_flags = Pack_Flags(flags_dict)
+    missile_dict['flags'] = packed_flags
+
+#Tships laser field is 32-bit signed.
+def Pack_Tships_Laser_Flags(ship_dict, flags_dict):
+    packed_flags = Pack_Flags(flags_dict, negative_bit = 31)
+    ship_dict['laser_compatibility_flags'] = packed_flags
+
+def Pack_Tships_Missile_Flags(ship_dict, flags_dict):
+    packed_flags = Pack_Flags(flags_dict)
+    ship_dict['missile_compatibility_flags'] = packed_flags
 
 
 import collections
-def Unpack_Flags(flag_bit_to_name_dict, packed_flags_value):
+def Unpack_Flags(flag_bit_to_name_dict, 
+                 packed_flags_value, 
+                 negative_bit = None):
     '''
     Unpacks a 1-hot packed_flags_value into an ordereddict.
     Keys are flag names where known, else bit indices where the flag was found.
     flag_bit_to_name_dict is the dict keying flag name to bit index, where 
      index 0 is the lowest bit (value 1).
+    If negative_bit != None, this is the sign bit of a signed number at
+    the input, and will be used to determine the unsigned conversion.
     Length of the returned dict is set by either the highest defined flag bit, or
      highest flag bit found in packed_flags.
     '''
@@ -113,6 +222,17 @@ def Unpack_Flags(flag_bit_to_name_dict, packed_flags_value):
     #Convert input to an int if a string was given.
     if isinstance(packed_flags_value, str):
         packed_flags_value = int(packed_flags_value)
+    #If there is a negative bit, make an adjustment.
+    if negative_bit != None:
+        #The value of the sign bit can be obtained with a shift.
+        #Eg. if the sign bit is 3 (4-bit signed number), this is -8.
+        sign_value = (1 << negative_bit) * -1
+        #If the input value is negative, can subtract the sign value
+        # twice to flip the value positive.
+        #The first sign_value negates the existing one, the second puts
+        # the bit back in as positive.
+        if packed_flags_value < 0:
+            packed_flags_value += sign_value *2
 
     #Start from bit 0 and go upward.
     bit_index = 0
@@ -148,27 +268,29 @@ def Unpack_Flags(flag_bit_to_name_dict, packed_flags_value):
         
     return flags_dict
 
-#Convenience call functions for the different t files.
-def Unpack_Tbullets_flags(packed_flags_value):
-    return Unpack_Flags(TBullets_flag_bits, packed_flags_value)
-def Unpack_Tmissiles_flags(packed_flags_value):
-    return Unpack_Flags(TMissiles_flag_bits, packed_flags_value)
-    
-import itertools
-def Pack_Flags(flags_dict):
+
+def Pack_Flags(flags_dict, negative_bit = None):
     '''
     Packs an ordereddict of flags into a 1-hot value.
     The first dict entry will be the lowest flag bit, proceeding upwards.
+    If negative_bit given, it is the bit position to be treated as
+    negative. Set this to the top bit for signed numbers, ignore for
+    unsigned numbers.
     Returns as a string.
     '''
     running_value = 0
     #Loop over the entries, start to end. Keys don't matter for this.
-    for entry, index in zip(flags_dict.values(), itertools.count()):
+    for index, entry in enumerate(flags_dict.values()):
         #The value to set the bit for this flag will be based on the index.
         #First flag at index = 0 corresponds to bit 1, requiring a value of 1.
         #Second flag at index = 1 is bit 2, requiring a value of 2.
         #Third flag needs a value of 4.
         if entry:
-            #Can just do a shift for the right value to add.
-            running_value += (1 << index)
+            #Can just do a shift for the right value.
+            value = (1 << index)
+            #Normally this will add in, but might subtract for the sign bit.
+            if index != negative_bit:
+                running_value += value
+            else:
+                running_value -= value
     return str(running_value)
