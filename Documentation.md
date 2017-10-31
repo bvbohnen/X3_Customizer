@@ -1,4 +1,4 @@
-X3 Customizer v2.06
+X3 Customizer v2.07
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -389,6 +389,10 @@ Missile Transforms:
         - If True, a scaling formula will be applied, such that missiles near target_damage_to_adjust see the full scaling_factor, and missiles near damage_to_keep_static remain largely unchanged. Otherwise, scaling_factor is applied to all missiles.
       * target_damage_to_adjust, damage_to_keep_static:
         - Equation tuning values.
+      * adjust_volume:
+        - If True, cargo volume is adjusted corresponding to damage.
+      * adjust_price:
+        - If True, price is adjusted corresponding to damage.
       * print_changes:
         - If True, speed adjustments are printed to the summary file.
       
@@ -548,9 +552,11 @@ Ship Transforms:
       * race_types:
         - List of race names whose ships will have variants added. By default, the following are included: [Argon, Boron, Split, Paranid, Teladi, Xenon, Khaak, Pirates, Goner, ATF, Terran, Yaki].
       * include_advanced_ships:
-        - Bool, if True then existing heavy ships (variation 20) and other non-basic ships will have variants added. This may result in some redundancies, eg. variants of Mercury and Advanced Mercury. In some cases, the existing ship will be reclassified as a basic version to remove their suffix, eg. Hyperion Vanguard will become a base Hyperion from which a vanguard and other variants are generated. Default True.
+        - Bool, if True then existing heavy ships (variation 20) and other non-basic ships will have variants added. This may result in some redundancies, eg. variants of Mercury and Advanced Mercury. In some cases, the existing ship will be reclassified as a basic version; see variant_indices_to_reset_on_base_ships.
       * variant_indices_to_ignore:
         - List of integers, any existing variants to be ignored for analysis and variant generation. Default list includes 8, XRM Mk.1 ships.
+      * variant_indices_to_reset_on_base_ships:
+        - List of integers, any variant types which will be set to 0 when that variant is used as a base ship. Eg. a Hyperion Vanguard (variation 16) may be switched to a base Hyperion, from which vanguard and other variants are made. Default list includes 16 (redundant vanguard) and 19 (redundant hauler).
       * add_mining_equipment:
         - Bool, if True mining equipment will be added to Miner variants. Default True.
       * prepatch_ship_variant_inconsistencies:
@@ -1036,3 +1042,6 @@ Change Log:
    - Added Add_Ship_Cross_Faction_Missiles.
    - Add_Ship_Boarding_Pod_Support.
    - Changed documentation generator to include more text in the readme file, and to categorize transforms.
+ * 2.07:
+   - Minor tweak to Add_Ship_Variants, allowing selection of which variant will be set to 0 when an existing variant is used as a base ship.
+   - Adjust_Missile_Damage has new parameters to scale missile ware volume and price in line with the damage adjustment.

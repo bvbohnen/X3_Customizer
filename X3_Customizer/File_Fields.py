@@ -2,6 +2,55 @@
 Specify the fields for various file types that are field based.
 Generally, this covers T files.
 '''
+'''
+Note on relative value fields:
+
+    These are split into a basic 'relative value' and an 
+    alternate 'relative value player'.
+
+    This represents how many seconds it takes to produce or consume
+    one item, for a factory running at 1x speed.
+    Eg. if the product value is 10, input is 5, then over 10 seconds
+    the factory will consume 2 inputs, produce 1 output.
+
+    Player factories use the player term, npc factories the normal term.
+    Commonly the player term is lower for end products, though not 
+    for intermediate goods.
+
+    Example: e-cells may have relval of 4 for npc and player, but mosquito
+    missiles have relval of 6 for npc, 4 for player.
+    As a result, a player produced mosquito consumes 33% fewer e-cells,
+    since in 24 seconds an npc factory is [+4 mosquitos, -6 ecells]
+    while a player factory is [+6 mosquitos, -6 ecells].
+
+    Secondary resource consumption rates are stated to be 1/3 normal
+    rate by egosoft, implying their relval is boosted 3x. Factories do
+    not require secondary resources to run, though the factory does
+    appear to need to run to use secondary resources (in brief checks).
+
+    Relval is also used to determine consumption at trading posts and
+    equipment docks, though the formula used is somewhat complex.
+    This has a code snippet, and claims there is more going on, but
+    there might not be.
+    https://forum.egosoft.com/viewtopic.php?t=113932
+    This suggests the consumption rate at docks is 6% the normal rate
+    for most wares, 3% for tech wares, with some randomness and variation
+    based on roundings and such. Tends to round down, making things worse.
+    The second case, for consumption <1, may cause inflated consumption
+    rates depending on how the random term computes.
+    Personal testing on food items came out around 1/20th rate, which
+    is in rough agreement with the above.
+
+
+    Prices are based on the npc relative value, combined with a hidden
+    multiplier that varies by item type. Some of these multipliers are
+    calculated and placed in Flags.py.
+
+    The price_modifier_1/2 fields are percentage changes in a ware's
+    base price to allow based on factory storage utilization, where
+    _1 is for primary resources, _2 for secondary resources.
+
+'''
 
 #T file names, and named fields of interest.
 #The original files contain semicolon delimited lines; the index to each field
@@ -14,8 +63,8 @@ T_file_name_field_dict_dict = {
     'Globals.txt' : {
         #Global lines are short, just 2 values and newline.
         'min_data_entries': 3,
-        0: 'name',
-        1: 'value',
+        0  : 'name',
+        1  : 'value',
         },
     'TBullets.txt' : {
         'min_data_entries': 5,
@@ -58,6 +107,8 @@ T_file_name_field_dict_dict = {
         2  : 'rotation_x',     #rpm = 60 * this value
         3  : 'rotation_y',
         4  : 'rotation_z',    #Appears to be 0 normally.
+        5  : 'subtype',       #Specific if eg. 'SG_MISSILE_LIGHT'.
+        6  : 'name_id',
         7  : 'speed',        #In meters per 500 seconds, or 1/500 meters per second.
         8  : 'acceleration', #In meters per 500 seconds per second
         9  : 'launch_sound',     #Int, an index
@@ -73,9 +124,15 @@ T_file_name_field_dict_dict = {
         19 : 'sound_volume_max', #Int, appears max is 255 (probably 8-bit)
         20 : 'impact_effect',    #Int, an index
         21 : 'explosion_effect', #Int, an index
+        22 : 'particle_effect',  #Engine trail; Int.
         23 : 'flags',         #Special 1-hot flags.
         24 : 'fire_delay',    #In milliseconds
         25 : 'icon',          #String, name of the icon to use.
+        26 : 'scene',         #String, a scene file name.
+        27 : 'volume',
+        28 : 'relative_value',   #Int, production time/ratio, seconds.
+        29 : 'price_modifier_1', #Int, percent primary resource price variation.
+        30 : 'price_modifier_2', #Int, percent secondary resource price variation.
         -2 : 'name',
         },
     'TShips.txt' : {
@@ -124,21 +181,21 @@ T_file_name_field_dict_dict = {
         },
     'TShields.txt': {
         'min_data_entries': 5,
-        0: 'model_file',  #Int.
-        5: 'subtype',  #Int, appears to go from 0 for 1MJ to 5 for 2GJ.
-        7: 'power_drain', #Int, the power draw of the shield, in kW. eg. 33 to 2500.
-        8: 'capacity', #Int, the size of the shield in kW, eg. 1000 for 1MJ.
+        0 : 'model_file',  #Int.
+        5 : 'subtype',  #Int, appears to go from 0 for 1MJ to 5 for 2GJ.
+        7 : 'power_drain', #Int, the power draw of the shield, in kW. eg. 33 to 2500.
+        8 : 'capacity', #Int, the size of the shield in kW, eg. 1000 for 1MJ.
         10: 'efficiency', #Float, recharge efficiency of the shield, eg. 0.85.
         -2: 'name',
         },
     'TGates.txt' : {
         'min_data_entries': 5,
-        7: 'model_scene',
+        7 : 'model_scene',
         -2: 'name',
         },
     'TBackgrounds.txt' : {
         'min_data_entries': 5,
-        7: 'image', #String, possibly background image
+        7 : 'image', #String, possibly background image
         11: 'fog1', #Integer, maybe goes to a fog code?
         12: 'fog2',
         13: 'fog3',
@@ -156,10 +213,10 @@ T_file_name_field_dict_dict = {
     'TWareT.txt':{
         'min_data_entries': 5,
         7 : 'volume',
-        8 : 'relative_value_npc',
-        9 : 'price_modifier_1',
-        10: 'price_modifier_2',
-        12: 'relative_value_player',
+        8 : 'relative_value_npc',    #Int, production time/ratio, seconds..
+        9 : 'price_modifier_1',      #Int, percent primary resource price variation.
+        10: 'price_modifier_2',      #Int, percent secondary resource price variation.
+        12: 'relative_value_player', #Int, production time/ratio, seconds..
         -2: 'name',
         },
     'WareLists.txt':{
@@ -194,13 +251,13 @@ T_file_name_field_dict_dict = {
         'lines_ap': 134,
         #Provide the replacement dict to use in the ap case.
         'ap_name' : 'Jobs.txt.ap',
-        0: 'id',                   #Integer
-        1: 'name',                 #String, name of the job entry
-        2: 'max_jobs',             #Integer
-        3: 'max_jobs_in_sector',   #Integer
-        4: 'script',               #String
-        5: 'script_config',        #String
-        6: 'name_id',              #Integer; this appears to relate to the in-game displayed name.
+        0 : 'id',                   #Integer
+        1 : 'name',                 #String, name of the job entry
+        2 : 'max_jobs',             #Integer
+        3 : 'max_jobs_in_sector',   #Integer
+        4 : 'script',               #String
+        5 : 'script_config',        #String
+        6 : 'name_id',              #Integer; the in-game displayed name.
         17: 'respawn_time',        #Integer, appears to be in seconds.
         31: 'manufacturer_argon',  #0 or 1; probably used in ship selection.
         32: 'manufacturer_boron', 

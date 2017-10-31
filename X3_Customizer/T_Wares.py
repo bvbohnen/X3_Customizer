@@ -3,13 +3,24 @@ Edits to the ware lists.
 '''
 from File_Manager import *
 
-#In XRM, ship tuning pricing starts at a high value on the first tuning, then counts down.
+#TODO:
+#Transform to set relative value the same for player and npcs, essentially
+# to remove the player factory advantage.
+#Can either set player to npc (player factories less efficient, and throws
+# off existing complex calculators), or set npc to player (better npc
+# factories; less penalty allowing npcs to build weapons to them purchase).
+#Go with the latter. This will impact many ware files, as well as lasers,
+# missiles, maybe some others.
+
+
+#In XRM, ship tuning pricing starts at a high value on the first tuning, then 
+# counts down.
 #This leads to capped ships selling for a bit much (their small number of tunings
 # being highly valued), and odd decision making on tunings (ignore or go all-in).
 #Some notes on how tuning pricing works are given further below.
 #This transform will restore the vanilla tuning prices.
 
-#-Removed, not very effective.
+#-Removed, not very effective; comments kept for good tuning info.
 '''
 #Bump up the cost of engine and rudder tunings, to make their purchase more
 # meaningful, and help with immersion when most ships in the universe do not

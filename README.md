@@ -1,4 +1,4 @@
-X3 Customizer v2.06
+X3 Customizer v2.07
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -438,3 +438,6 @@ Change Log:
    - Added Add_Ship_Cross_Faction_Missiles.
    - Add_Ship_Boarding_Pod_Support.
    - Changed documentation generator to include more text in the readme file, and to categorize transforms.
+ * 2.07:
+   - Minor tweak to Add_Ship_Variants, allowing selection of which variant will be set to 0 when an existing variant is used as a base ship.
+   - Adjust_Missile_Damage has new parameters to scale missile ware volume and price in line with the damage adjustment.

@@ -35,8 +35,7 @@ from File_Manager import *
 import Scaling_Equations
 import Flags
 
-#TODO: switch to custom tuned damage scaling formula like other
-# transforms. Maybe add cargo volume adjustment, so that ships with
+#TODO: add cargo volume adjustment, so that ships with
 # heavily weakened missiles get more of them to fire before running
 # out.
 @Check_Dependencies('Globals.txt', 'TMissiles.txt')
@@ -50,6 +49,8 @@ def Adjust_Missile_Damage(
     target_damage_to_adjust = 1000000,
     #The damage to pin in place on the low end, about 10000.
     damage_to_keep_static = 10000,
+    adjust_volume = False,
+    adjust_price = False,
     print_changes = False
     ):
     '''
@@ -65,6 +66,10 @@ def Adjust_Missile_Damage(
         Otherwise, scaling_factor is applied to all missiles.
     * target_damage_to_adjust, damage_to_keep_static:
       - Equation tuning values.
+    * adjust_volume:
+      - If True, cargo volume is adjusted corresponding to damage.
+    * adjust_price:
+      - If True, price is adjusted corresponding to damage.
     * print_changes:
       - If True, speed adjustments are printed to the summary file.
     '''
@@ -160,8 +165,23 @@ def Adjust_Missile_Damage(
             else:
                 new_damage_round = round(new_damage / 100)*100
 
+
             #Put the value back.
             this_dict['damage'] = str(int(new_damage_round))
+
+            #Based on the new/old damage ratio, maybe adjust volumne and
+            # price if requested.
+            if adjust_volume:
+                volume = int(this_dict['volume'])
+                #Ensure volume stays at least 1.
+                new_volume = max(1, volume * new_damage_round / damage)
+                this_dict['volume'] = str(int(new_volume))
+                
+            if adjust_price:
+                value = int(this_dict['relative_value'])
+                new_value = max(1, value * new_damage_round / damage)
+                this_dict['relative_value'] = str(int(new_value))
+
 
         #Debug printout.
         #Give missile name, old and new damage,
@@ -228,7 +248,8 @@ def Enhance_Mosquito_Missiles(
                 #This is in 500 units per meter.
                 this_dict['blast_radius'] = str(int(proximity_meters * 500))
 
-            return
+            break
+    return
 
 
  
@@ -322,8 +343,13 @@ def Adjust_Missile_Speed(
         lifetime = int(this_dict['lifetime'])
         new_lifetime = lifetime * speed / new_speed
 
+        #Adjust acceleration proportional with speed.
+        acceleration = int(this_dict['acceleration'])
+        new_acceleration = acceleration * new_speed / speed
+
         #Put speed back with *500 factor.
         this_dict['speed']    = str(int(new_speed * 500))
+        this_dict['acceleration'] = str(int(new_acceleration))
         this_dict['lifetime'] = str(int(new_lifetime))
         
         #Debug printout.
@@ -337,6 +363,8 @@ def Adjust_Missile_Speed(
                 #Give only two sig digits for the scaling factor.
                 round(new_speed / speed, 2)
                 ))
+            
+    return
             
             
 @Check_Dependencies('TMissiles.txt')
@@ -428,3 +456,4 @@ def Adjust_Missile_Range(
                 round(new_range_km / range_km, 2)
                 ))
 
+    return

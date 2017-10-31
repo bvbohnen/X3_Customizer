@@ -38,6 +38,11 @@ Change Log:
    - Add_Ship_Boarding_Pod_Support.
    - Changed documentation generator to include more text in the readme file,
      and to categorize transforms.
+ * 2.07:
+   - Minor tweak to Add_Ship_Variants, allowing selection of which variant will
+     be set to 0 when an existing variant is used as a base ship.
+   - Adjust_Missile_Damage has new parameters to scale missile ware volume
+     and price in line with the damage adjustment.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

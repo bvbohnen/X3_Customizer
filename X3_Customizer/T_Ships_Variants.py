@@ -1,12 +1,9 @@
 '''
 Split off file from T_Ships, holding the variant ship generation code.
 
-TODO: make more robust across mods that play with the variants, since
-this is mostly tuned for xrm. Perhaps use a pre-config block that
-can swap out variant names and indices, as well as variants to ignore
-and other such flags, tuned to a particular mod setup.
-At the very least, remove the xl tank/freighter from the defaults,
-since those are xrm variants only.
+TODO: add a helper transform for enabling variants in the jobs file,
+probably keying off cases where [basic] is selected, and a specific ship
+is not identified.
 '''
 from File_Manager import *
 import Flags
@@ -246,6 +243,10 @@ def Add_Ship_Variants(
             #This is mostly for xrm.
             8,
             ],
+        variant_indices_to_reset_on_base_ships = [
+            16,
+            19
+            ],
         include_advanced_ships = True,
         add_mining_equipment = True,
         print_variant_modifiers = False,
@@ -304,12 +305,16 @@ def Add_Ship_Variants(
         non-basic ships will have variants added. This may result in some
         redundancies, eg. variants of Mercury and Advanced Mercury.
         In some cases, the existing ship will be reclassified as a basic
-        version to remove their suffix, eg. Hyperion Vanguard will become 
-        a base Hyperion from which a vanguard and other variants are generated.
-        Default True.
+        version; see variant_indices_to_reset_on_base_ships.
     * variant_indices_to_ignore:
       - List of integers, any existing variants to be ignored for analysis
         and variant generation. Default list includes 8, XRM Mk.1 ships.
+    * variant_indices_to_reset_on_base_ships:
+      - List of integers, any variant types which will be set to 0 when that
+        variant is used as a base ship. Eg. a Hyperion Vanguard (variation 16)
+        may be switched to a base Hyperion, from which vanguard and other
+        variants are made. Default list includes 16 (redundant vanguard)
+        and 19 (redundant hauler).
     * add_mining_equipment:
       - Bool, if True mining equipment will be added to Miner variants. 
         Default True.
@@ -863,15 +868,20 @@ def Add_Ship_Variants(
             if basic_dict == None:
                 continue
                 
-            #Reclassify this as variant 0, the base.
+            #Maybe reclassify this as variant 0, the base.
             #This will also stip off redundant suffixes from some ships.
             #Eg. if basing off Hyperion Vanguard, change it to Hyperion
             # before making variants.
-            basic_dict['variation_index'] = str(0)
-            #Update the variant_id_ship_dict_dict to reflect this change,
-            # in case it matters ever.
-            del(variant_id_ship_dict_dict[test_index])
-            variant_id_ship_dict_dict[0] = basic_dict
+            #Control this from an input arg, since this feature is somewhat
+            # unsafe if a mod is using non-standard variants to control
+            # ship spawning, and so should be kept minimalist.
+            if test_index in variant_indices_to_reset_on_base_ships:
+                basic_dict['variation_index'] = str(0)
+                #Update the variant_id_ship_dict_dict to reflect this change,
+                # in case it matters ever.
+                del(variant_id_ship_dict_dict[test_index])
+                variant_id_ship_dict_dict[0] = basic_dict
+                #TODO: maybe print a warning about the replacement.
 
 
         #-Removed; this method tried to find a ship not having a variant

@@ -622,13 +622,17 @@ Enhance_Mosquito_Missiles()
 
 #Apply general missile damage nerfs.
 Adjust_Missile_Damage(
-    #Try a 50% reduction on the high end missiles.
+    #Try a 50% reduction on the high end missiles, though up to
+    # 80% works well.
     scaling_factor = 0.5,
     use_scaling_equation = True,
     #Heavy missiles are in the 500k+ range or so.
     target_damage_to_adjust = 500000,
     #Keep fighter tier missiles roughly unchanged.
     damage_to_keep_static = 50000,
+    #Try out scaling volume and price accordingly.
+    adjust_volume = True,
+    adjust_price = True,
     print_changes = True)
 
 if XRM:
@@ -672,7 +676,7 @@ if XRM:
     #Restore_Heavy_Missile_Trail()
 
     #Make missiles a little easier to shoot down.
-    Adjust_Missile_Hulls(0.5)
+    Adjust_Missile_Hulls(0.8)
     
     #Increase missile compatibilities in various ways.
     #Bombers get more missile options.
