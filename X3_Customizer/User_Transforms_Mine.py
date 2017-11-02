@@ -112,6 +112,19 @@ if Vanilla:
 elif XRM:
     pass
     #Swap_Standard_Gates_To_Terran_Gates()
+    Adjust_Gate_Rings(
+        standard_ring_option = 'use_reversed_hub',
+        hub_ring_option = 'use_reversed_hub',
+        #Tried out some other options; they appear to work fine.
+        #standard_ring_option = 'rotate_45',
+        #standard_ring_option = 'rotate_90',
+        #standard_ring_option = 'use_terran',
+        #standard_ring_option = 'remove',
+        #hub_ring_option = 'rotate_45',
+        #hub_ring_option = 'rotate_90',
+        #hub_ring_option = 'use_terran',
+        #hub_ring_option = 'remove',
+        )
 
     
 #####################################################

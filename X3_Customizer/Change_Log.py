@@ -43,6 +43,10 @@ Change Log:
      be set to 0 when an existing variant is used as a base ship.
    - Adjust_Missile_Damage has new parameters to scale missile ware volume
      and price in line with the damage adjustment.
+ * 2.08:
+   - Added Adjust_Gate_Rings.
+   - Removed Swap_Standard_Gates_To_Terran_Gates, which is replaced by an 
+     option in the new transform.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

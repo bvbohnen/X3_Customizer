@@ -28,18 +28,69 @@ Note on relative value fields:
     not require secondary resources to run, though the factory does
     appear to need to run to use secondary resources (in brief checks).
 
+
     Relval is also used to determine consumption at trading posts and
     equipment docks, though the formula used is somewhat complex.
-    This has a code snippet, and claims there is more going on, but
-    there might not be.
-    https://forum.egosoft.com/viewtopic.php?t=113932
-    This suggests the consumption rate at docks is 6% the normal rate
-    for most wares, 3% for tech wares, with some randomness and variation
-    based on roundings and such. Tends to round down, making things worse.
-    The second case, for consumption <1, may cause inflated consumption
-    rates depending on how the random term computes.
-    Personal testing on food items came out around 1/20th rate, which
-    is in rough agreement with the above.
+
+        This post has a code snippet:
+        https://forum.egosoft.com/viewtopic.php?t=113932
+
+        int use =((current_timestep / SA_GetTypeRelValue(m, s)) 
+                * (percentage / 100) 
+                * (BESTSTORE / BESTSTORE_SECONDARY) );
+
+        if (use == 0) {
+            int invuse = ((SA_GetTypeRelValue(m, s) / current_timestep) 
+                * (100 / percentage) 
+                * (BESTSTORE_SECONDARY / BESTSTORE) );
+            if (!invuse || !SE_Random(invuse)) {
+                use = (current_timestep / 20) + 1;
+            }
+            else {
+                use = 0;
+            }
+        } 
+
+        The first part appears to calculate the amount of wares consumed
+        in a given time period.  current_timestep in seconds from the last
+        evaluation, relvalue is seconds/unit, so this gives the base
+        unit consumption at 1x rate.  The percentage is 6% or 12% for
+        tech or non-tech respectively, a reduction in consumption rate.
+        The beststore terms appear to be constants, and evaluate to 1/2.
+
+        When the first term was floored to 0, it gets calculated in an 
+        inverse manner.  According to the post, the next if() statement
+        will fire with a (1/use) chance.  Logically, the inner statement
+        here should just set use=1, but the timestep contribution
+        will add some excess (1 unit per 20 seconds, regardless of type).
+
+        This suggests the consumption rate at docks is 6% the normal rate
+        for most wares, 3% for tech wares, being most accurate for low
+        value wares, reducing consumption somewhat for medium value
+        wares (rounded down), increasing consumption for high value
+        wares (hits the 1/20s term).
+
+        Personal testing on food items came out around 1/20th rate, which
+        is in rough agreement with the above.
+
+        Timestep is stated to be 5-300 seconds, and is presumably longer
+        when the player is not watching.  With this, can determine the
+        relval that will commonly round to 0 and trigger the alternate
+        calculation.
+            use = <1 = 300 / relval * [0.06,0.12] * 1/2
+                     = [9,18] /relval
+        Hence, a relval of >9 for tech goods, >18 for other goods, should
+        round to 0.  This would cover just about all tech goods except
+        for super cheap missiles.
+
+        At 300 seconds, the consumption rate inflation for these high
+        value goods would be (300/20 +1) = 16x.  When a tech good
+        is originally at a 3% consumption rate, it will actually be
+        at a 48% rate.
+
+        In summary:
+            Low value goods are consumed at a ~5% rate.
+            High value goods are consumed at a ~50% rate.
 
 
     Prices are based on the npc relative value, combined with a hidden
@@ -49,6 +100,11 @@ Note on relative value fields:
     The price_modifier_1/2 fields are percentage changes in a ware's
     base price to allow based on factory storage utilization, where
     _1 is for primary resources, _2 for secondary resources.
+
+
+Note on scene files:
+    These can be a string (path from the objects folder) or an integer
+    (implicitly path from objects/v folder, presumably).
 
 '''
 
@@ -103,7 +159,7 @@ T_file_name_field_dict_dict = {
     'TMissiles.txt' : {
         'min_data_entries': 5,
         #37 fields total
-        0  : 'model_scene',
+        0  : 'model_scene',    #String or int
         2  : 'rotation_x',     #rpm = 60 * this value
         3  : 'rotation_y',
         4  : 'rotation_z',    #Appears to be 0 normally.
@@ -190,7 +246,12 @@ T_file_name_field_dict_dict = {
         },
     'TGates.txt' : {
         'min_data_entries': 5,
-        7 : 'model_scene',
+        7 : 'model_scene', #String, int, or -1
+        -2: 'name',
+        },
+    'TSpecial.txt' : {
+        'min_data_entries': 5,
+        0 : 'model_scene', #String, int, or -1
         -2: 'name',
         },
     'TBackgrounds.txt' : {

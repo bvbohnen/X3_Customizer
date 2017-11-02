@@ -1,4 +1,4 @@
-X3 Customizer v2.07
+X3 Customizer v2.08
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -211,11 +211,23 @@ Director Transforms:
 
 Gate Transforms:
 
- * Swap_Standard_Gates_To_Terran_Gates
+ * Adjust_Gate_Rings
 
-    Requires: TGates.txt
+    Requires: TGates.txt, TSpecial.txt
 
-      Changes standard gates into Terran gates, possibly helping reduce large ship suicides when entering a system.
+      Various options to modify gate rings, with the aim of reducing capital ship suicides when colliding with the pylons shortly after the player enters a sector. Includes ring removal, rotation, reversal, and model swaps. Inactive versions of gates will also be updated for consistency. When applied to an existing save, gate changes will appear on a sector change.
+  
+      * standard_ring_option:
+        - String, one of the following options to be applied to the standard gates.
+          - 'use_reversed_hub': Replaces the gate ring with the Hub ring reversed 180 degrees, resulting in pylons only being on the back side.
+          - 'rotate_45': Rotates the gate 45 degrees, offsetting the pylons to be in corners.
+          - 'rotate_90': Rotates the gate 90 degrees, offsetting the pylons to be at the top and bottom.
+          - 'remove': Removes the gate ring entirely, leaving only a portal. This will not affect disabled gates.
+          - 'use_terran': Replaces the gate ring with the Terran gate from the Aldrin expansion plot.
+          - None: default, no change.
+      * hub_ring_option:
+        - String, one of the options for standard_ring_option, along with a new option:
+          - 'use_standard_ring_option': The Hub ring will match the option used for the standard ring, including Hub ring reversal. Default.
       
 
 
@@ -1045,3 +1057,6 @@ Change Log:
  * 2.07:
    - Minor tweak to Add_Ship_Variants, allowing selection of which variant will be set to 0 when an existing variant is used as a base ship.
    - Adjust_Missile_Damage has new parameters to scale missile ware volume and price in line with the damage adjustment.
+ * 2.08:
+   - Added Adjust_Gate_Rings.
+   - Removed Swap_Standard_Gates_To_Terran_Gates, which is replaced by an option in the new transform.

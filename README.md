@@ -1,4 +1,4 @@
-X3 Customizer v2.07
+X3 Customizer v2.08
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -96,9 +96,9 @@ Director Transforms:
 
 Gate Transforms:
 
- * Swap_Standard_Gates_To_Terran_Gates
+ * Adjust_Gate_Rings
 
-      Changes standard gates into Terran gates, possibly helping reduce large ship suicides when entering a system.
+      Various options to modify gate rings, with the aim of reducing capital ship suicides when colliding with the pylons shortly after the player enters a sector. Includes ring removal, rotation, reversal, and model swaps. Inactive versions of gates will also be updated for consistency. When applied to an existing save, gate changes will appear on a sector change.
 
 
 ***
@@ -441,3 +441,6 @@ Change Log:
  * 2.07:
    - Minor tweak to Add_Ship_Variants, allowing selection of which variant will be set to 0 when an existing variant is used as a base ship.
    - Adjust_Missile_Damage has new parameters to scale missile ware volume and price in line with the damage adjustment.
+ * 2.08:
+   - Added Adjust_Gate_Rings.
+   - Removed Swap_Standard_Gates_To_Terran_Gates, which is replaced by an option in the new transform.
