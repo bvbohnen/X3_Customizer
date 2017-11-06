@@ -1,5 +1,5 @@
 '''
-X3 Customizer v2.08
+X3 Customizer v2.09
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -82,6 +82,13 @@ Setup:
 #-Spaces in text being put into a list seems okay.
 #-In general, check changes in markdown (can use Visual Studio plugin)
 # to verify they look okay.
+
+'''
+General transform ideas:
+
+-Add larger factories (may be tricky to get naming right on suffixes).
+-Add a start customizer, selecting name, age, ship, location, etc.
+'''
 
 import sys, os
 #Load up the file manager.

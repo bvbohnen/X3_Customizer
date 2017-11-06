@@ -51,10 +51,22 @@ Race_name_code_dict = {x:y for y,x in Race_code_name_dict.items()}
 
 #Price adjustments, from relative value to credits.
 #This might vary by item type; organize by tfile.
+#Note: this is the mechanism by which factoreis can be made profitable,
+# since eg. if a factory consumes 3 inputs and produces 1 output,
+# the inputs need to average a value:credits ratio 1/3 that of the output,
+# since the factory consumes and produces value for all wares at an
+# equal rate.
 Value_to_credits_ratio_dict = {
-    'TLasers' : 64,
-    'TWaresT' : 28,
-    'TShips'  : 66,
+    'TWareE'    : 4,      #Ecells.
+    'TWareB'    : 5.33,   #Bio.
+    'TWareM'    : 5.33,   #Minerals.
+    'TWareF'    : 12,     #Food
+    'TWareT'    : 28,     #Various tech (microchips, warheads, etc.)
+    'TMissiles' : 28,
+    'TLaser'    : 64.9,
+    'TShields'  : 64.9,
+    'TShips'    : 66, #An old comment elsewhere said 81 here; needs retest maybe.
+    'TWareN'    : 4,      #Misc items (artefacts, etc.), all base value.
     }
 
 

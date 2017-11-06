@@ -1,4 +1,4 @@
-X3 Customizer v2.08
+X3 Customizer v2.09
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -310,11 +310,27 @@ Global Transforms:
 
 Job Transforms:
 
+ * Add_Job_Ship_Variants
+
+    Requires: Jobs.txt
+
+      Allows jobs to spawn with a larger selection of variant ships. This does not affect jobs with a preselected ship to spawn, only those with random selection. Variants are added when the basic version of the ship is allowed, to preserve cases where a variant has been preselected.
+      
+      * jobs_types:
+        - List of keys for the jobs to modify.
+        - Key will try to match a boolean field in the jobs file, (eg. 'owner_argon' or 'classification_trader', see File_Fields for field names), or failing that will try to do a job name match (partial match supported) based on the name in the jobs file.
+        - '*' will match all jobs not otherwise matched.
+      * ship_types:
+        - List of ship types to allow variants for, eg. 'SG_SH_M1'. Note that M0 and TM are not allowed since they do not have flags in the job entries.  Default includes all ship types possible.
+      * variant_types:
+        - List of variant types to allow. Variant names are given as strings. The default list is: ['vanguard', 'sentinel', 'raider', 'hauler', 'super freighter', 'tanker', 'tanker xl', 'super freighter xl'] The 'miner' variant is supported but omitted from the defaults.
+      
+
  * Adjust_Job_Count
 
     Requires: Jobs.txt
 
-      Adjusts job counts using a multiplier. These will always have a minimum of 1.
+      Adjusts job ship counts using a multiplier. These will always have a minimum of 1. Jobs are matched by name or an attribute flag, eg. 'owner_pirate'. This will also increase the max number of jobs per sector accordingly.
   
       * job_count_factors:
         - List of tuples pairing an identifier key with the adjustment value to apply. The first match will be used.
@@ -569,6 +585,8 @@ Ship Transforms:
         - List of integers, any existing variants to be ignored for analysis and variant generation. Default list includes 8, XRM Mk.1 ships.
       * variant_indices_to_reset_on_base_ships:
         - List of integers, any variant types which will be set to 0 when that variant is used as a base ship. Eg. a Hyperion Vanguard (variation 16) may be switched to a base Hyperion, from which vanguard and other variants are made. Default list includes 16 (redundant vanguard) and 19 (redundant hauler).
+      * shield_conversion_ratios:
+        - Dict of floats, keyed by ship attribute strings. When shielding cannot be adjusted accurately due to the X3 shielding system, this gives the rate at which shield adjustment error is converted to other ship attributes. Eg. if a ship is supposed to receive a 5% shield boost that cannot be given, and this dict has en entry with {'shield_power':1}, then an extra 5% boost will be given to the shield power generator instead. By default, shield error will convert using {'shield_power': 1, 'weapon_energy': 1, 'weapon_recharge_factor': 1}. Possible entries include: ['yaw','pitch','roll','speed','acceleration', 'shield_power','weapon_energy','weapon_recharge_factor','cargo', 'hull_strength','angular_acceleration','price']. Price should generally have a negative multiplier.
       * add_mining_equipment:
         - Bool, if True mining equipment will be added to Miner variants. Default True.
       * prepatch_ship_variant_inconsistencies:
@@ -745,6 +763,20 @@ Universe Transforms:
 ***
 
 Ware Transforms:
+
+ * Change_Ware_Size
+
+    Requires: 
+
+      Change the cargo size of a given ware.
+  
+      * ware_name:
+        - String, the name of the ware, eg. 'SS_WARE_WARPING' for jumpdrive. This may include lasers, factories, etc.
+      * new_size:
+        - Integer for the ware size. Exact meaning of the integers depends on any mods in use. In vanilla AP, 1-5 are small through ST. In XRM, 0-5 are small through ST, where 4 is XXL.
+      * ware_file:
+        - Optional string to help identify the ware file to look in, eg. 'TWareT' or 'TLaser'. If not given, ware files will be searched in order, skipping those not found in the source folder.
+      
 
  * Restore_Vanilla_Tuning_Pricing
 
@@ -1060,3 +1092,6 @@ Change Log:
  * 2.08:
    - Added Adjust_Gate_Rings.
    - Removed Swap_Standard_Gates_To_Terran_Gates, which is replaced by an option in the new transform.
+ * 2.09:
+   - Added Add_Job_Ship_Variants.
+   - Added Change_Ware_Size.

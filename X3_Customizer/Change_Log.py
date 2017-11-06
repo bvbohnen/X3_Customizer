@@ -47,6 +47,10 @@ Change Log:
    - Added Adjust_Gate_Rings.
    - Removed Swap_Standard_Gates_To_Terran_Gates, which is replaced by an 
      option in the new transform.
+ * 2.09:
+   - Added Add_Job_Ship_Variants.
+   - Added Change_Ware_Size.
+   - Tweaked Add_Ship_Variants to specify shield_conversion_ratios in args.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

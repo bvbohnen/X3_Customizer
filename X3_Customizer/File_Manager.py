@@ -7,6 +7,7 @@ from File_Fields import *
 import os
 from collections import OrderedDict
 import inspect
+import shutil
 
 #Specify the path to the addon folder.
 #Preferably full path, else relative path from location calling
@@ -329,13 +330,14 @@ def Load_Folder(folder_name):
         return_list.append(Load_File(file_name))
 
 
-def Load_File(file_name, return_t_file = False):
+def Load_File(file_name, return_t_file = False, error_if_not_found = True):
     '''
     Returns the contents of the given file, either raw text for XML
     or a dictionary for T files.
     If the file has not been loaded yet, reads from the expected
     source file.
-    If the file is not found, raises an exception.
+    If the file is not found and error_if_not_found == True, 
+    raises an exception, else returns None.
     If return_t_file == True, returns the T_File object instead of just
     the trimmed dict of data lines.
     '''
@@ -349,9 +351,11 @@ def Load_File(file_name, return_t_file = False):
         #Lookup the file path.
         file_path = Get_Source_File_Path(file_name)
 
-        #Error if the file isn't found.
+        #Error if the file isn't found, or return None.
         if file_path == None or not os.path.exists(file_path):
-            raise File_Missing_Exception()
+            if error_if_not_found:
+                raise File_Missing_Exception()
+            return None
 
         #If this is an xml file, do a raw load to a XML_File object.
         if file_path.endswith('xml'):
@@ -558,3 +562,23 @@ def Write_Files():
             #-Removed; use text instead of xml.
             #Let the xml plugin pick the encoding to write out in.
             #xml_tree.write(file_path)
+
+
+    #Loop over the files that were not loaded. These may need to be included
+    # in case a prior run transformed them, then the transform was removed
+    # such that they weren't loaded but need to overwrite old changes.
+    #These will do direct copies.
+    for file_name in File_path_dict:
+        #Skip the loaded files.
+        if file_name in File_dict:
+            continue
+
+        #Look up the source  path.
+        source_file_path = Get_Source_File_Path(file_name)
+        #Look up the output path.
+        dest_file_path = Get_Output_File_Path(file_name)
+        
+        #Do the copy.
+        shutil.copy(source_file_path, dest_file_path)
+
+    return

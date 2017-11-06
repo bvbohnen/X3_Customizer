@@ -66,7 +66,7 @@ def Run():
         fire_rate = Flags.Game_Ticks_Per_Minute / this_fire_delay / 60
             
         #Determine laser pricetag.
-        laser_price = int(laser_dict['production_value_npc']) * T_Weapons.Laser_price_scaling_factor
+        laser_price = int(laser_dict['relative_value_npc']) * T_Weapons.Laser_price_scaling_factor
 
         #Only operate on the first bullet created, ignore later ones.
         bullet_index = int(laser_dict['bullet'])

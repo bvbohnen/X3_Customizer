@@ -81,24 +81,36 @@ Convoys_made_of_race_ships()
 Standardize_Start_Plot_Overtunings(
     fraction_of_max = 0.70)
 
-#Reduce odds of non-fight missions, or increase odds of fight missions.
-Adjust_Generic_Missions({
-    #'Trade': 0.3,
-    #'Build': 0.3,
-    #'Think': 0.3,
-    #Reduce dual convoy.
-    'L2M183': 0.5,
-    #Disable sector info, as it is generally useless.
-    'L2M147': 0,
-    #Disable return ship missions, as they are generally impossible
-    # when playing without jump drives, and the temptation to keep
-    # ships is too great. (A shame, since these are fun.)
-    'L2M105': 0,
-    #Disable factory defense, since the AI doesn't defend itself
-    # properly for these missions (just focuses on the factory
-    # while getting picked off).
-    'L2M135': 0,
-    })
+#Adjust or disable generic missions.
+Disable_generic_missions = True
+if not Disable_generic_missions:
+    #Reduce odds of non-fight missions, or increase odds of fight missions.
+    Adjust_Generic_Missions({
+        #'Trade': 0.3,
+        #'Build': 0.3,
+        #'Think': 0.3,
+        #Reduce dual convoy.
+        'L2M183': 0.5,
+        #Disable sector info, as it is generally useless.
+        'L2M147': 0,
+        #Disable return ship missions, as they are generally impossible
+        # when playing without jump drives, and the temptation to keep
+        # ships is too great. (A shame, since these are fun.)
+        'L2M105': 0,
+        #Disable factory defense, since the AI doesn't defend itself
+        # properly for these missions (just focuses on the factory
+        # while getting picked off).
+        'L2M135': 0,
+        })
+
+else:
+    #Disable generic missions.
+    Adjust_Generic_Missions({
+        'Trade': 0,
+        'Fight': 0,
+        'Build': 0,
+        'Think': 0,
+        })
 
 #####################################################
 #Gates
@@ -194,6 +206,10 @@ if XRM:
             #Can reduce trade ships in general by a bit, if needed.
             #('classification_trader', 2/3),
 
+            #The universe in general has trouble moving energy cells around,
+            # moreso than other goods. Bump the energy transporters.
+            ('Energy', 1.5),
+
             #Reduce privateers from XRM, since they don't work well when standard
             # races are hostile to the player (they can shoot the player ships,
             # but fighting back causes other allied forces to turn on the player
@@ -241,7 +257,7 @@ if XRM:
             'owner_atf', 
             'owner_terran', 
             'owner_goner', 
-            #Allow the hostile races to spawn more freely.
+            #Allow the hostile races to spawn more freely, for now.
             #'owner_xenon', 
             #'owner_khaak', 
             #'owner_yaki', 
@@ -516,8 +532,9 @@ if XRM:
         #Special dict entries will override the above formula.
         #Note: formula will not touch beam, areal, or flak weapons for now.
         bullet_name_adjustment_dict = {
-            #Leave IREs fairly fast.
-            'SS_BULLET_IRE' : 1100 / 2000,
+            #Leave IREs fairly fast. -Removed; above settings are alread
+            # close to 1200.
+            #'SS_BULLET_IRE' : 1100 / 2000,
             },       
         print_changes = True
         )
@@ -531,44 +548,47 @@ if XRM:
     #    'SS_BULLET_MASS': 'Mass Driver Ammunition',
     #    })
 
-    Adjust_Beam_Weapon_Duration(
-        #The excessive amount of capital beam weapons causes issues in xrm,
-        # particularly with anti-missle and anti-fighter effectiveness being
-        # too high.
-        #Making beams last longer will spread their damage out, and against fighters
-        # will mean less time on target, essentially a nerf.
-        #TODO: make duration based on dps, though that would require laser level
-        # analysis rather than just a bullet tweak.
-        bullet_name_adjustment_dict = {
-            #Don't adjust repair lasers or tractor laser.
-            'SS_BULLET_TUG':     (None, 1, None),
-            'SS_BULLET_REPAIR':  (None, 1, None),
-            'SS_BULLET_REPAIR2': (None, 1, None),
-            #Try out a large increase. This may need more tweaks.
-            # 5x was a bit too much; a xenon m2 had trouble killing anything.
-            'default': (None, 4, 4),
-        })
-    
-    
-    Adjust_Beam_Weapon_Width(
-        #Some xrm beams are far too wide, eg. 4x4 when vanilla beams are all 1x1, a
-        # 16x increase in hit area (this mostly affects a Xenon capital weapon).
-        #Also apply a min, since some XRM beams are too narrow, eg. khaak having trouble
-        # hitting because they were reduces from 1x1 to 0.1x0.1.
-        bullet_name_adjustment_dict = {
-            #Capping at 1x1 was maybe too low; a xenon m2 had trouble landing hits
-            # on fighters even when they were right next to it.
-            #Maybe cap at 2x2.
-            #Floor at 0.5x0.5 for now, maybe bring up to 1x1.
-            '*': (0.5, 1, 2),
-        })
+    #-Removed; problematic beam weapons were converted to bullets,
+    # and khaak beams are a bit weak and don't need nerfing.
+    #Adjust_Beam_Weapon_Duration(
+    #    #The excessive amount of capital beam weapons causes issues in xrm,
+    #    # particularly with anti-missle and anti-fighter effectiveness being
+    #    # too high.
+    #    #Making beams last longer will spread their damage out, and against fighters
+    #    # will mean less time on target, essentially a nerf.
+    #    #TODO: make duration based on dps, though that would require laser level
+    #    # analysis rather than just a bullet tweak.
+    #    bullet_name_adjustment_dict = {
+    #        #Don't adjust repair lasers or tractor laser.
+    #        'SS_BULLET_TUG':     (None, 1, None),
+    #        'SS_BULLET_REPAIR':  (None, 1, None),
+    #        'SS_BULLET_REPAIR2': (None, 1, None),
+    #        #Try out a large increase. This may need more tweaks.
+    #        # 5x was a bit too much; a xenon m2 had trouble killing anything.
+    #        'default': (None, 4, 4),
+    #    })
+    #
+    #
+    #Adjust_Beam_Weapon_Width(
+    #    #Some xrm beams are far too wide, eg. 4x4 when vanilla beams are all 1x1, a
+    #    # 16x increase in hit area (this mostly affects a Xenon capital weapon).
+    #    #Also apply a min, since some XRM beams are too narrow, eg. khaak having trouble
+    #    # hitting because they were reduces from 1x1 to 0.1x0.1.
+    #    bullet_name_adjustment_dict = {
+    #        #Capping at 1x1 was maybe too low; a xenon m2 had trouble landing hits
+    #        # on fighters even when they were right next to it.
+    #        #Maybe cap at 2x2.
+    #        #Floor at 0.5x0.5 for now, maybe bring up to 1x1.
+    #        '*': (0.5, 1, 2),
+    #    })
 
     #Scale bullet energy.
     Adjust_Weapon_Energy_Usage(
-        #Vanilla has efficiency around shield_damage = 50x energy for HEPT, up to 100x for PPC.
+        #Vanilla has efficiency around shield_damage = 50x energy for HEPT, 
+        # up to 100x for PPC.
         #XRM is similar for HEPT, but 30x for PPC, a very large nerf.
-        #The scaling equation should seek to rebalance efficiencies around weapon dps, with
-        # both really low and really high dps getting efficiency bonuses.
+        #The scaling equation should seek to rebalance efficiencies around weapon 
+        # dps, with both really low and really high dps getting efficiency bonuses.
         #Alternatively, could up the laser generator on bigger ship classes to power
         # their big weapons, up to around 3x (to bring PPCs in line), which will have
         # the general effect of making ships trade off between high DPS weapons that
@@ -651,6 +671,9 @@ Adjust_Missile_Damage(
 if XRM:
     #XRM gives ships much larger missile loadouts, compounding problems
     # with missile spam.  Apply additional nerfs.
+    #Note: could maybe reduce missile loadouts in the jobs file, as it
+    # may be keyed to the fight skill value. That has a danger of
+    # unknown side effects, though.
     Adjust_Missile_Range(
         #The adjustment factor. Cut in half for now.
         #-Half feels about right in game.
@@ -670,7 +693,7 @@ if XRM:
         #The adjustment factor. -25% felt like too little, -50% is a bit
         # too much; try -35%.
         scaling_factor = 0.65,
-        #If diminishing returns should be used, so that short range
+        #If diminishing returns should be used, so that low speed
         # missiles are less affected.
         use_scaling_equation = True,
         #Set the tuning points.
@@ -745,16 +768,17 @@ if XRM:
     
 
     Adjust_Ship_Pricing(
-        #The XRM costs include eg. a 2-4x upscale on scouts, which combined with scouts being
-        # easier to shoot down (due to laser changes) makes them even more terrible.
-        #The rescale would bring costs in line with vanilla, which had pretty reasonable
-        # prices.
-        #This may only be applied to scouts themselves; other ships are more in line with
-        # their usefulness.
+        #The XRM costs include eg. a 2-4x upscale on scouts, which combined with
+        # scouts being easier to shoot down (due to laser changes) makes them even
+        # more terrible.
+        #The rescale would bring costs in line with vanilla, which had pretty
+        # reasonable prices.
+        #This may only be applied to scouts themselves; other ships are more in 
+        # line with their usefulness.
         adjustment_factors_dict = {
             #A vanilla disco is 0.13x the price of a buster; in xrm this is 0.37x.
-            #Can multiply by 0.35 to roughly bring scout prices in line, but a more conservative
-            # 0.5 should do okay as well.
+            #Can multiply by 0.35 to roughly bring scout prices in line, but 
+            # a more conservative 0.5 should do okay as well.
             'SG_SH_M5': 1/2,
         })
     
@@ -776,6 +800,8 @@ if XRM:
     Add_Ship_Combat_Variants(
         print_variant_count = True
         )
+    #Make these show up in the jobs file, for all ship types.
+    Add_Job_Ship_Variants(jobs_types = ['*'])
 
 
     #Increase laser recharge on corvettes in XRM, which uses TC style low values about
@@ -1058,7 +1084,20 @@ if XRM:
 if XRM:
     #Restore tuning prices such that they have increasing cost again,
     # by just resetting to vanilla pricing.
-    #-Removed; even though the increasing price is odd, the higher
-    # investment feels good in a way.
-    #Restore_Vanilla_Tuning_Pricing()
-    pass
+    #Also, the XRM pricing felt too high in practice, even if vanilla
+    # is too cheap.
+    #Tuning prices in general are just poorly implemented in X3, being
+    # either too high for small ships or too small for big ships, and
+    # are least disruptive if defaulting to being cheap and letting
+    # ship prices be balanced other ways.
+    Restore_Vanilla_Tuning_Pricing()
+
+    #Make the NPC factories produce at the player rate.
+    #-Removed for now; need to consider the side effects on player
+    # factory profitability. There are unfortunate ties between
+    # production rates and credit values, which often varies by
+    # ware type, which can make this not a good idea to do blindly.
+    #Normalize_Player_And_NPC_Production_Rates()
+
+    #Upsize the jumpdrive more, to xxl (4 in xrm).
+    Change_Ware_Size('SS_WARE_WARPING', 4)

@@ -63,6 +63,9 @@ def Make(args):
 
     def Make_Horizontal_Line(include_in_simple = True):
         'Adds a horizontal line, with extra newline before and after.'
+        #TODO: maybe swap to a bunch of dashes, for a better look
+        # in the raw text format. This requires a newline before
+        # the dashes to avoid upscaling prior text.
         this_line = '\n***\n'
         doc_lines.append(this_line)
         if include_in_simple:
@@ -203,6 +206,9 @@ def Make(args):
 
         #Check for the _file_names attribute, attached by the decorator.
         if hasattr(item, '_file_names'):
+            #Skip if the file name starts with an underscore.
+            if item.__name__[0] == '_':
+                continue
             #Record the transform.
             transform_modules_dict[(item.__module__,item.__name__)] = item
             

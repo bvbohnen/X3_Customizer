@@ -1,4 +1,4 @@
-X3 Customizer v2.08
+X3 Customizer v2.09
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -134,9 +134,13 @@ Global Transforms:
 
 Job Transforms:
 
+ * Add_Job_Ship_Variants
+
+      Allows jobs to spawn with a larger selection of variant ships. This does not affect jobs with a preselected ship to spawn, only those with random selection. Variants are added when the basic version of the ship is allowed, to preserve cases where a variant has been preselected.
+
  * Adjust_Job_Count
 
-      Adjusts job counts using a multiplier. These will always have a minimum of 1.
+      Adjusts job ship counts using a multiplier. These will always have a minimum of 1. Jobs are matched by name or an attribute flag, eg. 'owner_pirate'. This will also increase the max number of jobs per sector accordingly.
 
  * Adjust_Job_Respawn_Time
 
@@ -291,6 +295,10 @@ Universe Transforms:
 
 Ware Transforms:
 
+ * Change_Ware_Size
+
+      Change the cargo size of a given ware.
+
  * Restore_Vanilla_Tuning_Pricing
 
       Sets the price for ship tunings (engine, rudder, cargo) to those used in vanilla AP.
@@ -444,3 +452,6 @@ Change Log:
  * 2.08:
    - Added Adjust_Gate_Rings.
    - Removed Swap_Standard_Gates_To_Terran_Gates, which is replaced by an option in the new transform.
+ * 2.09:
+   - Added Add_Job_Ship_Variants.
+   - Added Change_Ware_Size.

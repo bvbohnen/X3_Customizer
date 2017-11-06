@@ -44,7 +44,9 @@ def Adjust_Job_Count(
     job_count_factors = [('*', 1)]
     ):
     '''
-    Adjusts job counts using a multiplier. These will always have a minimum of 1.
+    Adjusts job ship counts using a multiplier. These will always have a minimum of 1.
+    Jobs are matched by name or an attribute flag, eg. 'owner_pirate'.
+    This will also increase the max number of jobs per sector accordingly.
 
     * job_count_factors:
       - List of tuples pairing an identifier key with the adjustment value to apply.
@@ -63,6 +65,9 @@ def Adjust_Job_Count(
 
         #Check for key in the dict, going in order.
         factor = Find_entry_match(this_dict, job_count_factors)
+        #Skip if no entry was found.
+        if factor == None:
+            continue
 
         #Adjust both max jobs and max jobs per sector.
         for entry in ['max_jobs', 'max_jobs_in_sector']:
@@ -102,6 +107,12 @@ def Adjust_Job_Respawn_Time(
         #Multiplier is on the base timer, before the adder is added.
         multiplier = Find_entry_match(this_dict, time_multiplier_list)
         minutes_to_add = Find_entry_match(this_dict, time_adder_list)
+        
+        #Skip if no entry was found for either of these.
+        if multiplier == None:
+            continue
+        if minutes_to_add == None:
+            continue
 
         #Apply adjustment, converting minutes to seconds.
         value = int(this_dict['respawn_time'])
@@ -200,6 +211,105 @@ def Set_Job_Spawn_Locations(
             this_dict['docked_chance'] = str(docked_chance)
 
     return
+
+
+
+@Check_Dependencies('Jobs.txt')
+def Add_Job_Ship_Variants(
+    jobs_types = [],
+    ship_types = [
+        'SG_SH_M1',
+        'SG_SH_M2',
+        'SG_SH_M3',
+        'SG_SH_M4',
+        'SG_SH_M5',
+        'SG_SH_M6',
+        'SG_SH_M7',
+        'SG_SH_M8',
+        'SG_SH_TS',
+        'SG_SH_TP',
+        'SG_SH_TL',
+        ],
+    variant_types = [
+        'vanguard',
+        'sentinel',
+        'raider',
+        'hauler',
+        #Skip miners from defaults; there is generally not a good
+        # reason for the jobs to have mining equipment unless it was
+        # already specified explicitly.
+        #'miner',
+        'tanker',
+        'tanker xl',
+        'super freighter',
+        'super freighter xl',
+        ],
+    ):
+    '''
+    Allows jobs to spawn with a larger selection of variant ships.
+    This does not affect jobs with a preselected ship to spawn, only
+    those with random selection. Variants are added when the basic
+    version of the ship is allowed, to preserve cases where a
+    variant has been preselected.
+    
+    * jobs_types:
+      - List of keys for the jobs to modify.
+      - Key will try to match a boolean field in the jobs file, 
+        (eg. 'owner_argon' or 'classification_trader', see File_Fields
+        for field names), or failing that will try to do a job name match (partial
+        match supported) based on the name in the jobs file.
+      - '*' will match all jobs not otherwise matched.
+    * ship_types:
+      - List of ship types to allow variants for, eg. 'SG_SH_M1'. Note that
+        M0 and TM are not allowed since they do not have flags in the job
+        entries.  Default includes all ship types possible.
+    * variant_types:
+      - List of variant types to allow. Variant names are given as strings. 
+        The default list is: ['vanguard', 'sentinel', 'raider', 'hauler',
+        'super freighter', 'tanker', 'tanker xl', 'super freighter xl'].
+        The 'miner' variant is supported but omitted from the defaults.
+    '''
+    #TODO: maybe limit combat variants when a combat ship type is
+    # being spawned along with a trade ship, eg. when an m3 is used
+    # as a trader, so that it only makes hauler variants.
+
+    #Loop over the jobs.
+    for this_dict in Load_File('Jobs.txt'):
+        if not this_dict['script']:
+            continue
+
+        #Skip if this is not matched to jobs_types.
+        if not Check_for_match(this_dict, jobs_types):
+            continue
+
+        #Skip if this has a preselected ship.
+        if this_dict['ship_type_name'] != '-1':
+            continue
+        
+        #Skip if the basic variant now allowed.
+        if this_dict['variant_basic'] != '1':
+            continue
+
+        #Check if any of the allowed ship types are among those to
+        # allow variants for. If not, skip.
+        if not any(this_dict[x] == '1' for x in ship_types):
+            continue
+
+        #Can now flip on the variant flags requested.
+        for variant_name in variant_types:
+            #Match the variant name to the corresponding flag, with
+            # underscores for spaces.
+            flag_name = 'variant_{}'.format('_'.join(variant_name.split()))
+            #Set this flag.
+            this_dict[flag_name] = '1'
+
+        #Display/announce the variant in the name if the ship type is
+        # being included in the name.
+        if this_dict['show_ship_type'] == '1':
+            this_dict['show_variant'] = '1'
+
+    return
+
 
 
 def Find_entry_match(job_dict, entry_list):

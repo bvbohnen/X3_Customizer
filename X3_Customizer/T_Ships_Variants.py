@@ -247,6 +247,11 @@ def Add_Ship_Variants(
             16,
             19
             ],
+        shield_conversion_ratios = {
+            'shield_power': 1, 
+            'weapon_energy': 1, 
+            'weapon_recharge_factor': 1
+            },
         include_advanced_ships = True,
         add_mining_equipment = True,
         print_variant_modifiers = False,
@@ -315,6 +320,20 @@ def Add_Ship_Variants(
         may be switched to a base Hyperion, from which vanguard and other
         variants are made. Default list includes 16 (redundant vanguard)
         and 19 (redundant hauler).
+    * shield_conversion_ratios:
+      - Dict of floats, keyed by ship attribute strings. When shielding
+        cannot be adjusted accurately due to the X3 shielding system,
+        this gives the rate at which shield adjustment error is converted
+        to other ship attributes. Eg. if a ship is supposed to receive a
+        5% shield boost that cannot be given, and this dict has en
+        entry with {'shield_power':1}, then an extra 5% boost will be
+        given to the shield power generator instead.
+        By default, shield error will convert using {'shield_power': 1, 
+        'weapon_energy': 1, 'weapon_recharge_factor': 1}.
+        Possible entries include: ['yaw','pitch','roll','speed','acceleration',
+        'shield_power','weapon_energy','weapon_recharge_factor','cargo',
+        'hull_strength','angular_acceleration','price']. Price should generally
+        have a negative multiplier.
     * add_mining_equipment:
       - Bool, if True mining equipment will be added to Miner variants. 
         Default True.
@@ -603,8 +622,8 @@ def Add_Ship_Variants(
         'angular_acceleration',
         #Both values should be the same, but easier to modify separately
         # to avoid a special case.
-        'production_value_npc',
-        'production_value_player',
+        'relative_value_npc',
+        'relative_value_player',
         #Shielding will be a special case, relying on both
         # shield_type and max_shields.
         'shielding',
@@ -612,6 +631,16 @@ def Add_Ship_Variants(
         #Without reducing this, tankers are overpowered a bit.
         'cargo_size',
         ]
+
+    #For ease later, ensure the shield_conversion_ratios entries map to
+    # the fields 1:1.  Most of them will map, but a couple were simplified
+    # for user input.
+    if 'cargo' in shield_conversion_ratios:
+        shield_conversion_ratios['cargo_min'] = shield_conversion_ratios['cargo']
+        shield_conversion_ratios['cargo_max'] = shield_conversion_ratios['cargo']
+    if 'price' in shield_conversion_ratios:
+        shield_conversion_ratios['relative_value_npc'] = shield_conversion_ratios['price']
+        shield_conversion_ratios['relative_value_player'] = shield_conversion_ratios['price']
 
     
     #Can now gather the variation statistics.
@@ -703,7 +732,7 @@ def Add_Ship_Variants(
                     #-Removed; equipment is not part of base cost, so no special
                     # adjustment needed here for miners.
                     ##Special handling on value/cost, if this is a miner.
-                    #elif (field in ['production_value_npc', 'production_value_player']
+                    #elif (field in ['relative_value_npc', 'relative_value_player']
                     #and variant_type == 'miner'):
                     #    #Get the normal values.
                     #    basic_value   = int(basic_dict[field])
@@ -770,7 +799,7 @@ def Add_Ship_Variants(
             for field, ratio_list in field_ratios_list_dict.items():
 
                 #Special case: allow price outliers.
-                if field == 'price':
+                if field in ['relative_value_npc', 'relative_value_player']:
                     continue
 
                 for ratio_index, ratio in enumerate(ratio_list):
@@ -1104,38 +1133,46 @@ def Add_Ship_Variants(
                 # targetted value.
                 #To avoid a ship with a too-high shield being too strong,
                 # or a too-low shield being too weak, can rescale the ship
-                # speed value based on the error here.
-                #Eg. and overshielded raider will lose some of its speed
-                # boost.
+                # attributes based on the error here.
+
                 #Calculate the actual ratio applied to shielding.
                 actual_ratio = best_size * best_slots / start_value
+                #Calculate the error, as the amount of desired shield change
+                # that was not applied.
+                #Eg. if 1.15 was desired, and 1.10 was applied, this will
+                # be 0.05.  This is negative in overshoot cases.
+                shield_ratio_error = ratio - actual_ratio
                 
-                #If this ratio is too high, the ship is overshielded and
-                # needs a speed reduction.
-                #If this ratio is too low, the ship is undershielded and
-                # needs a speed buff.
-                #In either case, the speed adjustment will not match the
-                # shielding error, since shield does not transfer 1:1 to
-                # speed.
-                #The best approach is maybe to apply the ratio of ratios
-                # to the speed ratio used elsewhere.
-                # For instance, if only half the shield adjustment were
-                # applied, then only half the speed adjustment should be
-                # applied.
-                #Eg. if the shield was supposed to be -20%, and was actually
-                # -15%, it has a (1-.85)/(1-.8) = .75 factor on this adjustment,
-                # and can apply a .75 factor to the speed % change; if the
-                # speed ratio was 1.1, it would become ((1.1-1)*.75)+1 = 1.075.
-                #Does this also work for the increased-shield case?
-                # Eg. +15% applied of +20%: (1-1.15)/(1-1.2) = .75 still.
-                # It should be fine in both cases.
-                #Calculate the shield part of it here, speed part of it later.
-                #Also do an error check if ratio == 1 (and avoid /0 error).
-                if ratio == 1:
-                    assert actual_ratio == 1
-                    amount_of_shield_ratio_applied = 1
-                else:
-                    amount_of_shield_ratio_applied = (1-actual_ratio) / (1-ratio)
+                #-Removed; no longer map to speed directly like this, since
+                # it doesn't work well when small shield adjustments cause
+                # large speed corrections. Instead use an input arg with
+                # direct percent mappings.
+                ##If this ratio is too high, the ship is overshielded and
+                ## needs a speed reduction.
+                ##If this ratio is too low, the ship is undershielded and
+                ## needs a speed buff.
+                ##In either case, the speed adjustment will not match the
+                ## shielding error, since shield does not transfer 1:1 to
+                ## speed.
+                ##The best approach is maybe to apply the ratio of ratios
+                ## to the speed ratio used elsewhere.
+                ## For instance, if only half the shield adjustment were
+                ## applied, then only half the speed adjustment should be
+                ## applied.
+                ##Eg. if the shield was supposed to be -20%, and was actually
+                ## -15%, it has a (1-.85)/(1-.8) = .75 factor on this adjustment,
+                ## and can apply a .75 factor to the speed % change; if the
+                ## speed ratio was 1.1, it would become ((1.1-1)*.75)+1 = 1.075.
+                ##Does this also work for the increased-shield case?
+                ## Eg. +15% applied of +20%: (1-1.15)/(1-1.2) = .75 still.
+                ## It should be fine in both cases.
+                ##Calculate the shield part of it here, speed part of it later.
+                ##Also do an error check if ratio == 1 (and avoid /0 error).
+                #if ratio == 1:
+                #    assert actual_ratio == 1
+                #    amount_of_shield_ratio_applied = 1
+                #else:
+                #    amount_of_shield_ratio_applied = (1-actual_ratio) / (1-ratio)
 
 
             #Loop over the modifiers.
@@ -1149,17 +1186,24 @@ def Add_Ship_Variants(
                 try:
                     value = int(new_ship_dict[field])
 
-                    #If this is speed/acceleration, handle it specially.
-                    if field in ['speed','acceleration']:
-                        #Determine how much of the ratio to apply.
-                        #Basically, take difference from 1, scale that diff
-                        # by how much of the shield diff was applied, and
-                        # then add back the 1.
-                        actual_ratio = (ratio -1) * amount_of_shield_ratio_applied +1
-                        value *= actual_ratio
+                    #Do any adjustment based on shield_conversion_ratios if there
+                    # was innaccuracy in the shield adjustment.
+                    if field in shield_conversion_ratios:
+                        #Add the ratio error, at some conversion rate.
+                        ratio += shield_ratio_error * shield_conversion_ratios[field]
+
+                    #-Removed; speed no longer scaled directly by shield error.
+                    ##If this is speed/acceleration, handle it specially.
+                    #if field in ['speed','acceleration']:
+                    #    #Determine how much of the ratio to apply.
+                    #    #Basically, take difference from 1, scale that diff
+                    #    # by how much of the shield diff was applied, and
+                    #    # then add back the 1.
+                    #    actual_ratio = (ratio -1) * amount_of_shield_ratio_applied +1
+                    #    value *= actual_ratio
 
                     #Support an additional scaling on price.
-                    elif field in ['production_value_npc','production_value_player']:
+                    if field in ['relative_value_npc','relative_value_player']:
                         value *= ratio * price_multiplier
 
                     else:
@@ -1171,8 +1215,10 @@ def Add_Ship_Variants(
                     #Cargo is probably the most important to refine right
                     # now, and maybe hull; others can be tweaked later.
                     if field in ['cargo_min','cargo_max']:
+                        #Since some adjustments are small percentages,
+                        # don't want to over-round here.
                         if value > 10000:
-                            value = math.ceil(value/1000)*1000
+                            value = math.ceil(value/500)*500
                         elif value > 1000:
                             #Nearest 50 is common for cargo.
                             value = math.ceil(value/50)*50

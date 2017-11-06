@@ -3,15 +3,6 @@ Edits to the ware lists.
 '''
 from File_Manager import *
 
-#TODO:
-#Transform to set relative value the same for player and npcs, essentially
-# to remove the player factory advantage.
-#Can either set player to npc (player factories less efficient, and throws
-# off existing complex calculators), or set npc to player (better npc
-# factories; less penalty allowing npcs to build weapons to them purchase).
-#Go with the latter. This will impact many ware files, as well as lasers,
-# missiles, maybe some others.
-
 
 #In XRM, ship tuning pricing starts at a high value on the first tuning, then 
 # counts down.
@@ -101,6 +92,123 @@ def Set_Ware_Pricing(
                 value *= name_price_factor_dict[this_dict['name']]
                 this_dict[field] = str(int(value))
 
+    return
+
+#Transform to set relative value the same for player and npcs, essentially
+# to remove the player factory advantage.
+#Can either set player to npc (player factories less efficient, and throws
+# off existing complex calculators), or set npc to player (better npc
+# factories; less penalty allowing npcs to build weapons to them purchase).
+#Go with the latter. This will impact many ware files, as well as lasers,
+# missiles, maybe some others.
+#TODO: rethink this; weed/booze are easier for player to produce, but
+# lasers/etc. are often harder.  Want to consider in more detail what
+# side effects may be for changing this, and update the description
+# to be more accurate.
+# Could maybe tune these adjustments based on the value:credit ratio
+# of the ware type, in some smart way, to ensure factories are still
+# profitable.
+#At the moment, it looks like the only way this would work well is if
+# the value:credit ratios could be normalized somehow,
+# since the player/npc production rate differences are
+# often driven by value ratio differences (eg. missiles have half
+# the ratio of lasers, and players produce missiles twice as fast
+# as npcs).
+#-Removing transform for now; it doesn't seem the problems are solvable
+# when value:credit ratios are hardcoded.
+#@Check_Dependencies('TWareT.txt', 'TWareF.txt', 'TWareB.txt', 
+#                    'TLaser.txt', 'TShields.txt', 'TMissiles.txt')
+#def Normalize_Player_And_NPC_Production_Rates(
+#    match_player_to_npc = False
+#    ):
+#    '''
+#    Edits wares to ensure the NPC and player production rates are
+#    matched. This is an experimental transform, while side effects
+#    are worked out.
+#
+#    * match_player_to_npc:
+#      - If True, the player production rate is matched to the
+#        NPC rate. If False (default), the NPC rate is matched
+#        to the player rate.
+#    '''
+#    #Loop over the files that have been observed to have pricing
+#    # differences.
+#    for file_name in ['TWareT.txt', 'TWareF.txt', 'TWareB.txt', 
+#                    'TLaser.txt', 'TShields.txt', 'TMissiles.txt']:
+#        #Loop over the wares.
+#        for this_dict in Load_File(file_name):
+#            #Set one to the other, depending on the input arg.
+#            #If these are already matched, this will change nothing.
+#            if match_player_to_npc:
+#                this_dict['relative_value_player'] = this_dict['relative_value_npc']
+#            else:
+#                this_dict['relative_value_npc'] = this_dict['relative_value_player']
+#
+#    return
+
+#Quick dummy transform, to help the File_Manager recognize these as files
+# that may be changed.
+@Check_Dependencies('TWareT.txt', 'TLaser.txt', 'TShields.txt',
+                          'TMissiles.txt', 'TFactories.txt', 'TDocks.txt',
+                          'TWareF.txt', 'TWareB.txt', 'TWareE.txt',
+                           'TWareM.txt',  'TWareN.txt')
+def _dummy():
+    return
+
+#No predetermined dependency on this one; check it live.
+@Check_Dependencies()
+def Change_Ware_Size(
+    ware_name = None,
+    new_size = None,
+    ware_file = None):
+    '''
+    Change the cargo size of a given ware.
+
+    * ware_name:
+      - String, the name of the ware, eg. 'SS_WARE_WARPING' for jumpdrive.
+        This may include lasers, factories, etc.
+    * new_size:
+      - Integer for the ware size. Exact meaning of the integers depends on
+        any mods in use. In vanilla AP, 1-5 are small through ST. In XRM,
+        0-5 are small through ST, where 4 is XXL.
+    * ware_file:
+      - Optional string to help identify the ware file to look in, eg. 'TWareT'
+        or 'TLaser'.
+        If not given, ware files will be searched in order, skipping those not
+        found in the source folder.
+    '''
+    #Get the ware files to search.
+    if ware_file == None:
+        #Try everything, but in rough order of expected need to search.
+        ware_file_list = ['TWareT.txt', 'TLaser.txt', 'TShields.txt',
+                          'TMissiles.txt', 'TFactories.txt', 'TDocks.txt',
+                          'TWareF.txt', 'TWareB.txt', 'TWareE.txt',
+                           'TWareM.txt',  'TWareN.txt', ]
+    else:
+        #Pack in a list to match formatting, with a txt suffix.
+        ware_file_list = [ware_file + '.txt']
+
+    #Loop over the file  names.
+    for file_name in ware_file_list:
+
+        #Try to load it; skip if not found.
+        line_dict_list = Load_File(file_name)
+        if line_dict_list == None:
+            continue
+
+        #Loop over the wares.
+        for this_dict in line_dict_list:
+            #Search for a name match.
+            if this_dict['name'] == ware_name:
+
+                #Apply the change and return.
+                this_dict['cargo_size'] = str(new_size)
+                return
+
+    #If here, the ware wasn't found.
+    print('Change_Ware_Size error: ware {}'
+         ' not found in searched files.'.format(ware_name))
+    return
 
     
 def Get_Ware_Cost(ware_list):

@@ -145,15 +145,28 @@ T_file_name_field_dict_dict = {
         },
     'TLaser.txt' : {
         'min_data_entries': 5,
+        0 : 'model_file',   #Int
+        1 : 'picture_id',   #Int
         2 : 'rotation_x',     #rpm = 60 * this value. May be turret rpm.
         3 : 'rotation_y',
         4 : 'rotation_z',    #Appears to be 0 normally.
+        5 : 'subtype',    #String, eg. 'SG_LASER_IRE'
+        6 : 'name_id',    #Int
         7 : 'fire_delay', #In milliseconds
+        8 : 'sound',      #Int
         9 : 'bullet',     #Integer index in tbullets of the bullet to create
         10 : 'max_energy', #Energy stored in weapon at 100% charge
         11 : 'charge_rate', #Rate the weapon charges up
-        14 : 'production_value_npc',
-        18 : 'production_value_player',
+        12 : 'icon',      #String, eg. 'ICON_LASER_IRE'
+        13 : 'volume',    #Int
+        14 : 'relative_value_npc',
+        15 : 'price_modifier_1',
+        16 : 'price_modifier_2',
+        17 : 'cargo_size',
+        18 : 'relative_value_player',
+        19 : 'minimum_notoriety',
+        20 : 'video_id',
+        21 : 'skin_index',
         -2 : 'name', #Name is 'SS_LASER_'+suffix
         },
     'TMissiles.txt' : {
@@ -186,9 +199,14 @@ T_file_name_field_dict_dict = {
         25 : 'icon',          #String, name of the icon to use.
         26 : 'scene',         #String, a scene file name.
         27 : 'volume',
-        28 : 'relative_value',   #Int, production time/ratio, seconds.
-        29 : 'price_modifier_1', #Int, percent primary resource price variation.
-        30 : 'price_modifier_2', #Int, percent secondary resource price variation.
+        28 : 'relative_value_npc',
+        29 : 'price_modifier_1',
+        30 : 'price_modifier_2',
+        31 : 'cargo_size',
+        32 : 'relative_value_player',
+        33 : 'minimum_notoriety',
+        34 : 'video_id',
+        35 : 'skin_index',
         -2 : 'name',
         },
     'TShips.txt' : {
@@ -226,22 +244,54 @@ T_file_name_field_dict_dict = {
         49 : 'particle_effect', #Integer, corresponds to particles3 file?, engine trail
         50 : 'variation_index', #Int, the variation type of the ship, eg. 1 for vanguard.
         51 : 'angular_acceleration',
-        #Production values are a little unclear.
-        #Often these are set to the same number.
-        #Ship price appears to be roughly 81 * production_value_npc in sampling,
-        # but may depend on other fields to determine this.
-        -10: 'production_value_npc',
-        -6 : 'production_value_player',
+        -10: 'relative_value_npc',
+        -6 : 'relative_value_player',
         #Name is the last field before the newline.
         -2 : 'name',
         },
     'TShields.txt': {
         'min_data_entries': 5,
         0 : 'model_file',  #Int.
+        1 : 'picture_id',
+        2 : 'rotation_x',  #Always 0.
+        3 : 'rotation_y',
+        4 : 'rotation_z',
         5 : 'subtype',  #Int, appears to go from 0 for 1MJ to 5 for 2GJ.
+        6 : 'name_id',    #Int
         7 : 'power_drain', #Int, the power draw of the shield, in kW. eg. 33 to 2500.
         8 : 'capacity', #Int, the size of the shield in kW, eg. 1000 for 1MJ.
+        9 : 'hit_effect', #Int, always 1.
         10: 'efficiency', #Float, recharge efficiency of the shield, eg. 0.85.
+        11 : 'volume',
+        12 : 'relative_value_npc',
+        13 : 'price_modifier_1',
+        14 : 'price_modifier_2',
+        15 : 'cargo_size',
+        16 : 'relative_value_player',
+        17 : 'minimum_notoriety',
+        18 : 'video_id',
+        19 : 'skin_index',
+        -2: 'name',
+        },
+    #Catchall for the TWare files; individual links filled in further below.
+    'TWare_.txt':{
+        'min_data_entries': 5,
+        0  : 'model_file',  #Int.
+        1  : 'picture_id',
+        2  : 'rotation_x',  #Always 0.
+        3  : 'rotation_y',
+        4  : 'rotation_z',
+        5  : 'subtype',    #Int, varies, but not sure on meaning.
+        6  : 'name_id',    #Int
+        7  : 'volume',
+        8  : 'relative_value_npc',    #Int, production time/ratio, seconds.
+        9  : 'price_modifier_1',      #Int, percent primary resource price variation.
+        10 : 'price_modifier_2',      #Int, percent secondary resource price variation.
+        11 : 'cargo_size',
+        12 : 'relative_value_player', #Int, production time/ratio, seconds.
+        13 : 'minimum_notoriety',
+        14 : 'video_id',
+        15 : 'skin_index',
         -2: 'name',
         },
     'TGates.txt' : {
@@ -269,15 +319,6 @@ T_file_name_field_dict_dict = {
         24: 'fadeout_start', #Integer, in 1/500 meters (divide by 500 for meters), distance fade begins
         25: 'fadeout_end',   #Integer, in 1/500 meters, distance fade ends (past this, invisible)
         26: 'num_particles', #Integer, 0 or 100 seen, may be particles outside ship window
-        -2: 'name',
-        },
-    'TWareT.txt':{
-        'min_data_entries': 5,
-        7 : 'volume',
-        8 : 'relative_value_npc',    #Int, production time/ratio, seconds..
-        9 : 'price_modifier_1',      #Int, percent primary resource price variation.
-        10: 'price_modifier_2',      #Int, percent secondary resource price variation.
-        12: 'relative_value_player', #Int, production time/ratio, seconds..
         -2: 'name',
         },
     'WareLists.txt':{
@@ -319,7 +360,30 @@ T_file_name_field_dict_dict = {
         4 : 'script',               #String
         5 : 'script_config',        #String
         6 : 'name_id',              #Integer; the in-game displayed name.
+        #Int; if not 0, the override name to use.
+        # Unclear on relation to name_id.
+        8 : 'override_name',       
+        #These fields affect display and announcement name, being
+        # prefixed or suffixed to the name_id text/voice.
+        9 : 'show_race',           #0 or 1; for display name in game.
+        10: 'show_corperation',    #0 or 1; for display name in game.
+        11: 'show_ship_type',      #0 or 1; for display name in game.
+        12: 'show_variant',        #0 or 1; for display name in game.
         17: 'respawn_time',        #Integer, appears to be in seconds.
+        18: 'ship_type_name',  #String, optional name of ship to spawn. -1 if unused.
+        #Ship types to allow, given as standard type name for coding convenience.
+        19: 'SG_SH_M1', #0 or 1
+        20: 'SG_SH_M2', #0 or 1
+        21: 'SG_SH_M3', #0 or 1
+        22: 'SG_SH_M4', #0 or 1
+        23: 'SG_SH_M5', #0 or 1
+        24: 'SG_SH_M6', #0 or 1
+        25: 'SG_SH_M7', #0 or 1
+        26: 'SG_SH_M8', #0 or 1
+        27: 'SG_SH_TP', #0 or 1
+        28: 'SG_SH_TS', #0 or 1
+        29: 'SG_SH_TL', #0 or 1
+        30: 'special_tl_ts_flag', #0 or 1, unknown use.
         31: 'manufacturer_argon',  #0 or 1; probably used in ship selection.
         32: 'manufacturer_boron', 
         33: 'manufacturer_split', 
@@ -333,22 +397,22 @@ T_file_name_field_dict_dict = {
         41: 'manufacturer_terran', 
         42: 'manufacturer_yaki', 
         43: 'variant_basic',       #0 or 1
-        43: 'variant_vanguard',
-        43: 'variant_sentinel',
-        43: 'variant_raider',
-        43: 'variant_hauler',
-        43: 'variant_miner',
-        43: 'variant_super_freighter',
-        43: 'variant_tanker',
-        43: 'variant_mk1',
-        43: 'variant_9',
-        43: 'variant_10',
-        43: 'variant_11',
-        43: 'variant_12',
-        43: 'variant_13',
-        43: 'variant_tanker_xl',
-        43: 'variant_super_freighter_xl',
-        43: 'variant_advanced',
+        44: 'variant_vanguard',
+        45: 'variant_sentinel',
+        46: 'variant_raider',
+        47: 'variant_hauler',
+        48: 'variant_miner',
+        49: 'variant_super_freighter',
+        50: 'variant_tanker',
+        51: 'variant_mk1',
+        52: 'variant_9',
+        53: 'variant_10',
+        54: 'variant_11',
+        55: 'variant_12',
+        56: 'variant_13',
+        57: 'variant_tanker_xl',
+        58: 'variant_super_freighter_xl',
+        59: 'variant_advanced',
         #Hue/saturation are generally -1, sometimes 0, and may be unused.
         #The spray shop supports 0-360 hue, -256 to 256 saturation.
         #Could consider playing with this at some point, maybe randomizing,
@@ -406,6 +470,17 @@ T_file_name_field_dict_dict = {
         },
 }
 
+#Fill in the TWare file entries.
+for tware_name in [
+    'TWareB.txt',
+    'TWareE.txt',
+    'TWareF.txt',
+    'TWareM.txt',
+    'TWareN.txt',
+    'TWareT.txt',
+    ]:
+    T_file_name_field_dict_dict[tware_name] = T_file_name_field_dict_dict['TWare_.txt']
+    
 #Build an ap-specific dict for the jobs file, with inserted lines.
 for tc_line_number, field in T_file_name_field_dict_dict['Jobs.txt'].items():
     #Skip special entries.

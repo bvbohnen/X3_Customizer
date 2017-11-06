@@ -178,9 +178,10 @@ def Adjust_Missile_Damage(
                 this_dict['volume'] = str(int(new_volume))
                 
             if adjust_price:
-                value = int(this_dict['relative_value'])
-                new_value = max(1, value * new_damage_round / damage)
-                this_dict['relative_value'] = str(int(new_value))
+                for field in ['relative_value_npc', 'relative_value_player']:
+                    value = int(this_dict[field])
+                    new_value = max(1, value * new_damage_round / damage)
+                    this_dict[field] = str(int(new_value))
 
 
         #Debug printout.

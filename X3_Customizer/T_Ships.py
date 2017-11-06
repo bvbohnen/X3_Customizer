@@ -186,7 +186,7 @@ def Adjust_Ship_Pricing(
     for this_dict in Load_File('TShips.txt'):
         if this_dict['subtype'] in adjustment_factors_dict or scaling_factor != 1:
             #Apply change to both npc and player costs.
-            for field in ['production_value_npc', 'production_value_player']:
+            for field in ['relative_value_npc', 'relative_value_player']:
                 value = int(this_dict[field])
 
                 #Pick the table scaling factor, or the default.
@@ -330,10 +330,10 @@ def Fix_Pericles_Pricing():
         if this_dict['name'] == 'SS_SH_P_M4_ENH':
             #Verify the bug is in place, with mismatched pricing.
             #If this was already fixed in the source file, skip this step.
-            npc_price    = int(this_dict['production_value_npc'])
-            player_price = int(this_dict['production_value_player'])
+            npc_price    = int(this_dict['relative_value_npc'])
+            player_price = int(this_dict['relative_value_player'])
             if npc_price < player_price:
-                this_dict['production_value_npc'] = this_dict['production_value_player']
+                this_dict['relative_value_npc'] = this_dict['relative_value_player']
             break
 
        
