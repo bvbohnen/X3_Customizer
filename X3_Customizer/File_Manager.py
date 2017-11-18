@@ -265,6 +265,10 @@ def Check_Dependencies(*file_names, category = None):
 
             #Note this transform as being seen.
             Transforms_names_run.add(func.__name__)
+            
+            #On the first call, do some extra setup.
+            if First_call:
+                Init()
 
             #Loop over the required files.
             for file_name in func._file_names:
@@ -341,9 +345,6 @@ def Load_File(file_name, return_t_file = False, error_if_not_found = True):
     If return_t_file == True, returns the T_File object instead of just
     the trimmed dict of data lines.
     '''
-    #On the first call, do some extra setup.
-    if First_call:
-        Init()
 
     #If the file is not loaded, handle loading.
     if file_name not in File_dict:

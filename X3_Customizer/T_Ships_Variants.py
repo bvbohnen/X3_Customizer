@@ -12,7 +12,7 @@ from collections import defaultdict
 import copy
 from T_Ships import *
 from T_Wares import *
-
+from T_Scripts import *
 
 '''
 Notes on adding new ship variants:
@@ -267,7 +267,7 @@ def Add_Ship_Variants(
     with Hauler being considered both a combat variant.
     After variants are created, a script may be manually run in game from the
     script editor which will add variants to all shipyards that sell the base
-    ship. Run 'a.x3customizer.add.variants.to.shipyards.xml', no input args.
+    ship. Run 'x3customizer.add.variants.to.shipyards.xml', no input args.
     Note: this will add all stock variants as well, as it currently has no
     way to distinguish the new ships from existing ones.
     Warning: it is unsafe to remove variants once they have been added to
@@ -348,27 +348,29 @@ def Add_Ship_Variants(
       - If True  the calculated attributes used for variants will be printed
         to the summary file, given as multipliers on base attributes.
     '''
-    if prepatch_ship_variant_inconsistencies:
-        #Include the xrm fixes as well, by default.
-        Patch_Ship_Variant_Inconsistencies(include_xrm_fixes = True)
 
     #To add the variants to shipyards in game, a script has been set
     # up for running from the game script editor.
-    #Copy the script to the scripts directory, to make it available.
-    #Do this here to share the path with cleanup, which runs early.
-    import shutil
-    dest_path = os.path.join('scripts','a.x3customizer.add.variants.to.shipyards.xml')
-    #The file is present here in scripts, so can reuse the dest_path.
-    this_dir = os.path.normpath(os.path.dirname(__file__))
-    source_path = os.path.join(this_dir, dest_path)
-    shutil.copy(source_path, dest_path)
-    
-    #If in cleanup mode, check for the file and delete it if found.
+    script_name = 'x3customizer.add.variants.to.shipyards.xml'
+    # Remove it if needed.
     if _cleanup:
-        if os.path.exists(dest_path):
-            os.remove(dest_path)
+        Add_Script(script_name, remove = True)
         return
+    # Otherwise add it, overwriting any old one.
+    Add_Script(script_name)
     
+    # If an older script name is present, clean it out.
+    # This is not a big deal; can leave it in place for a version or two,
+    # then remove it.
+    old_script_name = 'a.x3customizer.add.variants.to.shipyards.xml'
+    Add_Script(old_script_name, remove = True)
+
+
+    # Fix some tships inconsistencies with variant numbers, if needed.
+    if prepatch_ship_variant_inconsistencies:
+        #Include the xrm fixes as well, by default.
+        Patch_Ship_Variant_Inconsistencies(include_xrm_fixes = True)
+            
     
     #Make an empty blacklist list if needed.
     if blacklist == None:
@@ -1571,3 +1573,7 @@ Testing:
     In general, it is working well, though had some oddities.
         
 '''
+
+#TODO: method to disable variants no longer wanted, but are present
+# in a save game and cannot be safely removed, since ship identifiers
+# tend to be based on line number in tships.

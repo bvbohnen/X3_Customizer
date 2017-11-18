@@ -157,8 +157,10 @@ def Make(args):
             Add_Lines('{}Requires: {}'
                         .format(
                              indent * (indent_level + 1),
-                             #Join the required file names with commas.
-                             ', '.join(function._file_names)),
+                             #Join the required file names with commas if
+                             # there are any, else print None.
+                             ', '.join(function._file_names) 
+                              if function._file_names else 'None'),
                          indent_level +1,
                          include_in_simple = False
                          )

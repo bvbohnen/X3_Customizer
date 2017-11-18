@@ -125,7 +125,7 @@ elif XRM:
     pass
     #Swap_Standard_Gates_To_Terran_Gates()
     Adjust_Gate_Rings(
-        standard_ring_option = 'use_reversed_hub',
+        standard_ring_option = 'use_plain_ring',
         hub_ring_option = 'use_reversed_hub',
         #Tried out some other options; they appear to work fine.
         #standard_ring_option = 'rotate_45',
@@ -1099,5 +1099,21 @@ if XRM:
     # ware type, which can make this not a good idea to do blindly.
     #Normalize_Player_And_NPC_Production_Rates()
 
-    #Upsize the jumpdrive more, to xxl (4 in xrm).
-    Change_Ware_Size('SS_WARE_WARPING', 4)
+    #Upsize the jumpdrive more, to xxl (4 in xrm), or maybe
+    # to tc (5). Aim is to stop npc military ships from jumping
+    # as much.
+    Change_Ware_Size('SS_WARE_WARPING', 5)
+
+
+    
+#####################################################
+# Scripts.
+
+# Allow Attack to be used for group Attack Nearest on player ships.
+Convert_Attack_To_Attack_Nearest()
+
+if Vanilla:
+    # Stop infinite hostile spawns in war sectors when the player has
+    # ships there but is not present.
+    Disable_OOS_War_Sector_Spawns()
+

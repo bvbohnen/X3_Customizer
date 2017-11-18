@@ -286,7 +286,7 @@ def Add_Job_Ship_Variants(
         if this_dict['ship_type_name'] != '-1':
             continue
         
-        #Skip if the basic variant now allowed.
+        #Skip if the basic variant not allowed.
         if this_dict['variant_basic'] != '1':
             continue
 

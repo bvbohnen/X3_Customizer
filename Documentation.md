@@ -1,4 +1,4 @@
-X3 Customizer v2.09
+X3 Customizer v2.10
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -219,15 +219,16 @@ Gate Transforms:
   
       * standard_ring_option:
         - String, one of the following options to be applied to the standard gates.
+          - 'use_plain_ring': Replaces the gate ring with a plain version lacking projecting pylons on either side. Default.
           - 'use_reversed_hub': Replaces the gate ring with the Hub ring reversed 180 degrees, resulting in pylons only being on the back side.
           - 'rotate_45': Rotates the gate 45 degrees, offsetting the pylons to be in corners.
           - 'rotate_90': Rotates the gate 90 degrees, offsetting the pylons to be at the top and bottom.
           - 'remove': Removes the gate ring entirely, leaving only a portal. This will not affect disabled gates.
           - 'use_terran': Replaces the gate ring with the Terran gate from the Aldrin expansion plot.
-          - None: default, no change.
+          - None: no change.
       * hub_ring_option:
-        - String, one of the options for standard_ring_option, along with a new option:
-          - 'use_standard_ring_option': The Hub ring will match the option used for the standard ring, including Hub ring reversal. Default.
+        - String, one of the options for standard_ring_option, defaulting to 'use_reversed_hub', along with a new option:
+          - 'use_standard_ring_option': The Hub ring will match the option used for the standard ring.
       
 
 
@@ -323,7 +324,7 @@ Job Transforms:
       * ship_types:
         - List of ship types to allow variants for, eg. 'SG_SH_M1'. Note that M0 and TM are not allowed since they do not have flags in the job entries.  Default includes all ship types possible.
       * variant_types:
-        - List of variant types to allow. Variant names are given as strings. The default list is: ['vanguard', 'sentinel', 'raider', 'hauler', 'super freighter', 'tanker', 'tanker xl', 'super freighter xl'] The 'miner' variant is supported but omitted from the defaults.
+        - List of variant types to allow. Variant names are given as strings. The default list is: ['vanguard', 'sentinel', 'raider', 'hauler', 'super freighter', 'tanker', 'tanker xl', 'super freighter xl']. The 'miner' variant is supported but omitted from the defaults.
       
 
  * Adjust_Job_Count
@@ -508,6 +509,37 @@ Missile Transforms:
 
 ***
 
+Script Transforms:
+
+ * Add_Script
+
+    Requires: None
+
+      Add a script to the addon/scripts folder. If an existing xml version of the script already exists, it is overwritten. If an existing pck version of the script already exists, it is renamed with suffix '.x3c.bak'.
+  
+      * script_name:
+        - String, the name of the script to add. This should be present in the /scripts directory of this program. The name does not need to include the '.xml' suffix, though it may.
+      * remove:
+        - Bool, if True then instead of adding the given script, it will be removed if present from a prior transform, and any backed up pck version will be restored.
+      
+
+ * Convert_Attack_To_Attack_Nearest
+
+    Requires: None
+
+      Modifies the Attack command when used on an owned asset to instead enact Attack Nearest. In vanilla AP, such attack commands are quietly ignored. Intended for use when commanding groups, where Attack is available but Attack Nearest is not. This replaces '!ship.cmd.attack.std'.
+      
+
+ * Disable_OOS_War_Sector_Spawns
+
+    Requires: None
+
+      Disables spawning of dedicated ships in the AP war sectors which attack player assets when the player is out-of-sector. By default, these ships scale up with player assets, and immediately respawn upon being killed. This replaces '!fight.war.protectsector'.
+      
+
+
+***
+
 Shield Transforms:
 
  * Adjust_Shield_Regen
@@ -565,7 +597,7 @@ Ship Transforms:
 
     Requires: TShips.txt, WareLists.txt, TWareT.txt
 
-      Adds variants for various ships. Variant attribute modifiers are based on the average differences between existing variants and their basic ship, where only M3,M4,M5 are analyzed for combat variants, and only TS,TP are analyzed for trade variants, with Hauler being considered both a combat variant. After variants are created, a script may be manually run in game from the script editor which will add variants to all shipyards that sell the base ship. Run 'a.x3customizer.add.variants.to.shipyards.xml', no input args. Note: this will add all stock variants as well, as it currently has no way to distinguish the new ships from existing ones. Warning: it is unsafe to remove variants once they have been added to an existing save.
+      Adds variants for various ships. Variant attribute modifiers are based on the average differences between existing variants and their basic ship, where only M3,M4,M5 are analyzed for combat variants, and only TS,TP are analyzed for trade variants, with Hauler being considered both a combat variant. After variants are created, a script may be manually run in game from the script editor which will add variants to all shipyards that sell the base ship. Run 'x3customizer.add.variants.to.shipyards.xml', no input args. Note: this will add all stock variants as well, as it currently has no way to distinguish the new ships from existing ones. Warning: it is unsafe to remove variants once they have been added to an existing save.
   
       Special attributes, such as turret count and weapon compatibitities, are not considered. Variants are added base on ship name and race; pirate variants are handled separately from standard variants. Ships without extensions or cargo are ignored (eg. drones, weapon platforms).
       
@@ -766,7 +798,7 @@ Ware Transforms:
 
  * Change_Ware_Size
 
-    Requires: 
+    Requires: None
 
       Change the cargo size of a given ware.
   
@@ -1095,3 +1127,12 @@ Change Log:
  * 2.09:
    - Added Add_Job_Ship_Variants.
    - Added Change_Ware_Size.
+   - Tweaked Add_Ship_Variants to specify shield_conversion_ratios in args.
+   - Unedited source files will now be copied to the main directory, in case a prior run did edit them and needs overwriting.
+ * 2.10:
+   - New option added to Adjust_Gate_Rings, supporting a protrusionless ring.
+   - Added Add_Script, generic transform to add pregenerated scripts.
+   - Added Disable_OOS_War_Sector_Spawns.
+   - Added Convert_Attack_To_Attack_Nearest.
+   - Bugfix for when the first transform called does not have file dependencies.
+   - Renames the script 'a.x3customizer.add.variants.to.shipyards.xml' to remove the 'a.' prefix.

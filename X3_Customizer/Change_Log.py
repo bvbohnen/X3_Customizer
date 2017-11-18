@@ -51,6 +51,16 @@ Change Log:
    - Added Add_Job_Ship_Variants.
    - Added Change_Ware_Size.
    - Tweaked Add_Ship_Variants to specify shield_conversion_ratios in args.
+   - Unedited source files will now be copied to the main directory, in case
+     a prior run did edit them and needs overwriting.
+ * 2.10:
+   - New option added to Adjust_Gate_Rings, supporting a protrusionless ring.
+   - Added Add_Script, generic transform to add pregenerated scripts.
+   - Added Disable_OOS_War_Sector_Spawns.
+   - Added Convert_Attack_To_Attack_Nearest.
+   - Bugfix for when the first transform called does not have file dependencies.
+   - Renames the script 'a.x3customizer.add.variants.to.shipyards.xml' to
+     remove the 'a.' prefix.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

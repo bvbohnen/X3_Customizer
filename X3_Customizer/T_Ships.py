@@ -1,5 +1,14 @@
 '''
 Similar to X3_Weapons, this will open the Tships file and perform systematic edits.
+
+TODO: switch many of the subtype checks to using object type, which will be more
+accurate, eg. a fighter drone is subclass M5 but has a unique object type (not M5),
+so using object type may be a better filter for actual M5s.
+Also, the xrm goner M6 (TLS) is listed as subtype GO, object type M6, so filtering
+by object type would capture it better.
+
+Object type is used for marine capacity (according to forum searching); need to know
+if it affects anything else if ever editing it to change marine counts.
 '''
 from File_Manager import *
 from Flags import *

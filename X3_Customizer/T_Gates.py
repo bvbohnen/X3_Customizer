@@ -202,6 +202,17 @@ Scene file notes (taken partially from playing with cockpit positions):
     Similarly, SS_SPECIAL_GATE_CONSTRUCTION references a raw terran_gate_construction,
     which could similarly be replaced with a scene.
 
+Update:
+    Found another ring option:
+        stations\others\terraformer_gate
+    In this case, the ring is plain with no projections, and in quick testing it is
+    the proper size for the portal. This appears to be the best option, though the
+    hub gate was working well regardless, and could be kept for the Hub itself.
+
+    The front side of this gate has dim spots where the normal top/bottom protrusions
+    would go, but the back side has a clean ring. As such, the gate should be flipped
+    around, similar to the hub, to look slightly better.
+
 '''
 from File_Manager import *
 import os
@@ -242,6 +253,8 @@ def Adjust_Gate_Rings(
     * standard_ring_option:
       - String, one of the following options to be applied to the
         standard gates.
+        - 'use_plain_ring': Replaces the gate ring with a plain
+          version lacking projecting pylons on either side. Default.
         - 'use_reversed_hub': Replaces the gate ring with the Hub
           ring reversed 180 degrees, resulting in pylons only being
           on the back side.
@@ -253,13 +266,12 @@ def Adjust_Gate_Rings(
           a portal. This will not affect disabled gates.
         - 'use_terran': Replaces the gate ring with the Terran gate
           from the Aldrin expansion plot.
-        - None: default, no change.
+        - None: no change.
     * hub_ring_option:
-      - String, one of the options for standard_ring_option, along
-        with a new option:
+      - String, one of the options for standard_ring_option, defaulting
+        to 'use_reversed_hub', along with a new option:
         - 'use_standard_ring_option': The Hub ring will match the
-          option used for the standard ring, including Hub ring reversal.
-          Default.
+          option used for the standard ring.
     '''
     
     #If 'use_standard_ring_option' was selected for the hub option,
@@ -408,6 +420,14 @@ def Adjust_Gate_Rings(
             gate_scene.clear()
             gate_scene.update(copy.deepcopy(base_gates['terraformer_gate']))
             #Do the 180 degree rotation.
+            gate_scene['gate'].rotation = (.5,0,1,0)
+
+        #Do plain ring replacement.
+        elif option == 'use_plain_ring':
+            #This will do a direct drop-in of the model file.
+            gate_scene['gate'].base_object = r'stations\others\terraformer_gate'
+            #Do the 180 degree rotation, to get the clean side of
+            # the gate facing the system.
             gate_scene['gate'].rotation = (.5,0,1,0)
 
         #Remove the ring.

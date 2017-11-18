@@ -216,7 +216,7 @@ T_file_name_field_dict_dict = {
         2 : 'yaw',  #rpm = 60 * this value
         3 : 'pitch',
         4 : 'roll',
-        5 : 'subtype',      #Specific if eg. 'SG_SH_TS' for transport ship
+        5 : 'subtype',      #Ship category, eg. 'SG_SH_TS' for transport ship
         6 : 'name_id',      #Int, the id of the in-game ship name.
         7 : 'speed',        #In meters per 500 seconds
         8 : 'acceleration', #In meters per 500 seconds per second
@@ -244,6 +244,7 @@ T_file_name_field_dict_dict = {
         49 : 'particle_effect', #Integer, corresponds to particles3 file?, engine trail
         50 : 'variation_index', #Int, the variation type of the ship, eg. 1 for vanguard.
         51 : 'angular_acceleration',
+        52 : 'obj_type',      #Ship alternate category, eg. 'OBJ_SHIP_TL' for transport ship
         -10: 'relative_value_npc',
         -6 : 'relative_value_player',
         #Name is the last field before the newline.

@@ -97,14 +97,6 @@ Note:
     There is no good way around this issue if trying to allow for fade effects.
     In general, the fade effects are too cool in play to give them up.
 
-
-TODO:
-    This code took the approach of overwriting existing background images to
-    remove stars, but it would probably be cleaner to instead change the
-    image referenced in tbackgrounds to some empty file, which will give
-    better precision on which backgrounds are changed.
-    This should have been the original approach, but it wasn't thought of
-    at the time.
     
 '''
 import os
