@@ -553,6 +553,14 @@ def Write_Files():
                     # needed here.
                     file.write(this_line)
 
+            #For some reason, TwareT has a pck version created sometimes,
+            # which ends up overriding the custom version.
+            #If a pck file exists, rename it.
+            pck_file_path = file_path.replace('.txt','.pck')
+            if os.path.exists(pck_file_path):
+                #Just stick a suffix on it, so it isn't completely gone.
+                os.rename(pck_file_path, pck_file_path + '.x3c.bak')
+
 
         elif isinstance(file_object, XML_File):
             #Open with the right encoding.

@@ -61,6 +61,9 @@ Change Log:
    - Bugfix for when the first transform called does not have file dependencies.
    - Renames the script 'a.x3customizer.add.variants.to.shipyards.xml' to
      remove the 'a.' prefix.
+ * 2.11:
+   - Minor fix to rename .pck files in the addon/types folder that interfere
+     with customized files.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

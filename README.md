@@ -1,4 +1,4 @@
-X3 Customizer v2.10
+X3 Customizer v2.11
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -481,3 +481,5 @@ Change Log:
    - Added Convert_Attack_To_Attack_Nearest.
    - Bugfix for when the first transform called does not have file dependencies.
    - Renames the script 'a.x3customizer.add.variants.to.shipyards.xml' to remove the 'a.' prefix.
+ * 2.11:
+   - Minor fix to rename .pck files in the addon/types folder that interfere with customized files.
