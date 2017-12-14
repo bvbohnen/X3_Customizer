@@ -9,8 +9,6 @@
    <arguments>
       <argument index="0" name="a.sector" type="Var/Sector" desc="Sector" />
       <argument index="1" name="a.existingShips" type="Value" desc="Existing Ship Array" />
-      <argument index="2" name="a.sector" type="Var/Sector" desc="Sector" />
-      <argument index="3" name="a.existingShips" type="Value" desc="Existing Ship Array" />
    </arguments>
    <sourcetext>
       <line linenr="001" indent=""><text></text><var>skip if</var><text> </text><var>$a.sector</var><text>  ->  exists</text></line>
@@ -121,65 +119,60 @@
       <line linenr="106" indent="&#160;"><text>end</text></line>
       <line linenr="107" indent="&#160;"> </line>
       <line linenr="108" indent="&#160;"> </line>
-      <line linenr="109" indent="&#160;"><comment>* find the race of the ships</comment></line>
-      <line linenr="110" indent="&#160;"><var>$race = </var><text></text><var>Terran </var><text></text></line>
-      <line linenr="111" indent="&#160;"><text></text><var>$noto.argon =</var><text> get notoriety from race </text><var>Argon</var><text> to race </text><var>Player</var><text></text></line>
-      <line linenr="112" indent="&#160;"><text></text><var>$noto.terran =</var><text> get notoriety from race </text><var>Terran</var><text> to race </text><var>Player</var><text></text></line>
-      <line linenr="113" indent="&#160;"><var>if </var><text></text><var>$noto.argon &lt; $noto.terran </var><text></text></line>
-      <line linenr="114" indent="&#160;&#160;"><var>$race = </var><text></text><var>Argon </var><text></text></line>
-      <line linenr="115" indent="&#160;"><text>end</text></line>
-      <line linenr="116" indent="&#160;"> </line>
-      <line linenr="117" indent="&#160;"><comment>* create the ships need to defend</comment></line>
-      <line linenr="118" indent="&#160;"><var>$carrier = </var><text></text><var>null </var><text></text></line>
-      <line linenr="119" indent="&#160;"><text></text><var>$count =</var><text> size of array </text><var>$UseShips</var><text></text></line>
-      <line linenr="120" indent="&#160;"><var>while </var><text></text><var>$count </var><text></text></line>
-      <line linenr="121" indent="&#160;&#160;"><text>dec </text><var>$count</var><text> =</text></line>
-      <line linenr="122" indent="&#160;&#160;"><text></text><var>$shipClass =</var><text> </text><var>$UseShips</var><text>[</text><var>$count</var><text>]</text></line>
-      <line linenr="123" indent="&#160;&#160;"><text></text><var>$gate =</var><text> find gate: flags=</text><var>[Find.Random]</var><text>, refobj=</text><var>$a.sector</var><text>, max dist=</text><var>null</var><text>, refpos=</text><var>null</var><text></text></line>
-      <line linenr="124" indent="&#160;&#160;"><text></text><var>if</var><text> </text><var>$gate</var><text>  ->  exists</text></line>
-      <line linenr="125" indent="&#160;&#160;&#160;"><text></text><var>$x =</var><text> </text><var>$gate</var><text>  ->  get x position</text></line>
-      <line linenr="126" indent="&#160;&#160;&#160;"><text></text><var>$y =</var><text> </text><var>$gate</var><text>  ->  get y position</text></line>
-      <line linenr="127" indent="&#160;&#160;&#160;"><text></text><var>$z =</var><text> </text><var>$gate</var><text>  ->  get z position</text></line>
-      <line linenr="128" indent="&#160;&#160;"><text>else</text></line>
-      <line linenr="129" indent="&#160;&#160;&#160;"><var>$x = </var><text></text><var>0 </var><text></text></line>
-      <line linenr="130" indent="&#160;&#160;&#160;"><var>$y = </var><text></text><var>0 </var><text></text></line>
-      <line linenr="131" indent="&#160;&#160;&#160;"><var>$z = </var><text></text><var>0 </var><text></text></line>
-      <line linenr="132" indent="&#160;&#160;"><text>end</text></line>
-      <line linenr="133" indent="&#160;&#160;"> </line>
-      <line linenr="134" indent="&#160;&#160;" interruptable="@"><text></text><var>$shipType =</var><text> </text><var>[THIS]</var><text></text><var> -> </var><text>call script </text><var></var><call>!lib.get.randomshiptype</call><var></var><text> : Race=</text><var>$race</var><text>  Ship class=</text><var>$shipClass</var><text>  Block Array=</text><var>null</var><text>  Only First Variant=</text><var>[TRUE]</var><text> </text></line>
-      <line linenr="135" indent="&#160;&#160;"><var>if </var><text></text><var>$shipType </var><text></text></line>
-      <line linenr="136" indent="&#160;&#160;&#160;"><text></text><var>$newShip =</var><text> = create ship: type=</text><var>$shipType</var><text> owner=</text><var>$race</var><text> addto=</text><var>$a.sector</var><text> x=</text><var>$x</var><text> y=</text><var>$y</var><text> z=</text><var>$z</var><text></text></line>
-      <line linenr="137" indent="&#160;&#160;&#160;"><text></text><var>$newShip</var><text>  ->  add default items to ship</text></line>
-      <line linenr="138" indent="&#160;&#160;&#160;"><text></text><var>$newShip</var><text>  ->  set local variable: name=</text><var>'war.defence'</var><text> value=</text><var>$a.sector</var><text></text></line>
-      <line linenr="139" indent="&#160;&#160;&#160;" interruptable="@"><text></text><var>START  =</var><text> </text><var>$newShip</var><text></text><var> -> </var><text>call script </text><var></var><call>!fight.war.attackplayer</call><var></var><text> :</text></line>
-      <line linenr="140" indent="&#160;&#160;&#160;"><text>append </text><var>$newShip</var><text> to array </text><var>$aCreatedShips</var><text></text></line>
-      <line linenr="141" indent="&#160;&#160;"><text>end</text></line>
-      <line linenr="142" indent="&#160;"><text>end</text></line>
-      <line linenr="143" indent=""><text>end</text></line>
-      <line linenr="144" indent=""> </line>
-      <line linenr="145" indent=""><text></text><var>if</var><text> size of array </text><var>$aCreatedShips</var><text></text></line>
-      <line linenr="146" indent="&#160;"><text></text><var>$count =</var><text> size of array </text><var>$aCreatedShips</var><text></text></line>
-      <line linenr="147" indent="&#160;"><var>while </var><text></text><var>$count </var><text></text></line>
-      <line linenr="148" indent="&#160;&#160;"><text>dec </text><var>$count</var><text> =</text></line>
-      <line linenr="149" indent="&#160;&#160;"><text></text><var>$ship =</var><text> </text><var>$aCreatedShips</var><text>[</text><var>$count</var><text>]</text></line>
-      <line linenr="150" indent="&#160;&#160;"><text></text><var>if</var><text> </text><var>$ship</var><text>  ->  exists</text></line>
-      <line linenr="151" indent="&#160;&#160;&#160;"><text></text><var>$ship</var><text>  ->  jump out of existence</text></line>
-      <line linenr="152" indent="&#160;&#160;"><text>end</text></line>
-      <line linenr="153" indent="&#160;"><text>end</text></line>
-      <line linenr="154" indent=""><text>end</text></line>
-      <line linenr="155" indent=""><text>return </text><var>null</var><text></text></line>
-      <line linenr="156" indent=""> </line>
+      <line linenr="109" indent="&#160;"> </line>
+      <line linenr="110" indent="&#160;"><comment>* find the race of the ships</comment></line>
+      <line linenr="111" indent="&#160;"><var>$race = </var><text></text><var>Terran </var><text></text></line>
+      <line linenr="112" indent="&#160;"><text></text><var>$noto.argon =</var><text> get notoriety from race </text><var>Argon</var><text> to race </text><var>Player</var><text></text></line>
+      <line linenr="113" indent="&#160;"><text></text><var>$noto.terran =</var><text> get notoriety from race </text><var>Terran</var><text> to race </text><var>Player</var><text></text></line>
+      <line linenr="114" indent="&#160;"><var>if </var><text></text><var>$noto.argon &lt; $noto.terran </var><text></text></line>
+      <line linenr="115" indent="&#160;&#160;"><var>$race = </var><text></text><var>Argon </var><text></text></line>
+      <line linenr="116" indent="&#160;"><text>end</text></line>
+      <line linenr="117" indent="&#160;"> </line>
+      <line linenr="118" indent="&#160;"><comment>* create the ships need to defend</comment></line>
+      <line linenr="119" indent="&#160;"><var>$carrier = </var><text></text><var>null </var><text></text></line>
+      <line linenr="120" indent="&#160;"><text></text><var>$count =</var><text> size of array </text><var>$UseShips</var><text></text></line>
+      <line linenr="121" indent="&#160;"><var>while </var><text></text><var>$count </var><text></text></line>
+      <line linenr="122" indent="&#160;&#160;"><text>dec </text><var>$count</var><text> =</text></line>
+      <line linenr="123" indent="&#160;&#160;"><text></text><var>$shipClass =</var><text> </text><var>$UseShips</var><text>[</text><var>$count</var><text>]</text></line>
+      <line linenr="124" indent="&#160;&#160;"><text></text><var>$gate =</var><text> find gate: flags=</text><var>[Find.Random]</var><text>, refobj=</text><var>$a.sector</var><text>, max dist=</text><var>null</var><text>, refpos=</text><var>null</var><text></text></line>
+      <line linenr="125" indent="&#160;&#160;"><text></text><var>if</var><text> </text><var>$gate</var><text>  ->  exists</text></line>
+      <line linenr="126" indent="&#160;&#160;&#160;"><text></text><var>$x =</var><text> </text><var>$gate</var><text>  ->  get x position</text></line>
+      <line linenr="127" indent="&#160;&#160;&#160;"><text></text><var>$y =</var><text> </text><var>$gate</var><text>  ->  get y position</text></line>
+      <line linenr="128" indent="&#160;&#160;&#160;"><text></text><var>$z =</var><text> </text><var>$gate</var><text>  ->  get z position</text></line>
+      <line linenr="129" indent="&#160;&#160;"><text>else</text></line>
+      <line linenr="130" indent="&#160;&#160;&#160;"><var>$x = </var><text></text><var>0 </var><text></text></line>
+      <line linenr="131" indent="&#160;&#160;&#160;"><var>$y = </var><text></text><var>0 </var><text></text></line>
+      <line linenr="132" indent="&#160;&#160;&#160;"><var>$z = </var><text></text><var>0 </var><text></text></line>
+      <line linenr="133" indent="&#160;&#160;"><text>end</text></line>
+      <line linenr="134" indent="&#160;&#160;"> </line>
+      <line linenr="135" indent="&#160;&#160;" interruptable="@"><text></text><var>$shipType =</var><text> </text><var>[THIS]</var><text></text><var> -> </var><text>call script </text><var></var><call>!lib.get.randomshiptype</call><var></var><text> : Race=</text><var>$race</var><text>  Ship class=</text><var>$shipClass</var><text>  Block Array=</text><var>null</var><text>  Only First Variant=</text><var>[TRUE]</var><text> </text></line>
+      <line linenr="136" indent="&#160;&#160;"><var>if </var><text></text><var>$shipType </var><text></text></line>
+      <line linenr="137" indent="&#160;&#160;&#160;"><text></text><var>$newShip =</var><text> = create ship: type=</text><var>$shipType</var><text> owner=</text><var>$race</var><text> addto=</text><var>$a.sector</var><text> x=</text><var>$x</var><text> y=</text><var>$y</var><text> z=</text><var>$z</var><text></text></line>
+      <line linenr="138" indent="&#160;&#160;&#160;"><text></text><var>$newShip</var><text>  ->  add default items to ship</text></line>
+      <line linenr="139" indent="&#160;&#160;&#160;"><text></text><var>$newShip</var><text>  ->  set local variable: name=</text><var>'war.defence'</var><text> value=</text><var>$a.sector</var><text></text></line>
+      <line linenr="140" indent="&#160;&#160;&#160;" interruptable="@"><text></text><var>START  =</var><text> </text><var>$newShip</var><text></text><var> -> </var><text>call script </text><var></var><call>!fight.war.attackplayer</call><var></var><text> :</text></line>
+      <line linenr="141" indent="&#160;&#160;&#160;"><text>append </text><var>$newShip</var><text> to array </text><var>$aCreatedShips</var><text></text></line>
+      <line linenr="142" indent="&#160;&#160;"><text>end</text></line>
+      <line linenr="143" indent="&#160;"><text>end</text></line>
+      <line linenr="144" indent=""><text>end</text></line>
+      <line linenr="145" indent=""> </line>
+      <line linenr="146" indent=""><text></text><var>if</var><text> size of array </text><var>$aCreatedShips</var><text></text></line>
+      <line linenr="147" indent="&#160;"><text></text><var>$count =</var><text> size of array </text><var>$aCreatedShips</var><text></text></line>
+      <line linenr="148" indent="&#160;"><var>while </var><text></text><var>$count </var><text></text></line>
+      <line linenr="149" indent="&#160;&#160;"><text>dec </text><var>$count</var><text> =</text></line>
+      <line linenr="150" indent="&#160;&#160;"><text></text><var>$ship =</var><text> </text><var>$aCreatedShips</var><text>[</text><var>$count</var><text>]</text></line>
+      <line linenr="151" indent="&#160;&#160;"><text></text><var>if</var><text> </text><var>$ship</var><text>  ->  exists</text></line>
+      <line linenr="152" indent="&#160;&#160;&#160;"><text></text><var>$ship</var><text>  ->  jump out of existence</text></line>
+      <line linenr="153" indent="&#160;&#160;"><text>end</text></line>
+      <line linenr="154" indent="&#160;"><text>end</text></line>
+      <line linenr="155" indent=""><text>end</text></line>
+      <line linenr="156" indent=""><text>return </text><var>null</var><text></text></line>
       <line linenr="157" indent=""> </line>
       <line linenr="158" indent=""> </line>
       <line linenr="159" indent=""> </line>
       <line linenr="160" indent=""> </line>
       <line linenr="161" indent=""> </line>
       <line linenr="162" indent=""> </line>
-      <line linenr="163" indent=""> </line>
-      <line linenr="164" indent=""> </line>
-      <line linenr="165" indent=""> </line>
-      <line linenr="166" indent=""> </line>
-      <line linenr="167" indent=""> </line>
    </sourcetext>
    <codearray>
       <sval type="array" size="10">
@@ -1028,15 +1021,7 @@
                <sval type="int" val="0" />
             </sval>
          </sval>
-         <sval type="array" size="4">
-            <sval type="array" size="2">
-               <sval type="int" val="14" />
-               <sval type="string" val="Sector" />
-            </sval>
-            <sval type="array" size="2">
-               <sval type="int" val="9" />
-               <sval type="string" val="Existing Ship Array" />
-            </sval>
+         <sval type="array" size="2">
             <sval type="array" size="2">
                <sval type="int" val="14" />
                <sval type="string" val="Sector" />
@@ -1046,7 +1031,7 @@
                <sval type="string" val="Existing Ship Array" />
             </sval>
          </sval>
-         <sval type="array" size="77">
+         <sval type="array" size="72">
             <sval type="array" size="2">
                <sval type="int" val="2" />
                <sval type="int" val="2" />
@@ -1262,6 +1247,10 @@
                <sval type="int" val="70" />
                <sval type="int" val="2" />
             </sval>
+            <sval type="array" size="2">
+               <sval type="int" val="70" />
+               <sval type="int" val="2" />
+            </sval>
             <sval type="array" size="3">
                <sval type="int" val="70" />
                <sval type="int" val="1" />
@@ -1319,30 +1308,6 @@
             <sval type="array" size="2">
                <sval type="int" val="106" />
                <sval type="int" val="4" />
-            </sval>
-            <sval type="array" size="2">
-               <sval type="int" val="107" />
-               <sval type="int" val="2" />
-            </sval>
-            <sval type="array" size="2">
-               <sval type="int" val="107" />
-               <sval type="int" val="2" />
-            </sval>
-            <sval type="array" size="2">
-               <sval type="int" val="107" />
-               <sval type="int" val="2" />
-            </sval>
-            <sval type="array" size="2">
-               <sval type="int" val="107" />
-               <sval type="int" val="2" />
-            </sval>
-            <sval type="array" size="2">
-               <sval type="int" val="107" />
-               <sval type="int" val="2" />
-            </sval>
-            <sval type="array" size="2">
-               <sval type="int" val="107" />
-               <sval type="int" val="2" />
             </sval>
             <sval type="array" size="2">
                <sval type="int" val="107" />
