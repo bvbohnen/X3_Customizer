@@ -64,6 +64,21 @@ Change Log:
  * 2.11:
    - Minor fix to rename .pck files in the addon/types folder that interfere
      with customized files.
+ * 2.12:
+   - Added Add_CLS_Software_To_More_Docks.
+   - Added Remove_Khaak_Corvette_Spin.
+   - Added option to Adjust_Ship_Laser_Recharge to adjust ship maximum
+     laser energy as well.
+   - Added cap on mosquito missile damage when adjusting damages, to avoid
+     possible OOS combat usage.
+   - Bugfix for transforms which adjust laser energy usage, to ensure the
+     laser can store enough charge for at least one shot.
+   - Bugfix for adjusting missile hulls, to add entries to globals when missing.
+   - Bugfix for file reading which broke in recent python update.
+   - Added patch support for editing files without doing full original source
+     uploads. Disable_OOS_War_Sector_Spawns now uses a patch.
+   - Added support for automatically filling in the source folder with any
+     necessary scripts.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

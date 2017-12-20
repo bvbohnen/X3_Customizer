@@ -1,0 +1,1124 @@
+<?xml version="1.0" standalone="yes"?>
+<?xml-stylesheet href="x2script.xsl" type="text/xsl"?>
+<!-- Generated using X-Studio -->
+<script>
+	<name>setup.x3customizer.add.cls.to.docks</name>
+	<version>7</version>
+	<engineversion>50</engineversion>
+	<description>X3 Customizer script to add CLS software to more docks</description>
+	<arguments />
+	<sourcetext>
+		<line linenr="001" indent="">
+			<comment>* X3_Customizer script for adding CLS software (mk1 and mk2) to more</comment>
+		</line>
+		<line linenr="002" indent="">
+			<comment>* docks, generally any with trade software mk2.</comment>
+		</line>
+		<line linenr="003" indent="">
+			<comment>* Note: this is primarily edited as a .txt file.</comment>
+		</line>
+		<line linenr="004" indent="">
+			<comment>* Copy the basic txt version into exscriptor to get a proper xml version.</comment>
+		</line>
+		<line linenr="005" indent="" />
+		<line linenr="006" indent="">
+			<comment>* Get an array of all docks with trade software mk2.</comment>
+		</line>
+		<line linenr="007" indent="">
+			<comment>* Update: this doesn't appear to work properly. May need to blindly grab all stations.</comment>
+		</line>
+		<line linenr="008" indent="">
+			<comment>* $array.docks = get station array: product={Trade Command Software MK2} include empty=[TRUE]</comment>
+		</line>
+		<line linenr="009" indent="" />
+		<line linenr="010" indent="">
+			<comment>* It seems docks need to be gathered by race, with no good global option.</comment>
+		</line>
+		<line linenr="011" indent="">
+			<comment>* Run through all races and append their equipment docks.</comment>
+		</line>
+		<line linenr="012" indent="">
+			<var>$array.docks</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<text>array</text>
+			<text> </text>
+			<text>alloc</text>
+			<text>:</text>
+			<text> </text>
+			<text>size</text>
+			<text>=</text>
+			<var>0</var>
+		</line>
+		<line linenr="013" indent="">
+			<var>$race</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>[Argon]</var>
+		</line>
+		<line linenr="014" indent="">
+			<text>gosub</text>
+			<text> </text>
+			<var>Func.Append.Docks</var>
+			<text>:</text>
+		</line>
+		<line linenr="015" indent="">
+			<var>$race</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>[Boron]</var>
+		</line>
+		<line linenr="016" indent="">
+			<text>gosub</text>
+			<text> </text>
+			<var>Func.Append.Docks</var>
+			<text>:</text>
+		</line>
+		<line linenr="017" indent="">
+			<var>$race</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>[Split]</var>
+		</line>
+		<line linenr="018" indent="">
+			<text>gosub</text>
+			<text> </text>
+			<var>Func.Append.Docks</var>
+			<text>:</text>
+		</line>
+		<line linenr="019" indent="">
+			<var>$race</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>[Paranid]</var>
+		</line>
+		<line linenr="020" indent="">
+			<text>gosub</text>
+			<text> </text>
+			<var>Func.Append.Docks</var>
+			<text>:</text>
+		</line>
+		<line linenr="021" indent="">
+			<var>$race</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>[Teladi]</var>
+		</line>
+		<line linenr="022" indent="">
+			<text>gosub</text>
+			<text> </text>
+			<var>Func.Append.Docks</var>
+			<text>:</text>
+		</line>
+		<line linenr="023" indent="">
+			<var>$race</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>[Terran]</var>
+		</line>
+		<line linenr="024" indent="">
+			<text>gosub</text>
+			<text> </text>
+			<var>Func.Append.Docks</var>
+			<text>:</text>
+		</line>
+		<line linenr="025" indent="">
+			<var>$race</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>[Pirates]</var>
+		</line>
+		<line linenr="026" indent="">
+			<text>gosub</text>
+			<text> </text>
+			<var>Func.Append.Docks</var>
+			<text>:</text>
+		</line>
+		<line linenr="027" indent="">
+			<var>$race</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>[Yaki]</var>
+		</line>
+		<line linenr="028" indent="">
+			<text>gosub</text>
+			<text> </text>
+			<var>Func.Append.Docks</var>
+			<text>:</text>
+		</line>
+		<line linenr="029" indent="">
+			<var>$race</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>[Xenon]</var>
+		</line>
+		<line linenr="030" indent="">
+			<text>gosub</text>
+			<text> </text>
+			<var>Func.Append.Docks</var>
+			<text>:</text>
+		</line>
+		<line linenr="031" indent="" />
+		<line linenr="032" indent="" />
+		<line linenr="033" indent="">
+			<comment>* Loop through the docks.</comment>
+		</line>
+		<line linenr="034" indent="">
+			<var>$int.dock.count</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<text>size</text>
+			<text> </text>
+			<text>of</text>
+			<text> </text>
+			<text>array</text>
+			<text> </text>
+			<var>$array.docks</var>
+		</line>
+		<line linenr="035" indent="" />
+		<line linenr="036" indent="">
+			<comment>* Early printout with dock count, used during debug to find 0 cases.</comment>
+		</line>
+		<line linenr="037" indent="">
+			<comment>* $msg = sprintf: fmt='Checking docks: %s', $int.dock.count, null, null, null, null</comment>
+		</line>
+		<line linenr="038" indent="">
+			<comment>* display subtitle text: text=$msg duration=10 ms</comment>
+		</line>
+		<line linenr="039" indent="" />
+		<line linenr="040" indent="">
+			<comment>* Running count of docks updated, for printout at end.</comment>
+		</line>
+		<line linenr="041" indent="">
+			<var>$int.updated.docks</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>0</var>
+		</line>
+		<line linenr="042" indent="" />
+		<line linenr="043" indent="">
+			<text>while</text>
+			<text> </text>
+			<var>$int.dock.count</var>
+		</line>
+		<line linenr="044" indent="&#160;">
+			<text>dec</text>
+			<text> </text>
+			<var>$int.dock.count</var>
+		</line>
+		<line linenr="045" indent="&#160;" />
+		<line linenr="046" indent="&#160;">
+			<comment>* Look up the next dock.</comment>
+		</line>
+		<line linenr="047" indent="&#160;">
+			<var>$dock</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>$array.docks</var>
+			<text>[</text>
+			<var>$int.dock.count</var>
+			<text>]</text>
+		</line>
+		<line linenr="048" indent="&#160;" />
+		<line linenr="049" indent="&#160;">
+			<comment>* Check if it has trade software mk2.</comment>
+		</line>
+		<line linenr="050" indent="&#160;">
+			<text>if</text>
+			<text> </text>
+			<var>$dock</var>
+			<text>-&gt;</text>
+			<text> </text>
+			<text>trades</text>
+			<text> </text>
+			<text>with</text>
+			<text> </text>
+			<text>ware</text>
+			<text> </text>
+			<var>{Trade Command Software MK2}</var>
+		</line>
+		<line linenr="051" indent="&#160;&#160;">
+			<comment>* Do another check for CLS already being present.</comment>
+		</line>
+		<line linenr="052" indent="&#160;&#160;">
+			<comment>* This is added mainly for the sake of the counter.</comment>
+		</line>
+		<line linenr="053" indent="&#160;&#160;">
+			<text>if</text>
+			<text> </text>
+			<text>not</text>
+			<text> </text>
+			<var>$dock</var>
+			<text>-&gt;</text>
+			<text> </text>
+			<text>trades</text>
+			<text> </text>
+			<text>with</text>
+			<text> </text>
+			<text>ware</text>
+			<text> </text>
+			<var>{Commodity Logistics Software MK1}</var>
+		</line>
+		<line linenr="054" indent="&#160;&#160;&#160;">
+			<comment>* Blindly add the upgrades; should be safe if the dock already has it.</comment>
+		</line>
+		<line linenr="055" indent="&#160;&#160;&#160;">
+			<var>$dock</var>
+			<text>-&gt;</text>
+			<text> </text>
+			<text>add</text>
+			<text> </text>
+			<text>product</text>
+			<text> </text>
+			<text>to</text>
+			<text> </text>
+			<text>factory</text>
+			<text> </text>
+			<text>or</text>
+			<text> </text>
+			<text>dock</text>
+			<text>:</text>
+			<text> </text>
+			<var>{Commodity Logistics Software MK1}</var>
+		</line>
+		<line linenr="056" indent="&#160;&#160;&#160;">
+			<var>$dock</var>
+			<text>-&gt;</text>
+			<text> </text>
+			<text>add</text>
+			<text> </text>
+			<text>product</text>
+			<text> </text>
+			<text>to</text>
+			<text> </text>
+			<text>factory</text>
+			<text> </text>
+			<text>or</text>
+			<text> </text>
+			<text>dock</text>
+			<text>:</text>
+			<text> </text>
+			<var>{Commodity Logistics Software MK2}</var>
+		</line>
+		<line linenr="057" indent="&#160;&#160;&#160;">
+			<comment>* Add to the updated dock counter.</comment>
+		</line>
+		<line linenr="058" indent="&#160;&#160;&#160;">
+			<text>inc</text>
+			<text> </text>
+			<var>$int.updated.docks</var>
+		</line>
+		<line linenr="059" indent="&#160;&#160;">
+			<text>end</text>
+		</line>
+		<line linenr="060" indent="&#160;&#160;" />
+		<line linenr="061" indent="&#160;">
+			<text>end</text>
+		</line>
+		<line linenr="062" indent="&#160;" />
+		<line linenr="063" indent="&#160;">
+			<comment>* -Removed; above is simpler.</comment>
+		</line>
+		<line linenr="064" indent="&#160;">
+			<comment>* $ware = {Commodity Logistics Software MK1}</comment>
+		</line>
+		<line linenr="065" indent="&#160;">
+			<comment>* gosub Func.Add.Ware:</comment>
+		</line>
+		<line linenr="066" indent="&#160;">
+			<comment>* $ware = {Commodity Logistics Software MK2}</comment>
+		</line>
+		<line linenr="067" indent="&#160;">
+			<comment>* gosub Func.Add.Ware:</comment>
+		</line>
+		<line linenr="068" indent="&#160;" />
+		<line linenr="069" indent="&#160;">
+			<comment>* Put in a message and a wait.</comment>
+		</line>
+		<line linenr="070" indent="&#160;">
+			<comment>* Throw up the current race, and how many ships still need processing.</comment>
+		</line>
+		<line linenr="071" indent="&#160;">
+			<comment>* -Removed; this runs pretty fast.</comment>
+		</line>
+		<line linenr="072" indent="&#160;">
+			<comment>* $msg = sprintf: fmt='Checking docks: %s', $int.dock.count, null, null, null, null</comment>
+		</line>
+		<line linenr="073" indent="&#160;">
+			<comment>* display subtitle text: text=$msg duration=10 ms</comment>
+		</line>
+		<line linenr="074" indent="&#160;">
+			<comment>* $temp = wait 1 ms</comment>
+		</line>
+		<line linenr="075" indent="&#160;" />
+		<line linenr="076" indent="">
+			<text>end</text>
+		</line>
+		<line linenr="077" indent="" />
+		<line linenr="078" indent="">
+			<comment>* Display a completion message, and the count, when done.</comment>
+		</line>
+		<line linenr="079" indent="">
+			<comment>* -Removed; switch script to running at game start automatically, since it is pretty fast.</comment>
+		</line>
+		<line linenr="080" indent="">
+			<comment>* $msg = sprintf: fmt='CLS added to %s docks', $int.updated.docks, null, null, null, null</comment>
+		</line>
+		<line linenr="081" indent="">
+			<comment>* display subtitle text: text=$msg duration=3000 ms</comment>
+		</line>
+		<line linenr="082" indent="" />
+		<line linenr="083" indent="">
+			<text>return</text>
+			<text> </text>
+			<var>null</var>
+		</line>
+		<line linenr="084" indent="" />
+		<line linenr="085" indent="" />
+		<line linenr="086" indent="">
+			<comment>* Function to add equipment docks for a race to the running array.</comment>
+		</line>
+		<line linenr="087" indent="">
+			<comment>* Input:</comment>
+		</line>
+		<line linenr="088" indent="">
+			<comment>*   $race</comment>
+		</line>
+		<line linenr="089" indent="">
+			<comment>*   $array.docks</comment>
+		</line>
+		<line linenr="090" indent="">
+			<comment>* Output:</comment>
+		</line>
+		<line linenr="091" indent="">
+			<comment>*   $array.docks</comment>
+		</line>
+		<line linenr="092" indent="">
+			<var>Func.Append.Docks</var>
+			<text>:</text>
+		</line>
+		<line linenr="093" indent="&#160;">
+			<var>$array.temp</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<text>get</text>
+			<text> </text>
+			<text>station</text>
+			<text> </text>
+			<text>array</text>
+			<text>:</text>
+			<text> </text>
+			<text>of</text>
+			<text> </text>
+			<text>race</text>
+			<text> </text>
+			<var>$race</var>
+			<text> </text>
+			<text>class</text>
+			<text>/</text>
+			<text>type</text>
+			<text>=</text>
+			<var>[Equipment Dock]</var>
+		</line>
+		<line linenr="094" indent="&#160;" />
+		<line linenr="095" indent="&#160;">
+			<comment>* Merge the arrays.</comment>
+		</line>
+		<line linenr="096" indent="&#160;">
+			<comment>* It is not clear on how to do this easily. An append loop will be</comment>
+		</line>
+		<line linenr="097" indent="&#160;">
+			<comment>* done here, though could also resize and then do a copy to new elements.</comment>
+		</line>
+		<line linenr="098" indent="&#160;">
+			<var>$int.index</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<text>size</text>
+			<text> </text>
+			<text>of</text>
+			<text> </text>
+			<text>array</text>
+			<text> </text>
+			<var>$array.temp</var>
+		</line>
+		<line linenr="099" indent="&#160;">
+			<text>while</text>
+			<text> </text>
+			<var>$int.index</var>
+		</line>
+		<line linenr="100" indent="&#160;&#160;">
+			<comment>* Count down; this also brings the index in range.</comment>
+		</line>
+		<line linenr="101" indent="&#160;&#160;">
+			<text>dec</text>
+			<text> </text>
+			<var>$int.index</var>
+		</line>
+		<line linenr="102" indent="&#160;&#160;">
+			<var>$temp</var>
+			<text> </text>
+			<text>=</text>
+			<text> </text>
+			<var>$array.temp</var>
+			<text>[</text>
+			<var>$int.index</var>
+			<text>]</text>
+		</line>
+		<line linenr="103" indent="&#160;&#160;">
+			<text>append</text>
+			<text> </text>
+			<var>$temp</var>
+			<text> </text>
+			<text>to</text>
+			<text> </text>
+			<text>array</text>
+			<text> </text>
+			<var>$array.docks</var>
+		</line>
+		<line linenr="104" indent="&#160;">
+			<text>end</text>
+		</line>
+		<line linenr="105" indent="&#160;" />
+		<line linenr="106" indent="">
+			<text>endsub</text>
+		</line>
+		<line linenr="107" indent="" />
+		<line linenr="108" indent="" />
+		<line linenr="109" indent="">
+			<text>return</text>
+			<text> </text>
+			<var>null</var>
+		</line>
+		<line linenr="110" indent="" />
+	</sourcetext>
+	<codearray>
+		<sval type="array" size="10">
+			<sval type="string" val="setup.x3customizer.add.cls.to.docks" />
+			<sval type="int" val="50" />
+			<sval type="string" val="X3 Customizer script to add CLS software to more docks" />
+			<sval type="int" val="7" />
+			<sval type="int" val="0" />
+			<sval type="array" size="8">
+				<sval type="string" val="array.docks" />
+				<sval type="string" val="race" />
+				<sval type="string" val="int.dock.count" />
+				<sval type="string" val="int.updated.docks" />
+				<sval type="string" val="dock" />
+				<sval type="string" val="array.temp" />
+				<sval type="string" val="int.index" />
+				<sval type="string" val="temp" />
+			</sval>
+			<sval type="array" size="41">
+				<sval type="array" size="4">
+					<sval type="int" val="128" />
+					<sval type="int" val="0" />
+					<sval type="int" val="4" />
+					<sval type="int" val="0" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="1" />
+					<sval type="int" val="1" />
+					<sval type="int" val="10" />
+					<sval type="int" val="1" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="1167" />
+					<sval type="int" val="31" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="1" />
+					<sval type="int" val="1" />
+					<sval type="int" val="10" />
+					<sval type="int" val="2" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="1167" />
+					<sval type="int" val="31" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="1" />
+					<sval type="int" val="1" />
+					<sval type="int" val="10" />
+					<sval type="int" val="3" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="1167" />
+					<sval type="int" val="31" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="1" />
+					<sval type="int" val="1" />
+					<sval type="int" val="10" />
+					<sval type="int" val="4" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="1167" />
+					<sval type="int" val="31" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="1" />
+					<sval type="int" val="1" />
+					<sval type="int" val="10" />
+					<sval type="int" val="5" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="1167" />
+					<sval type="int" val="31" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="1" />
+					<sval type="int" val="1" />
+					<sval type="int" val="10" />
+					<sval type="int" val="18" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="1167" />
+					<sval type="int" val="31" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="1" />
+					<sval type="int" val="1" />
+					<sval type="int" val="10" />
+					<sval type="int" val="8" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="1167" />
+					<sval type="int" val="31" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="1" />
+					<sval type="int" val="1" />
+					<sval type="int" val="10" />
+					<sval type="int" val="19" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="1167" />
+					<sval type="int" val="31" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="1" />
+					<sval type="int" val="1" />
+					<sval type="int" val="10" />
+					<sval type="int" val="6" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="1167" />
+					<sval type="int" val="31" />
+				</sval>
+				<sval type="array" size="4">
+					<sval type="int" val="131" />
+					<sval type="int" val="2" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="0" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="3" />
+					<sval type="int" val="1" />
+					<sval type="int" val="4" />
+					<sval type="int" val="0" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="-1610605047" />
+					<sval type="int" val="1" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="2" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="143" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="6">
+					<sval type="int" val="129" />
+					<sval type="int" val="4" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="0" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="6">
+					<sval type="int" val="637" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="4" />
+					<sval type="int" val="-1610605309" />
+					<sval type="int" val="9" />
+					<sval type="int" val="1048631" />
+				</sval>
+				<sval type="array" size="6">
+					<sval type="int" val="637" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="4" />
+					<sval type="int" val="-536863484" />
+					<sval type="int" val="9" />
+					<sval type="int" val="1048640" />
+				</sval>
+				<sval type="array" size="5">
+					<sval type="int" val="750" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="4" />
+					<sval type="int" val="9" />
+					<sval type="int" val="1048640" />
+				</sval>
+				<sval type="array" size="5">
+					<sval type="int" val="750" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="4" />
+					<sval type="int" val="9" />
+					<sval type="int" val="1048641" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="142" />
+					<sval type="int" val="3" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="112" />
+					<sval type="int" val="21" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="103" />
+					<sval type="int" val="0" />
+					<sval type="int" val="0" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="101" />
+					<sval type="string" val="Func.Append.Docks" />
+				</sval>
+				<sval type="array" size="6">
+					<sval type="int" val="1069" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="1" />
+					<sval type="int" val="5" />
+					<sval type="int" val="12" />
+					<sval type="int" val="2075" />
+				</sval>
+				<sval type="array" size="4">
+					<sval type="int" val="131" />
+					<sval type="int" val="6" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="5" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="-1610602743" />
+					<sval type="int" val="1" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="6" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="143" />
+					<sval type="int" val="6" />
+				</sval>
+				<sval type="array" size="6">
+					<sval type="int" val="129" />
+					<sval type="int" val="7" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="5" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="6" />
+				</sval>
+				<sval type="array" size="5">
+					<sval type="int" val="135" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="0" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="7" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="112" />
+					<sval type="int" val="34" />
+				</sval>
+				<sval type="array" size="1">
+					<sval type="int" val="1168" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="103" />
+					<sval type="int" val="0" />
+					<sval type="int" val="0" />
+				</sval>
+			</sval>
+			<sval type="int" val="0" />
+			<sval type="array" size="71">
+				<sval type="array" size="3">
+					<sval type="int" val="0" />
+					<sval type="int" val="1" />
+					<sval type="string" val="X3_Customizer script for adding CLS software (mk1 and mk2) to more" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="0" />
+					<sval type="int" val="1" />
+					<sval type="string" val="docks, generally any with trade software mk2." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="0" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Note: this is primarily edited as a .txt file." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="0" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Copy the basic txt version into exscriptor to get a proper xml version." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="0" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="0" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Get an array of all docks with trade software mk2." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="0" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Update: this doesn't appear to work properly. May need to blindly grab all stations." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="0" />
+					<sval type="int" val="1" />
+					<sval type="string" val="$array.docks = get station array: product={Trade Command Software MK2} include empty=[TRUE]" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="0" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="0" />
+					<sval type="int" val="1" />
+					<sval type="string" val="It seems docks need to be gathered by race, with no good global option." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="0" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Run through all races and append their equipment docks." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="19" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="19" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="19" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Loop through the docks." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="20" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="20" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Early printout with dock count, used during debug to find 0 cases." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="20" />
+					<sval type="int" val="1" />
+					<sval type="string" val="$msg = sprintf: fmt='Checking docks: %s', $int.dock.count, null, null, null, null" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="20" />
+					<sval type="int" val="1" />
+					<sval type="string" val="display subtitle text: text=$msg duration=10 ms" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="20" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="20" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Running count of docks updated, for printout at end." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="21" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="23" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="23" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Look up the next dock." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="24" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="24" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Check if it has trade software mk2." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="25" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Do another check for CLS already being present." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="25" />
+					<sval type="int" val="1" />
+					<sval type="string" val="This is added mainly for the sake of the counter." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="26" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Blindly add the upgrades; should be safe if the dock already has it." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="28" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Add to the updated dock counter." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="29" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="29" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="29" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="29" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="29" />
+					<sval type="int" val="1" />
+					<sval type="string" val="-Removed; above is simpler." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="29" />
+					<sval type="int" val="1" />
+					<sval type="string" val="$ware = {Commodity Logistics Software MK1}" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="29" />
+					<sval type="int" val="1" />
+					<sval type="string" val="gosub Func.Add.Ware:" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="29" />
+					<sval type="int" val="1" />
+					<sval type="string" val="$ware = {Commodity Logistics Software MK2}" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="29" />
+					<sval type="int" val="1" />
+					<sval type="string" val="gosub Func.Add.Ware:" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="29" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="29" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Put in a message and a wait." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="29" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Throw up the current race, and how many ships still need processing." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="29" />
+					<sval type="int" val="1" />
+					<sval type="string" val="-Removed; this runs pretty fast." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="29" />
+					<sval type="int" val="1" />
+					<sval type="string" val="$msg = sprintf: fmt='Checking docks: %s', $int.dock.count, null, null, null, null" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="29" />
+					<sval type="int" val="1" />
+					<sval type="string" val="display subtitle text: text=$msg duration=10 ms" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="29" />
+					<sval type="int" val="1" />
+					<sval type="string" val="$temp = wait 1 ms" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="29" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="30" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="30" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="30" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Display a completion message, and the count, when done." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="30" />
+					<sval type="int" val="1" />
+					<sval type="string" val="-Removed; switch script to running at game start automatically, since it is pretty fast." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="30" />
+					<sval type="int" val="1" />
+					<sval type="string" val="$msg = sprintf: fmt='CLS added to %s docks', $int.updated.docks, null, null, null, null" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="30" />
+					<sval type="int" val="1" />
+					<sval type="string" val="display subtitle text: text=$msg duration=3000 ms" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="30" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="31" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="31" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="31" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Function to add equipment docks for a race to the running array." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="31" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Input:" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="31" />
+					<sval type="int" val="1" />
+					<sval type="string" val="  $race" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="31" />
+					<sval type="int" val="1" />
+					<sval type="string" val="  $array.docks" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="31" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Output:" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="31" />
+					<sval type="int" val="1" />
+					<sval type="string" val="  $array.docks" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="33" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="33" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Merge the arrays." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="33" />
+					<sval type="int" val="1" />
+					<sval type="string" val="It is not clear on how to do this easily. An append loop will be" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="33" />
+					<sval type="int" val="1" />
+					<sval type="string" val="done here, though could also resize and then do a copy to new elements." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="35" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Count down; this also brings the index in range." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="39" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="39" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="40" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="40" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="41" />
+					<sval type="int" val="2" />
+				</sval>
+			</sval>
+			<sval type="int" val="0" />
+		</sval>
+	</codearray>
+</script>

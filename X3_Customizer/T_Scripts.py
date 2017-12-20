@@ -7,10 +7,14 @@ scripts to avoid overwriting them.
 
 This module will include a shared Add_Script transform, and some
 convenience transforms for select scripts.
+
+TODO: maybe use the xmldiff package or similar to do edits to vanilla
+scripts, instead of having to copy them entirely.
 '''
 from File_Manager import *
 import os
 import shutil
+from File_Patcher import *
 
 # No dependencies here; this only mucks around in the script folder.
 @Check_Dependencies()
@@ -22,7 +26,8 @@ def Add_Script(
     Add a script to the addon/scripts folder. If an existing xml version
     of the script already exists, it is overwritten. If an existing pck
     version of the script already exists, it is renamed with suffix
-    '.x3c.bak'.
+    '.x3c.bak'. Note: this is only for use with full scripts, not those
+    defined by diffs from existing scripts.
 
     * script_name:
       - String, the name of the script to add. This should be present
@@ -48,7 +53,7 @@ def Add_Script(
 
     # The file is present here in scripts, so can reuse the dest_path.
     this_dir = os.path.normpath(os.path.dirname(__file__))
-    source_path = os.path.join(this_dir, dest_path)
+    source_path = os.path.join(this_dir, 'source', script_name)
     
     # Continue based on if removal is being done or not.
     if not remove:
@@ -98,10 +103,13 @@ def Disable_OOS_War_Sector_Spawns(
     Disables spawning of dedicated ships in the AP war sectors which attack
     player assets when the player is out-of-sector. By default, these ships
     scale up with player assets, and immediately respawn upon being killed.
-    This replaces '!fight.war.protectsector'.
+    This patches '!fight.war.protectsector'.
     '''
     # Can pass the _cleanup flag straight through as the remove field.
-    Add_Script('!fight.war.protectsector', remove = _cleanup)
+    # Add_Script('!fight.war.protectsector', remove = _cleanup)
+    # Update: this will work on a file diff, to avoid having to keep the
+    # full original egosoft source around.
+    Apply_Patch('!fight.war.protectsector.xml')
 
     
 @Check_Dependencies()
@@ -116,3 +124,33 @@ def Convert_Attack_To_Attack_Nearest(
     This replaces '!ship.cmd.attack.std'.
     '''
     Add_Script('!ship.cmd.attack.std', remove = _cleanup)
+
+    
+@Check_Dependencies()
+def Add_CLS_Software_To_More_Docks(
+        _cleanup = False
+    ):
+    '''
+    Adds Commodity Logistics Software, internal and external, to all
+    equipment docks which stock Trade Command Software Mk2.
+    This is implemented as a setup script which runs on the game
+    loading. Once applied, this transform may be disabled to remove
+    the script run time. This change is not reversable.
+    '''
+    Add_Script('setup.x3customizer.add.cls.to.docks', remove = _cleanup)
+
+    
+#Quick dummy transform, to help the File_Manager recognize these as files
+# that may be changed.
+#Patched files should go here, else they get pulled from pck files every
+# time (not a huge problem, but unnecessary).
+#TODO: maybe find better solution; problem is that the source folder search
+# routine ignores files not in a dependency list somewhere. Alternative
+# might be to just grab everything, even user backup files that may
+# be present (also huge problem, just makes unnecessary copies).
+@Check_Dependencies(
+    '!fight.war.protectsector.xml', 
+    #'!ship.cmd.attack.std.xml',
+    )
+def _dummy():
+    return

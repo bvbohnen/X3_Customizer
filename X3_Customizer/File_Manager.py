@@ -40,6 +40,9 @@ def Set_Path(
       - Subfolder in the addon directory containing unmodified files, 
         internally having the same folder structure as addon to be
         used when writing out transform results.
+      - Folder will be created if it does not exist, and may be
+        populated with any source files that can be extracted from
+        the primary folders and are needed by transforms.
       - (eg. output to addon\types will source from input in
          addon\source_folder\types).
 
@@ -54,6 +57,10 @@ def Set_Path(
     Path_to_addon_folder = path_to_addon_folder
     Source_folder = source_folder
     Message_file_name = summary_file
+
+    # Call to generic Init moved here, to ensure it is applied before
+    # any transforms which may not use input files.
+    Init()
     return
 
 
@@ -102,6 +109,9 @@ First_call = True
 def Init():
     'Initialize the file manager.'
     #Safety check for First_call already being cleared, return early.
+    #TODO: remove this check, and remove all calls to Init except for that
+    # in Set_Path, which should always be called before anything else
+    # anyway.
     global First_call
     if not First_call:
         return
@@ -117,7 +127,12 @@ def Init():
     if not os.path.exists(Path_to_addon_folder):
         raise Exception('Path to the AP/addon folder appears invalid.')
     if not os.path.exists(os.path.join(Path_to_addon_folder, Source_folder)):
-        raise Exception('Path to the source folder appears invalid.')
+        # Create an empty source folder to capture any extracted files.
+        os.mkdir(os.path.join(Path_to_addon_folder, Source_folder))
+        #-Removed error for now; assume intentional.
+        #raise Exception('Path to the source folder appears invalid.')
+        print('Warning: Source folder {} not found and has been created'.format(
+            Source_folder))
 
     #Check for 01.cat, and that the path ends in 'addon'.
     #Print a warning but continue if anything looks wrong; the user may
@@ -126,7 +141,8 @@ def Init():
             not os.path.exists(os.path.join(Path_to_addon_folder, '01.cat')))
            ):
         print('Warning: Path to the AP/addon folder appears wrong.\n'
-              'Generated files may need manual moving to the correct folder.')
+              'Generated files may need manual moving to the correct folder.\n'
+              'Automated source file extraction will fail.')
         
 
     #Dynamically find all files in the source folder.
@@ -201,6 +217,7 @@ class T_File():
     Class exists mainly to clarify naming for now, and for any
     future attribute expansion.
     Members:
+        text            : Raw text for this file.
         line_dict_list  : List of OrderedDict objects, each holding the labelled 
                           contents of a line.
                           This includes all lines, with headers.
@@ -208,6 +225,7 @@ class T_File():
                           headers. This is used for transform editing.
     '''
     def __init__(s):
+        s.text = None
         s.line_dict_list = []
         s.data_dict_list = []
     def Read_Data(s):
@@ -320,21 +338,25 @@ def Get_Output_File_Path(file_name):
         return file_path
 
 
-def Load_Folder(folder_name):
-    '''
-    Returns a list of file contents for files in the given folder.
-    Eg. if folder_name is 'maps', returns the contents of all files
-    in the 'maps' folder.
-    '''
-    return_list = []
-    #Since files are pre-specified for now, some may not be present.
-    #For now, error if expected file(s) not found.
-    for file_name in File_path_dict[folder_name]:
-        #Try to load the file.
-        return_list.append(Load_File(file_name))
+#-Removed; from older code that pre-defined all source files and paths.
+#def Load_Folder(folder_name):
+#    '''
+#    Returns a list of file contents for files in the given folder.
+#    Eg. if folder_name is 'maps', returns the contents of all files
+#    in the 'maps' folder.
+#    '''
+#    return_list = []
+#    #Since files are pre-specified for now, some may not be present.
+#    #For now, error if expected file(s) not found.
+#    for file_name in File_path_dict[folder_name]:
+#        #Try to load the file.
+#        return_list.append(Load_File(file_name))
 
 
-def Load_File(file_name, return_t_file = False, error_if_not_found = True):
+def Load_File(file_name,
+              return_t_file = False, 
+              return_text = False,
+              error_if_not_found = True):
     '''
     Returns the contents of the given file, either raw text for XML
     or a dictionary for T files.
@@ -343,20 +365,33 @@ def Load_File(file_name, return_t_file = False, error_if_not_found = True):
     If the file is not found and error_if_not_found == True, 
     raises an exception, else returns None.
     If return_t_file == True, returns the T_File object instead of just
-    the trimmed dict of data lines.
+    the trimmed dict of data lines; does not work on xml files.
+    If return_text == True, returns the raw text of the loaded file,
+    without any edits from prior transforms applied.
+    If the source file is not found, will attempt to find the file in
+     a non-source folder and copy it to the source folder before proceeding;
+     this will attempt to unpack script .pck files.
     '''
 
     #If the file is not loaded, handle loading.
     if file_name not in File_dict:
 
-        #Lookup the file path.
+        # Lookup the file path.
         file_path = Get_Source_File_Path(file_name)
 
-        #Error if the file isn't found, or return None.
+        #Problem if the file isn't found, or return None.
         if file_path == None or not os.path.exists(file_path):
-            if error_if_not_found:
-                raise File_Missing_Exception()
-            return None
+
+            #Do a fallback search to find the file in a primary folder
+            # and copy to the source folder, then try again.
+            #This returns True if it made a copy; error if it fails
+            # to copy.
+            if not Find_and_Copy_Source_File(file_name):
+                if error_if_not_found:
+                    raise File_Missing_Exception()
+                return None
+            #Get the new file path.
+            file_path = Get_Source_File_Path(file_name)
 
         #If this is an xml file, do a raw load to a XML_File object.
         if file_path.endswith('xml'):
@@ -385,20 +420,29 @@ def Load_File(file_name, return_t_file = False, error_if_not_found = True):
             # probably easiest to just use ordered dicts.
             #Indices without names will be keyed by the index integer.
                     
-            #Open this file, vanilla version, and read into a list of lists.
+            #Prepare a T_File object to fill in.
+            this_t_file = T_File()
+
+            # Open this file, vanilla version, and read into a list of lists.
             with open(file_path, 'r') as file:
-                #This gets a list of lines, where each line is a list of strings.
-                #Read in the data lines into a list of lists.
-                #Sublists are a series of text strings.
-                #Since lines end in semicolons, the last entry will generally be a simple new line.
-                #Comment lines (//) are ignored.
+                # Store a copy of raw text, in case it is ever wanted anywhere.
+                # General expectation is that this isn't used, except maybe
+                #  in making patches from pre-modified files.
+                this_t_file.text = file.read()
+
+                # This gets a list of lines, where each line is a list of strings.
+                # Read in the data lines into a list of lists.
+                # Sublists are a series of text strings.
+                # Since lines end in semicolons, the last entry will generally be a simple new line.
+                # Comment lines (//) are ignored.
+                # Update: pull from this_t_file.text since the .read put the
+                # file at the end, so readlines won't work anymore; using
+                #  readlines worked prior to a VS update late 2017.
                 data_list_list = []
-                for line in file.readlines():
+                for line in this_t_file.text.splitlines(True):
                     if not line.startswith('//'):
                         data_list_list.append(line.split(';'))
 
-            #Prepare a T_File object to fill in.
-            this_t_file = T_File()
             #Lookup the fields for this file name.
             field_dict = T_file_name_field_dict_dict[file_name]
 
@@ -454,10 +498,12 @@ def Load_File(file_name, return_t_file = False, error_if_not_found = True):
             raise Exception('File type for {} not understood.'.format(file_name))
                 
     #Return the file contents.
-    if not return_t_file:
-        return File_dict[file_name].Read_Data()
-    else:
+    if return_t_file:
         return File_dict[file_name]
+    elif return_text:
+        return File_dict[file_name].text
+    else:
+        return File_dict[file_name].Read_Data()
 
             
 def Find_encoding(file_path):
@@ -480,7 +526,10 @@ def Find_encoding(file_path):
 
         #Get the first line by using split lines in a loop, and break early.
         for line in file.readlines():
-            assert 'encoding' in line
+            #If there is no encoding specified on the first line, as with
+            # script files, just assume utf-8.
+            if not 'encoding' in line:
+                return 'utf-8'
 
             #Just do some quick splits to get to the code string.
             #Split on 'encoding'
@@ -529,6 +578,9 @@ def Write_Files():
     '''
     Write output files for all source file content edited by transforms.
     Outputs will overwrite any existing files.
+    Any .pck files with otherwise the same name and location will be
+    renamed into .pck.x3c.bak; there is currently no code to rename
+    these back to .pck, since source files are always assumed modified.
     '''    
     #Loop over the files that were loaded.
     for file_name, file_object in File_dict.items():
@@ -555,14 +607,14 @@ def Write_Files():
 
             #For some reason, TwareT has a pck version created sometimes,
             # which ends up overriding the custom version.
-            #If a pck file exists, rename it.
+            #(This may be from the mod manager program, which may cause
+            # oddities; TODO: look into this.)
+            #If a pck file exists, rename it further below.
             pck_file_path = file_path.replace('.txt','.pck')
-            if os.path.exists(pck_file_path):
-                #Just stick a suffix on it, so it isn't completely gone.
-                os.rename(pck_file_path, pck_file_path + '.x3c.bak')
 
 
         elif isinstance(file_object, XML_File):
+            pck_file_path = file_path.replace('.xml','.pck')
             #Open with the right encoding.
             with open(file_path, 'w', encoding = file_object.encoding) as file:   
                 #Just write as raw text.  
@@ -572,11 +624,20 @@ def Write_Files():
             #Let the xml plugin pick the encoding to write out in.
             #xml_tree.write(file_path)
 
+        # Check for a pck version of the file.
+        if os.path.exists(pck_file_path):
+            #Just stick a suffix on it, so it isn't completely gone.
+            os.rename(pck_file_path, pck_file_path + '.x3c.bak')
+
 
     #Loop over the files that were not loaded. These may need to be included
     # in case a prior run transformed them, then the transform was removed
     # such that they weren't loaded but need to overwrite old changes.
     #These will do direct copies.
+    #TODO: consider cases with a .pck.x3c.bak version exists, and rename
+    # that to .pck instead, though this may not be entirely safe if the
+    # version in the source folder is different than the pck version,
+    # so don't implement this for now.
     for file_name in File_path_dict:
         #Skip the loaded files.
         if file_name in File_dict:
@@ -591,3 +652,110 @@ def Write_Files():
         shutil.copy(source_file_path, dest_file_path)
 
     return
+
+
+def Copy_File(
+        source_path,
+        dest_path,
+        remove = False
+    ):
+    '''
+    Suport function to copy a file from a source folder under this project, 
+    to a dest folder. Typically used for scripts, objects, etc.
+    The source_path will be based on this project directory.
+    The dest_path will be based on the AP/addon directory.
+    This handles removal of the copied file as well, for when the calling
+    transform wasn't selected.
+    If a file was already present at the destination, it will be overwritten.
+    '''
+    # Look up this project directory, and prefix the source_path.
+    this_dir = os.path.normpath(os.path.dirname(__file__))
+    source_path = os.path.join(this_dir, source_path)
+        
+    # Continue based on if removal is being done or not.
+    if not remove:        
+        # Error if the file is not found locally.
+        if not os.path.exists(source_path):
+            print('Copy_File error: no file found at {}.'.format(source_path))
+            return
+        # Create the folder if needed.
+        folder_path = os.path.dirname(dest_path)
+        if not os.path.exists(folder_path):
+            os.mkdir(folder_path)
+        # Perform the copy.
+        shutil.copy(source_path, dest_path)
+    else:
+        # Check if the file exists from a prior run.
+        if os.path.exists(dest_path):
+            # Remove the file.
+            os.remove(dest_path)
+    return
+
+
+import gzip
+def Find_and_Copy_Source_File(file_name):
+    '''
+    Attempts to fine a given file_name in a primary folder in
+    the addon directory. If found, the file is copied to the
+    source_folder with an appropriate path.
+    If a match is found in the script folder for a pck file,
+    it will be unzipped and copied as an xml file.
+    Currently, this only searches the script folder for pck files,
+    though the file_name should end in .xml.
+    Returns True if a file was copied over, else False
+    '''
+    folders_to_search = ['scripts']
+    copy_made = False
+    for folder in folders_to_search:
+        if folder == 'scripts':
+
+            # The file_name should end in xml; skip if it doesn't.
+            if not file_name.endswith('.xml'):
+                continue
+            # Strip off the .xml for now.
+            file_name_unsuffixed = file_name.replace('.xml','')
+
+            # Look for a valid file path for the pck extentions.
+            # This will also look for a backed up file from a prior run
+            # of this manager.
+            file_path = None
+            for extension in ['.pck', '.pck.x3c.bak']:
+                this_path = os.path.join(folder, file_name_unsuffixed + extension)
+                if os.path.exists(this_path):
+                    file_path = this_path
+                    break
+
+            # If no valid path found, skip.
+            if file_path == None:
+                continue
+
+            # Read the source text.
+            # X3 pck files were compressed using gzip, so use that package
+            # here to decompress.
+            #try:
+            with gzip.open(file_path,'r') as file:
+                text = file.read()
+            #except:
+            #    continue
+
+            # This text can now be written out as xml.
+            # Make sure the dest folder exists.
+            dest_folder = os.path.join(Source_folder, folder)
+            if not os.path.exists(dest_folder):
+                os.mkdir(dest_folder)
+
+            # Write the file.
+            dest_path = os.path.join(dest_folder, file_name)
+            with open(dest_path, 'wb') as file:
+                file.write(text)
+
+            # Record the file and path in the File_path_dict, which did 
+            # not see this file on the first run.
+            File_path_dict[file_name] = folder
+
+            # Stop searching the folders.
+            copy_made = True
+            break
+
+    return copy_made
+

@@ -18,24 +18,17 @@ import copy
 
 
 #TODO:
-#Reduce speed of the special aldrin ships, which are both around twice
-# as fast as others in their tier.
-#Could cut in half and still have them be competetive in vanilla.
-#XRM still has aldrin ships fast, but brings other similar ships up to a closer
-# speed, and all ships in those classes get a speed nerf further below, so nerfing
-# aldrin ships specifically isn't as important.
-    
-#TODO:
 #Consider if corvette turn rates should be reduced, and perhaps those of
 # capital ships in general as well.
 #Greatly reducing cap turning could be part of a mod for dogfighting around
 # caps, also nerfing their anti-fighter weapons.
 
-#TODO: maybe add cargo life support to the wares of capital ships by default.
-#It looks like xrm does this anyway.
-#It seems like it would be changed elsewhere, in some wares file maybe, since
-# ships just have an index for the built in wares to a list somewhere.
+#TODO:
+#May add SETA as a built-in ware for all ships.
 
+#TODO:
+#Cut hull on the 'unknown object' M6 in XRM, which is around 25x higher
+# than what is typical for an M6. Even a 90% reduction would be modest.
 
 @Check_Dependencies('TShips.txt')
 def Adjust_Ship_Hull(
@@ -153,7 +146,8 @@ def Adjust_Ship_Speed(
 @Check_Dependencies('TShips.txt')
 def Adjust_Ship_Laser_Recharge(
     scaling_factor = 1,
-    adjustment_factors_dict = {}
+    adjustment_factors_dict = {},
+    adjust_energy_cap = False
     ):
     '''
     Adjust ship laser regeneration rate, either globally or per ship class.
@@ -162,20 +156,36 @@ def Adjust_Ship_Laser_Recharge(
       - Multiplier to apply to any ship type not found in adjustment_factors_dict.
     * adjustment_factors_dict:
       - Dict keyed by ship type, holding a scaling factor to be applied.
+    * adjust_energy_cap:
+      - Bool, if True the ship maximum energy is also adjusted.
+        This may cause oddities if applied to an existing save.
+        Defaults False.
     '''
     for this_dict in Load_File('TShips.txt'):
         if this_dict['subtype'] in adjustment_factors_dict or scaling_factor != 1:
-            #Note that weapon recharge is a float, so do no rounding.
-            value = float(this_dict['weapon_recharge_factor'])
-
+            
             #Pick the table scaling factor, or the default.
             if this_dict['subtype'] in adjustment_factors_dict:
-                new_value = value * adjustment_factors_dict[this_dict['subtype']]
+                this_scaling = adjustment_factors_dict[this_dict['subtype']]
             else:
-                new_value = value * scaling_factor
+                this_scaling = scaling_factor
 
-            #Limit to 6 decimals.
-            this_dict['weapon_recharge_factor'] = str('{0:.6f}'.format(new_value))
+            # The recharge is stored as a multiplier on the ships
+            #  maximum stored energy.
+            # When updating the maximum, only it needs to change and the
+            #  recharge will scale accordingly.
+            # When not updating maximum, the multiplier needs to be
+            #  changed directly.
+            if adjust_energy_cap:
+                value = int(this_dict['weapon_energy'])
+                new_value = value * this_scaling
+                this_dict['weapon_energy'] = str(int(new_value))
+            else:
+                #Note that weapon recharge is a float, so do no rounding.
+                value = float(this_dict['weapon_recharge_factor'])
+                new_value = value * this_scaling
+                #Limit to 6 decimals.
+                this_dict['weapon_recharge_factor'] = str('{0:.6f}'.format(new_value))
 
             
             
@@ -857,6 +867,10 @@ def Add_Ship_Life_Support(
     '''
     Adds life support as a built-in ware for select ship classes.
     This is a convenience transform which calls Add_Ship_Equipment.
+    Warning: mission director scripts do not seem to have a way to check
+    for built in wares, and typically use a special TP check to get around
+    this. Other ship types with built-in life support will not be able
+    to pick up passengers in some cases.
 
     * ship_types:
       - List of ship types to add life support to, eg. ['SG_SH_M2'].
@@ -1086,4 +1100,29 @@ def Add_Ship_Boarding_Pod_Support(
         #Repack the modified flags.
         Pack_Tships_Missile_Flags(this_dict, missile_flags)
 
+    return
+
+
+@Check_Dependencies()
+def Remove_Khaak_Corvette_Spin(
+    _cleanup = False
+    ):
+    '''
+    Remove the spin on the secondary hull of the Khaak corvette.
+    The replacement file used is expected to work for vanilla, xrm,
+    and other mods that don't change the model scene file.
+    '''
+    # This will be done with a very simple file replacement, mostly
+    # because it is easy this way.
+    # TODO: maybe switch to a patch style, if ever setting up a way
+    # to pull from the cat/dat files automatically.
+    file_name = 'Khaak_m6_scene.bod'
+    source_path = os.path.join('source', file_name)
+    dest_path = os.path.join('..','objects','ships','M6', file_name)
+
+    # Use a convenience function, which also handles cleanup.
+    Copy_File(source_path = source_path, 
+              dest_path = dest_path, 
+              remove = _cleanup)
+    
     return

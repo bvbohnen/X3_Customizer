@@ -1,6 +1,5 @@
 '''
-Desired transforms are declared here, along with pathing to
-the X3/addon folder and the specifying the source file folder.
+These transforms are those used by the author.
 '''
 
 #Import all transform functions.
@@ -21,6 +20,9 @@ elif XRM:
         source_folder = 'xrm_source'
     )
     
+# Test.
+#import File_Manager
+#text = File_Manager.Load_File('!ship.cmd.attack.std.xml')
 
 #####################################################
 #Background
@@ -151,11 +153,11 @@ if XRM:
 
     #Set Hub music to be restored.
     #XRM breaks it by setting the track to 0.
-    #Restore_Hub_Music(apply_to_existing_save = True)
+    Restore_Hub_Music(apply_to_existing_save = True)
     
     #Set Argon Sector M148 music to be restored.
     #XRM changes this to the argon prime music.
-    #Restore_M148_Music(apply_to_existing_save = True)
+    Restore_M148_Music(apply_to_existing_save = True)
 
 
 #####################################################
@@ -716,7 +718,10 @@ if XRM:
     
     #Increase missile compatibilities in various ways.
     #Bombers get more missile options.
-    Expand_Bomber_Missiles()
+    # -Removed; causes bombers to spawn filled with generic missiles
+    # instead of their special ones. Probably better to leave this
+    # off so that npc bombers have special missiles.
+    #Expand_Bomber_Missiles()
     #Terrans can use dropped commonwealth missiles.
     Add_Ship_Cross_Faction_Missiles()
     #Corvettes and up can fire boarding pods.
@@ -724,6 +729,10 @@ if XRM:
     
 #####################################################
 #Ships
+
+# Remove the bothersome khaak corvette hull spin.
+Remove_Khaak_Corvette_Spin()
+
 
 if Vanilla:
     Fix_Pericles_Pricing()
@@ -1102,7 +1111,13 @@ if XRM:
     #Upsize the jumpdrive more, to xxl (4 in xrm), or maybe
     # to tc (5). Aim is to stop npc military ships from jumping
     # as much.
-    Change_Ware_Size('SS_WARE_WARPING', 5)
+    # Update: doesn't appear to stop military jumps, since those seem to
+    # be directly commanded in a script and not keyed off of jumpdrive
+    # presence. TODO: drop this to 4, though leave at 5 a bit longer,
+    # since observed jumps may have been on ships that spawned with a
+    # jumpdrive from before the change to TC ware size.
+    # -Removing for khaak/terran plot jumps.
+    #Change_Ware_Size('SS_WARE_WARPING', 5)
 
 
     
@@ -1112,8 +1127,11 @@ if XRM:
 # Allow Attack to be used for group Attack Nearest on player ships.
 Convert_Attack_To_Attack_Nearest()
 
-if Vanilla:
-    # Stop infinite hostile spawns in war sectors when the player has
-    # ships there but is not present.
-    Disable_OOS_War_Sector_Spawns()
+# Add CLS software to more docks, so not stuck with shipping from
+# Argon space.
+#Add_CLS_Software_To_More_Docks()
+
+# Stop infinite hostile spawns in war sectors when the player has
+# ships there but is not present.
+Disable_OOS_War_Sector_Spawns()
 

@@ -254,7 +254,7 @@ def Make(args):
         # after the underscore.
         category = module_name.split('_')[1]
         #Drop the ending 's' if there was one (which was mostly present to
-        # mimic the X3 source file names, eg. 'tships'.
+        # mimic the X3 source file names, eg. 'tships').
         if category[-1] == 's':
             category = category[0:-1]
         #If the transform has an override category, use it.

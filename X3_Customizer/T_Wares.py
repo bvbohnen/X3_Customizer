@@ -148,10 +148,11 @@ def Set_Ware_Pricing(
 
 #Quick dummy transform, to help the File_Manager recognize these as files
 # that may be changed.
-@Check_Dependencies('TWareT.txt', 'TLaser.txt', 'TShields.txt',
-                          'TMissiles.txt', 'TFactories.txt', 'TDocks.txt',
-                          'TWareF.txt', 'TWareB.txt', 'TWareE.txt',
-                           'TWareM.txt',  'TWareN.txt')
+@Check_Dependencies(
+    'TWareT.txt', 'TLaser.txt', 'TShields.txt',
+    'TMissiles.txt', 'TFactories.txt', 'TDocks.txt',
+    'TWareF.txt', 'TWareB.txt', 'TWareE.txt',
+    'TWareM.txt',  'TWareN.txt')
 def _dummy():
     return
 

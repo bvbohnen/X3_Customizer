@@ -28,6 +28,7 @@
     <Compile Include="Change_Log.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="File_Patcher.py" />
     <Compile Include="Make_Documentation.py">
       <SubType>Code</SubType>
     </Compile>
@@ -61,6 +62,9 @@
     <Compile Include="T_Wares.py" />
     <Compile Include="T_Weapons.py" />
     <Compile Include="T_Weapons_Fitter.py" />
+    <Compile Include="User_Transforms_Build_Patches.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="User_Transforms_Example.py">
       <SubType>Code</SubType>
     </Compile>
@@ -69,11 +73,10 @@
     <Compile Include="X3_Customizer.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="scripts\" />
+    <Folder Include="source\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="scripts\a.temp.x3c.add.shipyard.variants.txt" />
-    <Content Include="scripts\a.x3customizer.add.variants.to.shipyards.txt" />
+    <Content Include="source\Khaak_m6_scene.bod" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

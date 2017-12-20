@@ -95,6 +95,18 @@ import math
 #May also be used in other transforms, so set it here for all.
 Hull_to_shield_factor = 6
 
+#Names of lasers/bullets to ignore in some cases.
+#This will hold the mining and tractor beam, since there is not
+# much point to changing them in general, and the mining laser can
+# be sensetive since some ships only barely have enough energy
+# to fire it.
+Ignored_lasers_and_bullets = [
+    'SS_LASER_MINING',
+    'SS_BULLET_MINING',
+    'SS_LASER_TUG',
+    'SS_BULLET_TUG',
+    ]
+
 ##########################################################################################
 
 
@@ -167,6 +179,36 @@ def _Initialize_Bullet_to_laser_dict():
 
 
 
+def Floor_Laser_Energy_To_Bullet_Energy():
+    '''
+    Support transform which will ensure the amount of energy stored
+    by a laser is enough to fire at least one bullet.
+    For use when bullet energy is modified, possibly beyond the laser
+    energy cap.
+    '''
+    tbullets_dict_list = Load_File('TBullets.txt')
+    # Step through each laser.
+    for laser_dict in Load_File('TLaser.txt'):
+
+        # Grab the max laser energy storage.
+        laser_energy = int(laser_dict['max_energy'])
+        
+        # Look up the primary bullet to be fired.
+        # Extra child bullets shouldn't matter here.
+        this_bullet_index = int(laser_dict['bullet'])
+        bullet_dict = tbullets_dict_list[this_bullet_index]
+
+        # Get the bullet required energy.
+        bullet_energy = int(bullet_dict['energy_used'])
+
+        # If needed, upscale the laser storage.
+        if laser_energy < bullet_energy:
+            laser_dict['max_energy'] = str(bullet_energy)
+
+    return
+
+
+
 @Check_Dependencies('TBullets.txt', 'TLaser.txt')
 def Adjust_Weapon_Fire_Rate(
     scaling_factor = 1,
@@ -175,15 +217,13 @@ def Adjust_Weapon_Fire_Rate(
     #If the fire rate change should ignore ammo weapons, since there is no good way
     # to adjust ammo consumption, leaving them buffed as a result of changes.
     skip_ammo_weapons = True,
-
     ):
     '''
     Adjust weapon fire rates. DPS and energy efficiency will remain constant.
     This may be used to reduce fire rates for performance improvements.
-    Fire rate changes will apply to IS damage only; OOS does not use fire rate.
     Secondary weapon effects are not modified.
     If a bullet is used by multiple lasers, the first laser will
-     be used for fire rate damage and energy adjustment.
+    be used for fire rate damage and energy adjustment.
 
     * scaling_factor:
       - The base multiplier to apply to fire rate.
@@ -197,6 +237,11 @@ def Adjust_Weapon_Fire_Rate(
       - If True, the fire rate change will ignore ammo weapons, since there is 
         no good way to adjust ammo consumption.
     '''
+    #Add the ignored entries if not present.
+    for name in Ignored_lasers_and_bullets:
+        if name not in laser_name_adjustment_dict:
+            laser_name_adjustment_dict[name] = 1
+
     #TODO: adjust secondary effects: energy drain, etc.
     #-Would need to know what 'damage over time - energy' does, since in testing it does
     # not affect target laser energy at all.
@@ -220,7 +265,7 @@ def Adjust_Weapon_Fire_Rate(
     # there is some redundancy now.
 
     #Step through each laser.
-    for this_dict in Load_File('TLaser.txt'):            
+    for this_dict in Load_File('TLaser.txt'):
 
         #Grab the fire delay, in milliseconds.
         this_fire_delay = int(this_dict['fire_delay'])
@@ -293,6 +338,8 @@ def Adjust_Weapon_Fire_Rate(
             bullet_dict['shield_damage']     = str(int(shield_damage))
             bullet_dict['energy_used']       = str(int(energy_used  ))
 
+    # Since bullet energies were changed, update the max laser energies.
+    Floor_Laser_Energy_To_Bullet_Energy()
                 
 
 
@@ -528,6 +575,10 @@ def Adjust_Weapon_Shot_Speed(
     * print_changes:
       - If True, speed adjustments are printed to the summary file.
     '''
+    #Add the ignored entries if not present.
+    for name in Ignored_lasers_and_bullets:
+        if name not in bullet_name_adjustment_dict:
+            bullet_name_adjustment_dict[name] = 1
 
     if print_changes:
         Write_Summary_Line('\nShot speed adjustments:')
@@ -720,6 +771,11 @@ def Adjust_Weapon_DPS(
     * print_changes:
       - If True, speed adjustments are printed to the summary file.  
     '''
+    #Add the ignored entries if not present.
+    for name in Ignored_lasers_and_bullets:
+        if name not in bullet_name_adjustment_dict:
+            bullet_name_adjustment_dict[name] = 1
+
     tbullets_dict_list = Load_File('TBullets.txt')
     
     if print_changes:
@@ -910,6 +966,9 @@ def Adjust_Weapon_DPS(
                 max_factor = max(scaling_factor_dict.values())
                 value = int(bullet_dict['energy_used'])
                 bullet_dict['energy_used'] = str(int(value * max_factor))
+                
+    # Since bullet energies may have been changed, update the max laser energies.
+    Floor_Laser_Energy_To_Bullet_Energy()
 
 
 @Check_Dependencies('TBullets.txt')
@@ -1431,7 +1490,9 @@ def Adjust_Weapon_Energy_Usage(
 
             new_energy = energy * multiplier
             this_dict['energy_used'] = str(int(new_energy))
-                        
+
+    # Since bullet energies were changed, update the max laser energies.
+    Floor_Laser_Energy_To_Bullet_Energy()
     
 
 #Id integers for various named ammos.
@@ -1470,7 +1531,10 @@ def Convert_Weapon_To_Energy(
             #Put new values back.
             Flags.Pack_Tbullets_Flags(this_dict, flags_dict)
             this_dict['energy_used'] = str(int(new_energy))
-    
+
+    # Since bullet energies were changed, update the max laser energies.
+    Floor_Laser_Energy_To_Bullet_Energy()
+
             
 @Check_Dependencies('TBullets.txt')
 def Convert_Weapon_To_Ammo(
@@ -1517,7 +1581,9 @@ def Convert_Weapon_To_Ammo(
             #Put new values back.
             Flags.Pack_Tbullets_Flags(this_dict, flags_dict)
             this_dict['energy_used'] = str(int(new_energy))
-
+            
+    # Since bullet energies were changed, update the max laser energies.
+    Floor_Laser_Energy_To_Bullet_Energy()
 
             
 @Check_Dependencies('TBullets.txt')

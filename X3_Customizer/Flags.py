@@ -56,6 +56,9 @@ Race_name_code_dict = {x:y for y,x in Race_code_name_dict.items()}
 # the inputs need to average a value:credits ratio 1/3 that of the output,
 # since the factory consumes and produces value for all wares at an
 # equal rate.
+#The general trend here is each tier being ~30% more than the prior tier(s)
+# it is constructed from (ecells to bio, ecells+bio to food/minerals, etc.).
+# Some special handling is done for lasers/shields, however.
 Value_to_credits_ratio_dict = {
     'TWareE'    : 4,      #Ecells.
     'TWareB'    : 5.33,   #Bio.
@@ -68,6 +71,13 @@ Value_to_credits_ratio_dict = {
     'TShips'    : 66, #An old comment elsewhere said 81 here; needs retest maybe.
     'TWareN'    : 4,      #Misc items (artefacts, etc.), all base value.
     }
+#Side notes for profit expectation:
+# Player shields produce at 80/130 efficiency 
+#  (eg. as if 39.9 credits/value, or 39.9/(12+5.33+4) = +87% profit).
+# Player lasers produce at 72/96 efficiency
+#  (eg. as if 48.6 credits/value, or +127% profit).
+# Player missiles produce at 2x efficiency
+#  (eg. as if 48 credits/value, or +125% profit).
 
 
 

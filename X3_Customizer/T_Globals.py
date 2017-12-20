@@ -77,22 +77,68 @@ def Adjust_Missile_Hulls(
     * scaling_factor:
       - Multiplier on missile hull values.
     '''
+    #Look for any of the missile hull fields.
+    #Could match on 'MAXHULL_' and skip the swarm adjustment and
+    # boarding pods, or otherwise just print out all fields
+    # individually. Go with individual for now, in case of adding
+    # per-missile hull adjustments in the future.
+    #Note: these are in the globals for xrm, but not the vanilla
+    # game globals, so they should be added to the globals file
+    # first with defaults if needed.
+    # See https://forum.egosoft.com/viewtopic.php?t=316886&start=68
+    # for the default values.
+    default_damage_dict = {
+        'MAXHULL_MISSILE'        : 5,
+        'MAXHULL_MISSILE_AF'     : 5,
+        'MAXHULL_MISSILE_DMBF'   : 5,
+        'MAXHULL_MISSILE_LIGHT'  : 50,
+        'MAXHULL_MISSILE_MEDIUM' : 90,
+        'MAXHULL_MISSILE_KHAAK'  : 200,
+        'MAXHULL_MISSILE_HEAVY'  : 2000,
+        'MAXHULL_MISSILE_BOMBER' : 2700,
+        'MAXHULL_TORPEDO'        : 4000,
+        }
+
+    # Pass 1: determine which maxhull entries are not present.
+    names_to_add = [x for x in default_damage_dict]
     for this_dict in Load_File('Globals.txt'):
-        #Look for any of the missile hull fields.
-        #Could match on 'MAXHULL_' and skip the swarm adjustment and
-        # boarding pods, or otherwise just print out all fields
-        # individually. Go with individual for now, in case of adding
-        # per-missile hull adjustments in the future.
-        if this_dict['name'] in [
-            'MAXHULL_MISSILE'
-            'MAXHULL_MISSILE_LIGHT'
-            'MAXHULL_MISSILE_MEDIUM'
-            'MAXHULL_MISSILE_HEAVY'
-            'MAXHULL_MISSILE_BOMBER'
-            'MAXHULL_TORPEDO'
-            'MAXHULL_MISSILE_AF'
-            'MAXHULL_MISSILE_KHAAK'
-            ]:
+        if this_dict['name'] in default_damage_dict:
+            names_to_add.remove(this_dict['name'])
+
+    # Pass 2: add the entries with defaults.
+    # Start by making the new lines, as ordered dicts.
+    lines_to_add = []
+    for name in names_to_add:
+        this_line = OrderedDict()
+        this_line['name'] = name
+        this_line['value'] = str(default_damage_dict[name])
+        this_line[2] = '\n'
+        lines_to_add.append(this_line)
+
+    # This will edit the full t_file.
+    t_file = Load_File('Globals.txt', return_t_file = True)
+    # Add missiles to the full line list, and the active line list.
+    t_file.data_dict_list += lines_to_add
+    t_file.line_dict_list += lines_to_add
+
+    # Update the entry count.
+    for line_dict in t_file.line_dict_list:
+        #Looking for the first non-comment line; it should have
+        # 2 entries (with newline).
+        if not line_dict['name'].strip().startswith('/') and len(line_dict) == 2:
+            #The first field is the global count.
+            #It was labelled as 'name', to match normal data lines.
+            line_dict['name'] = str(int(line_dict['name']) + len(lines_to_add))
+            break
+            
+        #Error if hit a data line.
+        assert line_dict is not t_file.data_dict_list[0]
+
+
+    # Pass 3: apply the transform normally, on the defaults or
+    # whatever was in the file already.
+    for this_dict in Load_File('Globals.txt'):
+        if this_dict['name'] in default_damage_dict:
             new_value = int(this_dict['value']) * scaling_factor
             this_dict['value'] = str(int(new_value))
 

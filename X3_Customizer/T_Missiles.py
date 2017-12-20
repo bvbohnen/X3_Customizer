@@ -51,11 +51,12 @@ def Adjust_Missile_Damage(
     damage_to_keep_static = 10000,
     adjust_volume = False,
     adjust_price = False,
+    mosquito_safety_cap = True,
     print_changes = False
     ):
     '''
     Adjust missile damage values, by a flat scaler or configured
-    scaling formula.
+    scaling formula. 
     
     * scaling_factor:
       - The base multiplier to apply to missile damage.
@@ -68,8 +69,14 @@ def Adjust_Missile_Damage(
       - Equation tuning values.
     * adjust_volume:
       - If True, cargo volume is adjusted corresponding to damage.
+        Defaults False.
     * adjust_price:
       - If True, price is adjusted corresponding to damage.
+        Defaults False.
+    * mosquito_safety_cap
+      - If True, mosquito missiles will be capped at 350
+        damage, below the cutoff point (400) for usage in OOS combat.
+        Defaults True.
     * print_changes:
       - If True, speed adjustments are printed to the summary file.
     '''
@@ -165,6 +172,16 @@ def Adjust_Missile_Damage(
             else:
                 new_damage_round = round(new_damage / 100)*100
 
+            #Cap mosquitos.
+            if mosquito_safety_cap and this_dict['subtype'] == 'SG_MISSILE_COUNTER':
+                # In the lib.get.best.missile.for.target script, any missiles
+                # below 400 damage are ignored for OOS selection.
+                #If a missile is picked for OOS combat, the ship will not
+                # fire its lasers that turn, which makes it rather harmful
+                # for mosquitos to get picked.
+                #Capping mosquito damage should avoid this problem.
+                #Can go up to 399, but use 350 for a nicer looking number.
+                new_damage_round = min(350, new_damage_round)
 
             #Put the value back.
             this_dict['damage'] = str(int(new_damage_round))
@@ -222,6 +239,7 @@ def Enhance_Mosquito_Missiles(
     # fighter drones properly in XRM, where for some reason it takes
     # multiple mosquitos. The base game files don't make the problem
     # obvious since drones have 10 health, mosquitos have 200 damage.
+    # This cannot go >= 400 without OOS problems, though.
 
     #Step through each missile.
     for this_dict in Load_File('TMissiles.txt'):

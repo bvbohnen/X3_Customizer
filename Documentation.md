@@ -1,4 +1,4 @@
-X3 Customizer v2.11
+X3 Customizer v2.12
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -61,6 +61,7 @@ Setup methods:
    
        * source_folder:
          - Subfolder in the addon directory containing unmodified files, internally having the same folder structure as addon to be used when writing out transform results.
+         - Folder will be created if it does not exist, and may be populated with any source files that can be extracted from the primary folders and are needed by transforms.
          - (eg. output to addon	ypes will source from input in addon\source_folder	ypes).
    
        * summary_file:
@@ -410,7 +411,7 @@ Missile Transforms:
 
     Requires: Globals.txt, TMissiles.txt
 
-      Adjust missile damage values, by a flat scaler or configured scaling formula.
+      Adjust missile damage values, by a flat scaler or configured scaling formula. 
       
       * scaling_factor:
         - The base multiplier to apply to missile damage.
@@ -419,9 +420,11 @@ Missile Transforms:
       * target_damage_to_adjust, damage_to_keep_static:
         - Equation tuning values.
       * adjust_volume:
-        - If True, cargo volume is adjusted corresponding to damage.
+        - If True, cargo volume is adjusted corresponding to damage. Defaults False.
       * adjust_price:
-        - If True, price is adjusted corresponding to damage.
+        - If True, price is adjusted corresponding to damage. Defaults False.
+      * mosquito_safety_cap
+        - If True, mosquito missiles will be capped at 350 damage, below the cutoff point (400) for usage in OOS combat. Defaults True.
       * print_changes:
         - If True, speed adjustments are printed to the summary file.
       
@@ -511,11 +514,18 @@ Missile Transforms:
 
 Script Transforms:
 
+ * Add_CLS_Software_To_More_Docks
+
+    Requires: None
+
+      Adds Commodity Logistics Software, internal and external, to all equipment docks which stock Trade Command Software Mk2. This is implemented as a setup script which runs on the game loading. Once applied, this transform may be disabled to remove the script run time. This change is not reversable.
+      
+
  * Add_Script
 
     Requires: None
 
-      Add a script to the addon/scripts folder. If an existing xml version of the script already exists, it is overwritten. If an existing pck version of the script already exists, it is renamed with suffix '.x3c.bak'.
+      Add a script to the addon/scripts folder. If an existing xml version of the script already exists, it is overwritten. If an existing pck version of the script already exists, it is renamed with suffix '.x3c.bak'. Note: this is only for use with full scripts, not those defined by diffs from existing scripts.
   
       * script_name:
         - String, the name of the script to add. This should be present in the /scripts directory of this program. The name does not need to include the '.xml' suffix, though it may.
@@ -534,7 +544,7 @@ Script Transforms:
 
     Requires: None
 
-      Disables spawning of dedicated ships in the AP war sectors which attack player assets when the player is out-of-sector. By default, these ships scale up with player assets, and immediately respawn upon being killed. This replaces '!fight.war.protectsector'.
+      Disables spawning of dedicated ships in the AP war sectors which attack player assets when the player is out-of-sector. By default, these ships scale up with player assets, and immediately respawn upon being killed. This patches '!fight.war.protectsector'.
       
 
 
@@ -580,7 +590,7 @@ Ship Transforms:
 
     Requires: TShips.txt, WareLists.txt
 
-      Adds life support as a built-in ware for select ship classes. This is a convenience transform which calls Add_Ship_Equipment.
+      Adds life support as a built-in ware for select ship classes. This is a convenience transform which calls Add_Ship_Equipment. Warning: mission director scripts do not seem to have a way to check for built in wares, and typically use a special TP check to get around this. Other ship types with built-in life support will not be able to pick up passengers in some cases.
   
       * ship_types:
         - List of ship types to add life support to, eg. ['SG_SH_M2']. By default, this includes M6, M7, M2, M1, TL, TM.
@@ -653,6 +663,8 @@ Ship Transforms:
         - Multiplier to apply to any ship type not found in adjustment_factors_dict.
       * adjustment_factors_dict:
         - Dict keyed by ship type, holding a scaling factor to be applied.
+      * adjust_energy_cap:
+        - Bool, if True the ship maximum energy is also adjusted. This may cause oddities if applied to an existing save. Defaults False.
       
 
  * Adjust_Ship_Pricing
@@ -723,6 +735,13 @@ Ship Transforms:
   
       * include_xrm_fixes
         - Bool, if True then the Medusa Vanguard is patched if found and in the form set by XRM. Default True.
+      
+
+ * Remove_Khaak_Corvette_Spin
+
+    Requires: None
+
+      Remove the spin on the secondary hull of the Khaak corvette. The replacement file used is expected to work for vanilla, xrm, and other mods that don't change the model scene file.
       
 
  * Simplify_Engine_Trails
@@ -906,7 +925,7 @@ Weapon Transforms:
 
     Requires: TBullets.txt, TLaser.txt
 
-      Adjust weapon fire rates. DPS and energy efficiency will remain constant. This may be used to reduce fire rates for performance improvements. Fire rate changes will apply to IS damage only; OOS does not use fire rate. Secondary weapon effects are not modified. If a bullet is used by multiple lasers, the first laser will be used for fire rate damage and energy adjustment.
+      Adjust weapon fire rates. DPS and energy efficiency will remain constant. This may be used to reduce fire rates for performance improvements. Secondary weapon effects are not modified. If a bullet is used by multiple lasers, the first laser will be used for fire rate damage and energy adjustment.
   
       * scaling_factor:
         - The base multiplier to apply to fire rate.
@@ -1138,3 +1157,13 @@ Change Log:
    - Renames the script 'a.x3customizer.add.variants.to.shipyards.xml' to remove the 'a.' prefix.
  * 2.11:
    - Minor fix to rename .pck files in the addon/types folder that interfere with customized files.
+ * 2.12:
+   - Added Add_CLS_Software_To_More_Docks.
+   - Added Remove_Khaak_Corvette_Spin.
+   - Added option to Adjust_Ship_Laser_Recharge to adjust ship maximum laser energy as well.
+   - Added cap on mosquito missile damage when adjusting damages, to avoid possible OOS combat usage.
+   - Bugfix for transforms which adjust laser energy usage, to ensure the laser can store enough charge for at least one shot.
+   - Bugfix for adjusting missile hulls, to add entries to globals when missing.
+   - Bugfix for file reading which broke in recent python update.
+   - Added patch support for editing files without doing full original source uploads. Disable_OOS_War_Sector_Spawns now uses a patch.
+   - Added support for automatically filling in the source folder with any necessary scripts.

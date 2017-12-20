@@ -81,7 +81,8 @@ Note on relative value fields:
                      = [9,18] /relval
         Hence, a relval of >9 for tech goods, >18 for other goods, should
         round to 0.  This would cover just about all tech goods except
-        for super cheap missiles.
+        for super cheap missiles (explaining why mosquitos tend to fill
+        up at docks).
 
         At 300 seconds, the consumption rate inflation for these high
         value goods would be (300/20 +1) = 16x.  When a tech good
@@ -176,7 +177,7 @@ T_file_name_field_dict_dict = {
         2  : 'rotation_x',     #rpm = 60 * this value
         3  : 'rotation_y',
         4  : 'rotation_z',    #Appears to be 0 normally.
-        5  : 'subtype',       #Specific if eg. 'SG_MISSILE_LIGHT'.
+        5  : 'subtype',       #Category of missile, eg. 'SG_MISSILE_LIGHT'.
         6  : 'name_id',
         7  : 'speed',        #In meters per 500 seconds, or 1/500 meters per second.
         8  : 'acceleration', #In meters per 500 seconds per second

@@ -1,0 +1,258 @@
+--- 
++++ 
+@@ -6 +6 @@
+-<engineversion>52</engineversion>
++<engineversion>54</engineversion>
+@@ -83,0 +84,4 @@
++    
++  * Brent: short circuit the ship creation, after a wait period.
++@   = wait randomly from 10000 to 15000 ms
++    continue
+@@ -234,0 +239,4 @@
++<line indent=""><comment><text>*&#160;</text><var>Brent:&#160;short&#160;circuit&#160;the&#160;ship&#160;creation,&#160;after&#160;a&#160;wait&#160;period.</var></comment></line>
++<line interruptable="@" indent="&#160;"><var>=&#160;</var><text>wait&#160;randomly&#160;from&#160;</text><var>10000</var><text>&#160;to&#160;</text><var>15000</var><text>&#160;ms</text></line>
++<line indent="&#160;"><text>continue</text></line>
++<line indent="&#160;"></line>
+@@ -316 +324 @@
+-  <sval type="int" val="52"/>
++  <sval type="int" val="54"/>
+@@ -346 +354 @@
+-  <sval type="array" size="105">
++  <sval type="array" size="107">
+@@ -480 +488 @@
+-      <sval type="int" val="-1610588151"/>
++      <sval type="int" val="-1610587639"/>
+@@ -490 +498 @@
+-      <sval type="int" val="96"/>
++      <sval type="int" val="98"/>
+@@ -750,0 +759,12 @@
++    <sval type="array" size="6">
++      <sval type="int" val="107"/>
++      <sval type="int" val="-2147483647"/>
++      <sval type="int" val="4"/>
++      <sval type="int" val="10000"/>
++      <sval type="int" val="4"/>
++      <sval type="int" val="15000"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="112"/>
++      <sval type="int" val="17"/>
++    </sval>
+@@ -753 +773 @@
+-      <sval type="int" val="-1610598648"/>
++      <sval type="int" val="-1610598136"/>
+@@ -763 +783 @@
+-      <sval type="int" val="-1610597885"/>
++      <sval type="int" val="-1610597373"/>
+@@ -785 +805 @@
+-      <sval type="int" val="-536855036"/>
++      <sval type="int" val="-536854524"/>
+@@ -838 +858 @@
+-      <sval type="int" val="-536853500"/>
++      <sval type="int" val="-536852988"/>
+@@ -858 +878 @@
+-      <sval type="int" val="-536853497"/>
++      <sval type="int" val="-536852985"/>
+@@ -893 +913 @@
+-      <sval type="int" val="-1610594045"/>
++      <sval type="int" val="-1610593533"/>
+@@ -932 +952 @@
+-      <sval type="int" val="-1610588407"/>
++      <sval type="int" val="-1610587895"/>
+@@ -967 +987 @@
+-      <sval type="int" val="-1610591229"/>
++      <sval type="int" val="-1610590717"/>
+@@ -989 +1009 @@
+-      <sval type="int" val="87"/>
++      <sval type="int" val="89"/>
+@@ -1036 +1056 @@
+-      <sval type="int" val="-1610588669"/>
++      <sval type="int" val="-1610588157"/>
+@@ -1090 +1110 @@
+-      <sval type="int" val="75"/>
++      <sval type="int" val="77"/>
+@@ -1098 +1118 @@
+-      <sval type="int" val="-1610586109"/>
++      <sval type="int" val="-1610585597"/>
+@@ -1110 +1130 @@
+-      <sval type="int" val="-1610586103"/>
++      <sval type="int" val="-1610585591"/>
+@@ -1133 +1153 @@
+-      <sval type="int" val="-1610586365"/>
++      <sval type="int" val="-1610585853"/>
+@@ -1142 +1162 @@
+-      <sval type="int" val="98"/>
++      <sval type="int" val="100"/>
+@@ -1160 +1180 @@
+-  <sval type="array" size="58">
++  <sval type="array" size="61">
+@@ -1269 +1289 @@
+-      <sval type="string" val="we already have ships"/>
++      <sval type="string" val="Brent: short circuit the ship creation, after a wait period."/>
+@@ -1281,0 +1302,13 @@
++      <sval type="string" val="we already have ships"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="57"/>
++      <sval type="int" val="6"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="57"/>
++      <sval type="int" val="2"/>
++    </sval>
++    <sval type="array" size="3">
++      <sval type="int" val="57"/>
++      <sval type="int" val="1"/>
+@@ -1285 +1318 @@
+-      <sval type="int" val="58"/>
++      <sval type="int" val="60"/>
+@@ -1289,5 +1322,5 @@
+-      <sval type="int" val="58"/>
+-      <sval type="int" val="4"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="58"/>
++      <sval type="int" val="60"/>
++      <sval type="int" val="4"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="60"/>
+@@ -1297 +1330 @@
+-      <sval type="int" val="58"/>
++      <sval type="int" val="60"/>
+@@ -1302 +1335 @@
+-      <sval type="int" val="62"/>
++      <sval type="int" val="64"/>
+@@ -1306,9 +1339,9 @@
+-      <sval type="int" val="62"/>
+-      <sval type="int" val="4"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="62"/>
+-      <sval type="int" val="2"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="63"/>
++      <sval type="int" val="64"/>
++      <sval type="int" val="4"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="64"/>
++      <sval type="int" val="2"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="65"/>
+@@ -1318 +1351 @@
+-      <sval type="int" val="63"/>
++      <sval type="int" val="65"/>
+@@ -1323 +1356 @@
+-      <sval type="int" val="68"/>
++      <sval type="int" val="70"/>
+@@ -1327,13 +1360,13 @@
+-      <sval type="int" val="68"/>
+-      <sval type="int" val="4"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="68"/>
+-      <sval type="int" val="2"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="68"/>
+-      <sval type="int" val="2"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="68"/>
++      <sval type="int" val="70"/>
++      <sval type="int" val="4"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="70"/>
++      <sval type="int" val="2"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="70"/>
++      <sval type="int" val="2"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="70"/>
+@@ -1343 +1376 @@
+-      <sval type="int" val="68"/>
++      <sval type="int" val="70"/>
+@@ -1348,5 +1381,5 @@
+-      <sval type="int" val="73"/>
+-      <sval type="int" val="4"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="73"/>
++      <sval type="int" val="75"/>
++      <sval type="int" val="4"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="75"/>
+@@ -1356 +1389 @@
+-      <sval type="int" val="73"/>
++      <sval type="int" val="75"/>
+@@ -1361 +1394 @@
+-      <sval type="int" val="84"/>
++      <sval type="int" val="86"/>
+@@ -1365,14 +1398,6 @@
+-      <sval type="int" val="87"/>
+-      <sval type="int" val="4"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="87"/>
+-      <sval type="int" val="2"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="94"/>
+-      <sval type="int" val="4"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="95"/>
+-      <sval type="int" val="4"/>
++      <sval type="int" val="89"/>
++      <sval type="int" val="4"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="89"/>
++      <sval type="int" val="2"/>
+@@ -1385,13 +1410,21 @@
+-      <sval type="int" val="96"/>
+-      <sval type="int" val="2"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="103"/>
+-      <sval type="int" val="4"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="104"/>
+-      <sval type="int" val="4"/>
+-    </sval>
+-    <sval type="array" size="2">
+-      <sval type="int" val="104"/>
++      <sval type="int" val="97"/>
++      <sval type="int" val="4"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="98"/>
++      <sval type="int" val="4"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="98"/>
++      <sval type="int" val="2"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="105"/>
++      <sval type="int" val="4"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="106"/>
++      <sval type="int" val="4"/>
++    </sval>
++    <sval type="array" size="2">
++      <sval type="int" val="106"/>
+@@ -1405,3 +1438 @@
+-<signature>
+-dRMF8EnWqr4GNjKwLPLG7kCNl1DV2GU0/+DCa9ktBoxeSmobtLAUF6q7bJZw8+4nzv8ywiQyfv1IZObQHLy4vvy6UlnlSdaE5Gq0mMU9XigG8v7r25pRv+DTQ+EROmNbGqVbOm4lHIHFnPOTuxp0CpmFN9zEHx2ELKTbse8Pcx+hjkyWt6LRliQ1MiSAh+Qj+XIm8RhtMWThrVQGZ4gl9ho2ShRIKi2qAdfhHRrjkKdbAFNBIhzqqcYr/Nle+KHoA0UyHSb3OJpb47oK7OI6sbSodg4XDXjeeN84uSs8NFJpx5U5intgjKmBQOLZ3NHnZJ20w6JA0aMNX0BL1ufSAg==
+-</signature>
++<nosignature>9570</nosignature>
