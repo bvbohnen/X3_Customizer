@@ -97,7 +97,6 @@ def Add_Script(
 
 @Check_Dependencies()
 def Disable_OOS_War_Sector_Spawns(
-        _cleanup = False
     ):
     '''
     Disables spawning of dedicated ships in the AP war sectors which attack
