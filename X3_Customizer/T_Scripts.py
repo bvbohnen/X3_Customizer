@@ -139,6 +139,20 @@ def Allow_CAG_Apprentices_To_Sell(
     '''
     Apply_Patch('plugin.com.agent.main.xml')
     
+    
+@Check_Dependencies()
+def Fix_OOS_Laser_Missile_Conflict(
+    ):
+    '''
+    Allows OOS combat to include both missile and laser fire
+    in the same attack round. In vanilla AP, a ship firing a 
+    missile will not fire its lasers for a full round, generally 
+    causing a large drop in damage output.
+    With the change, adding missiles to OOS ships will not hurt
+    their performance.
+    '''
+    Apply_Patch('!plugin.acp.fight.attack.object.xml')
+    
 
 @Check_Dependencies()
 def Increase_Escort_Engagement_Range(

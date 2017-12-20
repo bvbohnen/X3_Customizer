@@ -28,6 +28,8 @@ Disable_Cleanup_and_Writeback()
 Make_Patch('!fight.war.protectsector.xml', verify = True)
 Make_Patch('plugin.com.agent.main.xml', verify = True)
 Make_Patch('!move.follow.template.xml', verify = True)
+Make_Patch('!plugin.acp.fight.attack.object.xml', verify = True)
+
 
 # Can leave the attack command mod as a standalone script, since it
 # is fairly simple.

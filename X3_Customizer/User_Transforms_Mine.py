@@ -1142,3 +1142,6 @@ Increase_Escort_Engagement_Range(
     medium_range = 4500,
     long_range   = 7000,
     )
+
+# Fix the OOS problem with missiles preventing laser fire.
+Fix_OOS_Laser_Missile_Conflict()

@@ -216,6 +216,10 @@ Script Transforms:
 
       Disables spawning of dedicated ships in the AP war sectors which attack player assets when the player is out-of-sector. By default, these ships scale up with player assets, and immediately respawn upon being killed. This patches '!fight.war.protectsector'.
 
+ * Fix_OOS_Laser_Missile_Conflict
+
+      Allows OOS combat to include both missile and laser fire in the same attack round. In vanilla AP, a ship firing a missile will not fire its lasers for a full round, generally causing a large drop in damage output. With the change, adding missiles to OOS ships will not hurt their performance.
+
  * Increase_Escort_Engagement_Range
 
       Increases the distance at which escort ships will break and attack a target. In vanilla AP an enemy must be within 3km of the escort ship. This transform will give custom values based on the size of the escorted ship, small, medium (m6), or large (m7+).
@@ -512,3 +516,4 @@ Change Log:
  * 2.13:
    - Added Allow_CAG_Apprentices_To_Sell.
    - Added Increase_Escort_Engagement_Range.
+   - Added Fix_OOS_Laser_Missile_Conflict.

@@ -82,6 +82,7 @@ Change Log:
  * 2.13:
    - Added Allow_CAG_Apprentices_To_Sell.
    - Added Increase_Escort_Engagement_Range.
+   - Added Fix_OOS_Laser_Missile_Conflict.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.
