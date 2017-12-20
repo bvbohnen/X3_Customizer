@@ -20,9 +20,6 @@ elif XRM:
         source_folder = 'xrm_source'
     )
     
-# Test.
-#import File_Manager
-#text = File_Manager.Load_File('!ship.cmd.attack.std.xml')
 
 #####################################################
 #Background
@@ -1135,3 +1132,13 @@ Convert_Attack_To_Attack_Nearest()
 # ships there but is not present.
 Disable_OOS_War_Sector_Spawns()
 
+# Make CAGs less frustrating to use for selling products, by
+# allowing them to sell right away.
+Allow_CAG_Apprentices_To_Sell()
+
+# Bump up the range escort ships respond to enemies.
+Increase_Escort_Engagement_Range(
+    small_range  = 3000,
+    medium_range = 4500,
+    long_range   = 7000,
+    )

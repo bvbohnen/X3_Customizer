@@ -16,6 +16,25 @@ import os
 import shutil
 from File_Patcher import *
 
+    
+#Quick dummy transform, to help the File_Manager recognize these as files
+# that may be changed.
+#Patched files should go here, else they get pulled from pck files every
+# time (not a huge problem, but unnecessary).
+#TODO: maybe find better solution; problem is that the source folder search
+# routine ignores files not in a dependency list somewhere. Alternative
+# might be to just grab everything, even user backup files that may
+# be present (also huge problem, just makes unnecessary copies).
+@Check_Dependencies(
+    '!fight.war.protectsector.xml', 
+    'plugin.com.agent.main.xml',
+    '!move.follow.template.xml',
+    #'!ship.cmd.attack.std.xml',
+    )
+def _dummy():
+    return
+
+
 # No dependencies here; this only mucks around in the script folder.
 @Check_Dependencies()
 def Add_Script(
@@ -112,6 +131,59 @@ def Disable_OOS_War_Sector_Spawns(
 
     
 @Check_Dependencies()
+def Allow_CAG_Apprentices_To_Sell(
+    ):
+    '''
+    Allows Commercial Agents to sell factory products at pilot
+    rank 0.
+    '''
+    Apply_Patch('plugin.com.agent.main.xml')
+    
+
+@Check_Dependencies()
+def Increase_Escort_Engagement_Range(
+    small_range  = 3000,
+    medium_range = 4000,
+    long_range   = 7000,
+    ):
+    '''
+    Increases the distance at which escort ships will break and
+    attack a target. In vanilla AP an enemy must be within 3km
+    of the escort ship. This transform will give custom values 
+    based on the size of the escorted ship, small, medium (m6), 
+    or large (m7+).
+    
+    * small_range:
+      - Int, distance in meters when the escorted ship is not 
+        classified as a Big Ship or Huge Ship.
+        Default 3000.
+    * medium_range:
+      - Int, distance in meters when the escorted ship is classified
+        as a Big Ship but not a Huge Ship, eg. m6.
+        Default 4000.
+    * long_range:
+      - Int, distance in meters when the escorted ship is classified
+        as a Huge Ship, eg. m7 and larger.
+        Default 7000.
+    '''
+    # Start by applying the patch.
+    # This will fill in these default values, which should be
+    # unique in the whole script:
+    # small_range  = 3011
+    # medium_range = 4011
+    # long_range   = 7011
+    Apply_Patch('!move.follow.template.xml')
+
+    # Can now grab the T file and do a replacement in its text.
+    source_t_file = Load_File('!move.follow.template.xml', 
+                              return_t_file = True)
+    source_t_file.text = (source_t_file.text
+            .replace('3011', str(small_range))
+            .replace('4011', str(medium_range))
+            .replace('7011', str(long_range)))
+    
+
+@Check_Dependencies()
 def Convert_Attack_To_Attack_Nearest(
         _cleanup = False
     ):
@@ -137,19 +209,3 @@ def Add_CLS_Software_To_More_Docks(
     the script run time. This change is not reversable.
     '''
     Add_Script('setup.x3customizer.add.cls.to.docks', remove = _cleanup)
-
-    
-#Quick dummy transform, to help the File_Manager recognize these as files
-# that may be changed.
-#Patched files should go here, else they get pulled from pck files every
-# time (not a huge problem, but unnecessary).
-#TODO: maybe find better solution; problem is that the source folder search
-# routine ignores files not in a dependency list somewhere. Alternative
-# might be to just grab everything, even user backup files that may
-# be present (also huge problem, just makes unnecessary copies).
-@Check_Dependencies(
-    '!fight.war.protectsector.xml', 
-    #'!ship.cmd.attack.std.xml',
-    )
-def _dummy():
-    return

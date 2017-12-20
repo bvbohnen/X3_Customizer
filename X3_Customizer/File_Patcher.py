@@ -112,6 +112,8 @@ def Make_Patch(file_name, verify = False, reformat_xml = False):
     whitespace, and reconvert them to strings, to somewhat
     standardize formatting between inputs.
     '''
+    print('Making patch for {}'.format(file_name))
+
     # Error if the modified file not found.
     modified_path = os.path.join(This_dir, 'patches', file_name)
     if not os.path.exists(modified_path):
@@ -222,6 +224,9 @@ def Apply_Patch(file_name):
     # from the patch based on prior changes.
     line_offset = 0
 
+    # Track if an error occurs.
+    error = False
+
     # Loop over the patch lines.
     for patch_line in patch_file_text.splitlines():
 
@@ -270,7 +275,8 @@ def Apply_Patch(file_name):
             line_text = modified_file_lines.pop(line_number)
             ref_text = patch_line.replace('-','',1)
             if line_text != ref_text:
-                print('Warning: patch line removal mismatch')
+                error = True
+                print('Error: patch line removal mismatch')
             # After the pop, line_number points to the next line (which
             # moved down an index), so leaving it unchanged should
             # support another pop following this.
@@ -289,6 +295,10 @@ def Apply_Patch(file_name):
     
         # Any other lines in the patch are likely just context, and
         # can be safely ignored.
+
+    if error:
+        print('Skipping {} due to patch error'.format(file_name))
+        return ''
 
     # Rejoin the list into a text block, adding back the newlines.
     modified_file_text = '\n'.join(modified_file_lines)

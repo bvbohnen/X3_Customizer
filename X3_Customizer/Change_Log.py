@@ -79,6 +79,9 @@ Change Log:
      uploads. Disable_OOS_War_Sector_Spawns now uses a patch.
    - Added support for automatically filling in the source folder with any
      necessary scripts.
+ * 2.13:
+   - Added Allow_CAG_Apprentices_To_Sell.
+   - Added Increase_Escort_Engagement_Range.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

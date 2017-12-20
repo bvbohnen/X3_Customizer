@@ -1,4 +1,4 @@
-X3 Customizer v2.12
+X3 Customizer v2.13
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -533,6 +533,13 @@ Script Transforms:
         - Bool, if True then instead of adding the given script, it will be removed if present from a prior transform, and any backed up pck version will be restored.
       
 
+ * Allow_CAG_Apprentices_To_Sell
+
+    Requires: None
+
+      Allows Commercial Agents to sell factory products at pilot rank 0.
+      
+
  * Convert_Attack_To_Attack_Nearest
 
     Requires: None
@@ -545,6 +552,20 @@ Script Transforms:
     Requires: None
 
       Disables spawning of dedicated ships in the AP war sectors which attack player assets when the player is out-of-sector. By default, these ships scale up with player assets, and immediately respawn upon being killed. This patches '!fight.war.protectsector'.
+      
+
+ * Increase_Escort_Engagement_Range
+
+    Requires: None
+
+      Increases the distance at which escort ships will break and attack a target. In vanilla AP an enemy must be within 3km of the escort ship. This transform will give custom values based on the size of the escorted ship, small, medium (m6), or large (m7+).
+      
+      * small_range:
+        - Int, distance in meters when the escorted ship is not classified as a Big Ship or Huge Ship. Default 3000.
+      * medium_range:
+        - Int, distance in meters when the escorted ship is classified as a Big Ship but not a Huge Ship, eg. m6. Default 4000.
+      * long_range:
+        - Int, distance in meters when the escorted ship is classified as a Huge Ship, eg. m7 and larger. Default 7000.
       
 
 
@@ -1167,3 +1188,6 @@ Change Log:
    - Bugfix for file reading which broke in recent python update.
    - Added patch support for editing files without doing full original source uploads. Disable_OOS_War_Sector_Spawns now uses a patch.
    - Added support for automatically filling in the source folder with any necessary scripts.
+ * 2.13:
+   - Added Allow_CAG_Apprentices_To_Sell.
+   - Added Increase_Escort_Engagement_Range.

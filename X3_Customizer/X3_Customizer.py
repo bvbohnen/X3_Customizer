@@ -1,5 +1,5 @@
 '''
-X3 Customizer v2.12
+X3 Customizer v2.13
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,

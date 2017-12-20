@@ -1,0 +1,351 @@
+--- 
++++ 
+@@ -6 +6 @@
+-<engineversion>44</engineversion>
++<engineversion>54</engineversion>
+@@ -120 +120 @@
+-  skip if not [THIS] -> is of class Little Ship
++  do if [THIS] -> is of class Little Ship
+@@ -122 +122 @@
+-  skip if not [THIS] -> is of class TM
++  do if [THIS] -> is of class TM
+@@ -124 +124 @@
+-  skip if not [THIS] -> is of class M6
++  do if [THIS] -> is of class M6
+@@ -126 +126 @@
+-  skip if not [THIS] -> is of class M8
++  do if [THIS] -> is of class M8
+@@ -192 +192 @@
+-  skip if not get global variable: name='com.agent.bonus.package'
++  do if get global variable: name='com.agent.bonus.package'
+@@ -197 +197 @@
+-    skip if not [THIS] -> get maximum laser strength
++    do if [THIS] -> get maximum laser strength
+@@ -219 +219 @@
+-      skip if not [THIS] -> get amount of ware Fight Command Software MK1 in cargo bay
++      do if [THIS] -> get amount of ware Fight Command Software MK1 in cargo bay
+@@ -221 +221 @@
+-      skip if not [THIS] -> get amount of ware Supply Command Software  in cargo bay
++      do if [THIS] -> get amount of ware Supply Command Software  in cargo bay
+@@ -228 +228 @@
+-    skip if not [THIS] -> is script plugin.travel.drive.main on stack of task=10
++    do if [THIS] -> is script plugin.travel.drive.main on stack of task=10
+@@ -230 +230 @@
+-    skip if not [THIS] -> is script plugin.travel.drive.main on stack of task=11
++    do if [THIS] -> is script plugin.travel.drive.main on stack of task=11
+@@ -235 +235 @@
+-    skip if not [THIS] -> get amount of ware Fight Command Software MK1 in cargo bay
++    do if [THIS] -> get amount of ware Fight Command Software MK1 in cargo bay
+@@ -240 +240 @@
+-    skip if not [THIS] -> get amount of ware Fight Command Software MK1 in cargo bay
++    do if [THIS] -> get amount of ware Fight Command Software MK1 in cargo bay
+@@ -242 +242 @@
+-    skip if not [THIS] -> get amount of ware Supply Command Software  in cargo bay
++    do if [THIS] -> get amount of ware Supply Command Software  in cargo bay
+@@ -246 +246 @@
+-  skip if not $PilotLevel >= 5
++  do if $PilotLevel >= 5
+@@ -268 +268 @@
+-    $Array.Ware = [HOMEBASE] -> get tradeable ware array from station
++    $Array.Ware = [HOMEBASE] -> get tradable ware array from station
+@@ -273 +273 @@
+-      skip if not is equipment: ware=$Ware
++      do if is equipment: ware=$Ware
+@@ -275 +275 @@
+-      skip if not is upgrade: ware=$Ware
++      do if is upgrade: ware=$Ware
+@@ -286 +286 @@
+-      skip if not $WareCargo > $WareCargoFree
++      do if $WareCargo > $WareCargoFree
+@@ -305 +305 @@
+-      skip if not [THIS] -> get amount of ware Supply Command Software  in cargo bay
++      do if [THIS] -> get amount of ware Supply Command Software  in cargo bay
+@@ -310 +310 @@
+-    skip if not $WareLoad > 0
++    do if $WareLoad > 0
+@@ -380 +380 @@
+-    $Array.Ware = [HOMEBASE] -> get tradeable ware array from station
++    $Array.Ware = [HOMEBASE] -> get tradable ware array from station
+@@ -394 +394 @@
+-      skip if not $Colleague == [THIS]
++      do if $Colleague == [THIS]
+@@ -405 +405 @@
+-      skip if not find $Ware in array: $Array.WareList
++      do if find $Ware in array: $Array.WareList
+@@ -421 +421 @@
+-    skip if not is equipment: ware=$Ware
++    do if is equipment: ware=$Ware
+@@ -423 +423 @@
+-    skip if not is upgrade: ware=$Ware
++    do if is upgrade: ware=$Ware
+@@ -445 +445 @@
+-  skip if not $BuyOrSell == 2
++  do if $BuyOrSell == 2
+@@ -507 +507 @@
+-    skip if not $ColleagueExists AND [ENVIRONMENT] == [HOMEBASE]
++    do if $ColleagueExists AND [ENVIRONMENT] == [HOMEBASE]
+@@ -514 +514 @@
+-    skip if not $ColleagueExists
++    do if $ColleagueExists
+@@ -517 +517 @@
+-    skip if not $Colleague
++    do if $Colleague
+@@ -582 +582 @@
+-        skip if not ( $WareCargo * 100 / $WareCargoMax >= 20 AND ! $ColleagueExists ) OR ! $WareBuy
++        do if ( $WareCargo * 100 / $WareCargoMax >= 20 AND ! $ColleagueExists ) OR ! $WareBuy
+@@ -633 +633 @@
+-    skip if not $ColleagueExists AND [ENVIRONMENT] == [HOMEBASE]
++    do if $ColleagueExists AND [ENVIRONMENT] == [HOMEBASE]
+@@ -640 +640 @@
+-    skip if not $ColleagueExists
++    do if $ColleagueExists
+@@ -643 +643 @@
+-    skip if not $Colleague
++    do if $Colleague
+@@ -708 +708 @@
+-        skip if not ( $WareCargo * 100 / $WareCargoMax >= 20 AND ! $ColleagueExists ) OR ! $WareBuy
++        do if ( $WareCargo * 100 / $WareCargoMax >= 20 AND ! $ColleagueExists ) OR ! $WareBuy
+@@ -728 +728 @@
+-  skip if not $BuyOrSell == 1
++  do if $BuyOrSell == 1
+@@ -730 +730,2 @@
+-  skip if $PilotLevel >= 1
++  * Brent: allow level 0 pilots to sell products.
++  skip if $PilotLevel >= 0
+@@ -819 +820 @@
+-    skip if not $WareLoad * 100 / $WareCargoMax >= 10 AND $While2 < $WhileMax2
++    do if $WareLoad * 100 / $WareCargoMax >= 10 AND $While2 < $WhileMax2
+@@ -824 +825 @@
+-  skip if not $PilotLevel >= 5 AND [ENVIRONMENT] != [HOMEBASE] AND $BuyOrSell != 2
++  do if $PilotLevel >= 5 AND [ENVIRONMENT] != [HOMEBASE] AND $BuyOrSell != 2
+@@ -839 +840 @@
+-  skip if not [HOMEBASE] -> get cargo bay size
++  do if [HOMEBASE] -> get cargo bay size
+@@ -927 +928 @@
+-    skip if not $WareLoad * 100 / $WareCargoMax >= 10 AND $While2 < $WhileMax2
++    do if $WareLoad * 100 / $WareCargoMax >= 10 AND $While2 < $WhileMax2
+@@ -932 +933 @@
+-  skip if not $PilotLevel >= 5 AND [ENVIRONMENT] != [HOMEBASE] AND $BuyOrSell != 2
++  do if $PilotLevel >= 5 AND [ENVIRONMENT] != [HOMEBASE] AND $BuyOrSell != 2
+@@ -961 +962 @@
+-        skip if not [THIS] -> get local variable: name='com.agent.log.file'
++        do if [THIS] -> get local variable: name='com.agent.log.file'
+@@ -998 +999 @@
+-      skip if not [HOMEBASE] -> is of class Dock
++      do if [HOMEBASE] -> is of class Dock
+@@ -1024 +1025 @@
+-          skip if not [THIS] -> get local variable: name='com.agent.log.file'
++          do if [THIS] -> get local variable: name='com.agent.log.file'
+@@ -1099 +1100 @@
+-      skip if not $WareIDSlotNumber == null
++      do if $WareIDSlotNumber == null
+@@ -1116 +1117 @@
+-      skip if not $ColleagueDestination == [HOMEBASE]
++      do if $ColleagueDestination == [HOMEBASE]
+@@ -1133 +1134 @@
+-  skip if not [THIS] -> get local variable: name='com.agent.colleague.agreement'
++  do if [THIS] -> get local variable: name='com.agent.colleague.agreement'
+@@ -1165 +1166 @@
+-  skip if not [THIS] -> get local variable: name='com.agent.colleague.agreement'
++  do if [THIS] -> get local variable: name='com.agent.colleague.agreement'
+@@ -1197 +1198 @@
+-  skip if not [THIS] -> get local variable: name='com.agent.colleague.agreement'
++  do if [THIS] -> get local variable: name='com.agent.colleague.agreement'
+@@ -1216 +1217 @@
+-    skip if not [HOMEBASE] -> is of class Headquarters
++    do if [HOMEBASE] -> is of class Headquarters
+@@ -1231 +1232 @@
+-    skip if not [HOMEBASE] -> get cargo bay size
++    do if [HOMEBASE] -> get cargo bay size
+@@ -1248 +1249 @@
+-  skip if not $Jumps > 2
++  do if $Jumps > 2
+@@ -1261 +1262 @@
+-  skip if not $JumpDrive OR $JumpDriveEmergency OR $TravelDrive
++  do if $JumpDrive OR $JumpDriveEmergency OR $TravelDrive
+@@ -1315 +1316 @@
+-    skip if not [ENVIRONMENT] == [HOMEBASE]
++    do if [ENVIRONMENT] == [HOMEBASE]
+@@ -1453 +1454 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>Little&#160;Ship</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>Little&#160;Ship</var></line>
+@@ -1455 +1456 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>TM</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>TM</var></line>
+@@ -1457 +1458 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>M6</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>M6</var></line>
+@@ -1459 +1460 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>M8</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>M8</var></line>
+@@ -1525 +1526 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><text>get&#160;global&#160;variable:&#160;name=</text><var>'com.agent.bonus.package'</var></line>
++<line indent=""><var>do&#160;if&#160;</var><text>get&#160;global&#160;variable:&#160;name=</text><var>'com.agent.bonus.package'</var></line>
+@@ -1530 +1531 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;maximum&#160;laser&#160;strength</text></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;maximum&#160;laser&#160;strength</text></line>
+@@ -1552 +1553 @@
+-<line indent="&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Fight&#160;Command&#160;Software&#160;MK1</var><text>&#160;in&#160;cargo&#160;bay</text></line>
++<line indent="&#160;&#160;"><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Fight&#160;Command&#160;Software&#160;MK1</var><text>&#160;in&#160;cargo&#160;bay</text></line>
+@@ -1554 +1555 @@
+-<line indent="&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Supply&#160;Command&#160;Software&#160;</var><text>&#160;in&#160;cargo&#160;bay</text></line>
++<line indent="&#160;&#160;"><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Supply&#160;Command&#160;Software&#160;</var><text>&#160;in&#160;cargo&#160;bay</text></line>
+@@ -1561 +1562 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;script&#160;</text><call>plugin.travel.drive.main</call><text>&#160;on&#160;stack&#160;of&#160;task=</text><var>10</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;script&#160;</text><call>plugin.travel.drive.main</call><text>&#160;on&#160;stack&#160;of&#160;task=</text><var>10</var></line>
+@@ -1563 +1564 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;script&#160;</text><call>plugin.travel.drive.main</call><text>&#160;on&#160;stack&#160;of&#160;task=</text><var>11</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;is&#160;script&#160;</text><call>plugin.travel.drive.main</call><text>&#160;on&#160;stack&#160;of&#160;task=</text><var>11</var></line>
+@@ -1568 +1569 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Fight&#160;Command&#160;Software&#160;MK1</var><text>&#160;in&#160;cargo&#160;bay</text></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Fight&#160;Command&#160;Software&#160;MK1</var><text>&#160;in&#160;cargo&#160;bay</text></line>
+@@ -1573 +1574 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Fight&#160;Command&#160;Software&#160;MK1</var><text>&#160;in&#160;cargo&#160;bay</text></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Fight&#160;Command&#160;Software&#160;MK1</var><text>&#160;in&#160;cargo&#160;bay</text></line>
+@@ -1575 +1576 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Supply&#160;Command&#160;Software&#160;</var><text>&#160;in&#160;cargo&#160;bay</text></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Supply&#160;Command&#160;Software&#160;</var><text>&#160;in&#160;cargo&#160;bay</text></line>
+@@ -1579 +1580 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>$PilotLevel</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>5</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>$PilotLevel</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>5</var></line>
+@@ -1601 +1602 @@
+-<line indent="&#160;"><var>$Array.Ware&#160;=&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;get&#160;tradeable&#160;ware&#160;array&#160;from&#160;station</text></line>
++<line indent="&#160;"><var>$Array.Ware&#160;=&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;get&#160;tradable&#160;ware&#160;array&#160;from&#160;station</text></line>
+@@ -1606 +1607 @@
+-<line indent="&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><text>is&#160;equipment:&#160;ware=</text><var>$Ware</var></line>
++<line indent="&#160;&#160;"><var>do&#160;if&#160;</var><text>is&#160;equipment:&#160;ware=</text><var>$Ware</var></line>
+@@ -1608 +1609 @@
+-<line indent="&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><text>is&#160;upgrade:&#160;ware=</text><var>$Ware</var></line>
++<line indent="&#160;&#160;"><var>do&#160;if&#160;</var><text>is&#160;upgrade:&#160;ware=</text><var>$Ware</var></line>
+@@ -1619 +1620 @@
+-<line indent="&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$WareCargo</var><text>&#160;</text><var>&gt;</var><text>&#160;</text><var>$WareCargoFree</var></line>
++<line indent="&#160;&#160;"><var>do&#160;if&#160;</var><var>$WareCargo</var><text>&#160;</text><var>&gt;</var><text>&#160;</text><var>$WareCargoFree</var></line>
+@@ -1638 +1639 @@
+-<line indent="&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Supply&#160;Command&#160;Software&#160;</var><text>&#160;in&#160;cargo&#160;bay</text></line>
++<line indent="&#160;&#160;"><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;amount&#160;of&#160;ware&#160;</text><var>Supply&#160;Command&#160;Software&#160;</var><text>&#160;in&#160;cargo&#160;bay</text></line>
+@@ -1643 +1644 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$WareLoad</var><text>&#160;</text><var>&gt;</var><text>&#160;</text><var>0</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>$WareLoad</var><text>&#160;</text><var>&gt;</var><text>&#160;</text><var>0</var></line>
+@@ -1713 +1714 @@
+-<line indent="&#160;"><var>$Array.Ware&#160;=&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;get&#160;tradeable&#160;ware&#160;array&#160;from&#160;station</text></line>
++<line indent="&#160;"><var>$Array.Ware&#160;=&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;get&#160;tradable&#160;ware&#160;array&#160;from&#160;station</text></line>
+@@ -1727 +1728 @@
+-<line indent="&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$Colleague</var><text>&#160;</text><var>==</var><text>&#160;</text><var>[THIS]</var></line>
++<line indent="&#160;&#160;"><var>do&#160;if&#160;</var><var>$Colleague</var><text>&#160;</text><var>==</var><text>&#160;</text><var>[THIS]</var></line>
+@@ -1738 +1739 @@
+-<line indent="&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><text>find&#160;</text><var>$Ware</var><text>&#160;in&#160;array:&#160;</text><var>$Array.WareList</var></line>
++<line indent="&#160;&#160;"><var>do&#160;if&#160;</var><text>find&#160;</text><var>$Ware</var><text>&#160;in&#160;array:&#160;</text><var>$Array.WareList</var></line>
+@@ -1754 +1755 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><text>is&#160;equipment:&#160;ware=</text><var>$Ware</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><text>is&#160;equipment:&#160;ware=</text><var>$Ware</var></line>
+@@ -1756 +1757 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><text>is&#160;upgrade:&#160;ware=</text><var>$Ware</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><text>is&#160;upgrade:&#160;ware=</text><var>$Ware</var></line>
+@@ -1778 +1779 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>$BuyOrSell</var><text>&#160;</text><var>==</var><text>&#160;</text><var>2</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>$BuyOrSell</var><text>&#160;</text><var>==</var><text>&#160;</text><var>2</var></line>
+@@ -1840 +1841 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$ColleagueExists</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>[ENVIRONMENT]</var><text>&#160;</text><var>==</var><text>&#160;</text><var>[HOMEBASE]</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>$ColleagueExists</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>[ENVIRONMENT]</var><text>&#160;</text><var>==</var><text>&#160;</text><var>[HOMEBASE]</var></line>
+@@ -1847 +1848 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$ColleagueExists</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>$ColleagueExists</var></line>
+@@ -1850 +1851 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$Colleague</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>$Colleague</var></line>
+@@ -1915 +1916 @@
+-<line indent="&#160;&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>(</var><text>&#160;</text><var>$WareCargo</var><text>&#160;</text><var>*</var><text>&#160;</text><var>100</var><text>&#160;</text><var>/</var><text>&#160;</text><var>$WareCargoMax</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>20</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>!</var><text>&#160;</text><var>$ColleagueExists</var><text>&#160;</text><var>)</var><text>&#160;</text><var>OR</var><text>&#160;</text><var>!</var><text>&#160;</text><var>$WareBuy</var></line>
++<line indent="&#160;&#160;&#160;"><var>do&#160;if&#160;</var><var>(</var><text>&#160;</text><var>$WareCargo</var><text>&#160;</text><var>*</var><text>&#160;</text><var>100</var><text>&#160;</text><var>/</var><text>&#160;</text><var>$WareCargoMax</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>20</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>!</var><text>&#160;</text><var>$ColleagueExists</var><text>&#160;</text><var>)</var><text>&#160;</text><var>OR</var><text>&#160;</text><var>!</var><text>&#160;</text><var>$WareBuy</var></line>
+@@ -1966 +1967 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$ColleagueExists</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>[ENVIRONMENT]</var><text>&#160;</text><var>==</var><text>&#160;</text><var>[HOMEBASE]</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>$ColleagueExists</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>[ENVIRONMENT]</var><text>&#160;</text><var>==</var><text>&#160;</text><var>[HOMEBASE]</var></line>
+@@ -1973 +1974 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$ColleagueExists</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>$ColleagueExists</var></line>
+@@ -1976 +1977 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$Colleague</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>$Colleague</var></line>
+@@ -2041 +2042 @@
+-<line indent="&#160;&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>(</var><text>&#160;</text><var>$WareCargo</var><text>&#160;</text><var>*</var><text>&#160;</text><var>100</var><text>&#160;</text><var>/</var><text>&#160;</text><var>$WareCargoMax</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>20</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>!</var><text>&#160;</text><var>$ColleagueExists</var><text>&#160;</text><var>)</var><text>&#160;</text><var>OR</var><text>&#160;</text><var>!</var><text>&#160;</text><var>$WareBuy</var></line>
++<line indent="&#160;&#160;&#160;"><var>do&#160;if&#160;</var><var>(</var><text>&#160;</text><var>$WareCargo</var><text>&#160;</text><var>*</var><text>&#160;</text><var>100</var><text>&#160;</text><var>/</var><text>&#160;</text><var>$WareCargoMax</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>20</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>!</var><text>&#160;</text><var>$ColleagueExists</var><text>&#160;</text><var>)</var><text>&#160;</text><var>OR</var><text>&#160;</text><var>!</var><text>&#160;</text><var>$WareBuy</var></line>
+@@ -2061 +2062 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>$BuyOrSell</var><text>&#160;</text><var>==</var><text>&#160;</text><var>1</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>$BuyOrSell</var><text>&#160;</text><var>==</var><text>&#160;</text><var>1</var></line>
+@@ -2063 +2064,2 @@
+-<line indent=""><var>skip&#160;if&#160;</var><var>$PilotLevel</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>1</var></line>
++<line indent=""><comment><text>*&#160;</text><var>Brent:&#160;allow&#160;level&#160;0&#160;pilots&#160;to&#160;sell&#160;products.</var></comment></line>
++<line indent=""><var>skip&#160;if&#160;</var><var>$PilotLevel</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>0</var></line>
+@@ -2152 +2154 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$WareLoad</var><text>&#160;</text><var>*</var><text>&#160;</text><var>100</var><text>&#160;</text><var>/</var><text>&#160;</text><var>$WareCargoMax</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>10</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>$While2</var><text>&#160;</text><var>&lt;</var><text>&#160;</text><var>$WhileMax2</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>$WareLoad</var><text>&#160;</text><var>*</var><text>&#160;</text><var>100</var><text>&#160;</text><var>/</var><text>&#160;</text><var>$WareCargoMax</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>10</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>$While2</var><text>&#160;</text><var>&lt;</var><text>&#160;</text><var>$WhileMax2</var></line>
+@@ -2157 +2159 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>$PilotLevel</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>5</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>[ENVIRONMENT]</var><text>&#160;</text><var>!=</var><text>&#160;</text><var>[HOMEBASE]</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>$BuyOrSell</var><text>&#160;</text><var>!=</var><text>&#160;</text><var>2</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>$PilotLevel</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>5</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>[ENVIRONMENT]</var><text>&#160;</text><var>!=</var><text>&#160;</text><var>[HOMEBASE]</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>$BuyOrSell</var><text>&#160;</text><var>!=</var><text>&#160;</text><var>2</var></line>
+@@ -2172 +2174 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;get&#160;cargo&#160;bay&#160;size</text></line>
++<line indent=""><var>do&#160;if&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;get&#160;cargo&#160;bay&#160;size</text></line>
+@@ -2260 +2262 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$WareLoad</var><text>&#160;</text><var>*</var><text>&#160;</text><var>100</var><text>&#160;</text><var>/</var><text>&#160;</text><var>$WareCargoMax</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>10</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>$While2</var><text>&#160;</text><var>&lt;</var><text>&#160;</text><var>$WhileMax2</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>$WareLoad</var><text>&#160;</text><var>*</var><text>&#160;</text><var>100</var><text>&#160;</text><var>/</var><text>&#160;</text><var>$WareCargoMax</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>10</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>$While2</var><text>&#160;</text><var>&lt;</var><text>&#160;</text><var>$WhileMax2</var></line>
+@@ -2265 +2267 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>$PilotLevel</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>5</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>[ENVIRONMENT]</var><text>&#160;</text><var>!=</var><text>&#160;</text><var>[HOMEBASE]</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>$BuyOrSell</var><text>&#160;</text><var>!=</var><text>&#160;</text><var>2</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>$PilotLevel</var><text>&#160;</text><var>&gt;=</var><text>&#160;</text><var>5</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>[ENVIRONMENT]</var><text>&#160;</text><var>!=</var><text>&#160;</text><var>[HOMEBASE]</var><text>&#160;</text><var>AND</var><text>&#160;</text><var>$BuyOrSell</var><text>&#160;</text><var>!=</var><text>&#160;</text><var>2</var></line>
+@@ -2294 +2296 @@
+-<line indent="&#160;&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;local&#160;variable:&#160;name=</text><var>'com.agent.log.file'</var></line>
++<line indent="&#160;&#160;&#160;"><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;local&#160;variable:&#160;name=</text><var>'com.agent.log.file'</var></line>
+@@ -2331 +2333 @@
+-<line indent="&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>Dock</var></line>
++<line indent="&#160;&#160;"><var>do&#160;if&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>Dock</var></line>
+@@ -2357 +2359 @@
+-<line indent="&#160;&#160;&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;local&#160;variable:&#160;name=</text><var>'com.agent.log.file'</var></line>
++<line indent="&#160;&#160;&#160;&#160;"><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;local&#160;variable:&#160;name=</text><var>'com.agent.log.file'</var></line>
+@@ -2432 +2434 @@
+-<line indent="&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$WareIDSlotNumber</var><text>&#160;</text><var>==</var><text>&#160;</text><var>null</var></line>
++<line indent="&#160;&#160;"><var>do&#160;if&#160;</var><var>$WareIDSlotNumber</var><text>&#160;</text><var>==</var><text>&#160;</text><var>null</var></line>
+@@ -2449 +2451 @@
+-<line indent="&#160;&#160;"><var>skip&#160;if&#160;not&#160;</var><var>$ColleagueDestination</var><text>&#160;</text><var>==</var><text>&#160;</text><var>[HOMEBASE]</var></line>
++<line indent="&#160;&#160;"><var>do&#160;if&#160;</var><var>$ColleagueDestination</var><text>&#160;</text><var>==</var><text>&#160;</text><var>[HOMEBASE]</var></line>
+@@ -2466 +2468 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;local&#160;variable:&#160;name=</text><var>'com.agent.colleague.agreement'</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;local&#160;variable:&#160;name=</text><var>'com.agent.colleague.agreement'</var></line>
+@@ -2498 +2500 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;local&#160;variable:&#160;name=</text><var>'com.agent.colleague.agreement'</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;local&#160;variable:&#160;name=</text><var>'com.agent.colleague.agreement'</var></line>
+@@ -2530 +2532 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;local&#160;variable:&#160;name=</text><var>'com.agent.colleague.agreement'</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>[THIS]&#160;-&gt;</var><text>&#160;get&#160;local&#160;variable:&#160;name=</text><var>'com.agent.colleague.agreement'</var></line>
+@@ -2549 +2551 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>Headquarters</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;is&#160;of&#160;class&#160;</text><var>Headquarters</var></line>
+@@ -2564 +2566 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;get&#160;cargo&#160;bay&#160;size</text></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>[HOMEBASE]&#160;-&gt;</var><text>&#160;get&#160;cargo&#160;bay&#160;size</text></line>
+@@ -2581 +2583 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>$Jumps</var><text>&#160;</text><var>&gt;</var><text>&#160;</text><var>2</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>$Jumps</var><text>&#160;</text><var>&gt;</var><text>&#160;</text><var>2</var></line>
+@@ -2594 +2596 @@
+-<line indent=""><var>skip&#160;if&#160;not&#160;</var><var>$JumpDrive</var><text>&#160;</text><var>OR</var><text>&#160;</text><var>$JumpDriveEmergency</var><text>&#160;</text><var>OR</var><text>&#160;</text><var>$TravelDrive</var></line>
++<line indent=""><var>do&#160;if&#160;</var><var>$JumpDrive</var><text>&#160;</text><var>OR</var><text>&#160;</text><var>$JumpDriveEmergency</var><text>&#160;</text><var>OR</var><text>&#160;</text><var>$TravelDrive</var></line>
+@@ -2648 +2650 @@
+-<line indent="&#160;"><var>skip&#160;if&#160;not&#160;</var><var>[ENVIRONMENT]</var><text>&#160;</text><var>==</var><text>&#160;</text><var>[HOMEBASE]</var></line>
++<line indent="&#160;"><var>do&#160;if&#160;</var><var>[ENVIRONMENT]</var><text>&#160;</text><var>==</var><text>&#160;</text><var>[HOMEBASE]</var></line>
+@@ -2680 +2682 @@
+-  <sval type="int" val="44"/>
++  <sval type="int" val="54"/>
+@@ -7412 +7414 @@
+-      <sval type="int" val="1"/>
++      <sval type="int" val="0"/>
+@@ -11675 +11677 @@
+-  <sval type="array" size="484">
++  <sval type="array" size="485">
+@@ -12779,0 +12782,5 @@
++    </sval>
++    <sval type="array" size="3">
++      <sval type="int" val="498"/>
++      <sval type="int" val="1"/>
++      <sval type="string" val="Brent: allow level 0 pilots to sell products."/>
+@@ -13714,3 +13721 @@
+-<signature>
+-yxxr6ffrdhXvA9YELNG6/Z62sLEyMbxJSe/7xFxAhIwQ5XcjIBJahO+QWNsLCRPy8z4ltXqGDSgtJUt4WzG3OO6wH+64fKebcLIzVNC/0kEKwxf3O9K3qRh67f6kes62tz3C2UUE8WJMrY2cP3Ay3se+oZamY/2jRtbiwnqgaMepwwK9zOS5j2f6XOPA8PtQfcdGMe7K/8k3nrX9ORfJCBo4ZYJeSvQdlo5tWQ+tVQ8xuCt4weEB1EUJFkJbUvO9CwtaA/EVDnbL/ovV2YmsjY3LJeLMwdomZxHNt7w1FsP+5TmxTX2RfWFo5nhoEitCGHQjRUolAxowk/A9L0/BHA==
+-</signature>
++<nosignature>4508</nosignature>

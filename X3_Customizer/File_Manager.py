@@ -78,6 +78,18 @@ def Write_Summary_Line(line, no_newline = False):
     Message_file.write(line + '\n' if not no_newline else '')
     
 
+Flag_disable_cleanup_and_writeback = False
+def Disable_Cleanup_and_Writeback():
+    '''
+    Set flag to disable cleanup and file writing at the end of the
+    program. This is mainly for use with the patch builder and
+    any related development transforms not intended to modify
+    the game files.
+    '''
+    global Flag_disable_cleanup_and_writeback
+    Flag_disable_cleanup_and_writeback = True
+
+
 #To simplify code a bit, predefine the paths for all expected
 # file names. This avoids having to specify path at every transform,
 # using an annoying os.path.join call. This is also more dynamic
@@ -559,6 +571,9 @@ def Cleanup():
     Handles cleanup of old transform files, generally aimed at transforms
     which were not run and which have a cleanup attribute.
     '''
+    # Skip when not cleaning up.
+    if Flag_disable_cleanup_and_writeback:
+        return
     #Loop over the transforms.
     for transform in Transform_list:
         #Skip if this was run, since it should handle its own cleanup
@@ -581,7 +596,10 @@ def Write_Files():
     Any .pck files with otherwise the same name and location will be
     renamed into .pck.x3c.bak; there is currently no code to rename
     these back to .pck, since source files are always assumed modified.
-    '''    
+    '''
+    # Skip when not cleaning up.
+    if Flag_disable_cleanup_and_writeback:
+        return
     #Loop over the files that were loaded.
     for file_name, file_object in File_dict.items():
 
