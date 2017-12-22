@@ -1569,8 +1569,33 @@ Testing:
     out the index to know the corresponding ship types, and then add
     those types to the shipyard.
 
-    Further work done in the script file, found in /scripts.
+    Further work done in the script file, found in /source.
     In general, it is working well, though had some oddities.
+
+
+TODO:
+    Revisit this and do it as a mission director script, which will
+    not require the player to manually run it through the script
+    editor.
+
+    Can maybe make use of commands like these:
+
+        <find_station group="Shipyards" multiple="1" ???>
+            <sector x="0" y="0"/>
+            <jumps max="100"/>
+        </find_station>
+        <do_all exact="{group.object.count@Shipyards}" counter="count">
+            <add_products object="{group.object.{counter@count}@Shipyards}">
+                <ware typename="shipname"/>
+                <ware typename="shipname"/>
+                ...
+            </add_products> 
+        </do_all> 
+
+    It would need a way to capture all shipyards everywhere, and
+    the typenames will need to be generated, but it should be much
+    faster to run than the script editor version with its name
+    string comparisons.
         
 '''
 

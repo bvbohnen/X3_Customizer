@@ -135,7 +135,7 @@ def Allow_CAG_Apprentices_To_Sell(
     ):
     '''
     Allows Commercial Agents to sell factory products at pilot
-    rank 0.
+    rank 0. May require CAG restart to take effect.
     '''
     Apply_Patch('plugin.com.agent.main.xml')
     

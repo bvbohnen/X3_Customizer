@@ -1126,7 +1126,7 @@ Convert_Attack_To_Attack_Nearest()
 
 # Add CLS software to more docks, so not stuck with shipping from
 # Argon space.
-#Add_CLS_Software_To_More_Docks()
+Add_CLS_Software_To_More_Docks()
 
 # Stop infinite hostile spawns in war sectors when the player has
 # ships there but is not present.

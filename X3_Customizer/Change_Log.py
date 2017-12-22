@@ -83,6 +83,8 @@ Change Log:
    - Added Allow_CAG_Apprentices_To_Sell.
    - Added Increase_Escort_Engagement_Range.
    - Added Fix_OOS_Laser_Missile_Conflict.
+ * 2.14:
+   - Bugfix for Add_CLS_Software_To_More_Docks.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

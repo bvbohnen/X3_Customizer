@@ -1,4 +1,4 @@
-X3 Customizer v2.13
+X3 Customizer v2.14
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -537,7 +537,7 @@ Script Transforms:
 
     Requires: None
 
-      Allows Commercial Agents to sell factory products at pilot rank 0.
+      Allows Commercial Agents to sell factory products at pilot rank 0. May require CAG restart to take effect.
       
 
  * Convert_Attack_To_Attack_Nearest
@@ -1199,3 +1199,5 @@ Change Log:
    - Added Allow_CAG_Apprentices_To_Sell.
    - Added Increase_Escort_Engagement_Range.
    - Added Fix_OOS_Laser_Missile_Conflict.
+ * 2.14:
+   - Bugfix for Add_CLS_Software_To_More_Docks.
