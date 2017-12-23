@@ -474,7 +474,8 @@ def Change_Sector_Music(
         file in the soundtrack folder.
     * cue_name:
       - String, name to use for the director cue and the generated
-        file if apply_to_existing_save == True.
+        file. This should be different than any used earlier in
+        a given saved game.
     * _cleanup:
       - Bool, if True any prior generated file for this cue_name will
         be deleted. This must be done manually since this tool does

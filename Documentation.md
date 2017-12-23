@@ -812,7 +812,7 @@ Universe Transforms:
       * music_id:
         - Integer, 5 digit value of the music to use, matching an mp3 file in the soundtrack folder.
       * cue_name:
-        - String, name to use for the director cue and the generated file if apply_to_existing_save == True.
+        - String, name to use for the director cue and the generated file. This should be different than any used earlier in a given saved game.
       * _cleanup:
         - Bool, if True any prior generated file for this cue_name will be deleted. This must be done manually since this tool does not track files generated on prior runs.
       
