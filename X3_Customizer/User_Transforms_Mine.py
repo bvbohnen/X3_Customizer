@@ -226,7 +226,7 @@ if XRM:
     # nerfs to respawn times.
     Adjust_Job_Respawn_Time(
         time_adder_list = [
-            #Just add a few minutes to everything for now.
+            #Just add a few minutes to everything.
             ('*', 15),
             ],
         time_multiplier_list = [
@@ -757,9 +757,7 @@ if XRM:
     #Can remove engine trails if they cause slowdown.
     #Simplify_Engine_Trails()
 
-    #Add life support to cap ships. This includes TLs by default,
-    # and may have effects on other transports (can check in game
-    # if that feels like a problem).
+    #Add life support to cap ships. This includes TLs by default.
     Add_Ship_Life_Support()
 
     #Set all ships to have the same tuning count.

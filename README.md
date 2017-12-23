@@ -1,4 +1,4 @@
-X3 Customizer v2.14
+X3 Customizer v2.15
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -311,6 +311,10 @@ Ship Transforms:
 
 Universe Transforms:
 
+ * Change_Sector_Music
+
+      Generic transform to change the music for a given sector. Currently, this only operates as a director script, and does not alter the universe file. To reverse the change, a new call must be made with a new cue name and the prior music_id.
+
  * Color_Sector_Names
 
       Colors sector names in the map based on race owners declared in the x3_universe file. Some sectors may remain uncolored if their name is not set in the standard way through text files. Only works on the English files, L044, for now. Note: searching sectors by typing a name will no longer work except on uncolored sectors, eg. unknown sectors.
@@ -519,3 +523,5 @@ Change Log:
    - Added Fix_OOS_Laser_Missile_Conflict.
  * 2.14:
    - Bugfix for Add_CLS_Software_To_More_Docks.
+ * 2.15:
+   - Added Change_Sector_Music.

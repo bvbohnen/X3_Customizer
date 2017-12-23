@@ -587,12 +587,6 @@ def Standardize_Ship_Tunings(
 @Check_Dependencies('TShips.txt', 'WareLists.txt')
 def Add_Ship_Equipment(
         ship_types = [
-            'SG_SH_M1',
-            'SG_SH_M2',
-            'SG_SH_M6',
-            'SG_SH_M7',
-            'SG_SH_TM',
-            'SG_SH_TL',
             ],
         equipment_list = [
             ]

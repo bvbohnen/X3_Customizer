@@ -85,6 +85,8 @@ Change Log:
    - Added Fix_OOS_Laser_Missile_Conflict.
  * 2.14:
    - Bugfix for Add_CLS_Software_To_More_Docks.
+ * 2.15:
+   - Added Change_Sector_Music.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

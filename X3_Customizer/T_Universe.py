@@ -372,11 +372,11 @@ def Restore_Hub_Music(
         at this time.
     '''
     #Pick a queue name for this; also use as file name.
-    queue_name = 'X3_Customizer_Restore_Hub_Music'
+    cue_name = 'X3_Customizer_Restore_Hub_Music'
 
     #Clean out old director file if requested.
     if _cleanup:
-        Make_Director_Shell(queue_name, _cleanup = True)
+        Make_Director_Shell(cue_name, _cleanup = True)
         return
 
     #Do the test replacement, as above, keying off of sector
@@ -393,14 +393,11 @@ def Restore_Hub_Music(
 
     #When a save already has the wrong music, apply a patch.
     if apply_to_existing_save:
-        #Lay out the body of the director command.
-        #This is packed into a do_all block.
-        #XRMINST.xml does this as well, and can be used as a reference maybe.
-        #The director manual says only x,y needed, which is good since the hub
-        # sector name is unclear.
-        text = (r'<alter_sector x="13" y="8" music="8302"/>')
-        #Make the file.
-        Make_Director_Shell(queue_name, text)
+        Change_Sector_Music(
+            sector_x = 13, 
+            sector_y = 8, 
+            music_id = 8302, 
+            cue_name = cue_name)
     else:
         #TODO: delete the file made above, if it exists.
         #May need to add support for a cleanup function to be called for
@@ -424,11 +421,11 @@ def Restore_M148_Music(
         at this time.
     '''
     #Pick a queue name for this; also use as file name.
-    queue_name = 'X3_Customizer_Restore_M148_Music'
+    cue_name = 'X3_Customizer_Restore_M148_Music'
 
     #Clean out old director file if requested.
     if _cleanup:
-        Make_Director_Shell(queue_name, _cleanup = True)
+        Make_Director_Shell(cue_name, _cleanup = True)
         return
 
     #Do the test replacement, as above, keying off of sector
@@ -445,17 +442,61 @@ def Restore_M148_Music(
 
     #When a save already has the wrong music, apply a patch.
     if apply_to_existing_save:
-        #Lay out the body of the director command.
-        #This is packed into a do_all block.
-        #XRMINST.xml does this as well, and can be used as a reference maybe.
-        #The director manual says only x,y needed, which is good since the hub
-        # sector name is unclear.
-        text = (r'<alter_sector x="14" y="8" music="8509"/>')
-        #Make the file.
-        Make_Director_Shell(queue_name, text)
+        Change_Sector_Music(
+            sector_x = 14, 
+            sector_y = 8, 
+            music_id = 8509, 
+            cue_name = cue_name)
     else:
         #TODO: delete the file made above, if it exists.
         pass
+    
+
+@Check_Dependencies()
+def Change_Sector_Music(
+        sector_x, 
+        sector_y, 
+        music_id,
+        cue_name = None, 
+        _cleanup = False
+        ):
+    '''
+    Generic transform to change the music for a given sector.
+    Currently, this only operates as a director script, and does
+    not alter the universe file.
+    To reverse the change, a new call must be made with a new cue
+    name and the prior music_id.
+    
+    * sector_x, sector_y:
+      - Integer values for the location of the sector to edit.
+    * music_id:
+      - Integer, 5 digit value of the music to use, matching an mp3
+        file in the soundtrack folder.
+    * cue_name:
+      - String, name to use for the director cue and the generated
+        file if apply_to_existing_save == True.
+    * _cleanup:
+      - Bool, if True any prior generated file for this cue_name will
+        be deleted. This must be done manually since this tool does
+        not track files generated on prior runs.
+    '''
+    #Clean out old director file if requested.
+    if _cleanup:
+        Make_Director_Shell(cue_name, _cleanup = True)
+        return
+    #When a save already has the wrong music, apply a patch.
+    #Lay out the body of the director command.
+    #This is packed into a do_all block.
+    #XRMINST.xml does this as well, and can be used as a reference maybe.
+    #The director manual says only x,y needed, which is good since the hub
+    # sector name is unclear.
+    text = (r'<alter_sector x="{}" y="{}" music="{}"/>'.format(
+        sector_x,
+        sector_y,
+        music_id,
+        ))
+    #Make the file.
+    Make_Director_Shell(cue_name, text)
 
     
 def Parse_universe_line(line):
@@ -481,14 +522,16 @@ def Parse_universe_line(line):
     return field_dict
 
 
-def Make_Director_Shell(queue_name, body_text = None, _cleanup = False):
+def Make_Director_Shell(cue_name, body_text = None, _cleanup = False):
     '''
     Support function to make a director shell file, setting up a queue
     with the given body text.
-    Optionally, delete any old file previously generated.
+    The file name will reuse the cue_name.
+    Optionally, delete any old file previously generated instead of
+    creating one.
     '''
     #Get the path to the file to generate.
-    file_path = os.path.join('Director',queue_name + '.xml')
+    file_path = os.path.join('Director',cue_name + '.xml')
     #If in cleanup mode, check for the file and delete it if found.
     if _cleanup:
         if os.path.exists(file_path):
@@ -508,7 +551,7 @@ def Make_Director_Shell(queue_name, body_text = None, _cleanup = False):
     <version number="0.0" date="today" status="testing" />
     </documentation>
     <cues>
-    <cue name="INSERT_QUEUE_NAME" check="cancel">
+    <cue name="INSERT_CUE_NAME" check="cancel">
         <condition>
         <check_value value="{player.age}" min="10s"/>
         </condition>
@@ -523,7 +566,7 @@ def Make_Director_Shell(queue_name, body_text = None, _cleanup = False):
     </cue>
     </cues>
 </director>
-'''.replace('INSERT_QUEUE_NAME', queue_name).replace('INSERT_BODY', body_text)
+'''.replace('INSERT_CUE_NAME', cue_name).replace('INSERT_BODY', body_text)
 
     #Path to the director folder and write the file, with this queue name.
     #Working directory should alrady be the addon directory, so dig down 1 folder.

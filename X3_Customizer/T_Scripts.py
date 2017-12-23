@@ -1,20 +1,19 @@
 '''
 Add new or modified scripts.
 
-Due to difficulty in directly modifying script files, this will focus
-on copying over pre-modified scripts where needed, renaming existing
-scripts to avoid overwriting them.
-
 This module will include a shared Add_Script transform, and some
 convenience transforms for select scripts.
-
-TODO: maybe use the xmldiff package or similar to do edits to vanilla
-scripts, instead of having to copy them entirely.
+Modified scripts will tend to be handled with patches, while original
+scripts will just be moved to the scripts folder.
 '''
 from File_Manager import *
 import os
 import shutil
 from File_Patcher import *
+
+#TODO: script to switch drone factories to using the food of their
+# race, instead of all using split food. Same for satellites and
+# majaglit.
 
     
 #Quick dummy transform, to help the File_Manager recognize these as files
