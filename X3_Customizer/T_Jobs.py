@@ -73,8 +73,10 @@ def Adjust_Job_Count(
         for entry in ['max_jobs', 'max_jobs_in_sector']:
             value = int(this_dict[entry])
             value = round(value * factor)
-            #Floor of 1.
-            value = max(1, value)
+            #Floor to 1 if the factor was not 0, to avoid low count
+            # jobs getting rounded away.
+            if factor != 0:
+                value = max(1, value)
             #Put back.
             this_dict[entry] = str(value)
 
