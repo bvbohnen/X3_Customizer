@@ -48,6 +48,31 @@ Race_code_name_dict = {
 #Convenience reverse direction lookup dict.
 Race_name_code_dict = {x:y for y,x in Race_code_name_dict.items()}
 
+# More limited translation to director script race names.
+# These are lower case, and have a few other differences.
+Director_race_code_name_dict = {
+    0  : 'none',
+    1  : 'argon',
+    2  : 'boron',
+    3  : 'split',
+    4  : 'paranid',
+    5  : 'teladi',
+    6  : 'xenon',
+    7  : 'khaak',
+    8  : 'pirate', # No 's'.
+    9  : 'goner',
+    10 : 'player',
+    11 : 'enemy',
+    12 : 'neutral',
+    13 : 'friend',
+    14 : 'abandoned',
+    15 : 'other1',
+    16 : 'other2',
+    17 : 'atf',
+    18 : 'terran',
+    19 : 'yaki',
+    }
+
 
 #Price adjustments, from relative value to credits.
 #This might vary by item type; organize by tfile.

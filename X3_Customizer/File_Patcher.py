@@ -75,6 +75,13 @@ Problem:
     replace-all in notepad++), open in game, insert/delete a line,
     resave, put the ! back.
 
+    Update:
+    When editing scripts from mods, they may not be saved from the
+    game, or could be from a much older version.
+    In such cases, normalizing the file format somewhat may provide
+    some relief.
+    This will be done on a per-file basis.
+
 
 For applying the diff as a patch, can  use third party code.
     This is mit licensed, but designed to work on files, not raw text.
@@ -143,9 +150,9 @@ def Make_Patch(file_name, verify = False, reformat_xml = False):
         # This will probably not end up being used, since attempts to
         # match up formatting didn't pan out due to too many integrated
         # differences.
-        #if reformat_xml:
-        #    modified_file_text = Standardize_XML_Format(modified_file_text)
-        #    source_file_text = Standardize_XML_Format(source_file_text)
+        if reformat_xml:
+            source_file_text = Standardize_XML_Format(source_file_text, encoding)
+            modified_file_text = Standardize_XML_Format(modified_file_text, encoding)
         
     else:
         # Use some default encoding.
@@ -170,12 +177,12 @@ def Make_Patch(file_name, verify = False, reformat_xml = False):
 
     # Write this out as-is to act as a patch.
     patch_path = modified_path + '.patch'
-    with open(patch_path, 'w', encoding = encoding) as file:
+    with open(patch_path, 'w') as file:
         file.writelines(unified_diff)
 
     if verify:
         # Apply the patch, get the modified file back.
-        patched_file_text = Apply_Patch(file_name)
+        patched_file_text = Apply_Patch(file_name, reformat_xml)
         # Compare the patched file to the original modified file.
         if patched_file_text != modified_file_text:
             print('Error: patch did not reproduce the original modified input.'
@@ -186,7 +193,7 @@ def Make_Patch(file_name, verify = False, reformat_xml = False):
     return
 
 
-def Apply_Patch(file_name):
+def Apply_Patch(file_name, reformat_xml = False):
     '''
     Reads and applies a patch to the original text, producing the
     modified text, and updates the File_Manager object accordingly.
@@ -209,6 +216,17 @@ def Apply_Patch(file_name):
     except File_Missing_Exception:
         print('Error: source for file {} not found'.format(file_name))
         return
+    
+    # Do some extra handling of xml to standardize format.
+    if file_name.endswith('.xml'):
+        # Look up the encoding on the source file, to be safe.
+        # This is generally expected to be whatever was used as default
+        # for scripts, which don't specify encoding; eg. utf-8.
+        encoding = Load_File(file_name, return_t_file = True).encoding
+        # Optionally try to reformat.
+        if reformat_xml:
+            source_file_text = Standardize_XML_Format(source_file_text, encoding)
+
 
     # To apply the patch manually, can traverse the changed blocks,
     # get their source file start line, blindly apply deletions and
@@ -296,63 +314,64 @@ def Apply_Patch(file_name):
         # Any other lines in the patch are likely just context, and
         # can be safely ignored.
 
-    if error:
-        print('Skipping {} due to patch error'.format(file_name))
-        return ''
 
     # Rejoin the list into a text block, adding back the newlines.
     modified_file_text = '\n'.join(modified_file_lines)
 
-    # Update the T file object directly.
-    source_t_file.text = modified_file_text
+    if error:
+        print('Skipping {} due to patch error'.format(file_name))
+    else:
+        # Update the T file object directly.
+        source_t_file.text = modified_file_text
 
     # Also return a copy of the new text if desired.
     return modified_file_text
 
 
-# Note: likely not used. Removed for now.
-#def Standardize_XML_Format(xml_text, remove_sourceplaintext = False):
-#    '''
-#    Standardize the newlines, indentation, and attribute ordering
-#    for an xml text block.
-#    '''    
-#    element_root = xml.etree.ElementTree.fromstring(xml_text)
-#
-#    # Note: excess indentation can arise from the text or tail of each element,
-#    # eg. when it is a newline followed by spaces that prefix the next
-#    # element when printed, or a newline in a text field preceeding a
-#    # subelement.
-#    for element in element_root.iter():
-#        # If nothing is left after splitting on the whitespace, can
-#        # replace with an empty string.
-#        if element.tail:
-#            if not ''.join(re.split('\s+', element.tail)):
-#                element.tail = ''
-#        if element.text:
-#            if not ''.join(re.split('\s+', element.text)):
-#                element.text = ''
-#
-#    # Get rid of exscriptor "linenr" attributes from elements, which aren't
-#    # present in source scripts.
-#    for element in element_root.iter():
-#        element.attrib.pop('linenr', None)
-#
-#            
-#    # For source scripts, remove the sourceplaintext element that is not
-#    # present in exscriptor scripts.
-#    source_plain_text = element_root.find('sourceplaintext')
-#    if source_plain_text != None:
-#        element_root.remove(source_plain_text)
-#
-#    # Getting standard format of lines/indents appears to require
-#    #  the minidom package instead.
-#    # Examples online just feed the elementtree text output into
-#    #  this and remake the text.
-#    # Specify unicode for the elementtree output to avoid getting
-#    #  a byte string.
-#    modified_xml_text = xml.etree.ElementTree.tostring(element_root, 
-#                                                        encoding = "unicode")
-#    minidom_version = minidom.parseString(modified_xml_text)
-#    modified_xml_text = minidom_version.toprettyxml(indent="\t")
-#
-#    return modified_xml_text
+def Standardize_XML_Format(xml_text, encoding):
+    '''
+    Standardize the newlines, indentation, and attribute ordering
+    for an xml text block.
+    '''    
+    element_root = xml.etree.ElementTree.fromstring(xml_text)
+
+    # Note: excess indentation can arise from the text or tail of each element,
+    # eg. when it is a newline followed by spaces that prefix the next
+    # element when printed, or a newline in a text field preceeding a
+    # subelement.
+    for element in element_root.iter():
+        # If nothing is left after splitting on the whitespace, can
+        # replace with an empty string.
+        if element.tail:
+            if not ''.join(re.split('\s+', element.tail)):
+                element.tail = ''
+        if element.text:
+            if not ''.join(re.split('\s+', element.text)):
+                element.text = ''
+    modified_xml_text = xml.etree.ElementTree.tostring(element_root, 
+                                                        encoding = "unicode")
+
+    # Get rid of exscriptor "linenr" attributes from elements, which aren't
+    # present in source scripts.
+    for element in element_root.iter():
+        element.attrib.pop('linenr', None)
+                    
+    # For source scripts, remove the sourceplaintext element that is not
+    # present in exscriptor scripts.
+    source_plain_text = element_root.find('sourceplaintext')
+    if source_plain_text != None:
+        element_root.remove(source_plain_text)
+
+    # Getting standard format of lines/indents appears to require
+    #  the minidom package instead.
+    # Examples online just feed the elementtree text output into
+    #  this and remake the text.
+    # Note: elementtree output is a byte string, but minidom output
+    #  appears to be a normal python string.
+    modified_xml_text = xml.etree.ElementTree.tostring(element_root)
+    minidom_version = minidom.parseString(modified_xml_text)
+    # Make sure the final string is encoded the same way as the input,
+    # else oddities can arise with eg. how spaces are given.
+    modified_xml_text = minidom_version.toprettyxml(indent="\t")
+
+    return modified_xml_text

@@ -6,13 +6,16 @@ probably keying off cases where [basic] is selected, and a specific ship
 is not identified.
 '''
 from File_Manager import *
+from T_Director import *
 import Flags
 import math
 from collections import defaultdict
 import copy
 from T_Ships import *
 from T_Wares import *
-from T_Scripts import *
+#-Removed; no longer rely on scripts.
+#from T_Scripts import *
+#from T_Scripts import _Include_Script_To_Update_Ship_Variants
 
 '''
 Notes on adding new ship variants:
@@ -201,6 +204,10 @@ variant_index_type_dict = {x:y for y,x in variant_name_index_dict.items()}
 # from being seen in the analysis in later calls.
 variant_id_field_ratios_dict_dict = None
 
+# Global tracker of all ships added in prior transforms, to be
+# included in generated director scripts.
+prior_new_variants = []
+
 
 @Check_Dependencies('TShips.txt', 'WareLists.txt', 'TWareT.txt')
 def Add_Ship_Variants(
@@ -257,6 +264,7 @@ def Add_Ship_Variants(
         print_variant_modifiers = False,
         print_variant_count = False,
         prepatch_ship_variant_inconsistencies = True,
+        cue_index = 0,
         _cleanup = False
     ):
     '''
@@ -265,11 +273,9 @@ def Add_Ship_Variants(
     existing variants and their basic ship, where only M3,M4,M5 are
     analyzed for combat variants, and only TS,TP are analyzed for trade variants,
     with Hauler being considered both a combat variant.
-    After variants are created, a script may be manually run in game from the
-    script editor which will add variants to all shipyards that sell the base
-    ship. Run 'x3customizer.add.variants.to.shipyards.xml', no input args.
-    Note: this will add all stock variants as well, as it currently has no
-    way to distinguish the new ships from existing ones.
+    Variants will be added to existing shipyards the first time a game is
+    loaded after running this transform; this may take several seconds to 
+    complete, during which time the game will be unresponsive.
     Warning: it is unsafe to remove variants once they have been added to
     an existing save.
 
@@ -347,23 +353,32 @@ def Add_Ship_Variants(
     * print_variant_modifiers:
       - If True  the calculated attributes used for variants will be printed
         to the summary file, given as multipliers on base attributes.
+    * cue_index:
+      - Int, index for the director cue which will update shipyards with
+        added variants. Increment this when changing the variants
+        in an existing save, as the update script will otherwise not fire
+        again for an already used cue_index. Default is 0.
     '''
-
-    #To add the variants to shipyards in game, a script has been set
-    # up for running from the game script editor.
-    script_name = 'x3customizer.add.variants.to.shipyards.xml'
-    # Remove it if needed.
-    if _cleanup:
-        Add_Script(script_name, remove = True)
-        return
-    # Otherwise add it, overwriting any old one.
-    Add_Script(script_name)
+    global prior_new_variants
     
-    # If an older script name is present, clean it out.
-    # This is not a big deal; can leave it in place for a version or two,
-    # then remove it.
-    old_script_name = 'a.x3customizer.add.variants.to.shipyards.xml'
-    Add_Script(old_script_name, remove = True)
+    # Location for the director script that will load the new ships.
+    # This should match the cue name.
+    director_loader_base_name = 'X3_Customizer_Update_Variants'
+    director_loader_path = os.path.join('director', director_loader_base_name+'.xml')
+
+    # General cleanup code to delete old files.
+    if _cleanup:
+        if os.path.exists(director_loader_path):
+            os.remove(director_loader_path)
+        return
+
+
+    # To add the variants to shipyards in game, a script has been set
+    # up for running from the game script editor.
+    # This is a shared called with Remove_Ship_Variants, adding the
+    # script if either transform gets used.
+    # -Removed, switching to director script style.
+    #_Include_Script_To_Update_Ship_Variants()
 
 
     # Fix some tships inconsistencies with variant numbers, if needed.
@@ -375,63 +390,18 @@ def Add_Ship_Variants(
     #Make an empty blacklist list if needed.
     if blacklist == None:
         blacklist = []
-
-
+        
     #Translate the input variant names to indices.
-    for index, input_arg in enumerate(variant_types):
-        error = False
-
-        #Check for a string.
-        if isinstance(input_arg, str):
-            #Error if this is not a name in the table.
-            if input_arg not in variant_name_index_dict:
-                error = True
-            else:
-                #Replace with the table value.
-                variant_types[index] = variant_name_index_dict[input_arg]
-
-        else:
-            #Verify this is in the 1-19 range.
-            if not isinstance(input_arg , int) or input_arg < 1 or input_arg > 19:
-                error = True
-
-        #Common error catch.
-        if error:
-            print('Add_Ship_Variants Error, variant type {} not understood.'.format(
-                input_arg))
-            return
+    #Catch any error and return early.
+    error = _Standardize_Variant_Types_List(variant_types)
+    if error:
+        return
 
     #Rename to clarify these as indices.
     variant_indices_to_generate = variant_types
-
-
+                
     #Suffixes to use for generated ship naming.
-    #This is just laid out manually, to make it clear and tweak the
-    # xl entries to distinguish them, while keeping suffixes short
-    # and expressive.
-    #Names are generally uppercase, so maintain that here.
-    #Limitations on ship names are unknown; there seems to be room
-    # for a moderate number of letters.  Try to limit to ~6 here.
-    #Stick an underscore, since that is common in existing names.
-    #These should cover all possible variants 1-19, in case mods
-    # add new ones in that range.
-    variant_index_suffix_dict = {
-        #Set up some nice names for basic variants.
-        variant_name_index_dict['basic']              : '_BASIC',
-        variant_name_index_dict['vanguard']           : '_VAN',
-        variant_name_index_dict['sentinel']           : '_SENT',
-        variant_name_index_dict['raider']             : '_RAID',
-        variant_name_index_dict['hauler']             : '_HAUL',
-        variant_name_index_dict['miner']              : '_MINE',
-        variant_name_index_dict['super freighter']    : '_SFR',
-        variant_name_index_dict['tanker']             : '_TANK',
-        variant_name_index_dict['tanker xl']          : '_TANKXL',
-        variant_name_index_dict['super freighter xl'] : '_SFRXL',
-    }
-    #Fill out with generics for the rest.
-    for i in range(20):
-        if i not in variant_index_suffix_dict:
-            variant_index_suffix_dict[i] = '_VAR{}'.format(i)
+    variant_index_suffix_dict = _Get_Variant_Suffixes()
 
     #Set up a list of mining equipment to add to mining variants.
     #Goal is to correct the cost adjustment to subtract off mining gear,
@@ -979,6 +949,10 @@ def Add_Ship_Variants(
         and basic_dict['name'] not in ship_types):
             continue
 
+        # Skip if this is not a race to add variants for.
+        race_type = Flags.Race_code_name_dict[int(basic_dict['race'])]
+        if race_type not in race_types:
+            continue
 
         #With the base type selected, can now start filling in the variants.
         #Loop over the variants being added.
@@ -998,6 +972,11 @@ def Add_Ship_Variants(
             # safe in case of future code changes that might add annotation
             # fields or similar.
             new_ship_dict = copy.deepcopy(basic_dict)
+
+            # Annotate it with the basic_dict's name, which will be the
+            # template name used in matching to shipyards to include
+            # this new variant.
+            new_ship_dict.template_name = basic_dict['name']
 
             #Need to edit the name.
             #Add the predefined suffix for the variant type.
@@ -1279,36 +1258,35 @@ def Add_Ship_Variants(
             if variant_index == variant_name_index_dict['miner']:
                 new_miners_list.append(new_ship_dict)
 
+                
+    # Get the director text for adding these new variants to
+    # shipyards.
+    text = Generate_Director_Text_To_Update_Shipyards(
+        # Ensure any ships added on prior transforms are
+        # included in the generated text still, instead of getting
+        # lost.
+        new_ships_list + prior_new_variants,
+        # Add an extra 3 indents.
+        indent_level = 3
+        )
+
+    # Stick the cue_index on the end of the cue name, to help ensure the
+    # cue will be unique and will fire (eg. wasn't fire previously in a
+    # given save).
+    #Make the file.
+    Make_Director_Shell(director_loader_base_name + '_' + str(cue_index), text,
+                        file_name = director_loader_base_name +'.xml')
+
 
     #All new ships will be put at the bottom of the tships dict_list.
-    #This will require that the header be modified to account for the
-    # new lines.
-    t_file = Load_File('TShips.txt', return_t_file = True)
-
-    #Add the new ships.
-    #These need to go in both the data and line lists, data for future
-    # visibility to this and other transforms, lines to be seen at
-    # writeout.
-    t_file.data_dict_list += new_ships_list
-    t_file.line_dict_list += new_ships_list
-
-    #Find the header line.
-    for line_dict in t_file.line_dict_list:
-        #Looking for the first non-comment line; it should have
-        # 3 entries (with newline).
-        if not line_dict[0].strip().startswith('/') and len(line_dict) == 3:
-            #The second field is the ship count.
-            #It was labelled as 'name', to match normal data lines.
-            line_dict['name'] = str(int(line_dict['name']) + len(new_ships_list))
-            break
-            
-        #Error if hit a data line.
-        assert line_dict is not t_file.data_dict_list[0]
+    Add_Entries_To_T_File('TShips.txt', new_ships_list)
 
     #Note how many ships were added.
     if print_variant_count:
         Write_Summary_Line('Number of new variants added: {}'.format(len(new_ships_list)))
 
+    # Update the prior variant list with these new ones.
+    prior_new_variants += new_ships_list
 
     #Add miner equipment.
     if add_mining_equipment:
@@ -1317,6 +1295,276 @@ def Add_Ship_Variants(
             equipment_list = mining_equipment )
 
 
+    return
+
+# Global tracker for which variants have been removed on
+# prior calls to Remove_Ship_Variants.
+prior_removed_variants = []
+
+@Check_Dependencies('TShips.txt')
+def Remove_Ship_Variants(
+        ship_types = [
+            ],
+        variant_types = [
+            ],
+        race_types = [
+            'Argon', 
+            'Boron', 
+            'Split', 
+            'Paranid', 
+            'Teladi', 
+            'Xenon', 
+            'Khaak', 
+            'Pirates', 
+            'Goner', 
+            'ATF', 
+            'Terran', 
+            'Yaki',
+            ],
+        blacklist = None,
+        print_variant_count = False,
+        cue_index = 0,
+        _cleanup = False
+    ):
+    '''
+    Removes variants for selected ships. May be used after Add_Ship_Variants
+    has already been applied to an existing save, to safely remove variants
+    while leaving their tships entries intact. In this case, leave the
+    Add_Ship_Variants call as it was previously with undesired variants, and
+    use this tranform to prune the variants.
+    Existing ships will remain in game, categorized as unknown race, though 
+    new ships will not spawn automatically.
+    Variants will be removed from existing shipyards the first time a game
+    is loaded after running this transform.
+    
+    * ship_types:
+      - List of ship names or types to remove variants for,
+        eg. ['SS_SH_OTAS_M2', 'SG_SH_M1'].
+    * variant_types:
+      - List of variant types to remove. See Add_Ship_Variants for details.
+    * blacklist:
+      - List of names of ships not to remove variants for.
+    * race_types:
+      - List of race names whose ships will have variants removed. By default,
+        the following are included: [Argon, Boron, Split, Paranid, Teladi, 
+        Xenon, Khaak, Pirates, Goner, ATF, Terran, Yaki].
+    * cue_index:
+      - Int, index for the director cue which will update shipyards with
+        added variants. Increment this when changing the variants
+        in an existing save, as the update script will otherwise not fire
+        again for an already used cue_index. Default is 0.
+    * print_variant_count:
+      - If True, the number of removed variants is printed to the summary file.
+    '''
+    # The general method here will be to leave the variants mostly intact
+    # in the tships file, to avoid game problems when loading saves with
+    # those ships present, as well as preserving ordering for later ships
+    # in tships (which could otherwise lead to ships changing type or the
+    # game crashing).
+    '''
+    Two general options here:
+    1) Set the removed ships to some special variant id which will be
+         outside those considered by the jobs file, and will be checked
+         by the game script to know when to remove a ship.
+        This will have the side effect of existing ships losting their
+         variant suffix, while keeping variant stats, which may be 
+         confusing.
+    2) Change the race owner of the variant to None.
+       This should similarly prevent spawning by the jobs file, will
+        leave the ship name intact, and can potentially be checked more
+        easily by the update script (the ships would naturally be
+        ignored when building lists of variants, and shipyards could
+        just have products checked for such a ship to be removed).
+       This has some danger of false-positive when seeing a race=0
+        ship at a shipyard that was intended to be there by other
+        mods.
+    3) Set the ware type to something other than small, or otherwise
+        edit some other generally unused field.
+       This should be safe to check in the update script, though does
+        not affect the normal ship spawning.
+
+    Use a mixture of (2) and (3), for the most reliable removal with
+    low impact on a current game.
+    TODO: move to director script, which doesn't need the ware size change.
+    '''
+    global prior_removed_variants
+    
+    # Location for the director script that will load the new ships.
+    # This should match the cue name.
+    director_loader_base_name = 'X3_Customizer_Remove_Variants'
+    director_loader_path = os.path.join('director', director_loader_base_name+'.xml')
+
+    # General cleanup code to delete old files.
+    if _cleanup:
+        if os.path.exists(director_loader_path):
+            os.remove(director_loader_path)
+        return
+
+    # Some of this code is shared with Add_Ship_Variants; major
+    # chunks have been moved to shared functions.
+
+    # Make sure the script is included to update the variants.
+    # -Removed, switching to director script style.
+    #_Include_Script_To_Update_Ship_Variants()
+    
+    #Make an empty blacklist list if needed.
+    if blacklist == None:
+        blacklist = []
+        
+    #Translate the input variant names to indices.
+    #Catch any error and return early.
+    error = _Standardize_Variant_Types_List(variant_types)
+    if error:
+        return
+
+    #Suffixes to use for generated ship naming.
+    variant_index_suffix_dict = _Get_Variant_Suffixes()
+    
+    # Build a list of variant ships to be removed in the
+    # director script.
+    removed_variants = []
+    
+    # Go through the tships list.
+    for ship_dict in Load_File('TShips.txt'):
+
+        # Skip those not of a standard race.
+        race_type = Flags.Race_code_name_dict[int(ship_dict['race'])]
+        if race_type not in race_types:
+            continue
+        # Skip those blacklisted.
+        if ship_dict['name'] in blacklist:
+            continue        
+        # Skip if this is not a ship type to modify.
+        if (ship_dict['subtype'] not in ship_types
+        and ship_dict['name'] not in ship_types):
+            continue
+                
+        # Grab the variant index.
+        variation_index = int(ship_dict['variation_index'])
+        
+        # Skip if this is not a variant to remove.
+        if variation_index not in variant_types:
+            continue
+
+        # When here, this ship needs to be removed.
+        # Update the race to 0.
+        ship_dict['race'] = '0'
+
+        # Update the ware size (should be 0 currently).
+        # (Note: 'cargo_size' is the size the ship can hold; 'cargo_size_unused'
+        #  is the size of the ship when in a cargo bay, which is meaningless.)
+        # If this transform was run multiple times, this may have been changed,
+        #  but that isn't expected in general. Disable the assertion for now,
+        #  just in case.
+        #assert ship_dict['cargo_size_unused'] == '0'
+        # The size to use is somewhat up in the air.
+        # The game will translate this into a transport_class constant, so
+        #  checking for the specific constant used here will not work well.
+        # Also, transport classes can be changed around by mods, eg. XRM switches
+        #  them up. The ST class, 5, seems to be matched up by vanilla and xrm,
+        #  so try using that here.
+        # -Removed, no longer use a script to handle this.
+        #ship_dict['cargo_size_unused'] = '5'
+        
+        # Add to the removed variants list.
+        removed_variants.append(ship_dict)
+
+
+    # Knowing the ships to remove, can now generate a director
+    # script which will handle the removals from shipyards.
+    text = Generate_Director_Text_To_Update_Shipyards(
+        # Ensure any ships removed on prior transforms are
+        # included in the generated text still, instead of getting
+        # lost.
+        removed_variants + prior_removed_variants,
+        removal_mode = True,
+        # Add an extra 3 indents.
+        indent_level = 3
+        )
+
+    # Stick the cue_index on the end of the cue name, to help ensure the
+    # cue will be unique and will fire (eg. wasn't fire previously in a
+    # given save).
+    #Make the file.
+    Make_Director_Shell(director_loader_base_name + '_' + str(cue_index), text,
+                        file_name = director_loader_base_name +'.xml')
+
+
+    # Update the tracker with removed variants.
+    prior_removed_variants += removed_variants
+
+    #Note how many ships were removed.
+    if print_variant_count:
+        Write_Summary_Line('Number of variants removed: {}'.format(
+            len(removed_variants)))
+
+    # That should be all that is needed for now.
+    # Other details are handled in the update script.
+    return
+
+
+
+    
+def _Get_Variant_Suffixes():
+    #Suffixes to use for generated ship naming.
+    #This is just laid out manually, to make it clear and tweak the
+    # xl entries to distinguish them, while keeping suffixes short
+    # and expressive.
+    #Names are generally uppercase, so maintain that here.
+    #Limitations on ship names are unknown; there seems to be room
+    # for a moderate number of letters.  Try to limit to ~6 here.
+    #Stick an underscore, since that is common in existing names.
+    #These should cover all possible variants 1-19, in case mods
+    # add new ones in that range.
+    variant_index_suffix_dict = {
+        #Set up some nice names for basic variants.
+        variant_name_index_dict['basic']              : '_BASIC',
+        variant_name_index_dict['vanguard']           : '_VAN',
+        variant_name_index_dict['sentinel']           : '_SENT',
+        variant_name_index_dict['raider']             : '_RAID',
+        variant_name_index_dict['hauler']             : '_HAUL',
+        variant_name_index_dict['miner']              : '_MINE',
+        variant_name_index_dict['super freighter']    : '_SFR',
+        variant_name_index_dict['tanker']             : '_TANK',
+        variant_name_index_dict['tanker xl']          : '_TANKXL',
+        variant_name_index_dict['super freighter xl'] : '_SFRXL',
+    }
+    #Fill out with generics for the rest.
+    for i in range(20):
+        if i not in variant_index_suffix_dict:
+            variant_index_suffix_dict[i] = '_VAR{}'.format(i)
+    return variant_index_suffix_dict
+
+
+def _Standardize_Variant_Types_List(variant_types):
+    '''
+    Translate the input variant names to indices.
+    Edits the variant_types list directly.
+    Returns None on success, integer 1 on error.
+    '''
+    for index, input_arg in enumerate(variant_types):
+        error = False
+
+        #Check for a string.
+        if isinstance(input_arg, str):
+            #Error if this is not a name in the table.
+            if input_arg not in variant_name_index_dict:
+                error = True
+            else:
+                #Replace with the table value.
+                variant_types[index] = variant_name_index_dict[input_arg]
+
+        else:
+            #Verify this is in the 1-19 range.
+            if not isinstance(input_arg , int) or input_arg < 1 or input_arg > 19:
+                error = True
+
+        #Common error catch.
+        if error:
+            print('Add_Ship_Variants Error, variant type {} not understood.'.format(
+                input_arg))
+            return 1
+        
     return
 
 '''
@@ -1573,7 +1821,7 @@ Testing:
     In general, it is working well, though had some oddities.
 
 
-TODO:
+Update:
     Revisit this and do it as a mission director script, which will
     not require the player to manually run it through the script
     editor.
@@ -1596,6 +1844,11 @@ TODO:
     the typenames will need to be generated, but it should be much
     faster to run than the script editor version with its name
     string comparisons.
+
+Update:
+    Revisit complete; the T_Factories transform motivated implementing
+    a proper director script generator.
+    Transforms here are updated accordingly.
         
 '''
 

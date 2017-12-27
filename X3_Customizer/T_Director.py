@@ -6,6 +6,10 @@ These are generally targetted at specific lines of the original input.
 import copy
 from File_Manager import *
 from copy import copy
+from collections import defaultdict
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
+import Flags
 
 @Check_Dependencies('3.01 Generic Missions.xml')
 def Adjust_Generic_Missions(
@@ -401,143 +405,297 @@ def Standardize_Start_Plot_Overtunings(
                             .replace(original_kea, replacement_kea)
                             .replace(original_hyp, replacement_hyp))
         
-    #-Removed; old line-by-line method didn't scale well.
-    ##Want to edit '3.05 Gamestart Missions'
-    #line_list = director_file_dict['3.05 Gamestart Missions']
-    ##Make separate transforms, since they occur at widely different line numbers.
-    ##Kea.
-    #transform_kea_dict = {
-    #    'start_line' : '<create_ship name="this.reward" dockobject="this.dock" typename="SS_SH_T_M3P_ENH" race="player">',
-    #    #Insert a line before by returning a string with a newline in it.
-    #    #Normal max 15 engine, 15 rudder.
-    #    2: lambda line: '{}{}\n{}'.format(
-    #        #Copy some whitespace to make the line pretty.
-    #        Get_whitespace(line),
-    #        #Remove existing tunings.
-    #        '<ware typename="SS_WARE_TECH213" exact="-50">',
-    #        #Add normal max to the fraction of max.
-    #        line.replace('18', '{}'.format(int(15 + 18 * fraction_of_max)))
-    #        ),
-    #    3: lambda line: '{}{}\n{}'.format(
-    #        Get_whitespace(line),
-    #        #Remove existing tunings.
-    #        '<ware typename="SS_WARE_TECH246" exact="-50">',
-    #        line.replace('9', '{}'.format(int(15 + 9 * fraction_of_max)))
-    #        ),
-    #    }
-    ##Hyperion and advanced perseus.
-    #transform_hyperion_dict = {
-    #    'start_line' : '<create_ship name="this.reward" dockobject="this.dock" typename="SS_SH_P_M6_ADV" race="player">',
-    #    #Hyperion, normal max 15 engine, 18 rudder.
-    #    2: lambda line: '{}{}\n{}'.format(
-    #        Get_whitespace(line),
-    #        #Remove existing tunings.
-    #        '<ware typename="SS_WARE_TECH213" exact="-50">',
-    #        #Normal max is 10             
-    #        line.replace('12', '{}'.format(int(15 + 12 * fraction_of_max)))
-    #        ),
-    #    3: lambda line: '{}{}\n{}'.format(
-    #        Get_whitespace(line),
-    #        #Remove existing tunings.
-    #        '<ware typename="SS_WARE_TECH246" exact="-50">',
-    #        #Normal max for a kea is 15.       
-    #        line.replace('8', '{}'.format(int(18 + 8 * fraction_of_max)))
-    #        ),
-    #    #Perseus, normal max 12 engine, 12 rudder.
-    #    8: lambda line: '{}{}\n{}'.format(
-    #        Get_whitespace(line),
-    #        #Remove existing tunings.
-    #        '<ware typename="SS_WARE_TECH213" exact="-50">',
-    #        #Normal max for a kea is 15.              
-    #        line.replace('8', '{}'.format(int(12 + 8 * fraction_of_max)))
-    #        ),
-    #    9: lambda line: '{}{}\n{}'.format(
-    #        Get_whitespace(line),
-    #        #Remove existing tunings.
-    #        '<ware typename="SS_WARE_TECH246" exact="-50">',
-    #        #Normal max for a kea is 15.       
-    #        line.replace('5', '{}'.format(int(12 + 5 * fraction_of_max)))
-    #        ),
-    #    }
-    #        
-    ##Apply the transform rules.
-    #Apply_transform_to_lines(line_list, transform_kea_dict)
-    #Apply_transform_to_lines(line_list, transform_hyperion_dict)
-
-
     return
 
 
+def Make_Director_Shell(cue_name, body_text = None, file_name = None, _cleanup = False):
+    '''
+    Support function to make a director shell file, setting up a queue
+    with the given body text.
+    The file name will reuse the cue_name if file_name not given.
+    Optionally, delete any old file previously generated instead of
+    creating one.
+    '''
+    # Set the default file name.
+    if not file_name:
+        file_name = cue_name + '.xml'
+    assert '.xml' in file_name
 
-#-Removed; old line-by-line method didn't scale well.
-#def Get_whitespace(line):
-#    'Helper function to return the leading white space from a line.'
-#    #Trick found at:
-#    # https://stackoverflow.com/questions/2268532/grab-a-lines-whitespace-indention-with-python
-#    #Basically, get the line without the whitespace, check its length, and take a 
-#    # slice of the line from the start out to the difference in length between
-#    # the original line and lstripped line.
-#    return line[ : len(line) - len( line.lstrip() )]
-#
-#def Apply_transform_to_lines(line_list, transform_dict):
-#    '''
-#    Support function to apply a transform to a group of lines.
-#    '''
-#    #This will track progress in the transform by creating a copy of
-#    # the dict, and popping off entries as they are satisfied, finishing
-#    # when the copy is empty.
-#    transform_dict_local = copy.copy(transform_dict)
-#    #Go through the copy and standardize it, so that any entries which
-#    # reference other entries get replaced with those entrie's values.
-#    # Eg. if entry X has value Y, and Y is another key, replace the value
-#    # of X with the value of Y.
-#    for key, value in transform_dict_local.items():
-#        if value in transform_dict_local:
-#            transform_dict_local[key] = transform_dict_local[value]
-#
-#    #If the start line has been found.
-#    start_found = False
-#    #The current line offset from the start.
-#    offset_from_start = 0
-#
-#    #Loop over lines by index, to make replacement more convenient.
-#    for index in range(len(line_list)):
-#        #Get this line.
-#        line = line_list[index]
-#        new_line = None
-#
-#        #If looking for the start still.
-#        if not start_found:
-#            if transform_dict_local['start_line'] in line:
-#                #If matched, remove start_line.
-#                transform_dict_local.pop('start_line')
-#                start_found = True
-#
-#        #Do line offset checks once start is found.
-#        #This should work for offset 0, eg. on the same line that find the
-#        # start tag.
-#        if start_found:
-#            #Check if the current line is in the dict.
-#            if offset_from_start in transform_dict_local:
-#                #Apply the transform.
-#                new_line = transform_dict_local[offset_from_start](line)
-#                #Remove the transform.
-#                transform_dict_local.pop(offset_from_start)
-#        
-#            #Advance line offset counter.
-#            offset_from_start += 1
-#
-#        #Put the new line back.
-#        if new_line:
-#            line_list[index] = new_line
-#
-#
-#        #Done when the transform dict is empty.
-#        if not transform_dict_local:
-#            break
-#
-#    #Error if stuff left in the transform dict.
-#    assert not transform_dict_local
-#
-#    #Return nothing; the list was modified in place.
-#    return
+    # Get the path to the file to generate.
+    file_path = os.path.join('Director', file_name)
+    # If in cleanup mode, check for the file and delete it if found.
+    if _cleanup:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        return
+    
+    # Double check the director folder exists.
+    if not os.path.exists('Director'):
+        os.mkdir('Director')
+
+    #Copied shell text from a patch script that cleared invulnerable station flags.
+    #This will make the queue name and text body replaceable.
+    #Since the shell text naturally has {} in it, don't use format here, just
+    # use replace.
+    shell_text = r'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml-stylesheet href="director.xsl" type="text/xsl" ?>
+<director name="template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="director.xsd">
+    <documentation>
+    <author name="X3_Customizer" alias="..." contact="..." />
+    <content reference="X3_Customizer" name="X3_Customizer generated" description="Director command injector." />
+    <version number="0.0" date="today" status="testing" />
+    </documentation>
+    <cues>
+    <cue name="INSERT_CUE_NAME" check="cancel">
+        <condition>
+        <check_value value="{player.age}" min="10s"/>
+        </condition>
+        <timing>
+        <time exact="1s"/>
+        </timing>
+        <action>
+        <do_all>
+            INSERT_BODY
+        </do_all>
+        </action>
+    </cue>
+    </cues>
+</director>
+'''.replace('INSERT_CUE_NAME', cue_name).replace('INSERT_BODY', body_text)
+
+    #Path to the director folder and write the file, with this queue name.
+    #Working directory should alrady be the addon directory, so dig down 1 folder.
+    with open(file_path, 'w') as file:
+        file.write(shell_text)
+
+
+        
+def Generate_Director_Text_To_Update_Shipyards(
+        new_wares_list,
+        indent_str = '    ',
+        indent_level = 0,
+        removal_mode = False,
+        return_xml = False):
+    '''
+    Create director script text which will select all shipyards, and
+     add to them new ships or factories if they have the matching
+     template object already sold.
+    The list of new_wares_list should be annotated with template_name, the
+     name of the existing product to look for when deciding which
+     shipyards to add wares to, and should have a 'name' dict field
+     with their own name, as well as a 'race' index field.
+    If return_xml == True, this will return an xml do_all node, else
+     will return a string version.
+    If removal_mode == True, this will remove the wares from shipyards
+     instead of adding them.
+    Optionally, provide an extra indent_level to add to returned text.
+    The returned text will be wrapped in a do_all block.
+    '''
+
+    # This will eventually be xml, so do it using a list of xml nodes
+    # to be placed inside of a do_all block.
+    # This should be a lot more elegant than raw text strings.
+    do_all_root = ET.Element('do_all',{})
+
+    '''
+    Can do this in two general ways:
+
+    1) Find all stations, loop on them, check their products and add
+     new entries.
+    2) Pick template object and find all stations that produce it,
+     and add the new entry to those.
+
+    Option (1) may be faster if the find_station command is slow,
+     since it only need to run once. Option (2) is likely simpler,
+     however, since it can potentially avoid checking if a template
+     ware is on the station product list.
+
+    Can try either, but go with (2) initially since it seems slightly
+     simpler.
+
+    Update: 
+     Option (2) seems to be slow, requiring close to 2 minutes to
+     complete when adding 811 factories to XRM.
+     Also, option (2) wants to match all stations; documentation is
+     somewhat unclear, saying that the 'multiple' option doesn't work
+     with a resource match, which may imply it also doesn't work
+     with a product match.
+    Go with option (1).
+     Update: option (1) is comparatively super fast.
+    '''
+
+    # To speed up the script, try to add all new objects together
+    #  which share the same template object, and also categorize
+    #  by race.
+    # Note: in removal mode, there are no template objects to worry
+    #  about; just put the ware itself in the template for that case,
+    #  to get reuse of the match code.
+    # Make a race : template_name : new_wares_sublist dict.
+    race_template_wares_list_dict_dict = defaultdict(
+                                        lambda : defaultdict(list))
+
+    for ware_dict in new_wares_list:
+        # Get the race as a string, using director race names.
+        race_type = Flags.Director_race_code_name_dict[int(ware_dict['race'])]
+        race_template_wares_list_dict_dict[
+            race_type][
+                # Use the template name, or ware name if removing it.
+                ware_dict.template_name if removal_mode == False else ware_dict['name']
+                ].append(ware_dict)
+
+
+    # For removal mode, much of this code will be the same until getting
+    #  into the do_if node when a template name is matched.
+
+    # Loop over the races.
+    for race, template_wares_list_dict in race_template_wares_list_dict_dict.items():
+
+        # For fun, toss up a help message to say what is happening.
+        # -Removed; the game basically freezes while this runs, so the
+        # display doesn't show up until after it completes. Can still
+        # put a final message.
+        #help_node = ET.Element('show_help',{
+        #    'text' : 'Updating {} shipyards with new wares.'.format(race),
+        #    # Try out 5 seconds or so.
+        #    'duration' : '5000'})
+        #do_all_root.append(help_node)
+
+        # Gather a list of all shipyards for this race.
+        # Example:
+        # <find_station group="Shipyards" multiple="1">
+        #     <sector x="0" y="0"/>
+        #     <jumps max="100"/>
+        # </find_station>
+        # Note: groups appear to be sticky, as in multiple commands with
+        # the same group will append to it, so after each shipyard group
+        # is handled the group should be cleared out.
+        station_node = ET.Element('find_station',{
+            'group' : 'Shipyards',
+            'multiple' : '1',
+            'class' : 'shipyard',
+            'race' : race,
+            })
+        station_node.extend( [
+            ET.Element('sector',{'x' : '0','y' : '0'}),
+            ET.Element('jumps',{'max' : '100'}),
+            # -Removed; ware check doesn't appear to work with multi match.
+            # This is leftover from trying style (2).
+            #ET.Element('ware',{'typename' : template_name,
+            #                   # Require at least 1 unit; otherwise this
+            #                   # seemed to be matching everything.
+            #                   'min'      : '1'}),
+            ])
+
+        # Set up a loop over the stations.
+        # Example:
+        # <do_all exact="{group.object.count@Shipyards}" counter="count">
+        loop_node = ET.Element('do_all',{
+            # Give the number of shipyards to count through.
+            'exact' : '{group.object.count@Shipyards}',
+            # Name the counter.
+            'counter' : 'count'})
+
+        # Indent here to indicate inside the loop above.
+        if 1:
+            # This string will be used to reference a given shipyard,
+            # by indexing into the Shipyards group based on the current
+            # counter value.
+            shipyard = '{group.object.{counter@count}@Shipyards}'
+
+            # Loop over all of the templates to be checked.
+            for template_name, new_wares_list in template_wares_list_dict.items():
+
+                # Check if this shipyard has this ware as a product.
+                # Thankfully, there appears to be a convenient command
+                # for this, getting a boolean.
+                # Put this in a do_if node.
+                if_node = ET.Element('do_if',{
+                    'value' : '{{object.products.{}.exists@{}}}'.format(
+                        template_name,
+                        shipyard
+                        ),
+                    'exact' : '1'})
+                # Add this to the loop.
+                loop_node.append(if_node)
+
+                # Indent for the do_if block.
+                if 1:
+                    # Loop over the new wares.
+                    for new_ware in new_wares_list:
+
+                        # In removal mode, it should be okay to remove the
+                        # product blindly.
+                        if removal_mode:
+                            # Only need to give a typename here; amount 
+                            # doesn't matter since it does a full removal.
+                            remove_node = ET.Element('remove_products',{'object' : shipyard})
+                            remove_node.append(ET.Element('ware',{
+                                'typename' : new_ware['name']}))
+                            # Stick in the outer do_if.
+                            if_node.append(remove_node)
+
+                        else:
+                            # Aim is to add just 1 unit of product, and to not add
+                            #  any more if the station already has at least 1 unit.
+                            # This will require another do_if, conditioned on the
+                            #  product count.
+                            # Check if the ware doesn't exist.
+                            inner_if_node = ET.Element('do_if',{
+                                'value' : '{{object.products.{}.exists@{}}}'.format(
+                                    new_ware['name'],
+                                    shipyard
+                                    ),
+                                'exact' : '0'})
+                            # Stick in the outer do_if.
+                            if_node.append(inner_if_node)
+
+                            # Indent again.
+                            if 1:
+                                # Add the product to the current shipyard.
+                                insert_node = ET.Element('add_products',{'object' : shipyard})
+                                insert_node.append(ET.Element('ware',{
+                                    'typename' : new_ware['name'],
+                                    # Give 1 unit, else shows up in game with 0.
+                                    'exact' : '1'}))
+                                # Stick inside the do_if.
+                                inner_if_node.append(insert_node)
+                    
+        # Clear out the shipyard group.
+        clear_node = ET.Element('remove_group',{'group' : 'Shipyards'})
+            
+        # Stick these in the outer do_all.
+        do_all_root.append(station_node)
+        do_all_root.append(loop_node)
+        do_all_root.append(clear_node)
+
+        
+    # Make a final status message.
+    do_all_root.append( ET.Element('show_help',{
+        'text' : 'Completed shipyard ware update.',
+        # Try out a few seconds.
+        # This seems to have the processing time counted against
+        # it, so should be longer than that.
+        # In testing, takes a few seconds to process.
+        'duration' : '6000'}))
+
+
+    # Send back the xml node if requested.
+    if return_xml:
+        return do_all_root
+
+    # Otherwise convert to text.
+    else:
+        # Give it some nice formatting.
+        xml_text = ET.tostring(do_all_root)
+        minidom_root = minidom.parseString(xml_text)
+        xml_text = minidom_root.toprettyxml(indent = indent_str)
+
+        # Post-process it to get rid of the xml declaration node, and add
+        # an extra indents.
+        xml_lines = xml_text.splitlines()
+        assert 'version' in xml_lines[0]
+        xml_lines = xml_lines[1:]
+        for index in range(len(xml_lines)):
+            xml_lines[index] = indent_str * indent_level + xml_lines[index]
+        xml_text = '\n'.join(xml_lines)
+        return xml_text

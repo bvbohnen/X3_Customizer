@@ -11,35 +11,40 @@
 		<line linenr="001" indent="">
 			<comment>* X3_Customizer script for adding generated ship variants to shipyards.</comment>
 		</line>
-		<line linenr="002" indent="" />
-		<line linenr="003" indent="" />
-		<line linenr="004" indent="">
+		<line linenr="002" indent="">
+			<comment>* This will also remove ships with race = 0 and a special transport_class,</comment>
+		</line>
+		<line linenr="003" indent="">
+			<comment>* which should uniquely identify those variants that were flagged to be removed.</comment>
+		</line>
+		<line linenr="004" indent="" />
+		<line linenr="005" indent="">
 			<comment>* Flags to turn on debug prints to the given log file.</comment>
 		</line>
-		<line linenr="005" indent="">
+		<line linenr="006" indent="">
 			<var>$debug</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>0</var>
 		</line>
-		<line linenr="006" indent="">
+		<line linenr="007" indent="">
 			<var>$logfile</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>100</var>
 		</line>
-		<line linenr="007" indent="" />
-		<line linenr="008" indent="">
+		<line linenr="008" indent="" />
+		<line linenr="009" indent="">
 			<comment>* Make the log file, using an empty write in non-append mode.</comment>
 		</line>
-		<line linenr="009" indent="">
+		<line linenr="010" indent="">
 			<text>if</text>
 			<text> </text>
 			<var>$debug</var>
 		</line>
-		<line linenr="010" indent="&#160;">
+		<line linenr="011" indent="&#160;">
 			<text>write</text>
 			<text> </text>
 			<text>to</text>
@@ -76,200 +81,200 @@
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="011" indent="">
+		<line linenr="012" indent="">
 			<text>end</text>
 		</line>
-		<line linenr="012" indent="" />
-		<line linenr="013" indent="">
+		<line linenr="013" indent="" />
+		<line linenr="014" indent="">
 			<comment>* To balance the script between speed and avoiding lag, each main</comment>
 		</line>
-		<line linenr="014" indent="">
+		<line linenr="015" indent="">
 			<comment>* ship name analysis loop can pause every X ships, where up to</comment>
 		</line>
-		<line linenr="015" indent="">
+		<line linenr="016" indent="">
 			<comment>* this many ships are handled per game frame.</comment>
 		</line>
-		<line linenr="016" indent="">
+		<line linenr="017" indent="">
 			<var>$int.ships.between.waits</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>5</var>
 		</line>
-		<line linenr="017" indent="" />
 		<line linenr="018" indent="" />
-		<line linenr="019" indent="">
+		<line linenr="019" indent="" />
+		<line linenr="020" indent="">
 			<comment>* Run init.</comment>
 		</line>
-		<line linenr="020" indent="">
+		<line linenr="021" indent="">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Init</var>
 			<text>:</text>
 		</line>
-		<line linenr="021" indent="" />
-		<line linenr="022" indent="">
+		<line linenr="022" indent="" />
+		<line linenr="023" indent="">
 			<comment>* To reduce run time a bit, and recognizing that races shouldn't stock ships of</comment>
 		</line>
-		<line linenr="023" indent="">
+		<line linenr="024" indent="">
 			<comment>* other races, the inner functions will run on one race at a time.</comment>
 		</line>
-		<line linenr="024" indent="">
+		<line linenr="025" indent="">
 			<comment>* A special case may be made for terran/atf, which will be merged under terran.</comment>
 		</line>
-		<line linenr="025" indent="">
+		<line linenr="026" indent="">
 			<var>$race</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>[Argon]</var>
 		</line>
-		<line linenr="026" indent="">
+		<line linenr="027" indent="">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Main.Routine</var>
 			<text>:</text>
 		</line>
-		<line linenr="027" indent="">
+		<line linenr="028" indent="">
 			<var>$race</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>[Boron]</var>
 		</line>
-		<line linenr="028" indent="">
+		<line linenr="029" indent="">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Main.Routine</var>
 			<text>:</text>
 		</line>
-		<line linenr="029" indent="">
+		<line linenr="030" indent="">
 			<var>$race</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>[Split]</var>
 		</line>
-		<line linenr="030" indent="">
+		<line linenr="031" indent="">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Main.Routine</var>
 			<text>:</text>
 		</line>
-		<line linenr="031" indent="">
+		<line linenr="032" indent="">
 			<var>$race</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>[Paranid]</var>
 		</line>
-		<line linenr="032" indent="">
+		<line linenr="033" indent="">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Main.Routine</var>
 			<text>:</text>
 		</line>
-		<line linenr="033" indent="">
+		<line linenr="034" indent="">
 			<var>$race</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>[Teladi]</var>
 		</line>
-		<line linenr="034" indent="">
+		<line linenr="035" indent="">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Main.Routine</var>
 			<text>:</text>
 		</line>
-		<line linenr="035" indent="">
+		<line linenr="036" indent="">
 			<var>$race</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>[Terran]</var>
 		</line>
-		<line linenr="036" indent="">
+		<line linenr="037" indent="">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Main.Routine</var>
 			<text>:</text>
 		</line>
-		<line linenr="037" indent="">
+		<line linenr="038" indent="">
 			<var>$race</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>[Pirates]</var>
 		</line>
-		<line linenr="038" indent="">
+		<line linenr="039" indent="">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Main.Routine</var>
 			<text>:</text>
 		</line>
-		<line linenr="039" indent="">
+		<line linenr="040" indent="">
 			<var>$race</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>[Yaki]</var>
 		</line>
-		<line linenr="040" indent="">
+		<line linenr="041" indent="">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Main.Routine</var>
 			<text>:</text>
 		</line>
-		<line linenr="041" indent="">
+		<line linenr="042" indent="">
 			<var>$race</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>[Xenon]</var>
 		</line>
-		<line linenr="042" indent="">
+		<line linenr="043" indent="">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Main.Routine</var>
 			<text>:</text>
 		</line>
-		<line linenr="043" indent="" />
 		<line linenr="044" indent="" />
-		<line linenr="045" indent="">
+		<line linenr="045" indent="" />
+		<line linenr="046" indent="">
 			<text>return</text>
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="046" indent="" />
 		<line linenr="047" indent="" />
-		<line linenr="048" indent="">
+		<line linenr="048" indent="" />
+		<line linenr="049" indent="">
 			<comment>* Function to run the main routine, finding shipyards and ships and adding</comment>
 		</line>
-		<line linenr="049" indent="">
+		<line linenr="050" indent="">
 			<comment>* buyable variants, for a given race.</comment>
 		</line>
-		<line linenr="050" indent="">
+		<line linenr="051" indent="">
 			<comment>* Input:</comment>
 		</line>
-		<line linenr="051" indent="">
+		<line linenr="052" indent="">
 			<comment>*     $race</comment>
 		</line>
-		<line linenr="052" indent="">
+		<line linenr="053" indent="">
 			<comment>* Output:</comment>
 		</line>
-		<line linenr="053" indent="">
+		<line linenr="054" indent="">
 			<comment>*     None</comment>
 		</line>
-		<line linenr="054" indent="">
+		<line linenr="055" indent="">
 			<var>Func.Main.Routine</var>
 			<text>:</text>
 		</line>
-		<line linenr="055" indent="&#160;" />
-		<line linenr="056" indent="&#160;">
+		<line linenr="056" indent="&#160;" />
+		<line linenr="057" indent="&#160;">
 			<comment>* Get a list of shipyards.</comment>
 		</line>
-		<line linenr="057" indent="&#160;">
+		<line linenr="058" indent="&#160;">
 			<var>$array.shipyards</var>
 			<text> </text>
 			<text>=</text>
@@ -293,11 +298,11 @@
 			<text>=</text>
 			<var>[Shipyard]</var>
 		</line>
-		<line linenr="058" indent="&#160;" />
-		<line linenr="059" indent="&#160;">
+		<line linenr="059" indent="&#160;" />
+		<line linenr="060" indent="&#160;">
 			<comment>* Get a list of ship types.</comment>
 		</line>
-		<line linenr="060" indent="&#160;">
+		<line linenr="061" indent="&#160;">
 			<var>$array.class.ship.type</var>
 			<text> </text>
 			<text>=</text>
@@ -321,11 +326,11 @@
 			<text>=</text>
 			<var>null</var>
 		</line>
-		<line linenr="061" indent="&#160;" />
-		<line linenr="062" indent="&#160;">
+		<line linenr="062" indent="&#160;" />
+		<line linenr="063" indent="&#160;">
 			<comment>* If this is terran, include atf shipyards and ships.</comment>
 		</line>
-		<line linenr="063" indent="&#160;">
+		<line linenr="064" indent="&#160;">
 			<text>if</text>
 			<text> </text>
 			<var>$race</var>
@@ -334,27 +339,27 @@
 			<text> </text>
 			<var>[Terran]</var>
 		</line>
-		<line linenr="064" indent="&#160;&#160;">
+		<line linenr="065" indent="&#160;&#160;">
 			<var>$race2</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>[ATF]</var>
 		</line>
-		<line linenr="065" indent="&#160;&#160;">
+		<line linenr="066" indent="&#160;&#160;">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Add.Second.Race.Shipyards.Ships</var>
 			<text>:</text>
 		</line>
-		<line linenr="066" indent="&#160;">
+		<line linenr="067" indent="&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="067" indent="&#160;" />
-		<line linenr="068" indent="&#160;">
+		<line linenr="068" indent="&#160;" />
+		<line linenr="069" indent="&#160;">
 			<comment>* If this is argon, include goners.</comment>
 		</line>
-		<line linenr="069" indent="&#160;">
+		<line linenr="070" indent="&#160;">
 			<text>if</text>
 			<text> </text>
 			<var>$race</var>
@@ -363,73 +368,73 @@
 			<text> </text>
 			<var>[Argon]</var>
 		</line>
-		<line linenr="070" indent="&#160;&#160;">
+		<line linenr="071" indent="&#160;&#160;">
 			<var>$race2</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>[Goner]</var>
 		</line>
-		<line linenr="071" indent="&#160;&#160;">
+		<line linenr="072" indent="&#160;&#160;">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Add.Second.Race.Shipyards.Ships</var>
 			<text>:</text>
 		</line>
-		<line linenr="072" indent="&#160;">
+		<line linenr="073" indent="&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="073" indent="&#160;" />
-		<line linenr="074" indent="&#160;">
+		<line linenr="074" indent="&#160;" />
+		<line linenr="075" indent="&#160;">
 			<comment>* Generate a list of ship type base names.</comment>
 		</line>
-		<line linenr="075" indent="&#160;">
+		<line linenr="076" indent="&#160;">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Parse.Ship.Names</var>
 			<text>:</text>
 		</line>
-		<line linenr="076" indent="&#160;" />
-		<line linenr="077" indent="&#160;">
+		<line linenr="077" indent="&#160;" />
+		<line linenr="078" indent="&#160;">
 			<comment>* Handle the shipyard additions.</comment>
 		</line>
-		<line linenr="078" indent="&#160;">
+		<line linenr="079" indent="&#160;">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Shipyard.Add.Variants</var>
 			<text>:</text>
 		</line>
-		<line linenr="079" indent="&#160;" />
-		<line linenr="080" indent="">
+		<line linenr="080" indent="&#160;" />
+		<line linenr="081" indent="">
 			<text>endsub</text>
 		</line>
-		<line linenr="081" indent="" />
 		<line linenr="082" indent="" />
 		<line linenr="083" indent="" />
-		<line linenr="084" indent="">
+		<line linenr="084" indent="" />
+		<line linenr="085" indent="">
 			<comment>* Function to parse ship base names.</comment>
 		</line>
-		<line linenr="085" indent="">
+		<line linenr="086" indent="">
 			<comment>* Input:</comment>
 		</line>
-		<line linenr="086" indent="">
+		<line linenr="087" indent="">
 			<comment>*     $array.class.ship.type</comment>
 		</line>
-		<line linenr="087" indent="">
+		<line linenr="088" indent="">
 			<comment>* Output:</comment>
 		</line>
-		<line linenr="088" indent="">
+		<line linenr="089" indent="">
 			<comment>*     $array.str.ship.type.name.base</comment>
 		</line>
-		<line linenr="089" indent="">
+		<line linenr="090" indent="">
 			<var>Func.Parse.Ship.Names</var>
 			<text>:</text>
 		</line>
-		<line linenr="090" indent="&#160;" />
-		<line linenr="091" indent="&#160;">
+		<line linenr="091" indent="&#160;" />
+		<line linenr="092" indent="&#160;">
 			<comment>* Make an array of the same size as the ship type array.</comment>
 		</line>
-		<line linenr="092" indent="&#160;">
+		<line linenr="093" indent="&#160;">
 			<var>$int.ship.count</var>
 			<text> </text>
 			<text>=</text>
@@ -442,7 +447,7 @@
 			<text> </text>
 			<var>$array.class.ship.type</var>
 		</line>
-		<line linenr="093" indent="&#160;">
+		<line linenr="094" indent="&#160;">
 			<var>$array.str.ship.type.name.base</var>
 			<text> </text>
 			<text>=</text>
@@ -456,13 +461,13 @@
 			<text>=</text>
 			<var>$int.ship.count</var>
 		</line>
-		<line linenr="094" indent="&#160;" />
-		<line linenr="095" indent="&#160;">
+		<line linenr="095" indent="&#160;" />
+		<line linenr="096" indent="&#160;">
 			<text>if</text>
 			<text> </text>
 			<var>$debug</var>
 		</line>
-		<line linenr="096" indent="&#160;&#160;">
+		<line linenr="097" indent="&#160;&#160;">
 			<text>write</text>
 			<text> </text>
 			<text>to</text>
@@ -499,55 +504,55 @@
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="097" indent="&#160;">
+		<line linenr="098" indent="&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="098" indent="&#160;" />
-		<line linenr="099" indent="&#160;">
+		<line linenr="099" indent="&#160;" />
+		<line linenr="100" indent="&#160;">
 			<comment>* Keep a rolling count of ships until the next wait point,</comment>
 		</line>
-		<line linenr="100" indent="&#160;">
+		<line linenr="101" indent="&#160;">
 			<comment>* used to prevent overlagging the game.</comment>
 		</line>
-		<line linenr="101" indent="&#160;">
+		<line linenr="102" indent="&#160;">
 			<comment>* This will start at the high count and go down to 0.</comment>
 		</line>
-		<line linenr="102" indent="&#160;">
+		<line linenr="103" indent="&#160;">
 			<var>$int.ships.until.wait</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>$int.ships.between.waits</var>
 		</line>
-		<line linenr="103" indent="&#160;" />
-		<line linenr="104" indent="&#160;">
+		<line linenr="104" indent="&#160;" />
+		<line linenr="105" indent="&#160;">
 			<comment>* Loop over the ship types.</comment>
 		</line>
-		<line linenr="105" indent="&#160;">
+		<line linenr="106" indent="&#160;">
 			<comment>* Other scripts like to do countdowns to 0, so keep that style here,</comment>
 		</line>
-		<line linenr="106" indent="&#160;">
+		<line linenr="107" indent="&#160;">
 			<comment>* filling names from last to first.</comment>
 		</line>
-		<line linenr="107" indent="&#160;">
+		<line linenr="108" indent="&#160;">
 			<text>while</text>
 			<text> </text>
 			<var>$int.ship.count</var>
 		</line>
-		<line linenr="108" indent="&#160;&#160;" />
-		<line linenr="109" indent="&#160;&#160;">
+		<line linenr="109" indent="&#160;&#160;" />
+		<line linenr="110" indent="&#160;&#160;">
 			<comment>* Count down; this also brings the index in range.</comment>
 		</line>
-		<line linenr="110" indent="&#160;&#160;">
+		<line linenr="111" indent="&#160;&#160;">
 			<text>dec</text>
 			<text> </text>
 			<var>$int.ship.count</var>
 		</line>
-		<line linenr="111" indent="&#160;&#160;" />
-		<line linenr="112" indent="&#160;&#160;">
+		<line linenr="112" indent="&#160;&#160;" />
+		<line linenr="113" indent="&#160;&#160;">
 			<comment>* Get the next ship type.</comment>
 		</line>
-		<line linenr="113" indent="&#160;&#160;">
+		<line linenr="114" indent="&#160;&#160;">
 			<var>$class.ship.type</var>
 			<text> </text>
 			<text>=</text>
@@ -557,34 +562,34 @@
 			<var>$int.ship.count</var>
 			<text>]</text>
 		</line>
-		<line linenr="114" indent="&#160;&#160;" />
-		<line linenr="115" indent="&#160;&#160;">
+		<line linenr="115" indent="&#160;&#160;" />
+		<line linenr="116" indent="&#160;&#160;">
 			<comment>* Do a debug print.</comment>
 		</line>
-		<line linenr="116" indent="&#160;&#160;">
+		<line linenr="117" indent="&#160;&#160;">
 			<comment>* if $debug</comment>
 		</line>
-		<line linenr="117" indent="&#160;&#160;">
+		<line linenr="118" indent="&#160;&#160;">
 			<comment>* write to log file $logfile append=1 printf: fmt='Ship %s, index %s', $class.ship.type, $int.ship.count, null, null, null</comment>
 		</line>
-		<line linenr="118" indent="&#160;&#160;">
+		<line linenr="119" indent="&#160;&#160;">
 			<comment>* end</comment>
 		</line>
-		<line linenr="119" indent="&#160;&#160;" />
-		<line linenr="120" indent="&#160;&#160;">
+		<line linenr="120" indent="&#160;&#160;" />
+		<line linenr="121" indent="&#160;&#160;">
 			<comment>* Get its base name.</comment>
 		</line>
-		<line linenr="121" indent="&#160;&#160;">
+		<line linenr="122" indent="&#160;&#160;">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Get.Ship.Type.Base.Name</var>
 			<text>:</text>
 		</line>
-		<line linenr="122" indent="&#160;&#160;" />
-		<line linenr="123" indent="&#160;&#160;">
+		<line linenr="123" indent="&#160;&#160;" />
+		<line linenr="124" indent="&#160;&#160;">
 			<comment>* Store the base name.</comment>
 		</line>
-		<line linenr="124" indent="&#160;&#160;">
+		<line linenr="125" indent="&#160;&#160;">
 			<var>$array.str.ship.type.name.base</var>
 			<text>[</text>
 			<var>$int.ship.count</var>
@@ -594,16 +599,16 @@
 			<text> </text>
 			<var>$str.ship.type.name.base</var>
 		</line>
-		<line linenr="125" indent="&#160;&#160;" />
-		<line linenr="126" indent="&#160;&#160;">
+		<line linenr="126" indent="&#160;&#160;" />
+		<line linenr="127" indent="&#160;&#160;">
 			<comment>* Count down to the next wait point, and see if it is reached.</comment>
 		</line>
-		<line linenr="127" indent="&#160;&#160;">
+		<line linenr="128" indent="&#160;&#160;">
 			<text>dec</text>
 			<text> </text>
 			<var>$int.ships.until.wait</var>
 		</line>
-		<line linenr="128" indent="&#160;&#160;">
+		<line linenr="129" indent="&#160;&#160;">
 			<text>if</text>
 			<text> </text>
 			<var>$int.ships.until.wait</var>
@@ -612,17 +617,17 @@
 			<text> </text>
 			<var>0</var>
 		</line>
-		<line linenr="129" indent="&#160;&#160;&#160;" />
-		<line linenr="130" indent="&#160;&#160;&#160;">
+		<line linenr="130" indent="&#160;&#160;&#160;" />
+		<line linenr="131" indent="&#160;&#160;&#160;">
 			<comment>* This might be slow and can lock up a game while running.</comment>
 		</line>
-		<line linenr="131" indent="&#160;&#160;&#160;">
+		<line linenr="132" indent="&#160;&#160;&#160;">
 			<comment>* To make more friendly, put in a message and a wait.</comment>
 		</line>
-		<line linenr="132" indent="&#160;&#160;&#160;">
+		<line linenr="133" indent="&#160;&#160;&#160;">
 			<comment>* Throw up the current race, and how many ships still need processing.</comment>
 		</line>
-		<line linenr="133" indent="&#160;&#160;&#160;">
+		<line linenr="134" indent="&#160;&#160;&#160;">
 			<var>$msg</var>
 			<text> </text>
 			<text>=</text>
@@ -649,16 +654,16 @@
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="134" indent="&#160;&#160;&#160;">
+		<line linenr="135" indent="&#160;&#160;&#160;">
 			<comment>* It is unclear on if a subtitle can be given extra time and the next</comment>
 		</line>
-		<line linenr="135" indent="&#160;&#160;&#160;">
+		<line linenr="136" indent="&#160;&#160;&#160;">
 			<comment>* will just overwrite it, or if they queue up, or what.</comment>
 		</line>
-		<line linenr="136" indent="&#160;&#160;&#160;">
+		<line linenr="137" indent="&#160;&#160;&#160;">
 			<comment>* Play it a little safe and give 10 ms, with 10 ms waits.</comment>
 		</line>
-		<line linenr="137" indent="&#160;&#160;&#160;">
+		<line linenr="138" indent="&#160;&#160;&#160;">
 			<text>display</text>
 			<text> </text>
 			<text>subtitle</text>
@@ -676,16 +681,16 @@
 			<text> </text>
 			<text>ms</text>
 		</line>
-		<line linenr="138" indent="&#160;&#160;&#160;">
+		<line linenr="139" indent="&#160;&#160;&#160;">
 			<comment>* 1ms will wait until the next screen update.</comment>
 		</line>
-		<line linenr="139" indent="&#160;&#160;&#160;">
+		<line linenr="140" indent="&#160;&#160;&#160;">
 			<comment>* Note: this needs a return arg for some reason; don't set null or exscriptor/x3</comment>
 		</line>
-		<line linenr="140" indent="&#160;&#160;&#160;">
+		<line linenr="141" indent="&#160;&#160;&#160;">
 			<comment>* sets it to $debug for some reason.</comment>
 		</line>
-		<line linenr="141" indent="&#160;&#160;&#160;" interruptable="@">
+		<line linenr="142" indent="&#160;&#160;&#160;" interruptable="@">
 			<var>$temp</var>
 			<text> </text>
 			<text>=</text>
@@ -696,56 +701,56 @@
 			<text> </text>
 			<text>ms</text>
 		</line>
-		<line linenr="142" indent="&#160;&#160;&#160;" />
-		<line linenr="143" indent="&#160;&#160;&#160;">
+		<line linenr="143" indent="&#160;&#160;&#160;" />
+		<line linenr="144" indent="&#160;&#160;&#160;">
 			<var>$int.ships.until.wait</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>$int.ships.between.waits</var>
 		</line>
-		<line linenr="144" indent="&#160;&#160;">
+		<line linenr="145" indent="&#160;&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="145" indent="&#160;">
+		<line linenr="146" indent="&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="146" indent="">
+		<line linenr="147" indent="">
 			<text>endsub</text>
 		</line>
-		<line linenr="147" indent="" />
 		<line linenr="148" indent="" />
 		<line linenr="149" indent="" />
-		<line linenr="150" indent="">
+		<line linenr="150" indent="" />
+		<line linenr="151" indent="">
 			<comment>* Function to add variants to shipyards.</comment>
 		</line>
-		<line linenr="151" indent="">
+		<line linenr="152" indent="">
 			<comment>* Input:</comment>
 		</line>
-		<line linenr="152" indent="">
+		<line linenr="153" indent="">
 			<comment>*     $array.shipyards</comment>
 		</line>
-		<line linenr="153" indent="">
+		<line linenr="154" indent="">
 			<comment>*     $array.class.ship.type</comment>
 		</line>
-		<line linenr="154" indent="">
+		<line linenr="155" indent="">
 			<comment>*     $array.str.ship.type.name.base</comment>
 		</line>
-		<line linenr="155" indent="">
+		<line linenr="156" indent="">
 			<comment>* Output:</comment>
 		</line>
-		<line linenr="156" indent="">
+		<line linenr="157" indent="">
 			<comment>*     None.</comment>
 		</line>
-		<line linenr="157" indent="">
+		<line linenr="158" indent="">
 			<var>Func.Shipyard.Add.Variants</var>
 			<text>:</text>
 		</line>
-		<line linenr="158" indent="&#160;" />
-		<line linenr="159" indent="&#160;">
+		<line linenr="159" indent="&#160;" />
+		<line linenr="160" indent="&#160;">
 			<comment>* Loop over the shipyards.</comment>
 		</line>
-		<line linenr="160" indent="&#160;">
+		<line linenr="161" indent="&#160;">
 			<var>$int.shipyard</var>
 			<text> </text>
 			<text>=</text>
@@ -758,21 +763,21 @@
 			<text> </text>
 			<var>$array.shipyards</var>
 		</line>
-		<line linenr="161" indent="&#160;">
+		<line linenr="162" indent="&#160;">
 			<text>while</text>
 			<text> </text>
 			<var>$int.shipyard</var>
 		</line>
-		<line linenr="162" indent="&#160;&#160;">
+		<line linenr="163" indent="&#160;&#160;">
 			<text>dec</text>
 			<text> </text>
 			<var>$int.shipyard</var>
 		</line>
-		<line linenr="163" indent="&#160;&#160;" />
-		<line linenr="164" indent="&#160;&#160;">
+		<line linenr="164" indent="&#160;&#160;" />
+		<line linenr="165" indent="&#160;&#160;">
 			<comment>* Grab the next shipyard.</comment>
 		</line>
-		<line linenr="165" indent="&#160;&#160;">
+		<line linenr="166" indent="&#160;&#160;">
 			<var>$shipyard</var>
 			<text> </text>
 			<text>=</text>
@@ -782,11 +787,11 @@
 			<var>$int.shipyard</var>
 			<text>]</text>
 		</line>
-		<line linenr="166" indent="&#160;&#160;" />
-		<line linenr="167" indent="&#160;&#160;">
+		<line linenr="167" indent="&#160;&#160;" />
+		<line linenr="168" indent="&#160;&#160;">
 			<comment>* Get the shipyard wares list.</comment>
 		</line>
-		<line linenr="168" indent="&#160;&#160;">
+		<line linenr="169" indent="&#160;&#160;">
 			<var>$array.shipyard.products</var>
 			<text> </text>
 			<text>=</text>
@@ -798,23 +803,23 @@
 			<text> </text>
 			<text>products</text>
 		</line>
-		<line linenr="169" indent="&#160;&#160;">
+		<line linenr="170" indent="&#160;&#160;">
 			<comment>* if $debug</comment>
 		</line>
-		<line linenr="170" indent="&#160;&#160;">
+		<line linenr="171" indent="&#160;&#160;">
 			<comment>* write to log file $logfile append=1 value=$shipyard</comment>
 		</line>
-		<line linenr="171" indent="&#160;&#160;">
+		<line linenr="172" indent="&#160;&#160;">
 			<comment>* write to log file $logfile append=1 value=$array.shipyard.products</comment>
 		</line>
-		<line linenr="172" indent="&#160;&#160;">
+		<line linenr="173" indent="&#160;&#160;">
 			<comment>* end</comment>
 		</line>
-		<line linenr="173" indent="&#160;&#160;" />
-		<line linenr="174" indent="&#160;&#160;">
+		<line linenr="174" indent="&#160;&#160;" />
+		<line linenr="175" indent="&#160;&#160;">
 			<comment>* Loop over the wares.</comment>
 		</line>
-		<line linenr="175" indent="&#160;&#160;">
+		<line linenr="176" indent="&#160;&#160;">
 			<var>$int.ware</var>
 			<text> </text>
 			<text>=</text>
@@ -827,21 +832,21 @@
 			<text> </text>
 			<var>$array.shipyard.products</var>
 		</line>
-		<line linenr="176" indent="&#160;&#160;">
+		<line linenr="177" indent="&#160;&#160;">
 			<text>while</text>
 			<text> </text>
 			<var>$int.ware</var>
 		</line>
-		<line linenr="177" indent="&#160;&#160;&#160;">
+		<line linenr="178" indent="&#160;&#160;&#160;">
 			<text>dec</text>
 			<text> </text>
 			<var>$int.ware</var>
 		</line>
-		<line linenr="178" indent="&#160;&#160;&#160;" />
-		<line linenr="179" indent="&#160;&#160;&#160;">
+		<line linenr="179" indent="&#160;&#160;&#160;" />
+		<line linenr="180" indent="&#160;&#160;&#160;">
 			<comment>* Grab the next ware.</comment>
 		</line>
-		<line linenr="180" indent="&#160;&#160;&#160;">
+		<line linenr="181" indent="&#160;&#160;&#160;">
 			<var>$ware</var>
 			<text> </text>
 			<text>=</text>
@@ -851,72 +856,171 @@
 			<var>$int.ware</var>
 			<text>]</text>
 		</line>
-		<line linenr="181" indent="&#160;&#160;&#160;" />
-		<line linenr="182" indent="&#160;&#160;&#160;">
+		<line linenr="182" indent="&#160;&#160;&#160;" />
+		<line linenr="183" indent="&#160;&#160;&#160;">
 			<comment>* Want to determine if this is a ship type.</comment>
 		</line>
-		<line linenr="183" indent="&#160;&#160;&#160;">
-			<comment>* Unclear on how best to do this, but easiest would probably be to</comment>
-		</line>
 		<line linenr="184" indent="&#160;&#160;&#160;">
-			<comment>* check if the ware is in the ship type array.</comment>
+			<comment>* Apparently wares have a maintype and subtype, which are integer</comment>
 		</line>
 		<line linenr="185" indent="&#160;&#160;&#160;">
-			<text>if</text>
+			<comment>* values. Can check for the ship main type.</comment>
+		</line>
+		<line linenr="186" indent="&#160;&#160;&#160;">
+			<var>$int.ware.maintype</var>
 			<text> </text>
-			<text>find</text>
+			<text>=</text>
+			<text> </text>
+			<text>get</text>
+			<text> </text>
+			<text>maintype</text>
+			<text> </text>
+			<text>of</text>
+			<text> </text>
+			<text>ware</text>
 			<text> </text>
 			<var>$ware</var>
+		</line>
+		<line linenr="187" indent="&#160;&#160;&#160;" />
+		<line linenr="188" indent="&#160;&#160;&#160;">
+			<comment>* Also grab the transport class, eg. cargo size, here.</comment>
+		</line>
+		<line linenr="189" indent="&#160;&#160;&#160;">
+			<var>$int.transport.class</var>
 			<text> </text>
-			<text>in</text>
+			<text>=</text>
 			<text> </text>
-			<text>array</text>
-			<text>:</text>
+			<text>get</text>
 			<text> </text>
-			<var>$array.class.ship.type</var>
+			<text>transport</text>
+			<text> </text>
+			<text>class</text>
+			<text> </text>
+			<text>of</text>
+			<text> </text>
+			<text>ware</text>
+			<text> </text>
+			<var>$ware</var>
 		</line>
-		<line linenr="186" indent="&#160;&#160;&#160;&#160;" />
-		<line linenr="187" indent="&#160;&#160;&#160;&#160;">
-			<comment>* Know that this is a ship type, and it is one of those being</comment>
+		<line linenr="190" indent="&#160;&#160;&#160;" />
+		<line linenr="191" indent="&#160;&#160;&#160;">
+			<comment>* If not a ship, skip it.</comment>
 		</line>
-		<line linenr="188" indent="&#160;&#160;&#160;&#160;">
-			<comment>* looked for.</comment>
-		</line>
-		<line linenr="189" indent="&#160;&#160;&#160;&#160;">
-			<comment>* Two options here:</comment>
-		</line>
-		<line linenr="190" indent="&#160;&#160;&#160;&#160;">
-			<comment>* Can get the base name of the ship, and use that for</comment>
-		</line>
-		<line linenr="191" indent="&#160;&#160;&#160;&#160;">
-			<comment>* finding variants, which would mean all shipyards with one</comment>
-		</line>
-		<line linenr="192" indent="&#160;&#160;&#160;&#160;">
-			<comment>* variant will pick up them all;</comment>
+		<line linenr="192" indent="&#160;&#160;&#160;">
+			<text>if</text>
+			<text> </text>
+			<text>not</text>
+			<text> </text>
+			<var>$int.ware.maintype</var>
+			<text> </text>
+			<text>==</text>
+			<text> </text>
+			<var>[SSTYPE_SHIP]</var>
 		</line>
 		<line linenr="193" indent="&#160;&#160;&#160;&#160;">
-			<comment>* Or can use the full name of the ship with suffix, skip it if it</comment>
+			<comment>* Do nothing</comment>
 		</line>
-		<line linenr="194" indent="&#160;&#160;&#160;&#160;">
-			<comment>* is not in the base name array, and then search the array for</comment>
-		</line>
+		<line linenr="194" indent="&#160;&#160;&#160;&#160;" />
 		<line linenr="195" indent="&#160;&#160;&#160;&#160;">
-			<comment>* matches, which would mean only shipyards with the base ship</comment>
+			<comment>* Check if this is a ship with a flagged transport class to</comment>
 		</line>
 		<line linenr="196" indent="&#160;&#160;&#160;&#160;">
-			<comment>* type will pick up variants.</comment>
+			<comment>* indicate removal.</comment>
 		</line>
 		<line linenr="197" indent="&#160;&#160;&#160;&#160;">
-			<comment>* The latter is probably good enough for most cases, and might run</comment>
+			<comment>* Normal ships have a 0 for this entry in tships, though this may</comment>
 		</line>
 		<line linenr="198" indent="&#160;&#160;&#160;&#160;">
-			<comment>* faster, so try it for now.</comment>
+			<comment>* translate into a unique integer in-game (checking for not-0 didn't</comment>
 		</line>
-		<line linenr="199" indent="&#160;&#160;&#160;&#160;" />
+		<line linenr="199" indent="&#160;&#160;&#160;&#160;">
+			<comment>* work out).</comment>
+		</line>
 		<line linenr="200" indent="&#160;&#160;&#160;&#160;">
-			<comment>* Get the ship name.</comment>
+			<comment>* The actual constant may depend on mod type.</comment>
 		</line>
 		<line linenr="201" indent="&#160;&#160;&#160;&#160;">
+			<comment>* For now, ST it used, in hopes it is stable across mods.</comment>
+		</line>
+		<line linenr="202" indent="&#160;&#160;&#160;">
+			<text>else</text>
+			<text> </text>
+			<text>if</text>
+			<text> </text>
+			<var>$int.transport.class</var>
+			<text> </text>
+			<text>==</text>
+			<text> </text>
+			<var>[ST]</var>
+		</line>
+		<line linenr="203" indent="&#160;&#160;&#160;&#160;">
+			<comment>* Remove this product from the shipyard.</comment>
+		</line>
+		<line linenr="204" indent="&#160;&#160;&#160;&#160;">
+			<var>$shipyard</var>
+			<text>-&gt;</text>
+			<text> </text>
+			<text>remove</text>
+			<text> </text>
+			<text>product</text>
+			<text> </text>
+			<text>from</text>
+			<text> </text>
+			<text>factory</text>
+			<text> </text>
+			<text>or</text>
+			<text> </text>
+			<text>dock</text>
+			<text>:</text>
+			<text> </text>
+			<var>$ware</var>
+		</line>
+		<line linenr="205" indent="&#160;&#160;&#160;&#160;" />
+		<line linenr="206" indent="&#160;&#160;&#160;">
+			<text>else</text>
+		</line>
+		<line linenr="207" indent="&#160;&#160;&#160;&#160;">
+			<comment>* Know that this is a ship type, and it is one of those being</comment>
+		</line>
+		<line linenr="208" indent="&#160;&#160;&#160;&#160;">
+			<comment>* looked for to possibly match to variants.</comment>
+		</line>
+		<line linenr="209" indent="&#160;&#160;&#160;&#160;" />
+		<line linenr="210" indent="&#160;&#160;&#160;&#160;">
+			<comment>* Two options here:</comment>
+		</line>
+		<line linenr="211" indent="&#160;&#160;&#160;&#160;">
+			<comment>* Can get the base name of the ship, and use that for</comment>
+		</line>
+		<line linenr="212" indent="&#160;&#160;&#160;&#160;">
+			<comment>* finding variants, which would mean all shipyards with one</comment>
+		</line>
+		<line linenr="213" indent="&#160;&#160;&#160;&#160;">
+			<comment>* variant will pick up them all;</comment>
+		</line>
+		<line linenr="214" indent="&#160;&#160;&#160;&#160;">
+			<comment>* Or can use the full name of the ship with suffix, skip it if it</comment>
+		</line>
+		<line linenr="215" indent="&#160;&#160;&#160;&#160;">
+			<comment>* is not in the base name array, and then search the array for</comment>
+		</line>
+		<line linenr="216" indent="&#160;&#160;&#160;&#160;">
+			<comment>* matches, which would mean only shipyards with the base ship</comment>
+		</line>
+		<line linenr="217" indent="&#160;&#160;&#160;&#160;">
+			<comment>* type will pick up variants.</comment>
+		</line>
+		<line linenr="218" indent="&#160;&#160;&#160;&#160;">
+			<comment>* The latter is probably good enough for most cases, and might run</comment>
+		</line>
+		<line linenr="219" indent="&#160;&#160;&#160;&#160;">
+			<comment>* faster, so try it for now.</comment>
+		</line>
+		<line linenr="220" indent="&#160;&#160;&#160;&#160;" />
+		<line linenr="221" indent="&#160;&#160;&#160;&#160;">
+			<comment>* Get the ship name.</comment>
+		</line>
+		<line linenr="222" indent="&#160;&#160;&#160;&#160;">
 			<var>$str.ship.type.name.full</var>
 			<text> </text>
 			<text>=</text>
@@ -943,36 +1047,36 @@
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="202" indent="&#160;&#160;&#160;&#160;">
+		<line linenr="223" indent="&#160;&#160;&#160;&#160;">
 			<comment>* Despace it if needed, to get proper matching.</comment>
 		</line>
-		<line linenr="203" indent="&#160;&#160;&#160;&#160;">
+		<line linenr="224" indent="&#160;&#160;&#160;&#160;">
 			<var>$str.to.despace</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>$str.ship.type.name.full</var>
 		</line>
-		<line linenr="204" indent="&#160;&#160;&#160;&#160;">
+		<line linenr="225" indent="&#160;&#160;&#160;&#160;">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Remove.Trailing.Space</var>
 			<text>:</text>
 		</line>
-		<line linenr="205" indent="&#160;&#160;&#160;&#160;">
+		<line linenr="226" indent="&#160;&#160;&#160;&#160;">
 			<var>$str.ship.type.name.full</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>$str.to.despace.out</var>
 		</line>
-		<line linenr="206" indent="&#160;&#160;&#160;&#160;" />
-		<line linenr="207" indent="&#160;&#160;&#160;&#160;">
+		<line linenr="227" indent="&#160;&#160;&#160;&#160;" />
+		<line linenr="228" indent="&#160;&#160;&#160;&#160;">
 			<text>if</text>
 			<text> </text>
 			<var>$debug</var>
 		</line>
-		<line linenr="208" indent="&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="229" indent="&#160;&#160;&#160;&#160;&#160;">
 			<text>write</text>
 			<text> </text>
 			<text>to</text>
@@ -1009,14 +1113,14 @@
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="209" indent="&#160;&#160;&#160;&#160;">
+		<line linenr="230" indent="&#160;&#160;&#160;&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="210" indent="&#160;&#160;&#160;&#160;" />
-		<line linenr="211" indent="&#160;&#160;&#160;&#160;">
+		<line linenr="231" indent="&#160;&#160;&#160;&#160;" />
+		<line linenr="232" indent="&#160;&#160;&#160;&#160;">
 			<comment>* Check if it is in the base names list.</comment>
 		</line>
-		<line linenr="212" indent="&#160;&#160;&#160;&#160;">
+		<line linenr="233" indent="&#160;&#160;&#160;&#160;">
 			<text>if</text>
 			<text> </text>
 			<text>find</text>
@@ -1030,11 +1134,11 @@
 			<text> </text>
 			<var>$array.str.ship.type.name.base</var>
 		</line>
-		<line linenr="213" indent="&#160;&#160;&#160;&#160;&#160;" />
-		<line linenr="214" indent="&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="234" indent="&#160;&#160;&#160;&#160;&#160;" />
+		<line linenr="235" indent="&#160;&#160;&#160;&#160;&#160;">
 			<comment>* Loop over every ship.type/name combo.</comment>
 		</line>
-		<line linenr="215" indent="&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="236" indent="&#160;&#160;&#160;&#160;&#160;">
 			<var>$int.ships</var>
 			<text> </text>
 			<text>=</text>
@@ -1047,21 +1151,21 @@
 			<text> </text>
 			<var>$array.class.ship.type</var>
 		</line>
-		<line linenr="216" indent="&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="237" indent="&#160;&#160;&#160;&#160;&#160;">
 			<text>while</text>
 			<text> </text>
 			<var>$int.ships</var>
 		</line>
-		<line linenr="217" indent="&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="238" indent="&#160;&#160;&#160;&#160;&#160;&#160;">
 			<text>dec</text>
 			<text> </text>
 			<var>$int.ships</var>
 		</line>
-		<line linenr="218" indent="&#160;&#160;&#160;&#160;&#160;&#160;" />
-		<line linenr="219" indent="&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="239" indent="&#160;&#160;&#160;&#160;&#160;&#160;" />
+		<line linenr="240" indent="&#160;&#160;&#160;&#160;&#160;&#160;">
 			<comment>* Do a name match to see if the ware is the same.</comment>
 		</line>
-		<line linenr="220" indent="&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="241" indent="&#160;&#160;&#160;&#160;&#160;&#160;">
 			<var>$str.sample.ship.type.name.base</var>
 			<text> </text>
 			<text>=</text>
@@ -1071,7 +1175,7 @@
 			<var>$int.ships</var>
 			<text>]</text>
 		</line>
-		<line linenr="221" indent="&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="242" indent="&#160;&#160;&#160;&#160;&#160;&#160;">
 			<text>if</text>
 			<text> </text>
 			<var>$str.ship.type.name.full</var>
@@ -1080,11 +1184,11 @@
 			<text> </text>
 			<var>$str.sample.ship.type.name.base</var>
 		</line>
-		<line linenr="222" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;" />
-		<line linenr="223" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="243" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;" />
+		<line linenr="244" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
 			<comment>* On a match, grab the ship type being sampled.</comment>
 		</line>
-		<line linenr="224" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="245" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
 			<var>$class.sample.ship.type</var>
 			<text> </text>
 			<text>=</text>
@@ -1094,11 +1198,11 @@
 			<var>$int.ships</var>
 			<text>]</text>
 		</line>
-		<line linenr="225" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;" />
-		<line linenr="226" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="246" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;" />
+		<line linenr="247" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
 			<comment>* Skip if it is a shipyard product already.</comment>
 		</line>
-		<line linenr="227" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="248" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
 			<text>if</text>
 			<text> </text>
 			<text>find</text>
@@ -1112,14 +1216,14 @@
 			<text> </text>
 			<var>$array.shipyard.products</var>
 		</line>
-		<line linenr="228" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="249" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
 			<text>else</text>
 		</line>
-		<line linenr="229" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" />
-		<line linenr="230" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="250" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" />
+		<line linenr="251" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
 			<comment>* Add it as a product.</comment>
 		</line>
-		<line linenr="231" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="252" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
 			<var>$shipyard</var>
 			<text>-&gt;</text>
 			<text> </text>
@@ -1138,13 +1242,13 @@
 			<text> </text>
 			<var>$class.sample.ship.type</var>
 		</line>
-		<line linenr="232" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" />
-		<line linenr="233" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="253" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;" />
+		<line linenr="254" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
 			<text>if</text>
 			<text> </text>
 			<var>$debug</var>
 		</line>
-		<line linenr="234" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="255" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
 			<text>write</text>
 			<text> </text>
 			<text>to</text>
@@ -1181,41 +1285,53 @@
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="235" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="256" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="236" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="257" indent="&#160;&#160;&#160;&#160;&#160;&#160;&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="237" indent="&#160;&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="258" indent="&#160;&#160;&#160;&#160;&#160;&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="238" indent="&#160;&#160;&#160;&#160;&#160;">
+		<line linenr="259" indent="&#160;&#160;&#160;&#160;&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="239" indent="&#160;&#160;&#160;&#160;">
+		<line linenr="260" indent="&#160;&#160;&#160;&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="240" indent="&#160;&#160;&#160;">
+		<line linenr="261" indent="&#160;&#160;&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="241" indent="&#160;&#160;&#160;" />
-		<line linenr="242" indent="&#160;&#160;&#160;">
+		<line linenr="262" indent="&#160;&#160;&#160;" />
+		<line linenr="263" indent="&#160;&#160;&#160;">
 			<comment>* This might be slow and can lock up a game while running.</comment>
 		</line>
-		<line linenr="243" indent="&#160;&#160;&#160;">
+		<line linenr="264" indent="&#160;&#160;&#160;">
 			<comment>* To make more friendly, put in a message and a wait.</comment>
 		</line>
-		<line linenr="244" indent="&#160;&#160;&#160;">
+		<line linenr="265" indent="&#160;&#160;&#160;">
 			<comment>* Could potentially put this on a counter to play with it, but</comment>
 		</line>
-		<line linenr="245" indent="&#160;&#160;&#160;">
+		<line linenr="266" indent="&#160;&#160;&#160;">
 			<comment>* every loop seems to work okay in testing.</comment>
 		</line>
-		<line linenr="246" indent="&#160;&#160;&#160;">
+		<line linenr="267" indent="&#160;&#160;&#160;">
 			<comment>* Throw up the current race, and how many factories still need processing.</comment>
 		</line>
-		<line linenr="247" indent="&#160;&#160;&#160;">
+		<line linenr="268" indent="&#160;&#160;&#160;">
+			<comment>* TODO: limit how often this print, eg. only every 5 ship names checked,</comment>
+		</line>
+		<line linenr="269" indent="&#160;&#160;&#160;">
+			<comment>* not counting factories, to speed up the script. Currently, the 1ms timer</comment>
+		</line>
+		<line linenr="270" indent="&#160;&#160;&#160;">
+			<comment>* rounds up to 1 frame, and at 40 fps on a shipyard with ~40 entries this</comment>
+		</line>
+		<line linenr="271" indent="&#160;&#160;&#160;">
+			<comment>* would add 1 second to processing time. (Low priority.)</comment>
+		</line>
+		<line linenr="272" indent="&#160;&#160;&#160;">
 			<var>$msg</var>
 			<text> </text>
 			<text>=</text>
@@ -1242,7 +1358,7 @@
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="248" indent="&#160;&#160;&#160;">
+		<line linenr="273" indent="&#160;&#160;&#160;">
 			<text>display</text>
 			<text> </text>
 			<text>subtitle</text>
@@ -1260,7 +1376,7 @@
 			<text> </text>
 			<text>ms</text>
 		</line>
-		<line linenr="249" indent="&#160;&#160;&#160;" interruptable="@">
+		<line linenr="274" indent="&#160;&#160;&#160;" interruptable="@">
 			<var>$temp</var>
 			<text> </text>
 			<text>=</text>
@@ -1271,44 +1387,44 @@
 			<text> </text>
 			<text>ms</text>
 		</line>
-		<line linenr="250" indent="&#160;&#160;">
+		<line linenr="275" indent="&#160;&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="251" indent="&#160;">
+		<line linenr="276" indent="&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="252" indent="">
+		<line linenr="277" indent="">
 			<text>endsub</text>
 		</line>
-		<line linenr="253" indent="" />
-		<line linenr="254" indent="" />
-		<line linenr="255" indent="">
+		<line linenr="278" indent="" />
+		<line linenr="279" indent="" />
+		<line linenr="280" indent="">
 			<comment>* Function to initialize some variables.</comment>
 		</line>
-		<line linenr="256" indent="">
+		<line linenr="281" indent="">
 			<comment>* Put here to avoid misc warnings during compile, so that these vars</comment>
 		</line>
-		<line linenr="257" indent="">
+		<line linenr="282" indent="">
 			<comment>* are known to be visible.</comment>
 		</line>
-		<line linenr="258" indent="">
+		<line linenr="283" indent="">
 			<comment>* Outputs:</comment>
 		</line>
-		<line linenr="259" indent="">
+		<line linenr="284" indent="">
 			<comment>*     $array.str.variant.suffixes</comment>
 		</line>
-		<line linenr="260" indent="">
+		<line linenr="285" indent="">
 			<comment>*     $str.empty</comment>
 		</line>
-		<line linenr="261" indent="">
+		<line linenr="286" indent="">
 			<var>Func.Init</var>
 			<text>:</text>
 		</line>
-		<line linenr="262" indent="&#160;" />
-		<line linenr="263" indent="&#160;">
+		<line linenr="287" indent="&#160;" />
+		<line linenr="288" indent="&#160;">
 			<comment>* Set up an empty string, for doing replacements of the suffixes with none.</comment>
 		</line>
-		<line linenr="264" indent="&#160;">
+		<line linenr="289" indent="&#160;">
 			<var>$str.empty</var>
 			<text> </text>
 			<text>=</text>
@@ -1335,43 +1451,43 @@
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="265" indent="&#160;" />
-		<line linenr="266" indent="&#160;">
+		<line linenr="290" indent="&#160;" />
+		<line linenr="291" indent="&#160;">
 			<comment>* Preread the xml file for variant suffixes.</comment>
 		</line>
-		<line linenr="267" indent="&#160;">
+		<line linenr="292" indent="&#160;">
 			<comment>* Get the text block with variant names. This is all in file 0001.</comment>
 		</line>
-		<line linenr="268" indent="&#160;">
+		<line linenr="293" indent="&#160;">
 			<comment>* -Removed; this should already be loaded, and if reloading it then its text</comment>
 		</line>
-		<line linenr="269" indent="&#160;">
+		<line linenr="294" indent="&#160;">
 			<comment>* will overwrite any later text files, causing oddities until a game reload.</comment>
 		</line>
-		<line linenr="270" indent="&#160;">
+		<line linenr="295" indent="&#160;">
 			<comment>* load text: id=1</comment>
 		</line>
-		<line linenr="271" indent="&#160;" />
-		<line linenr="272" indent="&#160;">
+		<line linenr="296" indent="&#160;" />
+		<line linenr="297" indent="&#160;">
 			<comment>* Get the different variant suffix components.</comment>
 		</line>
-		<line linenr="273" indent="&#160;">
+		<line linenr="298" indent="&#160;">
 			<comment>* Page is 300017, but the prefix 30 is presumably added automatically for</comment>
 		</line>
-		<line linenr="274" indent="&#160;">
+		<line linenr="299" indent="&#160;">
 			<comment>* AP, so just give the 17 as page.</comment>
 		</line>
-		<line linenr="275" indent="&#160;">
+		<line linenr="300" indent="&#160;">
 			<comment>* Suffixes go from 10001 to 10019, and should be usable as-is.</comment>
 		</line>
-		<line linenr="276" indent="&#160;" />
-		<line linenr="277" indent="&#160;">
+		<line linenr="301" indent="&#160;" />
+		<line linenr="302" indent="&#160;">
 			<comment>* Make the array. Keep items for 20 variants.</comment>
 		</line>
-		<line linenr="278" indent="&#160;">
+		<line linenr="303" indent="&#160;">
 			<comment>* (Note: actual variant ids may go higher).</comment>
 		</line>
-		<line linenr="279" indent="&#160;">
+		<line linenr="304" indent="&#160;">
 			<var>$array.str.variant.suffixes</var>
 			<text> </text>
 			<text>=</text>
@@ -1385,10 +1501,10 @@
 			<text>=</text>
 			<var>20</var>
 		</line>
-		<line linenr="280" indent="&#160;">
+		<line linenr="305" indent="&#160;">
 			<comment>* First entry will just be blank.</comment>
 		</line>
-		<line linenr="281" indent="&#160;">
+		<line linenr="306" indent="&#160;">
 			<var>$array.str.variant.suffixes</var>
 			<text>[</text>
 			<var>0</var>
@@ -1398,18 +1514,18 @@
 			<text> </text>
 			<var>$str.empty</var>
 		</line>
-		<line linenr="282" indent="&#160;" />
-		<line linenr="283" indent="&#160;">
+		<line linenr="307" indent="&#160;" />
+		<line linenr="308" indent="&#160;">
 			<comment>* Loop from 1 to 20.</comment>
 		</line>
-		<line linenr="284" indent="&#160;">
+		<line linenr="309" indent="&#160;">
 			<var>$loop.iter</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>1</var>
 		</line>
-		<line linenr="285" indent="&#160;">
+		<line linenr="310" indent="&#160;">
 			<text>while</text>
 			<text> </text>
 			<var>$loop.iter</var>
@@ -1418,11 +1534,11 @@
 			<text> </text>
 			<var>20</var>
 		</line>
-		<line linenr="286" indent="&#160;&#160;" />
-		<line linenr="287" indent="&#160;&#160;">
+		<line linenr="311" indent="&#160;&#160;" />
+		<line linenr="312" indent="&#160;&#160;">
 			<comment>* Calculate the text offset.</comment>
 		</line>
-		<line linenr="288" indent="&#160;&#160;">
+		<line linenr="313" indent="&#160;&#160;">
 			<var>$text.id</var>
 			<text> </text>
 			<text>=</text>
@@ -1433,10 +1549,10 @@
 			<text> </text>
 			<var>10000</var>
 		</line>
-		<line linenr="289" indent="&#160;&#160;">
+		<line linenr="314" indent="&#160;&#160;">
 			<comment>* Look up the text.</comment>
 		</line>
-		<line linenr="290" indent="&#160;&#160;">
+		<line linenr="315" indent="&#160;&#160;">
 			<var>$temp</var>
 			<text> </text>
 			<text>=</text>
@@ -1454,10 +1570,10 @@
 			<text>=</text>
 			<var>$text.id</var>
 		</line>
-		<line linenr="291" indent="&#160;&#160;">
+		<line linenr="316" indent="&#160;&#160;">
 			<comment>* Add a space to the prefix.</comment>
 		</line>
-		<line linenr="292" indent="&#160;&#160;">
+		<line linenr="317" indent="&#160;&#160;">
 			<var>$temp</var>
 			<text> </text>
 			<text>=</text>
@@ -1484,10 +1600,10 @@
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="293" indent="&#160;&#160;">
+		<line linenr="318" indent="&#160;&#160;">
 			<comment>* Store it.</comment>
 		</line>
-		<line linenr="294" indent="&#160;&#160;">
+		<line linenr="319" indent="&#160;&#160;">
 			<var>$array.str.variant.suffixes</var>
 			<text>[</text>
 			<var>$loop.iter</var>
@@ -1497,45 +1613,45 @@
 			<text> </text>
 			<var>$temp</var>
 		</line>
-		<line linenr="295" indent="&#160;&#160;" />
-		<line linenr="296" indent="&#160;&#160;">
+		<line linenr="320" indent="&#160;&#160;" />
+		<line linenr="321" indent="&#160;&#160;">
 			<text>inc</text>
 			<text> </text>
 			<var>$loop.iter</var>
 		</line>
-		<line linenr="297" indent="&#160;">
+		<line linenr="322" indent="&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="298" indent="&#160;" />
-		<line linenr="299" indent="">
+		<line linenr="323" indent="&#160;" />
+		<line linenr="324" indent="">
 			<text>endsub</text>
 		</line>
-		<line linenr="300" indent="" />
-		<line linenr="301" indent="" />
-		<line linenr="302" indent="">
+		<line linenr="325" indent="" />
+		<line linenr="326" indent="" />
+		<line linenr="327" indent="">
 			<comment>* Function to take a ship type and determine the base name.</comment>
 		</line>
-		<line linenr="303" indent="">
+		<line linenr="328" indent="">
 			<comment>* Input:</comment>
 		</line>
-		<line linenr="304" indent="">
+		<line linenr="329" indent="">
 			<comment>*     $class.ship.type</comment>
 		</line>
-		<line linenr="305" indent="">
+		<line linenr="330" indent="">
 			<comment>* Output:</comment>
 		</line>
-		<line linenr="306" indent="">
+		<line linenr="331" indent="">
 			<comment>*     $str.ship.type.name.base</comment>
 		</line>
-		<line linenr="307" indent="">
+		<line linenr="332" indent="">
 			<var>Func.Get.Ship.Type.Base.Name</var>
 			<text>:</text>
 		</line>
-		<line linenr="308" indent="&#160;" />
-		<line linenr="309" indent="&#160;">
+		<line linenr="333" indent="&#160;" />
+		<line linenr="334" indent="&#160;">
 			<comment>* Get the variant index.</comment>
 		</line>
-		<line linenr="310" indent="&#160;">
+		<line linenr="335" indent="&#160;">
 			<var>$int.ship.type.variant</var>
 			<text> </text>
 			<text>=</text>
@@ -1551,28 +1667,28 @@
 			<text>=</text>
 			<var>$class.ship.type</var>
 		</line>
-		<line linenr="311" indent="&#160;" />
-		<line linenr="312" indent="&#160;">
+		<line linenr="336" indent="&#160;" />
+		<line linenr="337" indent="&#160;">
 			<comment>* Note when a suffix needs removal. Default true.</comment>
 		</line>
-		<line linenr="313" indent="&#160;">
+		<line linenr="338" indent="&#160;">
 			<var>$bool.suffix.present</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>1</var>
 		</line>
-		<line linenr="314" indent="&#160;" />
-		<line linenr="315" indent="&#160;">
+		<line linenr="339" indent="&#160;" />
+		<line linenr="340" indent="&#160;">
 			<comment>* Look up the suffix for the variant.</comment>
 		</line>
-		<line linenr="316" indent="&#160;">
+		<line linenr="341" indent="&#160;">
 			<comment>* Set special cases for variant 0 (no suffix) or over 20 (unsupported</comment>
 		</line>
-		<line linenr="317" indent="&#160;">
+		<line linenr="342" indent="&#160;">
 			<comment>* by the lookup array).</comment>
 		</line>
-		<line linenr="318" indent="&#160;">
+		<line linenr="343" indent="&#160;">
 			<text>if</text>
 			<text> </text>
 			<var>$int.ship.type.variant</var>
@@ -1589,55 +1705,55 @@
 			<text> </text>
 			<var>20</var>
 		</line>
-		<line linenr="319" indent="&#160;&#160;" />
-		<line linenr="320" indent="&#160;&#160;">
+		<line linenr="344" indent="&#160;&#160;" />
+		<line linenr="345" indent="&#160;&#160;">
 			<comment>* Treat as unsuffixed, even if there is a special suffix</comment>
 		</line>
-		<line linenr="321" indent="&#160;&#160;">
+		<line linenr="346" indent="&#160;&#160;">
 			<comment>* (eg. 'explorer' in xrm is variant 25).</comment>
 		</line>
-		<line linenr="322" indent="&#160;&#160;">
+		<line linenr="347" indent="&#160;&#160;">
 			<comment>* Set an empty string for the debug print clarity.</comment>
 		</line>
-		<line linenr="323" indent="&#160;&#160;">
+		<line linenr="348" indent="&#160;&#160;">
 			<var>$str.variant.suffix</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>$str.empty</var>
 		</line>
-		<line linenr="324" indent="&#160;&#160;">
+		<line linenr="349" indent="&#160;&#160;">
 			<var>$bool.suffix.present</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>0</var>
 		</line>
-		<line linenr="325" indent="&#160;&#160;">
+		<line linenr="350" indent="&#160;&#160;">
 			<comment>* Note: because of the way xrm used some ship variants (eg. 10, 13, etc.)</comment>
 		</line>
-		<line linenr="326" indent="&#160;&#160;">
+		<line linenr="351" indent="&#160;&#160;">
 			<comment>* that used to have a suffix, but xrm overwrote the language file to blank</comment>
 		</line>
-		<line linenr="327" indent="&#160;&#160;">
+		<line linenr="352" indent="&#160;&#160;">
 			<comment>* the suffix, some ships will have a spurious space at the end of their</comment>
 		</line>
-		<line linenr="328" indent="&#160;&#160;">
+		<line linenr="353" indent="&#160;&#160;">
 			<comment>* name.</comment>
 		</line>
-		<line linenr="329" indent="&#160;&#160;">
+		<line linenr="354" indent="&#160;&#160;">
 			<comment>* This needs to be dealt with both here and when station products are</comment>
 		</line>
-		<line linenr="330" indent="&#160;&#160;">
+		<line linenr="355" indent="&#160;&#160;">
 			<comment>* being matched.</comment>
 		</line>
-		<line linenr="331" indent="&#160;">
+		<line linenr="356" indent="&#160;">
 			<text>else</text>
 		</line>
-		<line linenr="332" indent="&#160;&#160;">
+		<line linenr="357" indent="&#160;&#160;">
 			<comment>* Do a straight lookup.</comment>
 		</line>
-		<line linenr="333" indent="&#160;&#160;">
+		<line linenr="358" indent="&#160;&#160;">
 			<var>$str.variant.suffix</var>
 			<text> </text>
 			<text>=</text>
@@ -1647,17 +1763,17 @@
 			<var>$int.ship.type.variant</var>
 			<text>]</text>
 		</line>
-		<line linenr="334" indent="&#160;">
+		<line linenr="359" indent="&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="335" indent="&#160;" />
-		<line linenr="336" indent="&#160;">
+		<line linenr="360" indent="&#160;" />
+		<line linenr="361" indent="&#160;">
 			<comment>* Get the ship name, as a string.</comment>
 		</line>
-		<line linenr="337" indent="&#160;">
+		<line linenr="362" indent="&#160;">
 			<comment>* The sprintf function requires 5 inputs, always, but can set them to null when unused.</comment>
 		</line>
-		<line linenr="338" indent="&#160;">
+		<line linenr="363" indent="&#160;">
 			<var>$str.ship.type.name.full</var>
 			<text> </text>
 			<text>=</text>
@@ -1684,19 +1800,19 @@
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="339" indent="&#160;" />
-		<line linenr="340" indent="&#160;">
+		<line linenr="364" indent="&#160;" />
+		<line linenr="365" indent="&#160;">
 			<comment>* Strip off the variant suffix for the base name.</comment>
 		</line>
-		<line linenr="341" indent="&#160;">
+		<line linenr="366" indent="&#160;">
 			<comment>* Only do this when a suffix is present, else this will freeze the game.</comment>
 		</line>
-		<line linenr="342" indent="&#160;">
+		<line linenr="367" indent="&#160;">
 			<text>if</text>
 			<text> </text>
 			<var>$bool.suffix.present</var>
 		</line>
-		<line linenr="343" indent="&#160;&#160;">
+		<line linenr="368" indent="&#160;&#160;">
 			<var>$str.ship.type.name.base</var>
 			<text> </text>
 			<text>=</text>
@@ -1718,45 +1834,45 @@
 			<text> </text>
 			<var>$str.empty</var>
 		</line>
-		<line linenr="344" indent="&#160;">
+		<line linenr="369" indent="&#160;">
 			<text>else</text>
 		</line>
-		<line linenr="345" indent="&#160;&#160;">
+		<line linenr="370" indent="&#160;&#160;">
 			<comment>* Remove the trailing space. Somehow. If there is one.</comment>
 		</line>
-		<line linenr="346" indent="&#160;&#160;">
+		<line linenr="371" indent="&#160;&#160;">
 			<var>$str.to.despace</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>$str.ship.type.name.full</var>
 		</line>
-		<line linenr="347" indent="&#160;&#160;">
+		<line linenr="372" indent="&#160;&#160;">
 			<text>gosub</text>
 			<text> </text>
 			<var>Func.Remove.Trailing.Space</var>
 			<text>:</text>
 		</line>
-		<line linenr="348" indent="&#160;&#160;">
+		<line linenr="373" indent="&#160;&#160;">
 			<var>$str.ship.type.name.base</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>$str.to.despace.out</var>
 		</line>
-		<line linenr="349" indent="&#160;">
+		<line linenr="374" indent="&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="350" indent="&#160;" />
-		<line linenr="351" indent="&#160;">
+		<line linenr="375" indent="&#160;" />
+		<line linenr="376" indent="&#160;">
 			<comment>* Do a debug print.</comment>
 		</line>
-		<line linenr="352" indent="&#160;">
+		<line linenr="377" indent="&#160;">
 			<text>if</text>
 			<text> </text>
 			<var>$debug</var>
 		</line>
-		<line linenr="353" indent="&#160;&#160;">
+		<line linenr="378" indent="&#160;&#160;">
 			<text>write</text>
 			<text> </text>
 			<text>to</text>
@@ -1793,41 +1909,41 @@
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="354" indent="&#160;">
+		<line linenr="379" indent="&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="355" indent="&#160;" />
-		<line linenr="356" indent="">
+		<line linenr="380" indent="&#160;" />
+		<line linenr="381" indent="">
 			<text>endsub</text>
 		</line>
-		<line linenr="357" indent="" />
-		<line linenr="358" indent="" />
-		<line linenr="359" indent="">
+		<line linenr="382" indent="" />
+		<line linenr="383" indent="" />
+		<line linenr="384" indent="">
 			<comment>* Function to remove a space at the end of a string, if present.</comment>
 		</line>
-		<line linenr="360" indent="">
+		<line linenr="385" indent="">
 			<comment>* Input:</comment>
 		</line>
-		<line linenr="361" indent="">
+		<line linenr="386" indent="">
 			<comment>*     $str.to.despace</comment>
 		</line>
-		<line linenr="362" indent="">
+		<line linenr="387" indent="">
 			<comment>* Output:</comment>
 		</line>
-		<line linenr="363" indent="">
+		<line linenr="388" indent="">
 			<comment>*     $str.to.despace.out</comment>
 		</line>
-		<line linenr="364" indent="">
+		<line linenr="389" indent="">
 			<var>Func.Remove.Trailing.Space</var>
 			<text>:</text>
 		</line>
-		<line linenr="365" indent="&#160;">
+		<line linenr="390" indent="&#160;">
 			<comment>* Check for trailing space.</comment>
 		</line>
-		<line linenr="366" indent="&#160;">
+		<line linenr="391" indent="&#160;">
 			<comment>* Start with the string length, then grab the last char.</comment>
 		</line>
-		<line linenr="367" indent="&#160;">
+		<line linenr="392" indent="&#160;">
 			<var>$int.length</var>
 			<text> </text>
 			<text>=</text>
@@ -1842,7 +1958,7 @@
 			<text> </text>
 			<var>$str.to.despace</var>
 		</line>
-		<line linenr="368" indent="&#160;">
+		<line linenr="393" indent="&#160;">
 			<var>$int.length.m1</var>
 			<text> </text>
 			<text>=</text>
@@ -1853,7 +1969,7 @@
 			<text> </text>
 			<var>1</var>
 		</line>
-		<line linenr="369" indent="&#160;">
+		<line linenr="394" indent="&#160;">
 			<var>$str.last.char</var>
 			<text> </text>
 			<text>=</text>
@@ -1874,11 +1990,11 @@
 			<text>=</text>
 			<var>1</var>
 		</line>
-		<line linenr="370" indent="&#160;" />
-		<line linenr="371" indent="&#160;">
+		<line linenr="395" indent="&#160;" />
+		<line linenr="396" indent="&#160;">
 			<comment>* Compare to space.</comment>
 		</line>
-		<line linenr="372" indent="&#160;">
+		<line linenr="397" indent="&#160;">
 			<text>if</text>
 			<text> </text>
 			<var>$str.last.char</var>
@@ -1887,10 +2003,10 @@
 			<text> </text>
 			<text>' '</text>
 		</line>
-		<line linenr="373" indent="&#160;&#160;">
+		<line linenr="398" indent="&#160;&#160;">
 			<comment>* Slice the string to drop the last char.</comment>
 		</line>
-		<line linenr="374" indent="&#160;&#160;">
+		<line linenr="399" indent="&#160;&#160;">
 			<var>$str.to.despace.out</var>
 			<text> </text>
 			<text>=</text>
@@ -1911,62 +2027,62 @@
 			<text>=</text>
 			<var>$int.length.m1</var>
 		</line>
-		<line linenr="375" indent="&#160;">
+		<line linenr="400" indent="&#160;">
 			<text>else</text>
 		</line>
-		<line linenr="376" indent="&#160;&#160;">
+		<line linenr="401" indent="&#160;&#160;">
 			<comment>* No change.</comment>
 		</line>
-		<line linenr="377" indent="&#160;&#160;">
+		<line linenr="402" indent="&#160;&#160;">
 			<var>$str.to.despace.out</var>
 			<text> </text>
 			<text>=</text>
 			<text> </text>
 			<var>$str.to.despace</var>
 		</line>
-		<line linenr="378" indent="&#160;">
+		<line linenr="403" indent="&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="379" indent="">
+		<line linenr="404" indent="">
 			<text>endsub</text>
 		</line>
-		<line linenr="380" indent="" />
-		<line linenr="381" indent="" />
-		<line linenr="382" indent="">
+		<line linenr="405" indent="" />
+		<line linenr="406" indent="" />
+		<line linenr="407" indent="">
 			<comment>* Function to add a second race's shipyards and ships to the current arrays.</comment>
 		</line>
-		<line linenr="383" indent="">
+		<line linenr="408" indent="">
 			<comment>* Used for Terrans+ATF, Argon+Goners, maybe others.</comment>
 		</line>
-		<line linenr="384" indent="">
+		<line linenr="409" indent="">
 			<comment>* Input:</comment>
 		</line>
-		<line linenr="385" indent="">
+		<line linenr="410" indent="">
 			<comment>*     $race2</comment>
 		</line>
-		<line linenr="386" indent="">
+		<line linenr="411" indent="">
 			<comment>*     $array.shipyards</comment>
 		</line>
-		<line linenr="387" indent="">
+		<line linenr="412" indent="">
 			<comment>*     $array.class.ship.type</comment>
 		</line>
-		<line linenr="388" indent="">
+		<line linenr="413" indent="">
 			<comment>* Output:</comment>
 		</line>
-		<line linenr="389" indent="">
+		<line linenr="414" indent="">
 			<comment>*     $array.shipyards</comment>
 		</line>
-		<line linenr="390" indent="">
+		<line linenr="415" indent="">
 			<comment>*     $array.class.ship.type</comment>
 		</line>
-		<line linenr="391" indent="">
+		<line linenr="416" indent="">
 			<var>Func.Add.Second.Race.Shipyards.Ships</var>
 			<text>:</text>
 		</line>
-		<line linenr="392" indent="&#160;">
+		<line linenr="417" indent="&#160;">
 			<comment>* Get their shipyards and ships.</comment>
 		</line>
-		<line linenr="393" indent="&#160;">
+		<line linenr="418" indent="&#160;">
 			<var>$array.shipyards.2</var>
 			<text> </text>
 			<text>=</text>
@@ -1990,7 +2106,7 @@
 			<text>=</text>
 			<var>[Shipyard]</var>
 		</line>
-		<line linenr="394" indent="&#160;">
+		<line linenr="419" indent="&#160;">
 			<var>$array.class.ship.type.2</var>
 			<text> </text>
 			<text>=</text>
@@ -2014,17 +2130,17 @@
 			<text>=</text>
 			<var>null</var>
 		</line>
-		<line linenr="395" indent="&#160;" />
-		<line linenr="396" indent="&#160;">
+		<line linenr="420" indent="&#160;" />
+		<line linenr="421" indent="&#160;">
 			<comment>* Merge the arrays.</comment>
 		</line>
-		<line linenr="397" indent="&#160;">
+		<line linenr="422" indent="&#160;">
 			<comment>* It is not clear on how to do this easily. An append loop will be</comment>
 		</line>
-		<line linenr="398" indent="&#160;">
+		<line linenr="423" indent="&#160;">
 			<comment>* done here, though could also resize and then do a copy to new elements.</comment>
 		</line>
-		<line linenr="399" indent="&#160;">
+		<line linenr="424" indent="&#160;">
 			<var>$int.index</var>
 			<text> </text>
 			<text>=</text>
@@ -2037,20 +2153,20 @@
 			<text> </text>
 			<var>$array.shipyards.2</var>
 		</line>
-		<line linenr="400" indent="&#160;">
+		<line linenr="425" indent="&#160;">
 			<text>while</text>
 			<text> </text>
 			<var>$int.index</var>
 		</line>
-		<line linenr="401" indent="&#160;&#160;">
+		<line linenr="426" indent="&#160;&#160;">
 			<comment>* Count down; this also brings the index in range.</comment>
 		</line>
-		<line linenr="402" indent="&#160;&#160;">
+		<line linenr="427" indent="&#160;&#160;">
 			<text>dec</text>
 			<text> </text>
 			<var>$int.index</var>
 		</line>
-		<line linenr="403" indent="&#160;&#160;">
+		<line linenr="428" indent="&#160;&#160;">
 			<var>$temp</var>
 			<text> </text>
 			<text>=</text>
@@ -2060,7 +2176,7 @@
 			<var>$int.index</var>
 			<text>]</text>
 		</line>
-		<line linenr="404" indent="&#160;&#160;">
+		<line linenr="429" indent="&#160;&#160;">
 			<text>append</text>
 			<text> </text>
 			<var>$temp</var>
@@ -2071,11 +2187,11 @@
 			<text> </text>
 			<var>$array.shipyards</var>
 		</line>
-		<line linenr="405" indent="&#160;">
+		<line linenr="430" indent="&#160;">
 			<text>end</text>
 		</line>
-		<line linenr="406" indent="&#160;" />
-		<line linenr="407" indent="&#160;">
+		<line linenr="431" indent="&#160;" />
+		<line linenr="432" indent="&#160;">
 			<var>$int.index</var>
 			<text> </text>
 			<text>=</text>
@@ -2088,17 +2204,17 @@
 			<text> </text>
 			<var>$array.class.ship.type.2</var>
 		</line>
-		<line linenr="408" indent="&#160;&#160;">
+		<line linenr="433" indent="&#160;&#160;">
 			<text>while</text>
 			<text> </text>
 			<var>$int.index</var>
 		</line>
-		<line linenr="409" indent="&#160;">
+		<line linenr="434" indent="&#160;">
 			<text>dec</text>
 			<text> </text>
 			<var>$int.index</var>
 		</line>
-		<line linenr="410" indent="&#160;">
+		<line linenr="435" indent="&#160;">
 			<var>$temp</var>
 			<text> </text>
 			<text>=</text>
@@ -2108,7 +2224,7 @@
 			<var>$int.index</var>
 			<text>]</text>
 		</line>
-		<line linenr="411" indent="">
+		<line linenr="436" indent="">
 			<text>append</text>
 			<text> </text>
 			<var>$temp</var>
@@ -2119,27 +2235,27 @@
 			<text> </text>
 			<var>$array.class.ship.type</var>
 		</line>
-		<line linenr="412" indent="">
+		<line linenr="437" indent="">
 			<text>end</text>
 		</line>
-		<line linenr="413" indent="" />
-		<line linenr="414" indent="">
+		<line linenr="438" indent="" />
+		<line linenr="439" indent="">
 			<text>endsub</text>
 		</line>
-		<line linenr="415" indent="" />
-		<line linenr="416" indent="" />
-		<line linenr="417" indent="">
+		<line linenr="440" indent="" />
+		<line linenr="441" indent="" />
+		<line linenr="442" indent="">
 			<comment>* It is unclear if this is needed at the end;</comment>
 		</line>
-		<line linenr="418" indent="">
+		<line linenr="443" indent="">
 			<comment>* some other scripts have it after subfunctions.</comment>
 		</line>
-		<line linenr="419" indent="">
+		<line linenr="444" indent="">
 			<text>return</text>
 			<text> </text>
 			<var>null</var>
 		</line>
-		<line linenr="420" indent="" />
+		<line linenr="445" indent="" />
 	</sourcetext>
 	<codearray>
 		<sval type="array" size="10">
@@ -2148,7 +2264,7 @@
 			<sval type="string" val="X3 Customizer script to add ship variants to all shipyards" />
 			<sval type="int" val="1" />
 			<sval type="int" val="0" />
-			<sval type="array" size="38">
+			<sval type="array" size="40">
 				<sval type="string" val="debug" />
 				<sval type="string" val="logfile" />
 				<sval type="string" val="int.ships.between.waits" />
@@ -2168,6 +2284,8 @@
 				<sval type="string" val="array.shipyard.products" />
 				<sval type="string" val="int.ware" />
 				<sval type="string" val="ware" />
+				<sval type="string" val="int.ware.maintype" />
+				<sval type="string" val="int.transport.class" />
 				<sval type="string" val="str.ship.type.name.full" />
 				<sval type="string" val="str.to.despace" />
 				<sval type="string" val="str.to.despace.out" />
@@ -2188,7 +2306,7 @@
 				<sval type="string" val="array.class.ship.type.2" />
 				<sval type="string" val="int.index" />
 			</sval>
-			<sval type="array" size="149">
+			<sval type="array" size="155">
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
 					<sval type="int" val="0" />
@@ -2246,7 +2364,7 @@
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="1167" />
-					<sval type="int" val="92" />
+					<sval type="int" val="98" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
@@ -2416,7 +2534,7 @@
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="1167" />
-					<sval type="int" val="132" />
+					<sval type="int" val="138" />
 				</sval>
 				<sval type="array" size="13">
 					<sval type="int" val="104" />
@@ -2444,7 +2562,7 @@
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="1167" />
-					<sval type="int" val="132" />
+					<sval type="int" val="138" />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="1167" />
@@ -2533,7 +2651,7 @@
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="1167" />
-					<sval type="int" val="105" />
+					<sval type="int" val="111" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="130" />
@@ -2620,7 +2738,7 @@
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610589431" />
+					<sval type="int" val="-1610587895" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="14" />
@@ -2653,7 +2771,7 @@
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610589687" />
+					<sval type="int" val="-1610588151" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="17" />
@@ -2672,17 +2790,66 @@
 					<sval type="int" val="131074" />
 					<sval type="int" val="17" />
 				</sval>
-				<sval type="array" size="6">
-					<sval type="int" val="1406" />
-					<sval type="int" val="-1610590717" />
+				<sval type="array" size="4">
+					<sval type="int" val="655" />
+					<sval type="int" val="19" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="18" />
+				</sval>
+				<sval type="array" size="4">
+					<sval type="int" val="605" />
+					<sval type="int" val="20" />
 					<sval type="int" val="131074" />
+					<sval type="int" val="18" />
+				</sval>
+				<sval type="array" size="13">
+					<sval type="int" val="104" />
+					<sval type="int" val="-536852988" />
+					<sval type="int" val="3" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="19" />
+					<sval type="int" val="131075" />
+					<sval type="int" val="207" />
+					<sval type="int" val="15" />
+					<sval type="int" val="0" />
+					<sval type="int" val="3" />
+					<sval type="int" val="-1" />
+					<sval type="int" val="0" />
+					<sval type="int" val="-2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="112" />
+					<sval type="int" val="92" />
+				</sval>
+				<sval type="array" size="13">
+					<sval type="int" val="104" />
+					<sval type="int" val="-1610594043" />
+					<sval type="int" val="3" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="20" />
+					<sval type="int" val="13" />
 					<sval type="int" val="5" />
+					<sval type="int" val="15" />
+					<sval type="int" val="0" />
+					<sval type="int" val="3" />
+					<sval type="int" val="-1" />
+					<sval type="int" val="0" />
+					<sval type="int" val="-2" />
+				</sval>
+				<sval type="array" size="5">
+					<sval type="int" val="781" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="15" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="18" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="112" />
+					<sval type="int" val="92" />
 				</sval>
 				<sval type="array" size="14">
 					<sval type="int" val="149" />
-					<sval type="int" val="19" />
+					<sval type="int" val="21" />
 					<sval type="int" val="5" />
 					<sval type="string" val="%s" />
 					<sval type="int" val="131074" />
@@ -2698,29 +2865,29 @@
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="20" />
-					<sval type="int" val="1" />
-					<sval type="int" val="131074" />
-					<sval type="int" val="19" />
-					<sval type="int" val="1" />
-					<sval type="int" val="-1" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="1167" />
-					<sval type="int" val="123" />
-				</sval>
-				<sval type="array" size="7">
-					<sval type="int" val="104" />
-					<sval type="int" val="19" />
+					<sval type="int" val="22" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="21" />
 					<sval type="int" val="1" />
 					<sval type="int" val="-1" />
 				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="1167" />
+					<sval type="int" val="129" />
+				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610594045" />
+					<sval type="int" val="21" />
+					<sval type="int" val="1" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="23" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="-1610592509" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="0" />
@@ -2736,7 +2903,7 @@
 					<sval type="int" val="5" />
 					<sval type="string" val="Checking product %s" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="19" />
+					<sval type="int" val="21" />
 					<sval type="int" val="0" />
 					<sval type="int" val="0" />
 					<sval type="int" val="0" />
@@ -2748,47 +2915,47 @@
 				</sval>
 				<sval type="array" size="6">
 					<sval type="int" val="1406" />
-					<sval type="int" val="-1610590717" />
+					<sval type="int" val="-1610589181" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="19" />
+					<sval type="int" val="21" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="8" />
 				</sval>
 				<sval type="array" size="4">
 					<sval type="int" val="131" />
-					<sval type="int" val="22" />
+					<sval type="int" val="24" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="5" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610590711" />
+					<sval type="int" val="-1610589175" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="22" />
+					<sval type="int" val="24" />
 					<sval type="int" val="1" />
 					<sval type="int" val="-1" />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="143" />
-					<sval type="int" val="22" />
+					<sval type="int" val="24" />
 				</sval>
 				<sval type="array" size="6">
 					<sval type="int" val="129" />
-					<sval type="int" val="23" />
+					<sval type="int" val="25" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="8" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="22" />
+					<sval type="int" val="24" />
 				</sval>
 				<sval type="array" size="13">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610590973" />
+					<sval type="int" val="-1610589437" />
 					<sval type="int" val="3" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="19" />
+					<sval type="int" val="21" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="23" />
+					<sval type="int" val="25" />
 					<sval type="int" val="15" />
 					<sval type="int" val="0" />
 					<sval type="int" val="3" />
@@ -2798,34 +2965,34 @@
 				</sval>
 				<sval type="array" size="6">
 					<sval type="int" val="129" />
-					<sval type="int" val="24" />
+					<sval type="int" val="26" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="5" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="22" />
+					<sval type="int" val="24" />
 				</sval>
 				<sval type="array" size="6">
 					<sval type="int" val="1406" />
-					<sval type="int" val="-1610591741" />
+					<sval type="int" val="-1610590205" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="24" />
+					<sval type="int" val="26" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="16" />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="112" />
-					<sval type="int" val="85" />
+					<sval type="int" val="91" />
 				</sval>
 				<sval type="array" size="5">
 					<sval type="int" val="750" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="15" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="24" />
+					<sval type="int" val="26" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610590973" />
+					<sval type="int" val="-1610589437" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="0" />
@@ -2843,7 +3010,7 @@
 					<sval type="int" val="131074" />
 					<sval type="int" val="15" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="24" />
+					<sval type="int" val="26" />
 					<sval type="int" val="0" />
 					<sval type="int" val="0" />
 					<sval type="int" val="0" />
@@ -2853,7 +3020,7 @@
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="112" />
-					<sval type="int" val="75" />
+					<sval type="int" val="81" />
 				</sval>
 				<sval type="array" size="14">
 					<sval type="int" val="149" />
@@ -2901,7 +3068,7 @@
 				</sval>
 				<sval type="array" size="14">
 					<sval type="int" val="149" />
-					<sval type="int" val="25" />
+					<sval type="int" val="27" />
 					<sval type="int" val="5" />
 					<sval type="string" val="" />
 					<sval type="int" val="0" />
@@ -2917,22 +3084,22 @@
 				</sval>
 				<sval type="array" size="4">
 					<sval type="int" val="128" />
-					<sval type="int" val="26" />
+					<sval type="int" val="28" />
 					<sval type="int" val="4" />
 					<sval type="int" val="20" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="130" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="26" />
+					<sval type="int" val="28" />
 					<sval type="int" val="4" />
 					<sval type="int" val="0" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="25" />
+					<sval type="int" val="27" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="27" />
+					<sval type="int" val="29" />
 					<sval type="int" val="1" />
 					<sval type="int" val="4" />
 					<sval type="int" val="1" />
@@ -2941,10 +3108,10 @@
 				</sval>
 				<sval type="array" size="13">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610586103" />
+					<sval type="int" val="-1610584567" />
 					<sval type="int" val="3" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="27" />
+					<sval type="int" val="29" />
 					<sval type="int" val="4" />
 					<sval type="int" val="20" />
 					<sval type="int" val="15" />
@@ -2956,10 +3123,10 @@
 				</sval>
 				<sval type="array" size="13">
 					<sval type="int" val="104" />
-					<sval type="int" val="28" />
+					<sval type="int" val="30" />
 					<sval type="int" val="3" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="27" />
+					<sval type="int" val="29" />
 					<sval type="int" val="4" />
 					<sval type="int" val="10000" />
 					<sval type="int" val="15" />
@@ -2975,7 +3142,7 @@
 					<sval type="int" val="4" />
 					<sval type="int" val="17" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="28" />
+					<sval type="int" val="30" />
 				</sval>
 				<sval type="array" size="14">
 					<sval type="int" val="149" />
@@ -2996,19 +3163,19 @@
 				<sval type="array" size="7">
 					<sval type="int" val="130" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="26" />
+					<sval type="int" val="28" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="27" />
+					<sval type="int" val="29" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="13" />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="142" />
-					<sval type="int" val="27" />
+					<sval type="int" val="29" />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="112" />
-					<sval type="int" val="97" />
+					<sval type="int" val="103" />
 				</sval>
 				<sval type="array" size="1">
 					<sval type="int" val="1168" />
@@ -3019,13 +3186,13 @@
 				</sval>
 				<sval type="array" size="4">
 					<sval type="int" val="1476" />
-					<sval type="int" val="29" />
+					<sval type="int" val="31" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="10" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="30" />
+					<sval type="int" val="32" />
 					<sval type="int" val="1" />
 					<sval type="int" val="4" />
 					<sval type="int" val="1" />
@@ -3034,16 +3201,16 @@
 				</sval>
 				<sval type="array" size="25">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610584061" />
+					<sval type="int" val="-1610582525" />
 					<sval type="int" val="7" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="29" />
+					<sval type="int" val="31" />
 					<sval type="int" val="4" />
 					<sval type="int" val="0" />
 					<sval type="int" val="15" />
 					<sval type="int" val="0" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="29" />
+					<sval type="int" val="31" />
 					<sval type="int" val="4" />
 					<sval type="int" val="20" />
 					<sval type="int" val="15" />
@@ -3061,16 +3228,16 @@
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="31" />
+					<sval type="int" val="33" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="25" />
+					<sval type="int" val="27" />
 					<sval type="int" val="1" />
 					<sval type="int" val="-1" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="30" />
+					<sval type="int" val="32" />
 					<sval type="int" val="1" />
 					<sval type="int" val="4" />
 					<sval type="int" val="0" />
@@ -3079,19 +3246,19 @@
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="112" />
-					<sval type="int" val="113" />
+					<sval type="int" val="119" />
 				</sval>
 				<sval type="array" size="6">
 					<sval type="int" val="129" />
+					<sval type="int" val="33" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="28" />
+					<sval type="int" val="131074" />
 					<sval type="int" val="31" />
-					<sval type="int" val="131074" />
-					<sval type="int" val="26" />
-					<sval type="int" val="131074" />
-					<sval type="int" val="29" />
 				</sval>
 				<sval type="array" size="14">
 					<sval type="int" val="149" />
-					<sval type="int" val="19" />
+					<sval type="int" val="21" />
 					<sval type="int" val="5" />
 					<sval type="string" val="%s" />
 					<sval type="int" val="131074" />
@@ -3107,10 +3274,10 @@
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610582781" />
+					<sval type="int" val="-1610581245" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="30" />
+					<sval type="int" val="32" />
 					<sval type="int" val="1" />
 					<sval type="int" val="-1" />
 				</sval>
@@ -3118,41 +3285,41 @@
 					<sval type="int" val="1079" />
 					<sval type="int" val="11" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="19" />
+					<sval type="int" val="21" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="31" />
+					<sval type="int" val="33" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="25" />
+					<sval type="int" val="27" />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="112" />
-					<sval type="int" val="120" />
+					<sval type="int" val="126" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="20" />
-					<sval type="int" val="1" />
-					<sval type="int" val="131074" />
-					<sval type="int" val="19" />
-					<sval type="int" val="1" />
-					<sval type="int" val="-1" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="1167" />
-					<sval type="int" val="123" />
-				</sval>
-				<sval type="array" size="7">
-					<sval type="int" val="104" />
-					<sval type="int" val="11" />
+					<sval type="int" val="22" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="21" />
 					<sval type="int" val="1" />
 					<sval type="int" val="-1" />
 				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="1167" />
+					<sval type="int" val="129" />
+				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610581501" />
+					<sval type="int" val="11" />
+					<sval type="int" val="1" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="23" />
+					<sval type="int" val="1" />
+					<sval type="int" val="-1" />
+				</sval>
+				<sval type="array" size="7">
+					<sval type="int" val="104" />
+					<sval type="int" val="-1610579965" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="0" />
@@ -3170,9 +3337,9 @@
 					<sval type="int" val="131074" />
 					<sval type="int" val="10" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="29" />
-					<sval type="int" val="131074" />
 					<sval type="int" val="31" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="33" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="11" />
 					<sval type="int" val="0" />
@@ -3187,16 +3354,16 @@
 				</sval>
 				<sval type="array" size="4">
 					<sval type="int" val="1075" />
-					<sval type="int" val="32" />
+					<sval type="int" val="34" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="20" />
+					<sval type="int" val="22" />
 				</sval>
 				<sval type="array" size="13">
 					<sval type="int" val="104" />
-					<sval type="int" val="33" />
+					<sval type="int" val="35" />
 					<sval type="int" val="3" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="32" />
+					<sval type="int" val="34" />
 					<sval type="int" val="4" />
 					<sval type="int" val="1" />
 					<sval type="int" val="15" />
@@ -3208,20 +3375,20 @@
 				</sval>
 				<sval type="array" size="8">
 					<sval type="int" val="1077" />
-					<sval type="int" val="34" />
+					<sval type="int" val="36" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="20" />
+					<sval type="int" val="22" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="33" />
+					<sval type="int" val="35" />
 					<sval type="int" val="4" />
 					<sval type="int" val="1" />
 				</sval>
 				<sval type="array" size="13">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610579453" />
+					<sval type="int" val="-1610577917" />
 					<sval type="int" val="3" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="34" />
+					<sval type="int" val="36" />
 					<sval type="int" val="5" />
 					<sval type="string" val=" " />
 					<sval type="int" val="15" />
@@ -3233,24 +3400,24 @@
 				</sval>
 				<sval type="array" size="8">
 					<sval type="int" val="1077" />
-					<sval type="int" val="21" />
+					<sval type="int" val="23" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="20" />
+					<sval type="int" val="22" />
 					<sval type="int" val="4" />
 					<sval type="int" val="0" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="33" />
+					<sval type="int" val="35" />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="112" />
-					<sval type="int" val="131" />
+					<sval type="int" val="137" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="21" />
+					<sval type="int" val="23" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="20" />
+					<sval type="int" val="22" />
 					<sval type="int" val="1" />
 					<sval type="int" val="-1" />
 				</sval>
@@ -3265,13 +3432,13 @@
 					<sval type="int" val="1069" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="6" />
-					<sval type="int" val="35" />
+					<sval type="int" val="37" />
 					<sval type="int" val="12" />
 					<sval type="int" val="2037" />
 				</sval>
 				<sval type="array" size="6">
 					<sval type="int" val="1372" />
-					<sval type="int" val="36" />
+					<sval type="int" val="38" />
 					<sval type="int" val="131074" />
 					<sval type="int" val="6" />
 					<sval type="int" val="0" />
@@ -3279,30 +3446,30 @@
 				</sval>
 				<sval type="array" size="4">
 					<sval type="int" val="131" />
-					<sval type="int" val="37" />
+					<sval type="int" val="39" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="35" />
+					<sval type="int" val="37" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610576631" />
+					<sval type="int" val="-1610575095" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="37" />
+					<sval type="int" val="39" />
 					<sval type="int" val="1" />
 					<sval type="int" val="-1" />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="143" />
-					<sval type="int" val="37" />
+					<sval type="int" val="39" />
 				</sval>
 				<sval type="array" size="6">
 					<sval type="int" val="129" />
 					<sval type="int" val="13" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="35" />
-					<sval type="int" val="131074" />
 					<sval type="int" val="37" />
+					<sval type="int" val="131074" />
+					<sval type="int" val="39" />
 				</sval>
 				<sval type="array" size="5">
 					<sval type="int" val="135" />
@@ -3313,34 +3480,34 @@
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="112" />
-					<sval type="int" val="136" />
+					<sval type="int" val="142" />
 				</sval>
 				<sval type="array" size="4">
 					<sval type="int" val="131" />
-					<sval type="int" val="37" />
+					<sval type="int" val="39" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="36" />
+					<sval type="int" val="38" />
 				</sval>
 				<sval type="array" size="7">
 					<sval type="int" val="104" />
-					<sval type="int" val="-1610575095" />
+					<sval type="int" val="-1610573559" />
 					<sval type="int" val="1" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="37" />
+					<sval type="int" val="39" />
 					<sval type="int" val="1" />
 					<sval type="int" val="-1" />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="143" />
-					<sval type="int" val="37" />
+					<sval type="int" val="39" />
 				</sval>
 				<sval type="array" size="6">
 					<sval type="int" val="129" />
 					<sval type="int" val="13" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="36" />
+					<sval type="int" val="38" />
 					<sval type="int" val="131074" />
-					<sval type="int" val="37" />
+					<sval type="int" val="39" />
 				</sval>
 				<sval type="array" size="5">
 					<sval type="int" val="135" />
@@ -3351,7 +3518,7 @@
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="112" />
-					<sval type="int" val="142" />
+					<sval type="int" val="148" />
 				</sval>
 				<sval type="array" size="1">
 					<sval type="int" val="1168" />
@@ -3363,15 +3530,21 @@
 				</sval>
 			</sval>
 			<sval type="int" val="0" />
-			<sval type="array" size="282">
+			<sval type="array" size="303">
 				<sval type="array" size="3">
 					<sval type="int" val="0" />
 					<sval type="int" val="1" />
 					<sval type="string" val="X3_Customizer script for adding generated ship variants to shipyards." />
 				</sval>
-				<sval type="array" size="2">
+				<sval type="array" size="3">
 					<sval type="int" val="0" />
-					<sval type="int" val="2" />
+					<sval type="int" val="1" />
+					<sval type="string" val="This will also remove ships with race = 0 and a special transport_class," />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="0" />
+					<sval type="int" val="1" />
+					<sval type="string" val="which should uniquely identify those variants that were flagged to be removed." />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="0" />
@@ -3904,12 +4077,12 @@
 				<sval type="array" size="3">
 					<sval type="int" val="66" />
 					<sval type="int" val="1" />
-					<sval type="string" val="Unclear on how best to do this, but easiest would probably be to" />
+					<sval type="string" val="Apparently wares have a maintype and subtype, which are integer" />
 				</sval>
 				<sval type="array" size="3">
 					<sval type="int" val="66" />
 					<sval type="int" val="1" />
-					<sval type="string" val="check if the ware is in the ship type array." />
+					<sval type="string" val="values. Can check for the ship main type." />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="67" />
@@ -3918,84 +4091,83 @@
 				<sval type="array" size="3">
 					<sval type="int" val="67" />
 					<sval type="int" val="1" />
-					<sval type="string" val="Know that this is a ship type, and it is one of those being" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="looked for." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Two options here:" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Can get the base name of the ship, and use that for" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="finding variants, which would mean all shipyards with one" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="variant will pick up them all;" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Or can use the full name of the ship with suffix, skip it if it" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="is not in the base name array, and then search the array for" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="matches, which would mean only shipyards with the base ship" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="type will pick up variants." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="The latter is probably good enough for most cases, and might run" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="faster, so try it for now." />
+					<sval type="string" val="Also grab the transport class, eg. cargo size, here." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="67" />
+					<sval type="int" val="68" />
 					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="67" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Get the ship name." />
 				</sval>
 				<sval type="array" size="3">
 					<sval type="int" val="68" />
 					<sval type="int" val="1" />
-					<sval type="string" val="Despace it if needed, to get proper matching." />
+					<sval type="string" val="If not a ship, skip it." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="69" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Do nothing" />
 				</sval>
 				<sval type="array" size="2">
+					<sval type="int" val="69" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="69" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Check if this is a ship with a flagged transport class to" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="69" />
+					<sval type="int" val="1" />
+					<sval type="string" val="indicate removal." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="69" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Normal ships have a 0 for this entry in tships, though this may" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="69" />
+					<sval type="int" val="1" />
+					<sval type="string" val="translate into a unique integer in-game (checking for not-0 didn't" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="69" />
+					<sval type="int" val="1" />
+					<sval type="string" val="work out)." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="69" />
+					<sval type="int" val="1" />
+					<sval type="string" val="The actual constant may depend on mod type." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="69" />
+					<sval type="int" val="1" />
+					<sval type="string" val="For now, ST it used, in hopes it is stable across mods." />
+				</sval>
+				<sval type="array" size="3">
 					<sval type="int" val="71" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Remove this product from the shipyard." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="72" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="73" />
-					<sval type="int" val="4" />
+					<sval type="int" val="5" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Know that this is a ship type, and it is one of those being" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="looked for to possibly match to variants." />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="73" />
@@ -4003,85 +4175,111 @@
 				</sval>
 				<sval type="array" size="3">
 					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Two options here:" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Can get the base name of the ship, and use that for" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="finding variants, which would mean all shipyards with one" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="variant will pick up them all;" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Or can use the full name of the ship with suffix, skip it if it" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="is not in the base name array, and then search the array for" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="matches, which would mean only shipyards with the base ship" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="type will pick up variants." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="The latter is probably good enough for most cases, and might run" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="faster, so try it for now." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="73" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="73" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Get the ship name." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="74" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Despace it if needed, to get proper matching." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="77" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="79" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="79" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="79" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Check if it is in the base names list." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="74" />
+					<sval type="int" val="80" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="74" />
+					<sval type="int" val="80" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Loop over every ship.type/name combo." />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="77" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="77" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Do a name match to see if the ware is the same." />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="79" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="79" />
-					<sval type="int" val="1" />
-					<sval type="string" val="On a match, grab the ship type being sampled." />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="80" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="80" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Skip if it is a shipyard product already." />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="82" />
-					<sval type="int" val="5" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="82" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="82" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Add it as a product." />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="83" />
 					<sval type="int" val="2" />
 				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="85" />
-					<sval type="int" val="4" />
+				<sval type="array" size="3">
+					<sval type="int" val="83" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Do a name match to see if the ware is the same." />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="85" />
-					<sval type="int" val="4" />
+					<sval type="int" val="2" />
 				</sval>
-				<sval type="array" size="2">
+				<sval type="array" size="3">
 					<sval type="int" val="85" />
-					<sval type="int" val="4" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="86" />
-					<sval type="int" val="4" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="86" />
-					<sval type="int" val="4" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="86" />
-					<sval type="int" val="4" />
+					<sval type="int" val="1" />
+					<sval type="string" val="On a match, grab the ship type being sampled." />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="86" />
@@ -4090,30 +4288,31 @@
 				<sval type="array" size="3">
 					<sval type="int" val="86" />
 					<sval type="int" val="1" />
-					<sval type="string" val="This might be slow and can lock up a game while running." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="86" />
-					<sval type="int" val="1" />
-					<sval type="string" val="To make more friendly, put in a message and a wait." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="86" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Could potentially put this on a counter to play with it, but" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="86" />
-					<sval type="int" val="1" />
-					<sval type="string" val="every loop seems to work okay in testing." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="86" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Throw up the current race, and how many factories still need processing." />
+					<sval type="string" val="Skip if it is a shipyard product already." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="90" />
+					<sval type="int" val="88" />
+					<sval type="int" val="5" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="88" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="88" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Add it as a product." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="89" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="91" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="91" />
 					<sval type="int" val="4" />
 				</sval>
 				<sval type="array" size="2">
@@ -4122,7 +4321,15 @@
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="92" />
-					<sval type="int" val="2" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="92" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="92" />
+					<sval type="int" val="4" />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="92" />
@@ -4130,511 +4337,564 @@
 				</sval>
 				<sval type="array" size="3">
 					<sval type="int" val="92" />
+					<sval type="int" val="1" />
+					<sval type="string" val="This might be slow and can lock up a game while running." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="92" />
+					<sval type="int" val="1" />
+					<sval type="string" val="To make more friendly, put in a message and a wait." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="92" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Could potentially put this on a counter to play with it, but" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="92" />
+					<sval type="int" val="1" />
+					<sval type="string" val="every loop seems to work okay in testing." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="92" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Throw up the current race, and how many factories still need processing." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="92" />
+					<sval type="int" val="1" />
+					<sval type="string" val="TODO: limit how often this print, eg. only every 5 ship names checked," />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="92" />
+					<sval type="int" val="1" />
+					<sval type="string" val="not counting factories, to speed up the script. Currently, the 1ms timer" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="92" />
+					<sval type="int" val="1" />
+					<sval type="string" val="rounds up to 1 frame, and at 40 fps on a shipyard with ~40 entries this" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="92" />
+					<sval type="int" val="1" />
+					<sval type="string" val="would add 1 second to processing time. (Low priority.)" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="96" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="97" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="98" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="98" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="98" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Function to initialize some variables." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="92" />
+					<sval type="int" val="98" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Put here to avoid misc warnings during compile, so that these vars" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="92" />
+					<sval type="int" val="98" />
 					<sval type="int" val="1" />
 					<sval type="string" val="are known to be visible." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="92" />
+					<sval type="int" val="98" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Outputs:" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="92" />
+					<sval type="int" val="98" />
 					<sval type="int" val="1" />
 					<sval type="string" val="    $array.str.variant.suffixes" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="92" />
+					<sval type="int" val="98" />
 					<sval type="int" val="1" />
 					<sval type="string" val="    $str.empty" />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="93" />
+					<sval type="int" val="99" />
 					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="93" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Set up an empty string, for doing replacements of the suffixes with none." />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="94" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="94" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Preread the xml file for variant suffixes." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="94" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Get the text block with variant names. This is all in file 0001." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="94" />
-					<sval type="int" val="1" />
-					<sval type="string" val="-Removed; this should already be loaded, and if reloading it then its text" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="94" />
-					<sval type="int" val="1" />
-					<sval type="string" val="will overwrite any later text files, causing oddities until a game reload." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="94" />
-					<sval type="int" val="1" />
-					<sval type="string" val="load text: id=1" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="94" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="94" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Get the different variant suffix components." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="94" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Page is 300017, but the prefix 30 is presumably added automatically for" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="94" />
-					<sval type="int" val="1" />
-					<sval type="string" val="AP, so just give the 17 as page." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="94" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Suffixes go from 10001 to 10019, and should be usable as-is." />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="94" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="94" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Make the array. Keep items for 20 variants." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="94" />
-					<sval type="int" val="1" />
-					<sval type="string" val="(Note: actual variant ids may go higher)." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="95" />
-					<sval type="int" val="1" />
-					<sval type="string" val="First entry will just be blank." />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="96" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="96" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Loop from 1 to 20." />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="98" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="98" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Calculate the text offset." />
 				</sval>
 				<sval type="array" size="3">
 					<sval type="int" val="99" />
 					<sval type="int" val="1" />
-					<sval type="string" val="Look up the text." />
+					<sval type="string" val="Set up an empty string, for doing replacements of the suffixes with none." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="100" />
+					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
 					<sval type="int" val="100" />
 					<sval type="int" val="1" />
-					<sval type="string" val="Add a space to the prefix." />
+					<sval type="string" val="Preread the xml file for variant suffixes." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="100" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Get the text block with variant names. This is all in file 0001." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="100" />
+					<sval type="int" val="1" />
+					<sval type="string" val="-Removed; this should already be loaded, and if reloading it then its text" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="100" />
+					<sval type="int" val="1" />
+					<sval type="string" val="will overwrite any later text files, causing oddities until a game reload." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="100" />
+					<sval type="int" val="1" />
+					<sval type="string" val="load text: id=1" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="100" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="100" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Get the different variant suffix components." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="100" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Page is 300017, but the prefix 30 is presumably added automatically for" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="100" />
+					<sval type="int" val="1" />
+					<sval type="string" val="AP, so just give the 17 as page." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="100" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Suffixes go from 10001 to 10019, and should be usable as-is." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="100" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="100" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Make the array. Keep items for 20 variants." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="100" />
+					<sval type="int" val="1" />
+					<sval type="string" val="(Note: actual variant ids may go higher)." />
 				</sval>
 				<sval type="array" size="3">
 					<sval type="int" val="101" />
 					<sval type="int" val="1" />
-					<sval type="string" val="Store it." />
+					<sval type="string" val="First entry will just be blank." />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="102" />
 					<sval type="int" val="2" />
 				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="104" />
-					<sval type="int" val="4" />
+				<sval type="array" size="3">
+					<sval type="int" val="102" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Loop from 1 to 20." />
 				</sval>
 				<sval type="array" size="2">
 					<sval type="int" val="104" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="105" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="105" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
+					<sval type="int" val="104" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Calculate the text offset." />
+				</sval>
+				<sval type="array" size="3">
 					<sval type="int" val="105" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Look up the text." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="106" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Add a space to the prefix." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="107" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Store it." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="108" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="110" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="110" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="111" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="111" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="111" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Function to take a ship type and determine the base name." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="105" />
+					<sval type="int" val="111" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Input:" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="105" />
+					<sval type="int" val="111" />
 					<sval type="int" val="1" />
 					<sval type="string" val="    $class.ship.type" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="105" />
+					<sval type="int" val="111" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Output:" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="105" />
+					<sval type="int" val="111" />
 					<sval type="int" val="1" />
 					<sval type="string" val="    $str.ship.type.name.base" />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="106" />
+					<sval type="int" val="112" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="106" />
+					<sval type="int" val="112" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Get the variant index." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="107" />
+					<sval type="int" val="113" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="107" />
+					<sval type="int" val="113" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Note when a suffix needs removal. Default true." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="108" />
+					<sval type="int" val="114" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="108" />
+					<sval type="int" val="114" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Look up the suffix for the variant." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="108" />
+					<sval type="int" val="114" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Set special cases for variant 0 (no suffix) or over 20 (unsupported" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="108" />
+					<sval type="int" val="114" />
 					<sval type="int" val="1" />
 					<sval type="string" val="by the lookup array)." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="109" />
+					<sval type="int" val="115" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="109" />
+					<sval type="int" val="115" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Treat as unsuffixed, even if there is a special suffix" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="109" />
+					<sval type="int" val="115" />
 					<sval type="int" val="1" />
 					<sval type="string" val="(eg. 'explorer' in xrm is variant 25)." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="109" />
+					<sval type="int" val="115" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Set an empty string for the debug print clarity." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="111" />
+					<sval type="int" val="117" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Note: because of the way xrm used some ship variants (eg. 10, 13, etc.)" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="111" />
+					<sval type="int" val="117" />
 					<sval type="int" val="1" />
 					<sval type="string" val="that used to have a suffix, but xrm overwrote the language file to blank" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="111" />
+					<sval type="int" val="117" />
 					<sval type="int" val="1" />
 					<sval type="string" val="the suffix, some ships will have a spurious space at the end of their" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="111" />
+					<sval type="int" val="117" />
 					<sval type="int" val="1" />
 					<sval type="string" val="name." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="111" />
+					<sval type="int" val="117" />
 					<sval type="int" val="1" />
 					<sval type="string" val="This needs to be dealt with both here and when station products are" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="111" />
+					<sval type="int" val="117" />
 					<sval type="int" val="1" />
 					<sval type="string" val="being matched." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="112" />
+					<sval type="int" val="118" />
 					<sval type="int" val="5" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="112" />
+					<sval type="int" val="118" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Do a straight lookup." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="113" />
+					<sval type="int" val="119" />
 					<sval type="int" val="4" />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="113" />
+					<sval type="int" val="119" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="113" />
+					<sval type="int" val="119" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Get the ship name, as a string." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="113" />
+					<sval type="int" val="119" />
 					<sval type="int" val="1" />
 					<sval type="string" val="The sprintf function requires 5 inputs, always, but can set them to null when unused." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="114" />
+					<sval type="int" val="120" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="114" />
+					<sval type="int" val="120" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Strip off the variant suffix for the base name." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="114" />
+					<sval type="int" val="120" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Only do this when a suffix is present, else this will freeze the game." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="117" />
+					<sval type="int" val="123" />
 					<sval type="int" val="5" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="117" />
+					<sval type="int" val="123" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Remove the trailing space. Somehow. If there is one." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="120" />
+					<sval type="int" val="126" />
 					<sval type="int" val="4" />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="120" />
+					<sval type="int" val="126" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="120" />
+					<sval type="int" val="126" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Do a debug print." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="122" />
+					<sval type="int" val="128" />
 					<sval type="int" val="4" />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="122" />
+					<sval type="int" val="128" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="123" />
+					<sval type="int" val="129" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="123" />
+					<sval type="int" val="129" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="123" />
+					<sval type="int" val="129" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Function to remove a space at the end of a string, if present." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="123" />
+					<sval type="int" val="129" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Input:" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="123" />
+					<sval type="int" val="129" />
 					<sval type="int" val="1" />
 					<sval type="string" val="    $str.to.despace" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="123" />
+					<sval type="int" val="129" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Output:" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="123" />
+					<sval type="int" val="129" />
 					<sval type="int" val="1" />
 					<sval type="string" val="    $str.to.despace.out" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="124" />
+					<sval type="int" val="130" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Check for trailing space." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="124" />
+					<sval type="int" val="130" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Start with the string length, then grab the last char." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="127" />
+					<sval type="int" val="133" />
 					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="127" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Compare to space." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="128" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Slice the string to drop the last char." />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="130" />
-					<sval type="int" val="5" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="130" />
-					<sval type="int" val="1" />
-					<sval type="string" val="No change." />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="131" />
-					<sval type="int" val="4" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="132" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="132" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="132" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Function to add a second race's shipyards and ships to the current arrays." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="132" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Used for Terrans+ATF, Argon+Goners, maybe others." />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="132" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Input:" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="132" />
-					<sval type="int" val="1" />
-					<sval type="string" val="    $race2" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="132" />
-					<sval type="int" val="1" />
-					<sval type="string" val="    $array.shipyards" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="132" />
-					<sval type="int" val="1" />
-					<sval type="string" val="    $array.class.ship.type" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="132" />
-					<sval type="int" val="1" />
-					<sval type="string" val="Output:" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="132" />
-					<sval type="int" val="1" />
-					<sval type="string" val="    $array.shipyards" />
-				</sval>
-				<sval type="array" size="3">
-					<sval type="int" val="132" />
-					<sval type="int" val="1" />
-					<sval type="string" val="    $array.class.ship.type" />
 				</sval>
 				<sval type="array" size="3">
 					<sval type="int" val="133" />
 					<sval type="int" val="1" />
-					<sval type="string" val="Get their shipyards and ships." />
+					<sval type="string" val="Compare to space." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="134" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Slice the string to drop the last char." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="135" />
+					<sval type="int" val="136" />
+					<sval type="int" val="5" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="136" />
+					<sval type="int" val="1" />
+					<sval type="string" val="No change." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="137" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="138" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="138" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="135" />
+					<sval type="int" val="138" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Function to add a second race's shipyards and ships to the current arrays." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="138" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Used for Terrans+ATF, Argon+Goners, maybe others." />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="138" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Input:" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="138" />
+					<sval type="int" val="1" />
+					<sval type="string" val="    $race2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="138" />
+					<sval type="int" val="1" />
+					<sval type="string" val="    $array.shipyards" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="138" />
+					<sval type="int" val="1" />
+					<sval type="string" val="    $array.class.ship.type" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="138" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Output:" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="138" />
+					<sval type="int" val="1" />
+					<sval type="string" val="    $array.shipyards" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="138" />
+					<sval type="int" val="1" />
+					<sval type="string" val="    $array.class.ship.type" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="139" />
+					<sval type="int" val="1" />
+					<sval type="string" val="Get their shipyards and ships." />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="141" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="3">
+					<sval type="int" val="141" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Merge the arrays." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="135" />
+					<sval type="int" val="141" />
 					<sval type="int" val="1" />
 					<sval type="string" val="It is not clear on how to do this easily. An append loop will be" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="135" />
+					<sval type="int" val="141" />
 					<sval type="int" val="1" />
 					<sval type="string" val="done here, though could also resize and then do a copy to new elements." />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="137" />
+					<sval type="int" val="143" />
 					<sval type="int" val="1" />
 					<sval type="string" val="Count down; this also brings the index in range." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="141" />
-					<sval type="int" val="4" />
-				</sval>
-				<sval type="array" size="2">
-					<sval type="int" val="141" />
-					<sval type="int" val="2" />
-				</sval>
-				<sval type="array" size="2">
 					<sval type="int" val="147" />
 					<sval type="int" val="4" />
 				</sval>
@@ -4643,25 +4903,33 @@
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="148" />
+					<sval type="int" val="153" />
+					<sval type="int" val="4" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="153" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="148" />
+					<sval type="int" val="154" />
+					<sval type="int" val="2" />
+				</sval>
+				<sval type="array" size="2">
+					<sval type="int" val="154" />
 					<sval type="int" val="2" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="148" />
+					<sval type="int" val="154" />
 					<sval type="int" val="1" />
 					<sval type="string" val="It is unclear if this is needed at the end;" />
 				</sval>
 				<sval type="array" size="3">
-					<sval type="int" val="148" />
+					<sval type="int" val="154" />
 					<sval type="int" val="1" />
 					<sval type="string" val="some other scripts have it after subfunctions." />
 				</sval>
 				<sval type="array" size="2">
-					<sval type="int" val="149" />
+					<sval type="int" val="155" />
 					<sval type="int" val="2" />
 				</sval>
 			</sval>

@@ -5,15 +5,17 @@ This will also grab Set_Path from File_Manager to make it
 available to user transform modules easily.
 '''
 from File_Manager import Set_Path
+from T_Backgrounds import *
+from T_Director import *
+from T_Factories import *
+from T_Gates import *
+from T_Globals import *
+from T_Jobs import *
 from T_Missiles import *
+from T_Scripts import *
+from T_Shields import *
 from T_Ships import *
 from T_Ships_Variants import *
-from T_Weapons import *
-from T_Gates import *
-from T_Wares import *
-from T_Backgrounds import *
-from T_Jobs import *
-from T_Director import *
-from T_Globals import *
 from T_Universe import *
-from T_Shields import *
+from T_Wares import *
+from T_Weapons import *

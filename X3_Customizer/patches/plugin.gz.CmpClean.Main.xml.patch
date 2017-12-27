@@ -1,0 +1,964 @@
+--- 
++++ 
+@@ -4,2 +4,2 @@
+-	<version>408</version>
+-	<engineversion>44</engineversion>
++	<version>423</version>
++	<engineversion>54</engineversion>
+@@ -22,2 +22,2 @@
+-				*$Version = 
+-				<text>get script version</text>
++				<text>* </text>
++				<var>$Version = get script version</var>
+@@ -28 +28,4 @@
+-			<comment>*$DEBUG = 0</comment>
++			<comment>
++				<text>* </text>
++				<var>$DEBUG = 0</var>
++			</comment>
+@@ -152 +155 @@
+-			<text> get player tracking aim</text>
++			<text>get player tracking aim</text>
+@@ -173 +176 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -180 +183 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -187 +190 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -194 +197 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -201 +204 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -208 +211 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -215 +218 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -222 +225 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -229 +232 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -236 +239 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -243 +246 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -250 +253 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -257 +260 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -264 +267 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -271 +274 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -278 +281 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -285 +288 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -292 +295 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -299 +302 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -477 +480 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -542 +545,16 @@
+-		<line indent="    ">
++		<line indent="   ">
++			<text>end</text>
++		</line>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>Brent note: this moved from the 'if' block above to here, to fix</var>
++			</comment>
++		</line>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>a bug with the player target sometimes not being used.</var>
++			</comment>
++		</line>
++		<line indent="   ">
+@@ -545,3 +562,0 @@
+-		</line>
+-		<line indent="   ">
+-			<text>end</text>
+@@ -613 +628 @@
+-			<text> get player tracking aim</text>
++			<text>get player tracking aim</text>
+@@ -626 +641 @@
+-				<var>    Complex hub, no aim</var>
++				<var>Complex hub, no aim</var>
+@@ -1191,10 +1206,2 @@
+-				*START $Null -&gt;
+-				<text> call script </text>
+-				plugin.gz.CmpClean.hide
+-				<text> : </text>
+-				<text> ???=</text>
+-				null 
+-				<text> ???=</text>
+-				[TRUE] 
+-				<text> ???=</text>
+-				$SecPosition
++				<text>* </text>
++				<var>START $Null-&gt; call script 'plugin.gz.CmpClean.hide' : Select.in.Comp=null Select.out.of.Comp=[TRUE] Position=$SecPosition</var>
+@@ -1374 +1381 @@
+-			<text> set position: x=</text>
++			<text>set position: x=</text>
+@@ -1391 +1398 @@
+-			<text> set rotation: alpha=</text>
++			<text>set rotation: alpha=</text>
+@@ -1408 +1415 @@
+-			<text> set rotation: alpha=</text>
++			<text>set rotation: alpha=</text>
+@@ -1425 +1432 @@
+-			<text> set rotation: alpha=</text>
++			<text>set rotation: alpha=</text>
+@@ -1442 +1449 @@
+-			<text> set rotation: alpha=</text>
++			<text>set rotation: alpha=</text>
+@@ -1459 +1466 @@
+-			<text> set rotation: alpha=</text>
++			<text>set rotation: alpha=</text>
+@@ -1476 +1483 @@
+-			<text> set rotation: alpha=</text>
++			<text>set rotation: alpha=</text>
+@@ -1539,5 +1546,2 @@
+-				*[THIS] -&gt;
+-				<text> set local variable: name=</text>
+-				'gz.old.name'
+-				<text> value=</text>
+-				$Ship.Name
++				<text>* </text>
++				<var>[THIS]-&gt; set local variable: name='gz.old.name' value=$Ship.Name</var>
+@@ -1548,17 +1552,2 @@
+-				*[THIS] -&gt;
+-				<text> start task </text>
+-				$PageID
+-				<text> with script </text>
+-				plugin.gz.CmpClean.Rename
+-				<text> and prio </text>
+-				0
+-				<text>: arg1=</text>
+-				null
+-				<text> arg2=</text>
+-				null
+-				<text> arg3=</text>
+-				null
+-				<text> arg4=</text>
+-				null
+-				<text> arg5=</text>
+-				null
++				<text>* </text>
++				<var>[THIS]-&gt; begin task $PageID with script 'plugin.gz.CmpClean.Rename' and priority 0: arg1=null arg2=null arg3=null arg4=null arg5=null</var>
+@@ -1639 +1628 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -1701 +1690 @@
+-			<text> get substring of </text>
++			<text>get substring of </text>
+@@ -1718 +1707 @@
+-			<text> get substring of </text>
++			<text>get substring of </text>
+@@ -1727 +1716 @@
+-			<text> set name to </text>
++			<text>set name to </text>
+@@ -1736 +1725 @@
+-			<text> array alloc: size=</text>
++			<text>array alloc: size=</text>
+@@ -1808 +1797 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -1966 +1955 @@
+-			<text> set position: x=</text>
++			<text>set position: x=</text>
+@@ -1975 +1964 @@
+-			<text> set rotation: alpha=</text>
++			<text>set rotation: alpha=</text>
+@@ -1984 +1973 @@
+-			<text> ignore collisions: </text>
++			<text>ignore collisions: </text>
+@@ -2022 +2011 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -2029 +2018 @@
+-			<text> start task </text>
++			<text>start task </text>
+@@ -2062 +2051 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -2067,2 +2056,2 @@
+-				*$Target = 
+-				<text> get player tracking aim</text>
++				<text>* </text>
++				<var>$Target = get player tracking aim</var>
+@@ -2105 +2094,4 @@
+-			<comment>*$Ship.Y = $Ship.Y + 20000</comment>
++			<comment>
++				<text>* </text>
++				<var>$Ship.Y = $Ship.Y + 20000</var>
++			</comment>
+@@ -2125,3 +2117,2 @@
+-				*
+-				<text>gosub </text>
+-				Rename.Ship
++				<text>* </text>
++				<var>gosub Rename.Ship:</var>
+@@ -2301 +2292 @@
+-			<text> set position: x=</text>
++			<text>set position: x=</text>
+@@ -2310 +2301 @@
+-			<text> set rotation: alpha=</text>
++			<text>set rotation: alpha=</text>
+@@ -2319 +2310 @@
+-			<text> ignore collisions: </text>
++			<text>ignore collisions: </text>
+@@ -2467,3 +2457,0 @@
+-			<comment>*$Is.a.mine = null</comment>
+-		</line>
+-		<line indent="">
+@@ -2471,3 +2459,2 @@
+-				*do if $Target -&gt;
+-				<text> is of type </text>
+-				Argon Complex Hub
++				<text>* </text>
++				<var>$Is.a.mine = null</var>
+@@ -2477,3 +2463,0 @@
+-			<comment>*$Is.Hub = 1</comment>
+-		</line>
+-		<line indent="">
+@@ -2481,3 +2465,2 @@
+-				*do if $Target -&gt;
+-				<text> is of type </text>
+-				Boron Complex Hub
++				<text>* </text>
++				<var>do if $Target-&gt; is of type {Argon Complex Hub}</var>
+@@ -2487,3 +2469,0 @@
+-			<comment>*$Is.Hub = 1</comment>
+-		</line>
+-		<line indent="">
+@@ -2491,3 +2471,2 @@
+-				*do if $Target -&gt;
+-				<text> is of type </text>
+-				Paranid Complex Hub
++				<text>* </text>
++				<var>$Is.Hub = 1</var>
+@@ -2497,3 +2475,0 @@
+-			<comment>*$Is.Hub = 1</comment>
+-		</line>
+-		<line indent="">
+@@ -2501,3 +2477,2 @@
+-				*do if $Target -&gt;
+-				<text> is of type </text>
+-				Split Complex Hub
++				<text>* </text>
++				<var>do if $Target-&gt; is of type {Boron Complex Hub}</var>
+@@ -2507,3 +2481,0 @@
+-			<comment>*$Is.Hub = 1</comment>
+-		</line>
+-		<line indent="">
+@@ -2511,3 +2483,2 @@
+-				*do if $Target -&gt;
+-				<text> is of type </text>
+-				Teladi Complex Hub
++				<text>* </text>
++				<var>$Is.Hub = 1</var>
+@@ -2517 +2488,34 @@
+-			<comment>*$Is.Hub = 1</comment>
++			<comment>
++				<text>* </text>
++				<var>do if $Target-&gt; is of type {Paranid Complex Hub}</var>
++			</comment>
++		</line>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>$Is.Hub = 1</var>
++			</comment>
++		</line>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>do if $Target-&gt; is of type {Split Complex Hub}</var>
++			</comment>
++		</line>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>$Is.Hub = 1</var>
++			</comment>
++		</line>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>do if $Target-&gt; is of type {Teladi Complex Hub (FAC_T_COMPLEX)}</var>
++			</comment>
++		</line>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>$Is.Hub = 1</var>
++			</comment>
+@@ -2540 +2544 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -2566 +2570 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -2583,3 +2586,0 @@
+-			<comment>*$dummy = $Index + '   ' + $Ship.Name</comment>
+-		</line>
+-		<line indent="">
+@@ -2587,3 +2588,2 @@
+-				*[THIS] -&gt;
+-				<text> set name to </text>
+-				$dummy
++				<text>* </text>
++				<var>$dummy = $Index + '   ' + $Ship.Name</var>
+@@ -2594,4 +2594,8 @@
+-				*= 
+-				<text>wait </text>
+-				1
+-				<text> ms</text>
++				<text>* </text>
++				<var>[THIS]-&gt; set name to $dummy</var>
++			</comment>
++		</line>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>= wait 1 ms</var>
+@@ -2645 +2649 @@
+-			<text> array alloc: size=</text>
++			<text>array alloc: size=</text>
+@@ -2650 +2654 @@
+-			<text> array alloc: size=</text>
++			<text>array alloc: size=</text>
+@@ -2655 +2659 @@
+-			<text> array alloc: size=</text>
++			<text>array alloc: size=</text>
+@@ -2711 +2715 @@
+-			<text> array alloc: size=</text>
++			<text>array alloc: size=</text>
+@@ -2848 +2852 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -2873 +2877 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -3085,2 +3089,2 @@
+-			<text> create ship: type=</text>
+-			<var>Demeter Super Freighter</var>
++			<text>create ship: type=</text>
++			<var>Demeter Super Freighter XL</var>
+@@ -3155 +3159 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -3311 +3315,4 @@
+-			<comment>*$Safe.Position = null</comment>
++			<comment>
++				<text>* </text>
++				<var>$Safe.Position = null</var>
++			</comment>
+@@ -3329 +3336 @@
+-			<text> get player tracking aim</text>
++			<text>get player tracking aim</text>
+@@ -3342 +3349 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -3391 +3398 @@
+-				<var>  Player owned station targeted. Toggle ignore.</var>
++				<var>Player owned station targeted. Toggle ignore.</var>
+@@ -3402 +3409 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -3412 +3419 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -3427 +3434 @@
+-				<var>  ALWAYS  :  Show ignore flags for all stations</var>
++				<var>ALWAYS  :  Show ignore flags for all stations</var>
+@@ -3437 +3444 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -3466 +3473 @@
+-			<text> find position of pattern </text>
++			<text>find position of pattern </text>
+@@ -3503 +3510 @@
+-				<var>    Station should have a tag</var>
++				<var>Station should have a tag</var>
+@@ -3526 +3533 @@
+-			<text> set name to </text>
++			<text>set name to </text>
+@@ -3542 +3549 @@
+-				<var>    Station should not have a tag</var>
++				<var>Station should not have a tag</var>
+@@ -3557 +3564 @@
+-			<text> substitute in string </text>
++			<text>substitute in string </text>
+@@ -3566 +3573 @@
+-			<text> set name to </text>
++			<text>set name to </text>
+@@ -3625 +3632 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -3644 +3651 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -3679 +3686 @@
+-			<text> get ware from maintype </text>
++			<text>get ware from maintype </text>
+@@ -3696,11 +3703,2 @@
+-				*$Station.Arr = 
+-				<text> create new array, arguments=</text>
+-				Argon Complex Construction Kit
+-				<text>, </text>
+-				Boron Complex Construction Kit
+-				<text>, </text>
+-				Paranid Complex Construction Kit
+-				<text>, </text>
+-				Split Complex Construction Kit
+-				<text>, </text>
+-				Teladi Complex Construction Kit
++				<text>* </text>
++				<var>$Station.Arr = create new array, arguments={Argon Complex Construction Kit}, {Boron Complex Construction Kit}, {Paranid Complex Construction Kit}, {Split Complex Construction Kit}, {Teladi Complex Construction Kit}</var>
+@@ -3717 +3715 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -3909 +3907 @@
+-			<text> get number of subtypes of maintype </text>
++			<text>get number of subtypes of maintype </text>
+@@ -3922 +3920 @@
+-			<text> get ware from maintype </text>
++			<text>get ware from maintype </text>
+@@ -3948 +3946 @@
+-			<text> get number of subtypes of maintype </text>
++			<text>get number of subtypes of maintype </text>
+@@ -3961 +3959 @@
+-			<text> get ware from maintype </text>
++			<text>get ware from maintype </text>
+@@ -4026 +4024 @@
+-			<text> find </text>
++			<text>find </text>
+@@ -4049 +4047 @@
+-				<var>    Test factory</var>
++				<var>Test factory</var>
+@@ -4074,0 +4073,18 @@
++			<comment>
++				<text>* </text>
++				<var>Brent note: owner changed from neutral to player here, since when neutral</var>
++			</comment>
++		</line>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>some factory types (eg. teladi medium SPP) do not initialize their wares</var>
++			</comment>
++		</line>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>correctly, and end up getting ignored.</var>
++			</comment>
++		</line>
++		<line indent="">
+@@ -4076 +4092 @@
+-			<text> create station: type=</text>
++			<text>create station: type=</text>
+@@ -4079 +4095 @@
+-			<var>Neutral Race</var>
++			<var>Player</var>
+@@ -4091 +4107 @@
+-			<text> add default wares to station/dock</text>
++			<text>add default wares to station/dock</text>
+@@ -4101 +4117 @@
+-			<text> factory production task: on=</text>
++			<text>factory production task: on=</text>
+@@ -4130 +4146 @@
+-			<text> destruct: show no explosion=</text>
++			<text>destruct: show no explosion=</text>
+@@ -4191,0 +4208 @@
++		<line indent=" "/>
+@@ -4221 +4238 @@
+-				<var>    Build stations:</var>
++				<var>Build stations:</var>
+@@ -4254 +4271 @@
+-			<text> create station: type=</text>
++			<text>create station: type=</text>
+@@ -4269 +4286 @@
+-			<text> add default wares to station/dock</text>
++			<text>add default wares to station/dock</text>
+@@ -4273 +4290 @@
+-			<text> factory production task: on=</text>
++			<text>factory production task: on=</text>
+@@ -4316 +4333 @@
+-			<text> = random value from </text>
++			<text>random value from </text>
+@@ -4324 +4341 @@
+-			<text> = random value from </text>
++			<text>random value from </text>
+@@ -4332 +4349 @@
+-			<text> = random value from </text>
++			<text>random value from </text>
+@@ -4340 +4357 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -4422 +4439 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -4448 +4465 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -4486,0 +4504,2 @@
++		<line indent=""/>
++		<line indent=""/>
+@@ -4491 +4510 @@
+-			<sval type="int" val="44"/>
++			<sval type="int" val="54"/>
+@@ -4493 +4512 @@
+-			<sval type="int" val="408"/>
++			<sval type="int" val="423"/>
+@@ -5177 +5196 @@
+-					<sval type="int" val="-1610596349"/>
++					<sval type="int" val="-1610596605"/>
+@@ -9266 +9285 @@
+-					<sval type="int" val="12"/>
++					<sval type="int" val="10"/>
+@@ -9796,19 +9815,14 @@
+-			<sval size="242" type="array">
+-				<sval size="4" type="array">
+-					<sval type="int" val="2"/>
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="1031"/>
+-					<sval type="string" val="Version"/>
+-				</sval>
+-				<sval size="2" type="array">
+-					<sval type="int" val="2"/>
+-					<sval type="int" val="2"/>
+-				</sval>
+-				<sval size="7" type="array">
+-					<sval type="int" val="2"/>
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="string" val="DEBUG"/>
+-					<sval type="int" val="1"/>
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="0"/>
++			<sval size="250" type="array">
++				<sval size="3" type="array">
++					<sval type="int" val="2"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Version = get script version"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="2"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="3" type="array">
++					<sval type="int" val="2"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$DEBUG = 0"/>
+@@ -9904,2 +9918,12 @@
+-					<sval type="int" val="64"/>
+-					<sval type="int" val="4"/>
++					<sval type="int" val="63"/>
++					<sval type="int" val="4"/>
++				</sval>
++				<sval size="3" type="array">
++					<sval type="int" val="63"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="Brent note: this moved from the 'if' block above to here, to fix"/>
++				</sval>
++				<sval size="3" type="array">
++					<sval type="int" val="63"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="a bug with the player target sometimes not being used."/>
+@@ -9959 +9983 @@
+-					<sval type="string" val="    Complex hub, no aim"/>
++					<sval type="string" val="Complex hub, no aim"/>
+@@ -10058 +10082 @@
+-				<sval size="14" type="array">
++				<sval size="3" type="array">
+@@ -10060,13 +10084,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="102"/>
+-					<sval type="string" val="plugin.gz.CmpClean.hide"/>
+-					<sval type="int" val="-2147483646"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Null"/>
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="131075"/>
+-					<sval type="int" val="10"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="SecPosition"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="START $Null-&gt; call script 'plugin.gz.CmpClean.hide' : Select.in.Comp=null Select.out.of.Comp=[TRUE] Position=$SecPosition"/>
+@@ -10140 +10153 @@
+-				<sval size="9" type="array">
++				<sval size="3" type="array">
+@@ -10142,10 +10155,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="155"/>
+-					<sval type="int" val="131075"/>
+-					<sval type="int" val="1"/>
+-					<sval type="int" val="5"/>
+-					<sval type="string" val="gz.old.name"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Ship.Name"/>
+-				</sval>
+-				<sval size="20" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="[THIS]-&gt; set local variable: name='gz.old.name' value=$Ship.Name"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10153,19 +10160,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="1017"/>
+-					<sval type="int" val="131075"/>
+-					<sval type="int" val="1"/>
+-					<sval type="string" val="plugin.gz.CmpClean.Rename"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="PageID"/>
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="[THIS]-&gt; begin task $PageID with script 'plugin.gz.CmpClean.Rename' and priority 0: arg1=null arg2=null arg3=null arg4=null arg5=null"/>
+@@ -10260 +10250 @@
+-				<sval size="4" type="array">
++				<sval size="3" type="array">
+@@ -10262,3 +10252,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="535"/>
+-					<sval type="string" val="Target"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Target = get player tracking aim"/>
+@@ -10274 +10263 @@
+-				<sval size="11" type="array">
++				<sval size="3" type="array">
+@@ -10276,10 +10265,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="string" val="Ship.Y"/>
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Ship.Y"/>
+-					<sval type="int" val="15"/>
+-					<sval type="int" val="11"/>
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="20000"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Ship.Y = $Ship.Y + 20000"/>
+@@ -10295 +10276 @@
+-				<sval size="4" type="array">
++				<sval size="3" type="array">
+@@ -10297,3 +10278,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="1167"/>
+-					<sval type="string" val="Rename.Ship"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="gosub Rename.Ship:"/>
+@@ -10377 +10357 @@
+-				<sval size="7" type="array">
++				<sval size="3" type="array">
+@@ -10379,8 +10359,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="string" val="Is.a.mine"/>
+-					<sval type="int" val="1"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
+-				</sval>
+-				<sval size="8" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Is.a.mine = null"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10388,9 +10364,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="710"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Target"/>
+-					<sval type="int" val="-1610612728"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="393439"/>
+-				</sval>
+-				<sval size="7" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="do if $Target-&gt; is of type {Argon Complex Hub}"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10398,8 +10369,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="string" val="Is.Hub"/>
+-					<sval type="int" val="1"/>
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="1"/>
+-				</sval>
+-				<sval size="8" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Is.Hub = 1"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10407,9 +10374,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="710"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Target"/>
+-					<sval type="int" val="-1610612728"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="393440"/>
+-				</sval>
+-				<sval size="7" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="do if $Target-&gt; is of type {Boron Complex Hub}"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10417,8 +10379,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="string" val="Is.Hub"/>
+-					<sval type="int" val="1"/>
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="1"/>
+-				</sval>
+-				<sval size="8" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Is.Hub = 1"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10426,9 +10384,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="710"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Target"/>
+-					<sval type="int" val="-1610612728"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="393441"/>
+-				</sval>
+-				<sval size="7" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="do if $Target-&gt; is of type {Paranid Complex Hub}"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10436,8 +10389,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="string" val="Is.Hub"/>
+-					<sval type="int" val="1"/>
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="1"/>
+-				</sval>
+-				<sval size="8" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Is.Hub = 1"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10445,9 +10394,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="710"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Target"/>
+-					<sval type="int" val="-1610612728"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="393442"/>
+-				</sval>
+-				<sval size="7" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="do if $Target-&gt; is of type {Split Complex Hub}"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10455,8 +10399,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="string" val="Is.Hub"/>
+-					<sval type="int" val="1"/>
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="1"/>
+-				</sval>
+-				<sval size="8" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Is.Hub = 1"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10464,9 +10404,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="710"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Target"/>
+-					<sval type="int" val="-1610612728"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="393443"/>
+-				</sval>
+-				<sval size="7" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="do if $Target-&gt; is of type {Teladi Complex Hub (FAC_T_COMPLEX)}"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10474,6 +10409,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="string" val="Is.Hub"/>
+-					<sval type="int" val="1"/>
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="1"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Is.Hub = 1"/>
+@@ -10502 +10433 @@
+-				<sval size="15" type="array">
++				<sval size="3" type="array">
+@@ -10504,16 +10435,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="string" val="dummy"/>
+-					<sval type="int" val="5"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Index"/>
+-					<sval type="int" val="15"/>
+-					<sval type="int" val="11"/>
+-					<sval type="int" val="5"/>
+-					<sval type="string" val="   "/>
+-					<sval type="int" val="15"/>
+-					<sval type="int" val="11"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Ship.Name"/>
+-				</sval>
+-				<sval size="7" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="$dummy = $Index + '   ' + $Ship.Name"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10521,8 +10440,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="1029"/>
+-					<sval type="int" val="131075"/>
+-					<sval type="int" val="1"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="dummy"/>
+-				</sval>
+-				<sval size="6" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="[THIS]-&gt; set name to $dummy"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -10530,5 +10445,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="105"/>
+-					<sval type="int" val="-2147483647"/>
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="1"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="= wait 1 ms"/>
+@@ -10641 +10553 @@
+-				<sval size="7" type="array">
++				<sval size="3" type="array">
+@@ -10643,6 +10555,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="string" val="Safe.Position"/>
+-					<sval type="int" val="1"/>
+-					<sval type="int" val="0"/>
+-					<sval type="int" val="0"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Safe.Position = null"/>
+@@ -10678 +10586 @@
+-					<sval type="string" val="  Player owned station targeted. Toggle ignore."/>
++					<sval type="string" val="Player owned station targeted. Toggle ignore."/>
+@@ -10699 +10607 @@
+-					<sval type="string" val="  ALWAYS  :  Show ignore flags for all stations"/>
++					<sval type="string" val="ALWAYS  :  Show ignore flags for all stations"/>
+@@ -10716 +10624 @@
+-					<sval type="string" val="    Station should have a tag"/>
++					<sval type="string" val="Station should have a tag"/>
+@@ -10745 +10653 @@
+-					<sval type="string" val="    Station should not have a tag"/>
++					<sval type="string" val="Station should not have a tag"/>
+@@ -10798 +10706 @@
+-				<sval size="14" type="array">
++				<sval size="3" type="array">
+@@ -10800,13 +10708,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="1415"/>
+-					<sval type="string" val="Station.Arr"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="393444"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="393445"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="393446"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="393447"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="393448"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Station.Arr = create new array, arguments={Argon Complex Construction Kit}, {Boron Complex Construction Kit}, {Paranid Complex Construction Kit}, {Split Complex Construction Kit}, {Teladi Complex Construction Kit}"/>
+@@ -10896 +10793,16 @@
+-					<sval type="string" val="    Test factory"/>
++					<sval type="string" val="Test factory"/>
++				</sval>
++				<sval size="3" type="array">
++					<sval type="int" val="491"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="Brent note: owner changed from neutral to player here, since when neutral"/>
++				</sval>
++				<sval size="3" type="array">
++					<sval type="int" val="491"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="some factory types (eg. teladi medium SPP) do not initialize their wares"/>
++				</sval>
++				<sval size="3" type="array">
++					<sval type="int" val="491"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="correctly, and end up getting ignored."/>
+@@ -10899,0 +10812,4 @@
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="506"/>
+@@ -10913 +10829 @@
+-					<sval type="string" val="    Build stations:"/>
++					<sval type="string" val="Build stations:"/>
+@@ -10968,0 +10885,8 @@
++				<sval size="2" type="array">
++					<sval type="int" val="552"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="552"/>
++					<sval type="int" val="2"/>
++				</sval>
+@@ -10970 +10894 @@
+-			<sval type="int" val="725"/>
++			<sval type="string" val="725_COMPLEX_CLEANER"/>
+@@ -10972,0 +10897 @@
++	<nosignature>9021</nosignature>

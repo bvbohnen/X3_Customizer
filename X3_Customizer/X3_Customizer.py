@@ -1,5 +1,5 @@
 '''
-X3 Customizer v2.15
+X3 Customizer v2.17
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -84,9 +84,8 @@ Setup:
 # to verify they look okay.
 
 '''
-General transform ideas:
+TODO transforms:
 
--Add larger factories (may be tricky to get naming right on suffixes).
 -Add a start customizer, selecting name, age, ship, location, etc.
 '''
 

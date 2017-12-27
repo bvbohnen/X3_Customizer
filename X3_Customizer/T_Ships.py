@@ -759,33 +759,9 @@ def Add_Ship_Equipment(
         cap_ware_list_ids.add(new_ware_list_id)
 
 
-    #Update the warelists file with any new lines.
-    if new_ware_line_dicts_list:
-        #All new lists will be put at the bottom of the dict_list.
-        #This will require that the header be modified to account for the
-        # new lines.
-        t_file = Load_File('WareLists.txt', return_t_file = True)
-
-        #Add the new lists.
-        #These need to go in both the data and line lists, data for future
-        # visibility to this and other transforms, lines to be seen at
-        # writeout.
-        t_file.data_dict_list += new_ware_line_dicts_list
-        t_file.line_dict_list += new_ware_line_dicts_list
-
-        #Find the header line.
-        for line_dict in t_file.line_dict_list:
-            #Looking for the first non-comment line; it should have
-            # 2 entries (with newline).
-            if not list(line_dict.values())[0].strip().startswith('/') and len(line_dict) == 2:
-                #The first field is the list count.
-                line_dict['ware_count'] = str(int(line_dict['ware_count']) 
-                                              + len(new_ware_line_dicts_list))
-                break
-            
-            #Error if hit a data line.
-            assert line_dict is not t_file.data_dict_list[0]
-
+    # Add the entries to the t file.
+    Add_Entries_To_T_File('WareLists.txt', new_ware_line_dicts_list)
+    
 
     #If ware list ids are still in need of updating with equipment,
     # handle that now.

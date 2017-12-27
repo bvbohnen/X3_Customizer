@@ -44,6 +44,9 @@
     </Compile>
     <Compile Include="T_Backgrounds.py" />
     <Compile Include="T_Director.py" />
+    <Compile Include="T_Factories.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="T_Gates.py" />
     <Compile Include="T_Globals.py" />
     <Compile Include="T_Jobs.py" />

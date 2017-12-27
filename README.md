@@ -1,4 +1,4 @@
-X3 Customizer v2.15
+X3 Customizer v2.17
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -90,6 +90,15 @@ Director Transforms:
  * Standardize_Tunings
 
       Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
+
+
+***
+
+Factorie Transforms:
+
+ * Add_More_Factory_Sizes
+
+      Adds factories of alternate sizes, from basic to XL. Price and volume of new sizes is based on the scaling common to existing factories. Factories will be added to existing shipyards the first time a game is loaded after running this transform; this may take several seconds to complete, during which time the game will be unresponsive. Warning: it is unsafe to remove factories once they have been added to an existing save.
 
 
 ***
@@ -208,6 +217,14 @@ Script Transforms:
 
       Allows Commercial Agents to sell factory products at pilot rank 0. May require CAG restart to take effect.
 
+ * Complex_Cleaner_Bug_Fix
+
+      Apply bug fixes to the Complex Cleaner mod. Designed for version 4.09 of that mod. Includes a fix for mistargetted a wrong hub in systems with multiple hubs, and a fix for some factories getting ignored when crunching. Patches plugin.gz.CmpClean.Main.xml.
+
+ * Complex_Cleaner_Use_Small_Cube
+
+      Forces the Complex Cleaner to use the smaller cube model always when combining factories. Patches plugin.gz.CmpClean.crunch.xml.
+
  * Convert_Attack_To_Attack_Nearest
 
       Modifies the Attack command when used on an owned asset to instead enact Attack Nearest. In vanilla AP, such attack commands are quietly ignored. Intended for use when commanding groups, where Attack is available but Attack Nearest is not. This replaces '!ship.cmd.attack.std'.
@@ -219,6 +236,10 @@ Script Transforms:
  * Fix_OOS_Laser_Missile_Conflict
 
       Allows OOS combat to include both missile and laser fire in the same attack round. In vanilla AP, a ship firing a missile will not fire its lasers for a full round, generally causing a large drop in damage output. With the change, adding missiles to OOS ships will not hurt their performance.
+
+ * Fleet_Intercepter_Bug_Fix
+
+      Apply bug fixes to the Fleet logic for selecting ships to launch at enemies. A mispelling of 'interecept' causes M6 ships to be launched against enemy M8s instead of interceptors. Patches !lib.fleet.shipsfortarget.xml.
 
  * Increase_Escort_Engagement_Range
 
@@ -256,7 +277,7 @@ Ship Transforms:
 
  * Add_Ship_Variants
 
-      Adds variants for various ships. Variant attribute modifiers are based on the average differences between existing variants and their basic ship, where only M3,M4,M5 are analyzed for combat variants, and only TS,TP are analyzed for trade variants, with Hauler being considered both a combat variant. After variants are created, a script may be manually run in game from the script editor which will add variants to all shipyards that sell the base ship. Run 'x3customizer.add.variants.to.shipyards.xml', no input args. Note: this will add all stock variants as well, as it currently has no way to distinguish the new ships from existing ones. Warning: it is unsafe to remove variants once they have been added to an existing save.
+      Adds variants for various ships. Variant attribute modifiers are based on the average differences between existing variants and their basic ship, where only M3,M4,M5 are analyzed for combat variants, and only TS,TP are analyzed for trade variants, with Hauler being considered both a combat variant. Variants will be added to existing shipyards the first time a game is loaded after running this transform; this may take several seconds to complete, during which time the game will be unresponsive. Warning: it is unsafe to remove variants once they have been added to an existing save.
 
  * Adjust_Ship_Hull
 
@@ -297,6 +318,10 @@ Ship Transforms:
  * Remove_Khaak_Corvette_Spin
 
       Remove the spin on the secondary hull of the Khaak corvette. The replacement file used is expected to work for vanilla, xrm, and other mods that don't change the model scene file.
+
+ * Remove_Ship_Variants
+
+      Removes variants for selected ships. May be used after Add_Ship_Variants has already been applied to an existing save, to safely remove variants while leaving their tships entries intact. In this case, leave the Add_Ship_Variants call as it was previously with undesired variants, and use this tranform to prune the variants. Existing ships will remain in game, categorized as unknown race, though new ships will not spawn automatically. Variants will be removed from existing shipyards the first time a game is loaded after running this transform.
 
  * Simplify_Engine_Trails
 
@@ -525,3 +550,12 @@ Change Log:
    - Bugfix for Add_CLS_Software_To_More_Docks.
  * 2.15:
    - Added Change_Sector_Music.
+ * 2.16:
+   - Added Complex_Cleaner_Bug_Fix.
+   - Added Complex_Cleaner_Use_Small_Cube.
+ * 2.17:
+   - Added Add_More_Factory_Sizes.
+   - Added Remove_Ship_Variants.
+   - Added Fleet_Intercepter_Bug_Fix.
+   - Tweaked Adjust_Job_Count to support reducing counts to 0.
+   - Switched Add_Ship_Variants to use a director script to update shipyards.

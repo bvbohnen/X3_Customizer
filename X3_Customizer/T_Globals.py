@@ -114,27 +114,10 @@ def Adjust_Missile_Hulls(
         this_line['value'] = str(default_damage_dict[name])
         this_line[2] = '\n'
         lines_to_add.append(this_line)
-
-    # This will edit the full t_file.
-    t_file = Load_File('Globals.txt', return_t_file = True)
-    # Add missiles to the full line list, and the active line list.
-    t_file.data_dict_list += lines_to_add
-    t_file.line_dict_list += lines_to_add
-
-    # Update the entry count.
-    for line_dict in t_file.line_dict_list:
-        #Looking for the first non-comment line; it should have
-        # 2 entries (with newline).
-        if not line_dict['name'].strip().startswith('/') and len(line_dict) == 2:
-            #The first field is the global count.
-            #It was labelled as 'name', to match normal data lines.
-            line_dict['name'] = str(int(line_dict['name']) + len(lines_to_add))
-            break
-            
-        #Error if hit a data line.
-        assert line_dict is not t_file.data_dict_list[0]
-
-
+        
+    # Add the entries to the t file.
+    Add_Entries_To_T_File('Globals.txt', lines_to_add)
+    
     # Pass 3: apply the transform normally, on the defaults or
     # whatever was in the file already.
     for this_dict in Load_File('Globals.txt'):

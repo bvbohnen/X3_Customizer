@@ -87,6 +87,15 @@ Change Log:
    - Bugfix for Add_CLS_Software_To_More_Docks.
  * 2.15:
    - Added Change_Sector_Music.
+ * 2.16:
+   - Added Complex_Cleaner_Bug_Fix.
+   - Added Complex_Cleaner_Use_Small_Cube.
+ * 2.17:
+   - Added Add_More_Factory_Sizes.
+   - Added Remove_Ship_Variants.
+   - Added Fleet_Intercepter_Bug_Fix.
+   - Tweaked Adjust_Job_Count to support reducing counts to 0.
+   - Switched Add_Ship_Variants to use a director script to update shipyards.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

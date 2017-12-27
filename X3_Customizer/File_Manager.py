@@ -347,7 +347,12 @@ def Get_Output_File_Path(file_name):
         #Quick safety check: error if matches the source file path.
         source_file_path = Get_Source_File_Path(file_name)
         assert file_path != source_file_path
+        # In case the target directory doesn't exist, such as on a
+        # first run, make it.
+        if not os.path.exists(File_path_dict[file_name]):
+            os.mkdir(File_path_dict[file_name])
         return file_path
+    return None
 
 
 #-Removed; from older code that pre-defined all source files and paths.
@@ -482,17 +487,25 @@ def Load_File(file_name,
                 #Step through the fields, with an index counter.
                 for index, field_string in enumerate(data_list):
 
-                    #If this index has a field name, use it, otherwise use the index for a key.
+                    #If this index has a field name, use it, otherwise use 
+                    # the index for a key.
                     this_key = index
-                    if index in field_dict:
-                        this_key = field_dict[index]
-                    #Also check negative indices.
-                    negative_index = index - len(data_list)
-                    if negative_index in field_dict:
-                        this_key = field_dict[negative_index]
+                    # Only do the named key check when the line is considered
+                    # a data line; don't do this for headers/comments.
+                    if len(data_list) >= field_dict['min_data_entries']:
+                        if index in field_dict:
+                            this_key = field_dict[index]
+                        #Also check negative indices.
+                        negative_index = index - len(data_list)
+                        if negative_index in field_dict:
+                            this_key = field_dict[negative_index]
+                            # Error if both matched; something went wrong in that
+                            # case.
+                            assert index not in field_dict
 
                     #Record in the ordered dict.
-                    #Values will not be converted to ints, since some might need to stay strings.
+                    #Values will not be converted to ints, since some might 
+                    # need to stay strings.
                     #Int conversion should happen upon use elsewhere.
                     this_dict[this_key] = field_string
                                 
@@ -722,6 +735,19 @@ def Find_and_Copy_Source_File(file_name):
     though the file_name should end in .xml.
     Returns True if a file was copied over, else False
     '''
+    # During development, if a file was forgotten in the transform
+    # dependencies, it can end up getting copied on every run.
+    # This is extra awkward for xml files, which get overwritten
+    # after modification, then the edited version copied into the
+    # source folder again.
+    # To help catch these cases, check here if the file_name is
+    # in the Transform_required_file_names, warn if not.
+    if file_name not in Transform_required_file_names:
+        raise Exception(
+            'Error: file {} is not in Transform_required_file_names,'
+            ' add it to a transform to avoid potential errors'.format(
+                 file_name))
+
     folders_to_search = ['scripts']
     copy_made = False
     for folder in folders_to_search:
@@ -736,8 +762,10 @@ def Find_and_Copy_Source_File(file_name):
             # Look for a valid file path for the pck extentions.
             # This will also look for a backed up file from a prior run
             # of this manager.
+            # In case a loose .xml file is the target, check for that as
+            # well.
             file_path = None
-            for extension in ['.pck', '.pck.x3c.bak']:
+            for extension in ['.pck', '.pck.x3c.bak', '.xml', '.xml.x3c.bak']:
                 this_path = os.path.join(folder, file_name_unsuffixed + extension)
                 if os.path.exists(this_path):
                     file_path = this_path
@@ -746,15 +774,36 @@ def Find_and_Copy_Source_File(file_name):
             # If no valid path found, skip.
             if file_path == None:
                 continue
+            
+            # Note: in the xml source case, the original file will be
+            # overwritten during writeback after all transforms are
+            # finished. This should be safe overall, since the copy
+            # of the file placed in the source folder will be unchanged.
+            # The only danger is the source folder name being switched
+            # without a clean run of the customizer to restore all files
+            # from the prior folder name.
+            # Treat this as an unlikely case and mostly ignore it for now,
+            # but be a little safe and make a backup if there is none.
+            if extension == '.xml':
+                backup_path = os.path.join(folder, file_name_unsuffixed + '.xml.x3c.bak')
+                if not os.path.exists(backup_path):
+                    shutil.copy(file_path, backup_path)
+
 
             # Read the source text.
             # X3 pck files were compressed using gzip, so use that package
             # here to decompress.
-            #try:
-            with gzip.open(file_path,'r') as file:
-                text = file.read()
-            #except:
-            #    continue
+            if '.pck' in extension:
+                #try:
+                # Gzip uses a generic 'r' tag, but returns binary.
+                with gzip.open(file_path,'r') as file:
+                    text = file.read()
+                #except:
+                #    continue
+            else:
+                # Explicitly read binary.
+                with open(file_path,'rb') as file:
+                    text = file.read()
 
             # This text can now be written out as xml.
             # Make sure the dest folder exists.
@@ -762,7 +811,7 @@ def Find_and_Copy_Source_File(file_name):
             if not os.path.exists(dest_folder):
                 os.mkdir(dest_folder)
 
-            # Write the file.
+            # Write the file, as binary.
             dest_path = os.path.join(dest_folder, file_name)
             with open(dest_path, 'wb') as file:
                 file.write(text)
@@ -777,3 +826,72 @@ def Find_and_Copy_Source_File(file_name):
 
     return copy_made
 
+
+def Add_Entries_To_T_File(t_file_name, new_entry_list):
+    '''
+    Convenience function to add new lines to a t file.
+    t_file_name:
+      Name of the tfile to edit, with .txt extension.
+    new_entry_list:
+      List of OrderedDict entries matching the tfile's line format.
+    '''
+    # Return early if the list is empty.
+    if not new_entry_list:
+        return
+
+    # All new entries will be put at the bottom of the tfile dict_list.
+    # This will require that the header be modified to account for the
+    # new lines.
+    t_file = Load_File(t_file_name, return_t_file = True)
+
+    # Set how many columns are expected in the header line, based on
+    # the t file name, along with which column/index holds the
+    # entry counter.
+    # Error when a new t file seen; this somewhat has to be done
+    # manually.
+    if t_file_name == 'TShips.txt':
+        header_columns = 3
+        index_with_count = 1
+    elif t_file_name == 'TFactories.txt':
+        header_columns = 3
+        index_with_count = 1
+    elif t_file_name == 'Globals.txt':
+        header_columns = 2
+        index_with_count = 0
+    elif t_file_name == 'WareLists.txt':
+        header_columns = 2
+        index_with_count = 0
+    else:
+        raise Exception()
+
+    # Add the new entries.
+    # These need to go in both the data and line lists, data for future
+    # visibility to this and other transforms, lines to be seen at
+    # writeout.
+    t_file.data_dict_list += new_entry_list
+    t_file.line_dict_list += new_entry_list
+
+    # Find the header line.
+    for line_dict in t_file.line_dict_list:
+            
+        # To normalize handling when the dict could have indexed or named
+        # keys, pull out the first key (for comment checks) and the key
+        # with the counter.
+        keys = list(line_dict.keys())
+        first_key, count_key = keys[0], keys[index_with_count]
+
+        # Looking for the first non-comment line; it should have
+        # header_columns entries (with newline).
+        if (not line_dict[first_key].strip().startswith('/') 
+        and len(line_dict) == header_columns):
+            # The second field is the entry count, to be updated.
+            line_dict[count_key] = str(int(line_dict[count_key]) 
+                                              + len(new_entry_list))
+            # Can stop looping now.
+            break
+
+        # Error if hit a data line.
+        if line_dict is t_file.data_dict_list[0]:
+            raise Exception()
+
+    return

@@ -144,18 +144,51 @@ T_file_name_field_dict_dict = {
         39 : 'ammo_type',         #Integer, the item type to consume as ammo.
         -2 : 'name',               #Name is 'SS_BULLET_'+suffix
         },
+    'TFactories.txt' :{
+        'min_data_entries': 5,
+        0  : 'model_file',   #Int
+        1  : 'picture_id',   #Int
+        2  : 'rotation_x',   #0
+        3  : 'rotation_y',   #0
+        4  : 'rotation_z',   #0
+        5  : 'subtype',    #String, eg. 'SG_FAC_SHIP'
+        6  : 'name_id',    #Int
+        7  : 'flyby_sound', #Int
+        8  : 'docking_distance', #Float, may be negative.
+        9  : 'rendezvous_distance', #Int, may be negative; 3 and -3 observed.
+        10 : 'sound_volume', #Int
+        11 : 'scene', #String
+        12 : 'internal_scene', #Int
+        13 : 'race', #Int
+        14 : 'explosion_effect', #Int
+        15 : 'body_explosion_definition', #Int
+        16 : 'shield_recharge_rate', #Int
+        17 : 'factory_size', #Int, production rate, 1/2/5/10.
+        18 : 'icon',   #String, eg. 'ICON_TRG_ST_SHIPYARD'
+        19 : 'volume',    #Int
+        20 : 'relative_value_npc',
+        21 : 'price_modifier_1',
+        22 : 'price_modifier_2',
+        23 : 'cargo_size',
+        24 : 'relative_value_player',
+        25 : 'minimum_notoriety',
+        26 : 'video_id',
+        27 : 'skin_index',
+        -2 : 'name',               #Name is 'SS_FAC_'+suffix
+
+        },
     'TLaser.txt' : {
         'min_data_entries': 5,
-        0 : 'model_file',   #Int
-        1 : 'picture_id',   #Int
-        2 : 'rotation_x',     #rpm = 60 * this value. May be turret rpm.
-        3 : 'rotation_y',
-        4 : 'rotation_z',    #Appears to be 0 normally.
-        5 : 'subtype',    #String, eg. 'SG_LASER_IRE'
-        6 : 'name_id',    #Int
-        7 : 'fire_delay', #In milliseconds
-        8 : 'sound',      #Int
-        9 : 'bullet',     #Integer index in tbullets of the bullet to create
+        0  : 'model_file',   #Int
+        1  : 'picture_id',   #Int
+        2  : 'rotation_x',     #rpm = 60 * this value. May be turret rpm.
+        3  : 'rotation_y',
+        4  : 'rotation_z',    #Appears to be 0 normally.
+        5  : 'subtype',    #String, eg. 'SG_LASER_IRE'
+        6  : 'name_id',    #Int
+        7  : 'fire_delay', #In milliseconds
+        8  : 'sound',      #Int
+        9  : 'bullet',     #Integer index in tbullets of the bullet to create
         10 : 'max_energy', #Energy stored in weapon at 100% charge
         11 : 'charge_rate', #Rate the weapon charges up
         12 : 'icon',      #String, eg. 'ICON_LASER_IRE'
@@ -212,6 +245,8 @@ T_file_name_field_dict_dict = {
         },
     'TShips.txt' : {
         'min_data_entries': 5,
+        0  : 'model_file',  #Int.
+        1  : 'picture_id',
         #Dynamic number of fields, seemingly due to turret or other variation.
         #Positive indices will count forward, negatives will count backwards.
         2 : 'yaw',  #rpm = 60 * this value
@@ -221,9 +256,16 @@ T_file_name_field_dict_dict = {
         6 : 'name_id',      #Int, the id of the in-game ship name.
         7 : 'speed',        #In meters per 500 seconds
         8 : 'acceleration', #In meters per 500 seconds per second
+        9 : 'engine_sound', #Int
+        11 : 'engine_effect_color', #Int
+        12 : 'engine_effect_glow', #Int
         #Power for recharging shields.
         #Exact recharge rate also depends on shield types and number.
         13 : 'shield_power',
+        14 : 'sound_volumne_min',
+        15 : 'sound_volumne_max',
+        16 : 'ship_scene',    #String or int
+        17 : 'cockpit_scene', #String or int
         18 : 'laser_compatibility_flags', #32-bit 1-hot flags for lasers equippable, signed.
         #Total weapon energy storable.
         #Called kW, even though that is not a unit of energy...
@@ -239,15 +281,26 @@ T_file_name_field_dict_dict = {
         28 : 'cargo_min',
         29 : 'cargo_max',
         30 : 'ware_list', #Integer, index in warelists.txt for built-in wares.
-        44 : 'cargo_size', #Int, 0-5, the size of cargo that can be held, 0 for S, 5 for ST.
+        43 : 'docking_slots', #Int
+        44 : 'cargo_size', #Int, 0-5, the size of cargo that can be held.
         45 : 'race',  #Int, the race this ship type is associated with.
         46 : 'hull_strength',
+        47 : 'explosion_effect', #Int
+        48 : 'body_explosion_effect', #Int
         49 : 'particle_effect', #Integer, corresponds to particles3 file?, engine trail
         50 : 'variation_index', #Int, the variation type of the ship, eg. 1 for vanguard.
         51 : 'angular_acceleration',
         52 : 'obj_type',      #Ship alternate category, eg. 'OBJ_SHIP_TL' for transport ship
+        # Note: 53-X (96?) appear to be cockpits/turrets/guns.
+        -11: 'volume', #Int; often 1, but may be related to marine capacity according to a forum post.
         -10: 'relative_value_npc',
+        -9 : 'price_modifier_1',
+        -8 : 'price_modifier_2',
+        -7 : 'cargo_size_unused', #Int, cargo size for a ship ware; meaningless, always 0.
         -6 : 'relative_value_player',
+        -5 : 'minimum_notoriety',
+        -4 : 'video_id',
+        -3 : 'skin_index',
         #Name is the last field before the newline.
         -2 : 'name',
         },

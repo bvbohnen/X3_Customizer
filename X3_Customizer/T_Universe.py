@@ -165,6 +165,7 @@ remains unfound.
 '''
 from File_Manager import *
 import os
+from T_Director import Make_Director_Shell
 
 
 @Check_Dependencies('x3_universe.xml','0001-L044.xml','7027-L044.xml','7360-L044.xml')
@@ -491,11 +492,11 @@ def Change_Sector_Music(
     #XRMINST.xml does this as well, and can be used as a reference maybe.
     #The director manual says only x,y needed, which is good since the hub
     # sector name is unclear.
-    text = (r'<alter_sector x="{}" y="{}" music="{}"/>'.format(
+    text = r'<alter_sector x="{}" y="{}" music="{}"/>'.format(
         sector_x,
         sector_y,
         music_id,
-        ))
+        )
     #Make the file.
     Make_Director_Shell(cue_name, text)
 
@@ -521,58 +522,6 @@ def Parse_universe_line(line):
         field_dict[entry_split[0]] = entry_split[1]
 
     return field_dict
-
-
-def Make_Director_Shell(cue_name, body_text = None, _cleanup = False):
-    '''
-    Support function to make a director shell file, setting up a queue
-    with the given body text.
-    The file name will reuse the cue_name.
-    Optionally, delete any old file previously generated instead of
-    creating one.
-    '''
-    #Get the path to the file to generate.
-    file_path = os.path.join('Director',cue_name + '.xml')
-    #If in cleanup mode, check for the file and delete it if found.
-    if _cleanup:
-        if os.path.exists(file_path):
-            os.remove(file_path)
-        return
-
-    #Copied shell text from a patch script that cleared invulnerable station flags.
-    #This will make the queue name and text body replaceable.
-    #Since the shell text naturally has {} in it, don't use format here, just
-    # use replace.
-    shell_text = r'''<?xml version="1.0" encoding="ISO-8859-1" ?>
-<?xml-stylesheet href="director.xsl" type="text/xsl" ?>
-<director name="template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="director.xsd">
-    <documentation>
-    <author name="X3_Customizer" alias="..." contact="..." />
-    <content reference="X3_Customizer" name="X3_Customizer generated" description="Director command injector." />
-    <version number="0.0" date="today" status="testing" />
-    </documentation>
-    <cues>
-    <cue name="INSERT_CUE_NAME" check="cancel">
-        <condition>
-        <check_value value="{player.age}" min="10s"/>
-        </condition>
-        <timing>
-        <time exact="1s"/>
-        </timing>
-        <action>
-        <do_all>
-            INSERT_BODY
-        </do_all>
-        </action>
-    </cue>
-    </cues>
-</director>
-'''.replace('INSERT_CUE_NAME', cue_name).replace('INSERT_BODY', body_text)
-
-    #Path to the director folder and write the file, with this queue name.
-    #Working directory should alrady be the addon directory, so dig down 1 folder.
-    with open(file_path, 'w') as file:
-        file.write(shell_text)
 
 
 

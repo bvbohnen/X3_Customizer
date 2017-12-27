@@ -174,6 +174,17 @@ Set_Dock_Storage_Capacity(
     hub_factor = 6
     )
 
+
+#####################################################
+#Factories
+
+# Flesh out the factory sizes.
+# Use linear cost here, to avoid the larger sizes being
+# cheaper than buying many small ones. This is mainly for
+# convenience, not balance.
+Add_More_Factory_Sizes(linear_cost_scaling = True, cue_index = 1)
+
+
 #####################################################
 #Jobs
 
@@ -207,7 +218,13 @@ if XRM:
 
             #The universe in general has trouble moving energy cells around,
             # moreso than other goods. Bump the energy transporters.
-            ('Energy', 1.5),
+            ('Energy ', 1.5),
+            #Problems also observed with moving ore.
+            #Several jobs can move ore, but the most focused seem to be
+            # the mineral and ore transporters.
+            #Keep a space on these, to be extra safe.
+            ('Mineral ', 1.5),
+            ('Ore ', 1.5),
 
             #Reduce privateers from XRM, since they don't work well when standard
             # races are hostile to the player (they can shoot the player ships,
@@ -804,6 +821,41 @@ if XRM:
     Add_Ship_Combat_Variants(
         print_variant_count = True
         )
+    # The above gives trade variants to TMs, but those don't feel very
+    # satisfying. Remove the trade variants, and add in combat variants
+    # instead.
+    # Update: this works, but feels uncertain, and clutters the ship
+    # browser mod with the old variants. Leave off for now.
+    if 0:
+        Remove_Ship_Variants(
+            ship_types = [
+                'SG_SH_TM',
+                ],
+            variant_types = [
+                # Leave hauler in; remove others.
+                # Note: hauler may have trader stats instead of combat
+                # stats, but no good way to fix that at the moment.
+                'miner',
+                'tanker',
+                'super freighter',
+                'tanker xl',
+                'super freighter xl',
+                ],
+            print_variant_count = True
+            )
+        Add_Ship_Variants(
+            ship_types = [
+                'SG_SH_TM',
+                ],
+            variant_types = [
+                # Hauler is already in; include the others.
+                'vanguard',
+                'sentinel',
+                'raider',
+                ],
+            print_variant_count = True
+            )
+
     #Make these show up in the jobs file, for all ship types.
     Add_Job_Ship_Variants(jobs_types = ['*'])
 
@@ -1143,3 +1195,12 @@ Increase_Escort_Engagement_Range(
 
 # Fix the OOS problem with missiles preventing laser fire.
 Fix_OOS_Laser_Missile_Conflict()
+
+# Fix a couple bugs in the complex cleaner mod.
+Complex_Cleaner_Bug_Fix()
+# Make the mod use small cubes, to reduce visual footprint.
+Complex_Cleaner_Use_Small_Cube()
+
+# Fix a bug with fleet logic for selecting interceptors
+# against bombers.
+Fleet_Intercepter_Bug_Fix()

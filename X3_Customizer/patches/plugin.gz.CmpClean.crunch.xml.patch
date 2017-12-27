@@ -1,0 +1,836 @@
+--- 
++++ 
+@@ -5 +5 @@
+-	<engineversion>44</engineversion>
++	<engineversion>54</engineversion>
+@@ -36 +36,4 @@
+-			<comment>*$Debug = [TRUE]</comment>
++			<comment>
++				<text>* </text>
++				<var>$Debug = [TRUE]</var>
++			</comment>
+@@ -77,3 +80,2 @@
+-				*
+-				<text>goto label </text>
+-				Cleanup
++				<text>* </text>
++				<var>goto label Cleanup:</var>
+@@ -177 +179 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -208 +210 @@
+-			<text> ignore collisions: </text>
++			<text>ignore collisions: </text>
+@@ -281 +283 @@
+-				<var>  only REAL factories return 1+</var>
++				<var>only REAL factories return 1+</var>
+@@ -455 +457 @@
+-			<text> find </text>
++			<text>find </text>
+@@ -475 +477 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -496 +498 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -516 +518 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -589 +591 @@
+-			<text> get tradeable ware array from station</text>
++			<text> get tradable ware array from station</text>
+@@ -593 +595 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -681 +683 @@
+-				<var>  Station too big to crunch: Only max size MODULES are ignored</var>
++				<var>Station too big to crunch: Only max size MODULES are ignored</var>
+@@ -687 +689 @@
+-				<var>  Super sized mines are not a problem.</var>
++				<var>Super sized mines are not a problem.</var>
+@@ -698 +700 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -725,3 +727,2 @@
+-				*
+-				<text>gosub </text>
+-				Find.station.size
++				<text>* </text>
++				<var>gosub Find.station.size:</var>
+@@ -781 +782 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -819 +820 @@
+-			<text> array alloc: size=</text>
++			<text>array alloc: size=</text>
+@@ -824 +825 @@
+-			<text> array alloc: size=</text>
++			<text>array alloc: size=</text>
+@@ -830 +831 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -908 +909 @@
+-				<var>     New station type found</var>
++				<var>New station type found</var>
+@@ -941 +942 @@
+-			<text> array alloc: size=</text>
++			<text>array alloc: size=</text>
+@@ -962 +963 @@
+-				<var>     Add to existing entry</var>
++				<var>Add to existing entry</var>
+@@ -1029 +1030 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -1034 +1035 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -1082 +1083 @@
+-				<var>  Find combined production factor of all similiar fabs</var>
++				<var>Find combined production factor of all similiar fabs</var>
+@@ -1096 +1097 @@
+-			<text> get tradeable ware array from station</text>
++			<text> get tradable ware array from station</text>
+@@ -1100 +1101 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -1105 +1106 @@
+-			<text> array alloc: size=</text>
++			<text>array alloc: size=</text>
+@@ -1119 +1120 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -1168 +1169 @@
+-				<var>  Assemble stock levels while I'm looping the subarray anyway</var>
++				<var>Assemble stock levels while I'm looping the subarray anyway</var>
+@@ -1173 +1174 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -1255 +1256 @@
+-				<var>  end   Index 2</var>
++				<var>end   Index 2</var>
+@@ -1306 +1307 @@
+-				<var>  Find minimum number of factories</var>
++				<var>Find minimum number of factories</var>
+@@ -1319 +1320 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -1392 +1393 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -1456 +1457 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -1496 +1497 @@
+-				<var>       Create Factory</var>
++				<var>Create Factory</var>
+@@ -1521 +1522 @@
+-			<text> create station: type=</text>
++			<text>create station: type=</text>
+@@ -1536 +1537 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -1543 +1544 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -1550 +1551 @@
+-			<text> force position: x=</text>
++			<text>force position: x=</text>
+@@ -1559 +1560 @@
+-			<text> ignore collisions: </text>
++			<text>ignore collisions: </text>
+@@ -1584 +1585 @@
+-			<var>500 MJ Shield</var>
++			<var>2 GJ Shield</var>
+@@ -1625 +1626 @@
+-				<var>       Adjust Wares</var>
++				<var>Adjust Wares</var>
+@@ -1630 +1631 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -1682 +1683 @@
+-			<text> add primary resource to factory: </text>
++			<text>add primary resource to factory: </text>
+@@ -1697 +1698 @@
+-			<text> add second resource to factory: </text>
++			<text>add second resource to factory: </text>
+@@ -1712 +1713 @@
+-			<text> add product to factory or dock: </text>
++			<text>add product to factory or dock: </text>
+@@ -1732 +1733 @@
+-			<text> set name to </text>
++			<text>set name to </text>
+@@ -1802 +1803 @@
+-				<var>       end Index4</var>
++				<var>end Index4</var>
+@@ -1807 +1808 @@
+-			<text> station trade and production tasks: on=</text>
++			<text>station trade and production tasks: on=</text>
+@@ -1819 +1820 @@
+-				<var> end Index3</var>
++				<var>end Index3</var>
+@@ -1826 +1827 @@
+-				<var>  All factories I want are now created.</var>
++				<var>All factories I want are now created.</var>
+@@ -1832 +1833 @@
+-				<var>  Destroy old ones</var>
++				<var>Destroy old ones</var>
+@@ -1837 +1838 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -1874,2 +1875,2 @@
+-				*$Dummy2 = 
+-				<text>get player money</text>
++				<text>* </text>
++				<var>$Dummy2 = get player money</var>
+@@ -1879,3 +1879,0 @@
+-			<comment>*skip if $Dummy1 &gt; 1000000000 OR $Dummy2 &gt; 1000000000</comment>
+-		</line>
+-		<line indent="">
+@@ -1883,3 +1881,8 @@
+-				*
+-				<text>add money to player: </text>
+-				$Dummy1
++				<text>* </text>
++				<var>skip if $Dummy1 &gt; 1000000000 OR $Dummy2 &gt; 1000000000</var>
++			</comment>
++		</line>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>add money to player: $Dummy1</var>
+@@ -1894 +1897 @@
+-			<text> destruct: show no explosion=</text>
++			<text>destruct: show no explosion=</text>
+@@ -1924 +1927 @@
+-			<text> add money: </text>
++			<text>add money: </text>
+@@ -1929 +1932 @@
+-			<text> add money: </text>
++			<text>add money: </text>
+@@ -2011 +2014 @@
+-			<text> get index of </text>
++			<text>get index of </text>
+@@ -2049,5 +2052,2 @@
+-				*$Station -&gt;
+-				<text> set local variable: name=</text>
+-				'GZ.CC.REAL.MINE'
+-				<text> value=</text>
+-				[TRUE]
++				<text>* </text>
++				<var>$Station-&gt; set local variable: name='GZ.CC.REAL.MINE' value=[TRUE]</var>
+@@ -2342 +2342 @@
+-			<text> create station: type=</text>
++			<text>create station: type=</text>
+@@ -2357 +2357 @@
+-			<text> add primary resource to factory: </text>
++			<text>add primary resource to factory: </text>
+@@ -2368 +2368 @@
+-			<text> destruct: show no explosion=</text>
++			<text>destruct: show no explosion=</text>
+@@ -2400 +2400 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -2460 +2460 @@
+-			<text> get tradeable ware array from station</text>
++			<text> get tradable ware array from station</text>
+@@ -2465 +2465 @@
+-			<text> get tradeable ware array from station</text>
++			<text> get tradable ware array from station</text>
+@@ -2469 +2469 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -2474 +2474 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -2633 +2633 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -2657 +2657 @@
+-			<text> put into environment </text>
++			<text>put into environment </text>
+@@ -2662 +2662 @@
+-			<text> set position: x=</text>
++			<text>set position: x=</text>
+@@ -2866,2 +2866,2 @@
+-				*$Station.Arr = $Sector -&gt;
+-				<text> get player owned station array from sector</text>
++				<text>* </text>
++				<var>$Station.Arr = $Sector-&gt; get player owned station array from sector</var>
+@@ -2877 +2877 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -2916 +2916 @@
+-			<text> get index of </text>
++			<text>get index of </text>
+@@ -2970 +2970 @@
+-			<text> remove product from factory or dock: </text>
++			<text>remove product from factory or dock: </text>
+@@ -2975 +2975 @@
+-			<text> remove product from factory or dock: </text>
++			<text>remove product from factory or dock: </text>
+@@ -3007 +3007 @@
+-			<text> destruct: show no explosion=</text>
++			<text>destruct: show no explosion=</text>
+@@ -3029 +3029 @@
+-			<text> set owner race to </text>
++			<text>set owner race to </text>
+@@ -3089 +3089 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -3141 +3141 @@
+-			<text> set position: x=</text>
++			<text>set position: x=</text>
+@@ -3150 +3150 @@
+-			<text> force position: x=</text>
++			<text>force position: x=</text>
+@@ -3253,0 +3254,12 @@
++		<line indent=""/>
++		<line indent="">
++			<comment>
++				<text>* </text>
++				<var>Brent note: force index1 to 0 for the smallest cube type.</var>
++			</comment>
++		</line>
++		<line indent="">
++			<var>$Index1 = </var>
++			<var>0</var>
++		</line>
++		<line indent=""/>
+@@ -3275 +3287 @@
+-			<text> read text: page=</text>
++			<text>read text: page=</text>
+@@ -3351 +3363 @@
+-			<text> destruct: show no explosion=</text>
++			<text>destruct: show no explosion=</text>
+@@ -3356 +3368 @@
+-			<text> destruct: show no explosion=</text>
++			<text>destruct: show no explosion=</text>
+@@ -3369 +3381 @@
+-				<var>  existing type is correct</var>
++				<var>existing type is correct</var>
+@@ -3387,3 +3399,2 @@
+-				*if $Module.Holder -&gt;
+-				<text> is of type </text>
+-				$Module.Holder.Type
++				<text>* </text>
++				<var>if $Module.Holder-&gt; is of type $Module.Holder.Type</var>
+@@ -3394 +3405 @@
+-			<text> start task </text>
++			<text>start task </text>
+@@ -3489 +3500 @@
+-			<text> destruct: show no explosion=</text>
++			<text>destruct: show no explosion=</text>
+@@ -3516 +3527 @@
+-			<text> create station: type=</text>
++			<text>create station: type=</text>
+@@ -3531 +3542 @@
+-			<text> set name to </text>
++			<text>set name to </text>
+@@ -3536 +3547 @@
+-			<text> station trade and production tasks: on=</text>
++			<text>station trade and production tasks: on=</text>
+@@ -3541 +3552 @@
+-			<text> force position: x=</text>
++			<text>force position: x=</text>
+@@ -3550 +3561 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -3557 +3568 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -3564 +3575 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -3571 +3582 @@
+-			<text> start task </text>
++			<text>start task </text>
+@@ -3591 +3602 @@
+-			<text> set local variable: name=</text>
++			<text>set local variable: name=</text>
+@@ -3614 +3625 @@
+-			<var>500 MJ Shield</var>
++			<var>2 GJ Shield</var>
+@@ -3618,3 +3629,2 @@
+-				*$Module.Holder -&gt;
+-				<text> add product to factory or dock: </text>
+-				Lasertower
++				<text>* </text>
++				<var>$Module.Holder-&gt; add product to factory or dock: {Lasertower}</var>
+@@ -3625,3 +3635,2 @@
+-				*$Module.Holder -&gt;
+-				<text> add product to factory or dock: </text>
+-				SQUASH Mine
++				<text>* </text>
++				<var>$Module.Holder-&gt; add product to factory or dock: {SQUASH Mine}</var>
+@@ -3632,5 +3641,2 @@
+-				*= $Module.Holder -&gt;
+-				<text> add </text>
+-				$Save.LT
+-				<text> units of </text>
+-				Lasertower
++				<text>* </text>
++				<var>= $Module.Holder-&gt; add $Save.LT units of {Lasertower}</var>
+@@ -3641,5 +3647,2 @@
+-				*= $Module.Holder -&gt;
+-				<text> add </text>
+-				$Save.SQM
+-				<text> units of </text>
+-				SQUASH Mine
++				<text>* </text>
++				<var>= $Module.Holder-&gt; add $Save.SQM units of {SQUASH Mine}</var>
+@@ -3650 +3653 @@
+-			<text> set current shield strength to </text>
++			<text>set current shield strength to </text>
+@@ -3728 +3731 @@
+-			<text> find ship: sector=</text>
++			<text>find ship: sector=</text>
+@@ -3747 +3750 @@
+-			<text> size of array </text>
++			<text>size of array </text>
+@@ -3786 +3789 @@
+-			<text> set position: x=</text>
++			<text>set position: x=</text>
+@@ -3857,0 +3861,2 @@
++		<line indent=""/>
++		<line indent=""/>
+@@ -3862 +3867 @@
+-			<sval type="int" val="44"/>
++			<sval type="int" val="54"/>
+@@ -3921 +3926 @@
+-			<sval size="482" type="array">
++			<sval size="483" type="array">
+@@ -6064 +6069 @@
+-					<sval type="int" val="474"/>
++					<sval type="int" val="475"/>
+@@ -6095 +6100 @@
+-					<sval type="int" val="474"/>
++					<sval type="int" val="475"/>
+@@ -7670,0 +7676,9 @@
++				<sval size="7" type="array">
++					<sval type="int" val="104"/>
++					<sval type="int" val="21"/>
++					<sval type="int" val="1"/>
++					<sval type="int" val="4"/>
++					<sval type="int" val="0"/>
++					<sval type="int" val="1"/>
++					<sval type="int" val="-1"/>
++				</sval>
+@@ -7710 +7724 @@
+-					<sval type="int" val="-1610504440"/>
++					<sval type="int" val="-1610504184"/>
+@@ -7749 +7763 @@
+-					<sval type="int" val="-1610498813"/>
++					<sval type="int" val="-1610498557"/>
+@@ -7761 +7775 @@
+-					<sval type="int" val="-1610502141"/>
++					<sval type="int" val="-1610501885"/>
+@@ -7776 +7790 @@
+-					<sval type="int" val="-1610502904"/>
++					<sval type="int" val="-1610502648"/>
+@@ -7827 +7841 @@
+-					<sval type="int" val="-1610500605"/>
++					<sval type="int" val="-1610500349"/>
+@@ -7862 +7876 @@
+-					<sval type="int" val="-1610500856"/>
++					<sval type="int" val="-1610500600"/>
+@@ -7893 +7907 @@
+-					<sval type="int" val="-1610500088"/>
++					<sval type="int" val="-1610499832"/>
+@@ -7958 +7972 @@
+-					<sval type="int" val="-1610498296"/>
++					<sval type="int" val="-1610498040"/>
+@@ -8111 +8125 @@
+-					<sval type="int" val="-1610494461"/>
++					<sval type="int" val="-1610494205"/>
+@@ -8211 +8225 @@
+-					<sval type="int" val="-1610491639"/>
++					<sval type="int" val="-1610491383"/>
+@@ -8267 +8281 @@
+-					<sval type="int" val="465"/>
++					<sval type="int" val="466"/>
+@@ -8278 +8292 @@
+-					<sval type="int" val="-1610490616"/>
++					<sval type="int" val="-1610490360"/>
+@@ -8311 +8325 @@
+-					<sval type="int" val="-1610489848"/>
++					<sval type="int" val="-1610489592"/>
+@@ -8360,15 +8374,11 @@
+-			<sval size="214" type="array">
+-				<sval size="7" type="array">
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="string" val="Debug"/>
+-					<sval type="int" val="1"/>
+-					<sval type="int" val="131075"/>
+-					<sval type="int" val="10"/>
+-				</sval>
+-				<sval size="2" type="array">
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="2"/>
+-				</sval>
+-				<sval size="4" type="array">
++			<sval size="219" type="array">
++				<sval size="3" type="array">
++					<sval type="int" val="4"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Debug = [TRUE]"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="4"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -8376,3 +8386,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="100"/>
+-					<sval type="string" val="Cleanup"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="goto label Cleanup:"/>
+@@ -8433 +8442 @@
+-					<sval type="string" val="  only REAL factories return 1+"/>
++					<sval type="string" val="only REAL factories return 1+"/>
+@@ -8549 +8558 @@
+-					<sval type="string" val="  Station too big to crunch: Only max size MODULES are ignored"/>
++					<sval type="string" val="Station too big to crunch: Only max size MODULES are ignored"/>
+@@ -8554 +8563 @@
+-					<sval type="string" val="  Super sized mines are not a problem."/>
++					<sval type="string" val="Super sized mines are not a problem."/>
+@@ -8561 +8570 @@
+-				<sval size="4" type="array">
++				<sval size="3" type="array">
+@@ -8563,3 +8572,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="1167"/>
+-					<sval type="string" val="Find.station.size"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="gosub Find.station.size:"/>
+@@ -8622 +8630 @@
+-					<sval type="string" val="     New station type found"/>
++					<sval type="string" val="New station type found"/>
+@@ -8631 +8639 @@
+-					<sval type="string" val="     Add to existing entry"/>
++					<sval type="string" val="Add to existing entry"/>
+@@ -8662 +8670 @@
+-					<sval type="string" val="  Find combined production factor of all similiar fabs"/>
++					<sval type="string" val="Find combined production factor of all similiar fabs"/>
+@@ -8683 +8691 @@
+-					<sval type="string" val="  Assemble stock levels while I'm looping the subarray anyway"/>
++					<sval type="string" val="Assemble stock levels while I'm looping the subarray anyway"/>
+@@ -8708 +8716 @@
+-					<sval type="string" val="  end   Index 2"/>
++					<sval type="string" val="end   Index 2"/>
+@@ -8725 +8733 @@
+-					<sval type="string" val="  Find minimum number of factories"/>
++					<sval type="string" val="Find minimum number of factories"/>
+@@ -8764 +8772 @@
+-					<sval type="string" val="       Create Factory"/>
++					<sval type="string" val="Create Factory"/>
+@@ -8777 +8785 @@
+-					<sval type="string" val="       Adjust Wares"/>
++					<sval type="string" val="Adjust Wares"/>
+@@ -8814 +8822 @@
+-					<sval type="string" val="       end Index4"/>
++					<sval type="string" val="end Index4"/>
+@@ -8827 +8835 @@
+-					<sval type="string" val=" end Index3"/>
++					<sval type="string" val="end Index3"/>
+@@ -8836 +8844 @@
+-					<sval type="string" val="  All factories I want are now created."/>
++					<sval type="string" val="All factories I want are now created."/>
+@@ -8841,3 +8849,3 @@
+-					<sval type="string" val="  Destroy old ones"/>
+-				</sval>
+-				<sval size="4" type="array">
++					<sval type="string" val="Destroy old ones"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -8845,5 +8853,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="626"/>
+-					<sval type="string" val="Dummy2"/>
+-				</sval>
+-				<sval size="19" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Dummy2 = get player money"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -8851,20 +8858,4 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="104"/>
+-					<sval type="int" val="-536870905"/>
+-					<sval type="int" val="7"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Dummy1"/>
+-					<sval type="int" val="15"/>
+-					<sval type="int" val="2"/>
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="1000000000"/>
+-					<sval type="int" val="15"/>
+-					<sval type="int" val="10"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Dummy2"/>
+-					<sval type="int" val="15"/>
+-					<sval type="int" val="2"/>
+-					<sval type="int" val="4"/>
+-					<sval type="int" val="1000000000"/>
+-				</sval>
+-				<sval size="5" type="array">
++					<sval type="int" val="1"/>
++					<sval type="string" val="skip if $Dummy1 &gt; 1000000000 OR $Dummy2 &gt; 1000000000"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -8872,4 +8863,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="662"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Dummy1"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="add money to player: $Dummy1"/>
+@@ -8948 +8937 @@
+-				<sval size="9" type="array">
++				<sval size="3" type="array">
+@@ -8950,8 +8939,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="155"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Station"/>
+-					<sval type="int" val="5"/>
+-					<sval type="string" val="GZ.CC.REAL.MINE"/>
+-					<sval type="int" val="131075"/>
+-					<sval type="int" val="10"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Station-&gt; set local variable: name='GZ.CC.REAL.MINE' value=[TRUE]"/>
+@@ -9137 +9120 @@
+-				<sval size="6" type="array">
++				<sval size="3" type="array">
+@@ -9139,5 +9122,2 @@
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="1013"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Sector"/>
+-					<sval type="string" val="Station.Arr"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Station.Arr = $Sector-&gt; get player owned station array from sector"/>
+@@ -9200 +9180,10 @@
+-					<sval type="int" val="423"/>
++					<sval type="int" val="418"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="3" type="array">
++					<sval type="int" val="418"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="Brent note: force index1 to 0 for the smallest cube type."/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="419"/>
+@@ -9208,5 +9197,9 @@
+-					<sval type="int" val="432"/>
+-					<sval type="int" val="4"/>
+-				</sval>
+-				<sval size="2" type="array">
+-					<sval type="int" val="432"/>
++					<sval type="int" val="425"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="433"/>
++					<sval type="int" val="4"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="433"/>
+@@ -9216,33 +9209,3 @@
+-					<sval type="int" val="432"/>
+-					<sval type="int" val="1"/>
+-					<sval type="string" val="  existing type is correct"/>
+-				</sval>
+-				<sval size="8" type="array">
+-					<sval type="int" val="434"/>
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="710"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Module.Holder"/>
+-					<sval type="int" val="-1610612733"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Module.Holder.Type"/>
+-				</sval>
+-				<sval size="2" type="array">
+-					<sval type="int" val="438"/>
+-					<sval type="int" val="4"/>
+-				</sval>
+-				<sval size="2" type="array">
+-					<sval type="int" val="440"/>
+-					<sval type="int" val="2"/>
+-				</sval>
+-				<sval size="2" type="array">
+-					<sval type="int" val="445"/>
+-					<sval type="int" val="4"/>
+-				</sval>
+-				<sval size="2" type="array">
+-					<sval type="int" val="445"/>
+-					<sval type="int" val="2"/>
+-				</sval>
+-				<sval size="2" type="array">
+-					<sval type="int" val="447"/>
+-					<sval type="int" val="2"/>
++					<sval type="int" val="433"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="existing type is correct"/>
+@@ -9251 +9214,26 @@
+-					<sval type="int" val="447"/>
++					<sval type="int" val="435"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="if $Module.Holder-&gt; is of type $Module.Holder.Type"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="439"/>
++					<sval type="int" val="4"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="441"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="446"/>
++					<sval type="int" val="4"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="446"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="448"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="3" type="array">
++					<sval type="int" val="448"/>
+@@ -9256,46 +9244,4 @@
+-					<sval type="int" val="455"/>
+-					<sval type="int" val="2"/>
+-				</sval>
+-				<sval size="7" type="array">
+-					<sval type="int" val="458"/>
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="750"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Module.Holder"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="1048585"/>
+-				</sval>
+-				<sval size="7" type="array">
+-					<sval type="int" val="458"/>
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="750"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Module.Holder"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="1048584"/>
+-				</sval>
+-				<sval size="10" type="array">
+-					<sval type="int" val="458"/>
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="646"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Module.Holder"/>
+-					<sval type="int" val="-2147483647"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Save.LT"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="1048585"/>
+-				</sval>
+-				<sval size="10" type="array">
+-					<sval type="int" val="458"/>
+-					<sval type="int" val="3"/>
+-					<sval type="int" val="646"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Module.Holder"/>
+-					<sval type="int" val="-2147483647"/>
+-					<sval type="int" val="131074"/>
+-					<sval type="string" val="Save.SQM"/>
+-					<sval type="int" val="9"/>
+-					<sval type="int" val="1048584"/>
+-				</sval>
+-				<sval size="2" type="array">
++					<sval type="int" val="456"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="3" type="array">
+@@ -9303,9 +9249,2 @@
+-					<sval type="int" val="2"/>
+-				</sval>
+-				<sval size="2" type="array">
+-					<sval type="int" val="462"/>
+-					<sval type="int" val="4"/>
+-				</sval>
+-				<sval size="2" type="array">
+-					<sval type="int" val="462"/>
+-					<sval type="int" val="2"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Module.Holder-&gt; add product to factory or dock: {Lasertower}"/>
+@@ -9314 +9253,28 @@
+-					<sval type="int" val="462"/>
++					<sval type="int" val="459"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="$Module.Holder-&gt; add product to factory or dock: {SQUASH Mine}"/>
++				</sval>
++				<sval size="3" type="array">
++					<sval type="int" val="459"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="= $Module.Holder-&gt; add $Save.LT units of {Lasertower}"/>
++				</sval>
++				<sval size="3" type="array">
++					<sval type="int" val="459"/>
++					<sval type="int" val="1"/>
++					<sval type="string" val="= $Module.Holder-&gt; add $Save.SQM units of {SQUASH Mine}"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="460"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="463"/>
++					<sval type="int" val="4"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="463"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="3" type="array">
++					<sval type="int" val="463"/>
+@@ -9319 +9285 @@
+-					<sval type="int" val="462"/>
++					<sval type="int" val="463"/>
+@@ -9324,8 +9289,0 @@
+-					<sval type="int" val="473"/>
+-					<sval type="int" val="4"/>
+-				</sval>
+-				<sval size="2" type="array">
+-					<sval type="int" val="473"/>
+-					<sval type="int" val="2"/>
+-				</sval>
+-				<sval size="2" type="array">
+@@ -9332,0 +9291,8 @@
++					<sval type="int" val="4"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="474"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="475"/>
+@@ -9336 +9302 @@
+-					<sval type="int" val="474"/>
++					<sval type="int" val="475"/>
+@@ -9341 +9307,9 @@
+-					<sval type="int" val="481"/>
++					<sval type="int" val="482"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="483"/>
++					<sval type="int" val="2"/>
++				</sval>
++				<sval size="2" type="array">
++					<sval type="int" val="483"/>
+@@ -9347,0 +9322 @@
++	<nosignature>6367</nosignature>

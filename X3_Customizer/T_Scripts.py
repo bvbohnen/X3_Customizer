@@ -28,7 +28,11 @@ from File_Patcher import *
     '!fight.war.protectsector.xml', 
     'plugin.com.agent.main.xml',
     '!move.follow.template.xml',
+    '!plugin.acp.fight.attack.object.xml',
+    '!lib.fleet.shipsfortarget.xml',
     #'!ship.cmd.attack.std.xml',
+    'plugin.gz.CmpClean.crunch.xml',
+    'plugin.gz.CmpClean.Main.xml',
     )
 def _dummy():
     return
@@ -154,6 +158,22 @@ def Fix_OOS_Laser_Missile_Conflict(
     
 
 @Check_Dependencies()
+def Fleet_Intercepter_Bug_Fix(
+    ):
+    '''
+    Apply bug fixes to the Fleet logic for selecting ships to launch
+    at enemies. A mispelling of 'interecept' causes M6 ships to be
+    launched against enemy M8s instead of interceptors.
+    Patches !lib.fleet.shipsfortarget.xml.
+    '''
+    # Fix bug in !lib.fleet.shipsfortarget.pck at line 12, mispelled intercept,
+    # which does not have matching mispell in !lib.fleet.getship.role.pck,
+    # with the effect that enemy bombers should have an intercepter sent
+    # at them, but will actually have a corvette sent.
+    Apply_Patch('!lib.fleet.shipsfortarget.xml')
+
+
+@Check_Dependencies()
 def Increase_Escort_Engagement_Range(
     small_range  = 3000,
     medium_range = 4000,
@@ -222,3 +242,80 @@ def Add_CLS_Software_To_More_Docks(
     the script run time. This change is not reversable.
     '''
     Add_Script('setup.x3customizer.add.cls.to.docks', remove = _cleanup)
+
+        
+    
+@Check_Dependencies()
+def Complex_Cleaner_Bug_Fix(
+        # Note: no cleanup needed, since the unmodified script should
+        # be present in the source_folder and it will just be moved
+        # back to the scripts folder unchanged.
+    ):
+    '''
+    Apply bug fixes to the Complex Cleaner mod. Designed for version
+    4.09 of that mod. Includes a fix for mistargetted a wrong hub
+    in systems with multiple hubs, and a fix for some factories
+    getting ignored when crunching.
+    Patches plugin.gz.CmpClean.Main.xml.
+    '''
+    Apply_Patch('plugin.gz.CmpClean.Main.xml', reformat_xml = True)
+
+    
+    
+@Check_Dependencies()
+def Complex_Cleaner_Use_Small_Cube(
+        # Note: no cleanup needed, as above.
+    ):
+    '''
+    Forces the Complex Cleaner to use the smaller cube model always
+    when combining factories.
+    Patches plugin.gz.CmpClean.crunch.xml.
+    '''
+    Apply_Patch('plugin.gz.CmpClean.crunch.xml', reformat_xml = True)
+
+    
+
+@Check_Dependencies()
+def _Include_Script_To_Update_Ship_Variants(
+        # Set this to be ignored when making documentation.
+        # It exists mainly to ensure proper behavior between the
+        # two ship variants transforms, so that if either runs then
+        # this script will be included, but if neither runs then
+        # this script will be cleaned out.
+        _cleanup = False
+    ):
+    '''
+    Adds the 'x3customizer.add.variants.to.shipyards' script to the
+    game, which will update shipyards with any added or removed
+    variants after calls to Add_Ship_Variants and Remove_Ship_Variants.
+    This is called automatically by the above transforms, and is not
+    intended for general direct calls.
+    The script must be manually called from the ingame script editor
+    currently, and will may take many seconds to complete an update.
+    '''
+    Add_Script('x3customizer.add.variants.to.shipyards.xml', remove = _cleanup)
+    
+    # If an older script name is present, clean it out.
+    # This is not a big deal; can leave it in place for a version or two,
+    # then remove it.
+    # Update: removed as of version 2.17.
+    # old_script_name = 'a.x3customizer.add.variants.to.shipyards.xml'
+    # Add_Script(old_script_name, remove = True)
+
+    
+
+@Check_Dependencies()
+def _Include_Script_To_Update_Factory_Sizes(
+        _cleanup = False
+    ):
+    '''
+    Adds the 'x3customizer.add.factories.to.shipyards' script to the
+    game, which will update shipyards with any added factory sizes
+    after a call to Add_More_Factory_Sizes.
+    This is called automatically by the above transform, and is not
+    intended for general direct calls.
+    The script must be manually called from the ingame script editor
+    currently.
+    '''
+    Add_Script('x3customizer.add.factories.to.shipyards.xml', remove = _cleanup)
+    

@@ -1,0 +1,40 @@
+--- 
++++ 
+@@ -6 +6 @@
+-<engineversion>50</engineversion>
++<engineversion>54</engineversion>
+@@ -25 +25,3 @@
+-    $aRoles = create new array, arguments='interecept', null, null, null, null
++  * Brent note: fixed bug here for mispelled 'interecept', which
++  * would cause M6s to be used instead of M4s.
++    $aRoles = create new array, arguments='intercept', null, null, null, null
+@@ -97 +99,3 @@
+-<line indent="&#160;"><var>$aRoles&#160;=&#160;</var><text>create&#160;new&#160;array,&#160;arguments=</text><var>'interecept'</var><text>,&#160;</text><var>null</var><text>,&#160;</text><var>null</var><text>,&#160;</text><var>null</var><text>,&#160;</text><var>null</var></line>
++<line indent=""><comment><text>*&#160;</text><var>Brent&#160;note:&#160;fixed&#160;bug&#160;here&#160;for&#160;mispelled&#160;'interecept',&#160;which</var></comment></line>
++<line indent=""><comment><text>*&#160;</text><var>would&#160;cause&#160;M6s&#160;to&#160;be&#160;used&#160;instead&#160;of&#160;M4s.</var></comment></line>
++<line indent="&#160;"><var>$aRoles&#160;=&#160;</var><text>create&#160;new&#160;array,&#160;arguments=</text><var>'intercept'</var><text>,&#160;</text><var>null</var><text>,&#160;</text><var>null</var><text>,&#160;</text><var>null</var><text>,&#160;</text><var>null</var></line>
+@@ -160 +164 @@
+-  <sval type="int" val="50"/>
++  <sval type="int" val="54"/>
+@@ -313 +317 @@
+-      <sval type="string" val="interecept"/>
++      <sval type="string" val="intercept"/>
+@@ -743 +747 @@
+-  <sval type="array" size="19">
++  <sval type="array" size="21">
+@@ -747,0 +752,10 @@
++    </sval>
++    <sval type="array" size="3">
++      <sval type="int" val="13"/>
++      <sval type="int" val="1"/>
++      <sval type="string" val="Brent note: fixed bug here for mispelled 'interecept', which"/>
++    </sval>
++    <sval type="array" size="3">
++      <sval type="int" val="13"/>
++      <sval type="int" val="1"/>
++      <sval type="string" val="would cause M6s to be used instead of M4s."/>
+@@ -828,3 +842 @@
+-<signature>
+-FMl30trz7JpZz9z5zefNs+wiBqubRJYDttApvbf2UEFTwR4i+iOfFQfgfdJNyKgQh1cjZFtD6E+ZBslJQl1AtWZyaXNHsZoCiQb0b3FVrimdIVEHdlt3F7F5+Wc5ac/Fnv8cfmvzj34IsQuOJ1rCgUcRObtAGXHH9kdNYBIQCIWa3vRKH58cMTA6LbrVnW9vgwqPNH1Fcyf71Zq8vlpJtPHCX7FNUw9nvLJYhgpYFd+XDo04ldKSYxHdkwksPiL2bsPvLbxNAK+y2qM8CjC6/SIo1UPI8We24oRhqkWEfoobYeVJw1+2vK6wO7NIjS9J5pufqZ4YmEDOdD1cD7OhTg==
+-</signature>
++<nosignature>0675</nosignature>
