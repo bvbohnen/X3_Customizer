@@ -93,7 +93,7 @@ Change Log:
  * 2.17:
    - Added Add_More_Factory_Sizes.
    - Added Remove_Ship_Variants.
-   - Added Fleet_Intercepter_Bug_Fix.
+   - Added Fleet_Interceptor_Bug_Fix.
    - Tweaked Adjust_Job_Count to support reducing counts to 0.
    - Switched Add_Ship_Variants to use a director script to update shipyards.
 '''

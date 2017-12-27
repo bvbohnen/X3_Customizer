@@ -1024,11 +1024,11 @@ if XRM:
         adjustment_factors_dict = {
             #Bring scouts back down based on kestrel (drop 715 to 600).
             'SG_SH_M5': 600 / 715,
-            #Bring intercepters back down based on buster, but still keeping a boost
+            #Bring interceptors back down based on buster, but still keeping a boost
             # over vanilla.  Go with 50% boost.
             'SG_SH_M4': 175 / 301 * 1.5,
             #Bring fighters down based on nova, and retain about half the boost
-            # of the intercepter.
+            # of the interceptor.
             'SG_SH_M3': 150 / 237 * 1.25,
             #Bombers are often unchanged.
             #'SG_SH_M8': 1.0,
@@ -1203,4 +1203,4 @@ Complex_Cleaner_Use_Small_Cube()
 
 # Fix a bug with fleet logic for selecting interceptors
 # against bombers.
-Fleet_Intercepter_Bug_Fix()
+Fleet_Interceptor_Bug_Fix()

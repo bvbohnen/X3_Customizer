@@ -158,7 +158,7 @@ def Fix_OOS_Laser_Missile_Conflict(
     
 
 @Check_Dependencies()
-def Fleet_Intercepter_Bug_Fix(
+def Fleet_Interceptor_Bug_Fix(
     ):
     '''
     Apply bug fixes to the Fleet logic for selecting ships to launch
@@ -168,7 +168,7 @@ def Fleet_Intercepter_Bug_Fix(
     '''
     # Fix bug in !lib.fleet.shipsfortarget.pck at line 12, mispelled intercept,
     # which does not have matching mispell in !lib.fleet.getship.role.pck,
-    # with the effect that enemy bombers should have an intercepter sent
+    # with the effect that enemy bombers should have an interceptor sent
     # at them, but will actually have a corvette sent.
     Apply_Patch('!lib.fleet.shipsfortarget.xml')
 
