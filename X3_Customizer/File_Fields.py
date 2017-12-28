@@ -424,6 +424,10 @@ T_file_name_field_dict_dict = {
         10: 'show_corperation',    #0 or 1; for display name in game.
         11: 'show_ship_type',      #0 or 1; for display name in game.
         12: 'show_variant',        #0 or 1; for display name in game.
+        13: 'job_wing_index',      #Int; entry in JobWings.txt with subjobs to act as wingmen.
+        14: 'ware_list_index',     #Int; wares associated with this job (eg to trade)
+        15: 'job_jump_range',      #Int. Note: not 100% verified. Missing in x3 editor.
+        16: 'idle_rate',           #Int, generally 0-10 or so.
         17: 'respawn_time',        #Integer, appears to be in seconds.
         18: 'ship_type_name',  #String, optional name of ship to spawn. -1 if unused.
         #Ship types to allow, given as standard type name for coding convenience.

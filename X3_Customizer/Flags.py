@@ -71,6 +71,13 @@ Director_race_code_name_dict = {
     17 : 'atf',
     18 : 'terran',
     19 : 'yaki',
+    # Other options include:
+    # 'default' : 5 primary races
+    # 'pirategroup' : yaki and pirate
+    # 'terrangroup' : terran and atf
+    # 'aggressive'  : xenon and khaak
+    # 'all'
+    # Also, several for races known to the player.
     }
 
 

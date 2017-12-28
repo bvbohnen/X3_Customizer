@@ -437,6 +437,12 @@ def Make_Director_Shell(cue_name, body_text = None, file_name = None, _cleanup =
     #This will make the queue name and text body replaceable.
     #Since the shell text naturally has {} in it, don't use format here, just
     # use replace.
+    #Update: the 'check' term in the cue definition indicates what to do when
+    # the first condition check fails; in the invuln-station-fix, it is set to
+    # cancel, indicating that when it checks on a new game (player age check
+    # fails) it will cancel and not run the cue.
+    # To ensure these cues do run on new games, do not use a check value, or
+    # set it to none, which should put the cue on a constant recheck.
     shell_text = r'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <?xml-stylesheet href="director.xsl" type="text/xsl" ?>
 <director name="template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="director.xsd">
@@ -446,9 +452,9 @@ def Make_Director_Shell(cue_name, body_text = None, file_name = None, _cleanup =
     <version number="0.0" date="today" status="testing" />
     </documentation>
     <cues>
-    <cue name="INSERT_CUE_NAME" check="cancel">
+    <cue name="INSERT_CUE_NAME">
         <condition>
-        <check_value value="{player.age}" min="10s"/>
+        <check_value value="{player.age}" min="1s"/>
         </condition>
         <timing>
         <time exact="1s"/>
@@ -569,11 +575,13 @@ def Generate_Director_Text_To_Update_Shipyards(
         # Note: groups appear to be sticky, as in multiple commands with
         # the same group will append to it, so after each shipyard group
         # is handled the group should be cleared out.
+        # Note: when looking for terrans, also match with atf, which can
+        # be done using the special 'terrangroup' flag.
         station_node = ET.Element('find_station',{
             'group' : 'Shipyards',
             'multiple' : '1',
             'class' : 'shipyard',
-            'race' : race,
+            'race' : race if race not in ['terran','atf'] else 'terrangroup',
             })
         station_node.extend( [
             ET.Element('sector',{'x' : '0','y' : '0'}),

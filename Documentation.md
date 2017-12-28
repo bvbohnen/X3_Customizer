@@ -1,4 +1,4 @@
-X3 Customizer v2.17
+X3 Customizer v2.18
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -1298,3 +1298,5 @@ Change Log:
    - Added Fleet_Interceptor_Bug_Fix.
    - Tweaked Adjust_Job_Count to support reducing counts to 0.
    - Switched Add_Ship_Variants to use a director script to update shipyards.
+ * 2.18:
+   - Bug fixes for the director scripts, to ensure they work on new games and on terran/atf shipyards with cross-faction wares.

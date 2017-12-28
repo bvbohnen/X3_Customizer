@@ -96,6 +96,9 @@ Change Log:
    - Added Fleet_Interceptor_Bug_Fix.
    - Tweaked Adjust_Job_Count to support reducing counts to 0.
    - Switched Add_Ship_Variants to use a director script to update shipyards.
+ * 2.18:
+   - Bug fixes for the director scripts, to ensure they work on new
+     games and on terran/atf shipyards with cross-faction wares.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.
