@@ -99,6 +99,12 @@ Change Log:
  * 2.18:
    - Bug fixes for the director scripts, to ensure they work on new
      games and on terran/atf shipyards with cross-faction wares.
+ * 2.19:
+   - Support added for editing .obj files containing game assembly code.
+   - Added Adjust_Max_Seta.
+   - Added Adjust_Max_Speedup_Rate.
+   - Added Stop_Events_From_Disabling_Seta.
+   - Added Set_Max_Marines.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

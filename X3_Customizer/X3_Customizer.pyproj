@@ -51,6 +51,9 @@
     <Compile Include="T_Globals.py" />
     <Compile Include="T_Jobs.py" />
     <Compile Include="T_Missiles.py" />
+    <Compile Include="T_Obj_Code.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="T_Scripts.py">
       <SubType>Code</SubType>
     </Compile>

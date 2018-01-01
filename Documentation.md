@@ -1,4 +1,4 @@
-X3 Customizer v2.18
+X3 Customizer v2.19
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -14,9 +14,9 @@ Usage:
 Setup:
   * Transforms will operate on source files (eg. tships.txt) which need to be set up prior to running this tool. Source files can be extracted using X3 Editor 2 if needed. Source files may be provided after any other mods have been applied.
 
-  * Source files need to be located in a folder underneath the specified AP addon directory, and will have an internal folder structure matching that of the files in the normal addon directory.
+  * Source files need to be located in a folder underneath the specified AP addon directory, and will have an internal folder structure matching that of the files in the normal addon directory. A special case is made for .obj files in the L folder above the addon directory; these should be placed in source_folder/L.
 
-  * The user must write a Python script which will specify paths and control the customizer by calling transforms.
+  * The user must write a Python script which will specify paths and control the customizer by calling transforms. This script will be called by the customizer and run once. The quickest way to set this up would be to edit the example file. Included in the repository is User_Transforms_Mine, the author's personal set of transforms, which can be checked for futher examples of how to use most transforms available.
 
   * Output files will be generated in the addon directory matching the folder structure in the source folder. Non-transformed files will generate output files. Files which do not have a name matching the requirement of any transform will be ignored and not copied. In some cases, files may be generated one directory up, in the presumed Terran Conflict folder.
 
@@ -534,6 +534,63 @@ Missile Transforms:
   
       * swarm_count:
         - Int, the number of missiles per swarm.
+      
+
+
+***
+
+Obj Transforms:
+
+ * Adjust_Max_Seta
+
+    Requires: x3story.obj
+
+      Changes the maximum SETA speed multiplier. Higher multipliers than the game default of 10 may cause oddities.
+      
+      * speed_factor
+        - Int, the multiplier to use. At least 2, currently limited to 50, the debug mode maximum.
+      
+
+ * Adjust_Max_Speedup_Rate
+
+    Requires: x3story.obj
+
+      Changes the rate at which SETA turns on. By default, it will accelerate by (selected SETA -1)/10 every 250 milliseconds. This transform will reduce the delay between speedup ticks.
+      
+      * scaling_factor
+        - Float, the amount to boost the speedup rate by. Eg. 2 will reduce the delay between ticks to 125 ms. Practical limit may be set by game frame rate, eg. approximately 15x at 60 fps.
+      
+
+ * Set_Max_Marines
+
+    Requires: x3story.obj
+
+      Sets the maximum number of marines that each ship type can carry. These are byte values, signed, so max is 127.
+      
+      * tm_count
+        - Int, marines carried by TMs.
+      * tp_count
+        - Int, marines carried by TPs.
+      * m6_count
+        - Int, marines carried by M6s.
+      * capital_count
+        - Int, marines carried by capital ships: M1, M2, M7, TL.
+      * sirokos_count
+        - Int, marines carried by the Sirokos, or whichever ship is located at entry 263 in Tships (when starting count at 1). Note: XRM does not use this slot in Tships.
+      
+
+ * Stop_Events_From_Disabling_Seta
+
+    Requires: x3story.obj
+
+      Stop SETA from being turned off automatically upon certain events, such as missile attacks.
+      
+      * on_missile_launch
+        - If True, Seta will not turn off when a missile is fired at the player ship.
+      * on_receiving_priority_message
+        - If True, Seta will not turn off when a priority message is received, such as a police notice of being scanned.
+      * on_collision_warning
+        - If True, Seta will not turn off when a near collision occurs.
       
 
 
@@ -1300,3 +1357,9 @@ Change Log:
    - Switched Add_Ship_Variants to use a director script to update shipyards.
  * 2.18:
    - Bug fixes for the director scripts, to ensure they work on new games and on terran/atf shipyards with cross-faction wares.
+ * 2.19:
+   - Support added for editing .obj files containing game assembly code.
+   - Added Adjust_Max_Seta.
+   - Added Adjust_Max_Speedup_Rate.
+   - Added Stop_Events_From_Disabling_Seta.
+   - Added Set_Max_Marines.

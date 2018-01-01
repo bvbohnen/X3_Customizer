@@ -224,7 +224,7 @@ class XML_File():
 
 class T_File():
     '''
-    T file contents holder, as a life of OrderedDict objects.
+    T file contents holder, as a list of OrderedDict objects.
     Each OrderedDict represents a separate line.
     Class exists mainly to clarify naming for now, and for any
     future attribute expansion.
@@ -246,6 +246,19 @@ class T_File():
         # be edited directly.
         return s.data_dict_list
     
+class Obj_File():
+    '''
+    Obj file contents holder.
+    These are binary files holding KC assembly level code.
+    '''
+    def __init__(s):
+        s.binary = None
+    def Read_Data(s):
+        'Return the contents to be sent for Load_File requests.'
+        #For obj, this will be the full Obj_File object so that its
+        # binary field can be edited.
+        return s
+
 
 class File_Missing_Exception(Exception):
     '''Exception raised when Load_File doesn't find the file.'''
@@ -341,18 +354,33 @@ def Get_Output_File_Path(file_name):
     Path will be relative to the AP/addon directory.
     '''
     if file_name in File_path_dict:
-        #Look up the path from the source folder, and add it to the
-        # path to the AP/addon folder, eg. the working directory.
-        file_path = os.path.join(File_path_dict[file_name], file_name)
+
+        # Special case: obj files need to go a higher level than the
+        # addon directory.
+        if file_name.endswith('.obj'):
+            # Stick this one folder up, in the L folder.
+            folder_path = os.path.join('..', 'L')
+        else:
+            #Look up the path from the source folder, and add it to the
+            # path to the AP/addon folder, eg. the working directory.
+            folder_path = File_path_dict[file_name]
+
+        # Construct the full file path.
+        file_path = os.path.join(folder_path, file_name)
+
         #Quick safety check: error if matches the source file path.
         source_file_path = Get_Source_File_Path(file_name)
         assert file_path != source_file_path
+
         # In case the target directory doesn't exist, such as on a
         # first run, make it.
-        if not os.path.exists(File_path_dict[file_name]):
-            os.mkdir(File_path_dict[file_name])
+        if not os.path.exists(folder_path):
+            os.mkdir(folder_path)
         return file_path
-    return None
+
+    # Shouldn't be here.
+    raise Exception('Failed to find output path for file {}'.format(file_name))
+    return
 
 
 #-Removed; from older code that pre-defined all source files and paths.
@@ -428,6 +456,14 @@ def Load_File(file_name,
             ##Parse the xml.
             #xml_tree = xml.etree.ElementTree.parse(file_path)
             #subdict[file_name] = xml_tree
+
+
+        #If this is an obj file, load its binary data.
+        elif file_path.endswith('obj'):
+            this_obj_file = Obj_File()
+            with open(file_path, 'rb') as file:
+                this_obj_file.binary = file.read()
+            File_dict[file_name] = this_obj_file
 
 
         #If this is a T file, parse its fields.
@@ -644,6 +680,7 @@ def Write_Files():
             pck_file_path = file_path.replace('.txt','.pck')
 
 
+        #Handle xml files.
         elif isinstance(file_object, XML_File):
             pck_file_path = file_path.replace('.xml','.pck')
             #Open with the right encoding.
@@ -655,8 +692,18 @@ def Write_Files():
             #Let the xml plugin pick the encoding to write out in.
             #xml_tree.write(file_path)
 
+
+        #Handle obj files.
+        elif isinstance(file_object, Obj_File):
+            # No pck files for these.
+            pck_file_path = None
+            # Do a binary write.
+            with open(file_path, 'wb') as file:
+                file.write(file_object.binary)
+
+
         # Check for a pck version of the file.
-        if os.path.exists(pck_file_path):
+        if pck_file_path and os.path.exists(pck_file_path):
             #Just stick a suffix on it, so it isn't completely gone.
             os.rename(pck_file_path, pck_file_path + '.x3c.bak')
 

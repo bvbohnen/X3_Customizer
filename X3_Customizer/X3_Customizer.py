@@ -1,5 +1,5 @@
 '''
-X3 Customizer v2.18
+X3 Customizer v2.19
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -35,9 +35,16 @@ Setup:
   * Source files need to be located in a folder underneath the 
   specified AP addon directory, and will have an internal folder
   structure matching that of the files in the normal addon directory.
+  A special case is made for .obj files in the L folder above the
+  addon directory; these should be placed in source_folder/L.
 
   * The user must write a Python script which will specify paths
-  and control the customizer by calling transforms.
+  and control the customizer by calling transforms. This script
+  will be called by the customizer and run once. The quickest way
+  to set this up would be to edit the example file. Included in
+  the repository is User_Transforms_Mine, the author's personal
+  set of transforms, which can be checked for futher examples of
+  how to use most transforms available.
 
   * Output files will be generated in the addon directory matching
   the folder structure in the source folder. Non-transformed files
@@ -87,6 +94,9 @@ Setup:
 TODO transforms:
 
 -Add a start customizer, selecting name, age, ship, location, etc.
+-Add option for salvage command software mod to disable the extra 
+ content (invincible repair stations and such).
+-Add option for xrm bounties to not spam the player log with messages.
 '''
 
 import sys, os

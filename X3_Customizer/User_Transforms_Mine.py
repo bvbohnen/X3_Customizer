@@ -19,6 +19,33 @@ elif XRM:
         path_to_addon_folder = r'C:\Base\x3 terran conflict xrm\addon',
         source_folder = 'xrm_source'
     )
+
+
+    
+#####################################################
+# Obj code file changes.
+
+# Bump up max seta.
+Adjust_Max_Seta(12)
+# Make seta speed up faster.
+Adjust_Max_Speedup_Rate(2)
+# Keep seta on in more situations.
+Stop_Events_From_Disabling_Seta(
+        on_missile_launch = True,
+        # Side note: not yet verified this one due to police not wanting
+        # to scan.
+        on_receiving_priority_message = True,
+        on_collision_warning = True,
+    )
+
+# Toy around with max marine counts.
+Set_Max_Marines(
+        tm_count      = 15,
+        tp_count      = 60,
+        m6_count      = 15,
+        capital_count = 60,
+        sirokos_count = 80,
+    )
     
 
 #####################################################
