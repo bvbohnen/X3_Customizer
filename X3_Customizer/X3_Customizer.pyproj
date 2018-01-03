@@ -64,6 +64,9 @@
     <Compile Include="T_Ships_Variants.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="T_Sounds.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="T_Universe.py" />
     <Compile Include="T_Wares.py" />
     <Compile Include="T_Weapons.py" />

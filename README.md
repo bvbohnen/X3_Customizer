@@ -1,4 +1,4 @@
-X3 Customizer v2.19
+X3 Customizer v2.20
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -213,6 +213,10 @@ Obj Transforms:
 
       Changes the rate at which SETA turns on. By default, it will accelerate by (selected SETA -1)/10 every 250 milliseconds. This transform will reduce the delay between speedup ticks.
 
+ * Disable_Combat_Music
+
+      Turns off combat music, keeping the normal environment musc playing when nearing hostile objects. If applied to a saved game already in combat mode, combat music may continue to play for a moment. The beep on nearing an enemy will still be played.
+
  * Set_Max_Marines
 
       Sets the maximum number of marines that each ship type can carry. These are byte values, signed, so max is 127.
@@ -351,6 +355,19 @@ Ship Transforms:
  * Standardize_Ship_Tunings
 
       Standardize max engine or rudder tuning amounts across all ships. Eg. instead of scouts having 25 and carriers having 5 engine runings, both will have some fixed number. Maximum ship speed and turn rate is kept constant, but minimum will change. If applied to an existing save, existing ships may end up overtuned; this is recommended primarily for new games, pending inclusion of a modification script which can recap ships to max tunings. Ships with 0 tunings will remain unedited.
+
+
+***
+
+Sound Transforms:
+
+ * Remove_Combat_Beep
+
+      Removes the beep that plays when entering combat.
+
+ * Remove_Sound
+
+      Removes a sound by writing an empty file in its place, based on the sound's id. If a non-empty file is already present in the 's' folder, it will be backed up.
 
 
 ***
@@ -588,3 +605,7 @@ Change Log:
    - Added Adjust_Max_Speedup_Rate.
    - Added Stop_Events_From_Disabling_Seta.
    - Added Set_Max_Marines.
+  * 2.20
+   - Added Disable_Combat_Music.
+   - Added Remove_Sound.
+   - Added Remove_Combat_Beep.

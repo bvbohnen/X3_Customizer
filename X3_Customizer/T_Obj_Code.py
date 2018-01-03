@@ -9,6 +9,10 @@ reasonably safe.
 
 Initial focus will be on x3story. Much of the code is copied at 
 different offset in x3galedit, which may be added if needed.
+
+TODO:
+Write more dynamic code which can generate these patches without
+exact pointers, to be resiliant against game patches.
 '''
 from File_Manager import *
 # This function will convert hex strings to bytes objects.
@@ -330,55 +334,114 @@ def Set_Max_Marines(
             new_code = hex2bin('05') + count.to_bytes(1, byteorder = 'big'),
         ))
    
-    #-Removed; only half of the patches, and too verbose.
-    ## Sirokos. Special case of SHIP.
-    #patch_list.append( Obj_Patch(
-    #    file = 'x3story',
-    #    offset = 0x000A876E,
-    #    # Check an extra couple bytes.
-    #    ref_code = hex2bin('051E8301'),
-    #    new_code = hex2bin('05') + sirokos_count.to_bytes(1, byteorder = 'big'),
-    #    ))
-    #
-    ## TM. Inherits from SHIP_BIG.
-    #patch_list.append( Obj_Patch(
-    #    file = 'x3story',
-    #    offset = 0x000CFA1C,
-    #    # Check an extra couple bytes.
-    #    ref_code = hex2bin('05085D34'),
-    #    new_code = hex2bin('05') + tm_count.to_bytes(1, byteorder = 'big'),
-    #    ))
-    #
-    ## Capitals, inherit from Obj_2019.
-    #patch_list.append( Obj_Patch(
-    #    file = 'x3story',
-    #    offset = 0x000D58EE,
-    #    # Check an extra couple bytes.
-    #    ref_code = hex2bin('05145D34'),
-    #    new_code = hex2bin('05') + capital_count.to_bytes(1, byteorder = 'big'),
-    #    ))
-    #
-    ## M6. Uses SHIP_M6.
-    #patch_list.append( Obj_Patch(
-    #    file = 'x3story',
-    #    offset = 0x000D68DB,
-    #    # Check an extra couple bytes.
-    #    ref_code = hex2bin('05085D34'),
-    #    new_code = hex2bin('05') + m6_count.to_bytes(1, byteorder = 'big'),
-    #    ))
-    #
-    ## TP. Uses SHIP_TP.
-    #patch_list.append( Obj_Patch(
-    #    file = 'x3story',
-    #    offset = 0x000D9537,
-    #    # Check an extra couple bytes.
-    #    ref_code = hex2bin('05285D34'),
-    #    new_code = hex2bin('05') + tp_count.to_bytes(1, byteorder = 'big'),
-    #    ))
-        
 
     # Apply the patches.
     for patch in patch_list:
         Apply_Obj_Patch(patch)
+
+    return
+
+#-Removed; the function edited appears to not be used for in-sector
+# damage, and may be almost purely out of sector or special cases,
+# which isn't so useful.
+#@Check_Dependencies('x3story.obj')
+#def Disable_Friendly_Fire(
+#    ):
+#    '''
+#    Turns off friendly fire damage. This should also work against
+#    collision damage. Friendly fire is defined aa an owner match
+#    between the victim ship and the damage source object.
+#    '''
+#    # Construct the patch.
+#    # This will edit the SHIP.Hit function where it does a matched
+#    # owner check. Normally it will skip code for calling help, 
+#    # player notoriety hit, etc. Now it will skip everything and
+#    # jump to the function exit.
+#    patch = Obj_Patch(
+#            file = 'x3story',
+#            offset = 0x000C0172,
+#            # Existing code is 'if SP[0]=0 then jump L000C02E5'.
+#            # Check an extra couple bytes.
+#            ref_code = hex2bin('34000C02E5'+'0F0001'),
+#            # The exit block poped 3 from the stack, and there was
+#            # 3 after the above jump, so everything should work okay.
+#            new_code = hex2bin('34000C04D0'),
+#            )
+#    Apply_Obj_Patch(patch)
+#
+#    # Test patch:
+#    # Above not working. Try shortcutting the whole function earlier,
+#    # when it does the environment check.
+#    patch = Obj_Patch(
+#            file = 'x3story',
+#            offset = 0x000C0184,
+#            # Existing code is 'if SP[0]=0 then jump L000C01A1'.
+#            # Want to change to jumping on 1, an environment mismatch,
+#            # so that environment match falls through and evenally returns.
+#            # Check an extra couple bytes.
+#            ref_code = hex2bin('34000C01A1'+'060812'),
+#            # Change opcode to 33, for jump on not-0.
+#            new_code = hex2bin('33000C01A1'),
+#            )
+#    Apply_Obj_Patch(patch)
+#
+#    # Above had no effect.
+#    # Another test patch, changing a flag check which normally early
+#    # returns on flag being 1, to use an OR instead of AND mask on
+#    # the flag isolation, causing it to always see a non-0 result
+#    # and return.
+#    # Do this for ships and stations.
+#    patch = Obj_Patch(
+#            file = 'x3story',
+#            offset = 0x000C015D,
+#            ref_code = hex2bin('53'+'34000C0165'),
+#            # Opcode to 54, OR.
+#            new_code = hex2bin('54'),
+#            )
+#    Apply_Obj_Patch(patch)
+#
+#    patch = Obj_Patch(
+#            file = 'x3story',
+#            offset = 0x00098BEE,
+#            ref_code = hex2bin('53'+'3400098BF6'),
+#            # Opcode to 54, OR.
+#            new_code = hex2bin('54'),
+#            )
+#    Apply_Obj_Patch(patch)
+#
+#    return
+
+
+@Check_Dependencies('x3story.obj')
+def Disable_Combat_Music(
+    ):
+    '''
+    Turns off combat music, keeping the normal environment musc playing
+    when nearing hostile objects. If applied to a saved game already in
+    combat mode, combat music may continue to play for a moment.
+    The beep on nearing an enemy will still be played.
+    '''
+    # Construct the patch.
+    # This will edit the CLIENT.NotifyAlert function, such that when
+    #  called to turn on combat mode, and checking to see if already
+    #  in combat mode and return early, it will instead return early
+    #  if not in combat mode (skipping the combat mode enable code).
+    # To deal with cases where this transform is applied and combat
+    #  mode is already on, the turn-on code will be edited to turn
+    #  off combat mode instead.
+    # Both of these changes are next to each other, and can be done
+    #  with one patch.
+    patch = Obj_Patch(
+            file = 'x3story',
+            offset = 0x00017895,
+            # Existing code is 
+            # 'if SP[0]=0 then jump L000178A9'
+            # 'push       1'
+            # 'write      CLIENT.cl_Alert'
+            ref_code = hex2bin('34000178A9'+'02'+'160007'),
+            # Switch to 'if SP[0] != 0' and 'push 0'.
+            new_code = hex2bin('33000178A9'+'01'),
+            )
+    Apply_Obj_Patch(patch)
 
     return

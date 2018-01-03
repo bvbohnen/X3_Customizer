@@ -17,6 +17,7 @@ from T_Scripts import *
 from T_Shields import *
 from T_Ships import *
 from T_Ships_Variants import *
+from T_Sounds import *
 from T_Universe import *
 from T_Wares import *
 from T_Weapons import *

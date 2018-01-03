@@ -1,4 +1,4 @@
-X3 Customizer v2.19
+X3 Customizer v2.20
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -561,6 +561,13 @@ Obj Transforms:
         - Float, the amount to boost the speedup rate by. Eg. 2 will reduce the delay between ticks to 125 ms. Practical limit may be set by game frame rate, eg. approximately 15x at 60 fps.
       
 
+ * Disable_Combat_Music
+
+    Requires: x3story.obj
+
+      Turns off combat music, keeping the normal environment musc playing when nearing hostile objects. If applied to a saved game already in combat mode, combat music may continue to play for a moment. The beep on nearing an enemy will still be played.
+      
+
  * Set_Max_Marines
 
     Requires: x3story.obj
@@ -921,6 +928,30 @@ Ship Transforms:
         - Int, the max rudder tunings to set.
       * ship_types:
         - List of ship names or types to adjust tunings for. If empty (default), all ships are adjusted.
+      
+
+
+***
+
+Sound Transforms:
+
+ * Remove_Combat_Beep
+
+    Requires: None
+
+      Removes the beep that plays when entering combat.
+      
+
+ * Remove_Sound
+
+    Requires: None
+
+      Removes a sound by writing an empty file in its place, based on the sound's id. If a non-empty file is already present in the 's' folder, it will be backed up.
+  
+      * sound_id
+       - Int, the id of the sound file to be overwritten.
+      * cleanup
+       - Bool, if True then any empty overwrite file will be removed, restoring a sound previously overwritten.
       
 
 
@@ -1363,3 +1394,7 @@ Change Log:
    - Added Adjust_Max_Speedup_Rate.
    - Added Stop_Events_From_Disabling_Seta.
    - Added Set_Max_Marines.
+  * 2.20
+   - Added Disable_Combat_Music.
+   - Added Remove_Sound.
+   - Added Remove_Combat_Beep.

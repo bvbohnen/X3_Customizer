@@ -25,6 +25,9 @@ elif XRM:
 #####################################################
 # Obj code file changes.
 
+# Testing.
+#Disable_Friendly_Fire()
+
 # Bump up max seta.
 Adjust_Max_Seta(12)
 # Make seta speed up faster.
@@ -47,6 +50,10 @@ Set_Max_Marines(
         sirokos_count = 80,
     )
     
+# Disable combat music.
+Disable_Combat_Music()
+# Similarly, disable the combat entrance beeping.
+Remove_Combat_Beep()
 
 #####################################################
 #Background
