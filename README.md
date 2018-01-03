@@ -605,7 +605,7 @@ Change Log:
    - Added Adjust_Max_Speedup_Rate.
    - Added Stop_Events_From_Disabling_Seta.
    - Added Set_Max_Marines.
-  * 2.20
+ * 2.20:
    - Added Disable_Combat_Music.
    - Added Remove_Sound.
    - Added Remove_Combat_Beep.
