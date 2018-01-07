@@ -29,7 +29,7 @@ elif XRM:
 #Disable_Friendly_Fire()
 
 # Bump up max seta.
-Adjust_Max_Seta(127)
+Adjust_Max_Seta(15)
 # Make seta speed up faster.
 Adjust_Max_Speedup_Rate(4)
 # Keep seta on in more situations.
@@ -280,14 +280,14 @@ if XRM:
         ])
 
     
-    # Test code for a universe that doesn't move ecells.
-    # Used to see if solar power plants get removed.
-    Adjust_Job_Count(
-        job_count_factors = [
-            ('classification_civilian', 0),
-            ('Energy ', 0),
-            ('*', 0.1),
-        ])
+    ## Test code for a universe that doesn't move ecells.
+    ## Used to see if solar power plants get removed.
+    #Adjust_Job_Count(
+    #    job_count_factors = [
+    #        ('classification_civilian', 0),
+    #        ('Energy ', 0),
+    #        ('*', 0.1),
+    #    ])
 
     #Khaak in particular respawn extremely fast (a few minutes), but
     # battle groups in general respawn too often, so aim to do general
