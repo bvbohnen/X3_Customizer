@@ -109,6 +109,9 @@ Change Log:
    - Added Disable_Combat_Music.
    - Added Remove_Sound.
    - Added Remove_Combat_Beep.
+ * 2.21:
+   - Added Stop_GoD_From_Removing_Stations.
+   - Added Disable_Asteroid_Respawn.
 '''
 #Note: changes moved here for organization, and to make them easier to
 #break out during documentation generation.

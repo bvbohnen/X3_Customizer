@@ -29,9 +29,9 @@ elif XRM:
 #Disable_Friendly_Fire()
 
 # Bump up max seta.
-Adjust_Max_Seta(12)
+Adjust_Max_Seta(127)
 # Make seta speed up faster.
-Adjust_Max_Speedup_Rate(2)
+Adjust_Max_Speedup_Rate(4)
 # Keep seta on in more situations.
 Stop_Events_From_Disabling_Seta(
         on_missile_launch = True,
@@ -54,6 +54,13 @@ Set_Max_Marines(
 Disable_Combat_Music()
 # Similarly, disable the combat entrance beeping.
 Remove_Combat_Beep()
+
+# Stop GoD from deleting factories.
+# Note: not working in initial testing.
+Stop_GoD_From_Removing_Stations()
+
+# Maybe stop asteroid respawn, if wanting to blow some up.
+#Disable_Asteroid_Respawn()
 
 #####################################################
 #Background
@@ -270,6 +277,16 @@ if XRM:
 
             #Everything else gets this factor.
             ('*', 1),
+        ])
+
+    
+    # Test code for a universe that doesn't move ecells.
+    # Used to see if solar power plants get removed.
+    Adjust_Job_Count(
+        job_count_factors = [
+            ('classification_civilian', 0),
+            ('Energy ', 0),
+            ('*', 0.1),
         ])
 
     #Khaak in particular respawn extremely fast (a few minutes), but

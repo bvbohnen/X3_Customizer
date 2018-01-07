@@ -10,13 +10,24 @@ reasonably safe.
 Initial focus will be on x3story. Much of the code is copied at 
 different offset in x3galedit, which may be added if needed.
 
+Note: current patch offsets are based on AP version 3.4.
+
 TODO:
 Write more dynamic code which can generate these patches without
 exact pointers, to be resiliant against game patches.
+    -This will require extended matching regions, likely with wildcards
+    for the pointers.
+    -Where pointer values need to be used in the replacement, a similar
+    wildcard match can be used, but which will return the value found
+    in the wildcarded slice.
 '''
 from File_Manager import *
+import inspect
 # This function will convert hex strings to bytes objects.
 from binascii import unhexlify as hex2bin
+
+OPCODE_NOP = '0C'
+OPCODE_POP = '24'
 
 class Obj_Patch:
     '''
@@ -66,7 +77,12 @@ def Apply_Obj_Patch(patch):
     ref_code_slice = file_contents.binary[offset : offset + len(patch.ref_code)]
     # Error check.
     if ref_code_slice != patch.ref_code:
-        print('Error: Obj patch reference code mismatch.')
+        # Look up the calling transform's name for the printout.
+        try:
+            caller_name = inspect.stack()[1][3]
+        except:
+            caller_name = '?'
+        print('Error: Obj patch reference code mismatch in {}.'.format(caller_name))
         return
 
     # Do the insertion, building a new byte string.
@@ -90,8 +106,9 @@ def Adjust_Max_Seta(
     the game default of 10 may cause oddities.
     
     * speed_factor
-      - Int, the multiplier to use. At least 2, currently limited to 50,
-        the debug mode maximum.
+      - Int, the multiplier to use. At least 2. X3 debug mode allows
+        up to 50. This transform will soft cap at 127, the max positive
+        single byte value.
     '''
     # Make sure the input is an int, not float.
     try:
@@ -100,7 +117,7 @@ def Adjust_Max_Seta(
         print('Adjust_Max_Seta error: non-integer speed_factor')
         return
     # Check the range on the input.
-    if not (2 <= speed_factor <= 50):
+    if not (2 <= speed_factor <= 127):
         print('Adjust_Max_Seta error: speed_factor unsupported.')
         return
 
@@ -215,11 +232,18 @@ def Stop_Events_From_Disabling_Seta(
     # This will work by finding the places where a call is made to
     # CLIENT.StopFastForward, and replace them with something
     # benign, like a call to CLIENT.IsFastForward.
+
+    # Update: To simplify this code (and make it easier in the future
+    # to update), use nop replacement instead.
+
     # Predefine the call hex values here, to reuse in patches.
     # call86     CLIENT.StopFastForward
-    original_call = hex2bin('8600015770')
+    # pop
+    original_call = hex2bin('8600015770'+'24')
+    #-Removed
     # call86     CLIENT.IsFastForward
-    new_call      = hex2bin('86000157A9')
+    #new_call      = hex2bin('86000157A9')
+    new_call      = hex2bin(OPCODE_NOP * 6)
 
 
     # Construct the patches.
@@ -230,7 +254,7 @@ def Stop_Events_From_Disabling_Seta(
             file = 'x3story',
             offset = 0x00017BEE,
             # Check an extra couple bytes.
-            ref_code = original_call + hex2bin('246F'),
+            ref_code = original_call + hex2bin('6F'),
             new_code = new_call,
             ))
     if on_receiving_priority_message:
@@ -238,7 +262,7 @@ def Stop_Events_From_Disabling_Seta(
             file = 'x3story',
             offset = 0x00015DCA,
             # Check an extra couple bytes.
-            ref_code = original_call + hex2bin('240D'),
+            ref_code = original_call + hex2bin('0D'),
             new_code = new_call,
             ))
     if on_collision_warning:
@@ -246,7 +270,7 @@ def Stop_Events_From_Disabling_Seta(
             file = 'x3story',
             offset = 0x00017F22,
             # Check an extra couple bytes.
-            ref_code = original_call + hex2bin('2424'),
+            ref_code = original_call + hex2bin('24'),
             new_code = new_call,
             ))
         
@@ -445,3 +469,173 @@ def Disable_Combat_Music(
     Apply_Obj_Patch(patch)
 
     return
+
+
+
+# Notes on the god engine station removal behavior:
+'''
+The primary sector and station analysis occurs in GODENGINE.InspectSectorTask.
+Characteristics of this task:
+
+    Infinite loop.
+    Each loop randomly selects a sector, within 0-23 x, 0-19 y.
+	    -Skips xenon/khaak/unclaimed sectors.
+	    -Skips sectors flagged as 
+	    -Skips sectors checked in the prior 10 hours.
+    Analyzes one sector per 35 seconds or so (some random variation, with a 
+        lot of scattered small waits).
+	    -This is fast enough to traverse all sectors ~5 times in 10 hours.
+	    -Probably spend most time doing ~15 second waits between skipped sectors.
+	    -A sector with its 10 hours up will probably get visited within ~2 hours.
+    In the sector, will loop over all factories.
+    Loops over all resources, and records their overall fullness.
+    Aims to capture factories that are lightly filled, and factories that are 
+     starved (average <=7% full over 10 sampled fullness counts taken by the 
+     factory at some inteverals.
+    Also captures factories that are overfull (average >93% fill).
+
+    If any such starved or stuffed factories found, an event will be spawned 
+    for the sectors with those factories in a list, presumably to handle deletion.
+	    -Some effort was spent on following the logic for how events work, but 
+        the script calling was extremely obtuse.
+
+    If the above deletion event not started, more logic is present to do further
+    analysis, leading to a secondary event type.
+	    -This was not explored in detail, and is not described here.
+        -In testing, this logic chain appears to also perform station deletion.
+
+    To stop station deletion, the code leading to the corresponding events need 
+    to be modified. Two general options here:
+        a)  Change code just prior to the Event creations to skip them, leaving
+            the rest of the code intact in case of any important changes it might
+            make.
+        b)  Change the code prior to factory analysis to skip the sector
+            entirely.
+    In either case, the code for deleting wrecks should be left intact, so
+    any edits should occur after there.
+    
+	Test results:
+		1) Game started with god enabled, modded to skip first event type. Fail.
+		2) Game started with all sectors skipped from start. Success.
+		3) Game started with only the first event type skipped from start. Fail.
+			-Suggest second event type also removes stations.
+		4) Game started with both event types skipped from start. Success.
+		4) Game started with god enabled, then modded to skip all sectors. Success.
+'''
+
+@Check_Dependencies('x3story.obj')
+def Stop_GoD_From_Removing_Stations(
+    ):
+    '''
+    Stops the GoD engine from removing stations which are nearly
+    full on products or nearly starved of resources for extended
+    periods of time.  This will not affect stations already removed
+    or in the process of being removed.
+    '''
+    # Construct the patch.
+    # This will edit GODENGINE.InspectSectorTask.
+
+    # Pick the patching style.
+    # Both work in testing, though the general sector skipper is
+    # simpler to maintain.
+    patch_style = 1
+
+    if patch_style == 0:
+        # To disable individual events:
+        # Event type 1:
+        # A particular 'if' equivelent flag check can be tuned so that
+        # a given factory doesn't count as full/starved, whatever path
+        # its analysis took, since both paths will now write a 0.
+        patch = Obj_Patch(
+                file = 'x3story',
+                offset = 0x0017F560,
+                # Change the 'push 1' to 'push 0'.
+                # Verify the following instruction.
+                ref_code = hex2bin('02'+'320017F567'),
+                new_code = hex2bin('01'),
+                )
+        Apply_Obj_Patch(patch)
+    
+        # Event type 2:
+        # Edit the code near L0017FC6B, which decided if a non-existent
+        # object gets removed from the list. Replace the jump with a
+        # pop and some nops, so that all list items get removed. The later
+        # check for an empty list will then skip to the next sector.
+        patch = Obj_Patch(
+                file = 'x3story',
+                offset = 0x0017FC59,
+                ref_code = hex2bin('340017FC6B'),
+                new_code = hex2bin(OPCODE_POP + OPCODE_NOP * 4),
+                )
+        Apply_Obj_Patch(patch)
+    
+    else:
+        # Alterative: skip the sector before any factory analysis.
+        # When the sector is checking for its 'SetNoEvents'
+        # flag to be skipped, ensure both result paths
+        # will skip the sector.
+        # This will be used in general, being easier to maintain a
+        # single patch.
+        patch = Obj_Patch(
+                file = 'x3story',
+                offset = 0x0017EEEB,
+                # Swap 'push 0' to 'push 1'.
+                ref_code = hex2bin('01'+'320017EEF2'),
+                new_code = hex2bin('02'),
+                )
+        Apply_Obj_Patch(patch)
+
+    return
+
+
+@Check_Dependencies('x3story.obj')
+def Disable_Asteroid_Respawn(
+    ):
+    '''
+    Stops any newly destroyed asteroids from being set to respawn.
+    This can be set temporarily when wishing to clear out some
+    unwanted asteroids.
+    It is not recommended to leave this transform applied long term.
+    '''
+    '''
+    This one might be a little bit tricky.
+    The best approach is to modify ASTEROID.Destruct to no longer
+    make a call to REBUILD.RequestRebuild, but it needs to be
+    done using a 1:1 replacement, and that call consumes 3
+    stack items, so the replacement would need to work similarly.
+
+    Can try out the nop instruction for this; though it hasn't
+    been generally observed in existing code, it might be safe
+    to used as an insert.
+
+    Code to replace:
+        get_object
+        push       1
+        pushw      303d ; 012Fh
+        call86     REBUILD.RequestRebuild
+        pop
+    Byte count: 11
+    '''
+    # Construct the patch.
+
+
+    # This will edit GODENGINE.InspectSectorTask.
+    # At one point, an if/else block prior to the final station
+    # creation event launcher will loop back to the next sector
+    # if a particular table is empty. This change will ensure the
+    # alternate path also jumps to the next sector, bypassing
+    # the final code section.
+
+    patch = Obj_Patch(
+            file = 'x3story',
+            offset = 0x0008F9EB,
+            # Replace with nops.
+            ref_code = hex2bin('2E'+'02'+'06012F'+'8600085F30'+'24'),
+            new_code = hex2bin( OPCODE_NOP * 11),
+            )
+    Apply_Obj_Patch(patch)
+
+    return
+
+
+# TODO: asteroid/station respawn time edits.

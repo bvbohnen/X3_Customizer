@@ -1,4 +1,4 @@
-X3 Customizer v2.20
+X3 Customizer v2.21
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -548,7 +548,7 @@ Obj Transforms:
       Changes the maximum SETA speed multiplier. Higher multipliers than the game default of 10 may cause oddities.
       
       * speed_factor
-        - Int, the multiplier to use. At least 2, currently limited to 50, the debug mode maximum.
+        - Int, the multiplier to use. At least 2. X3 debug mode allows up to 50. This transform will soft cap at 127, the max positive single byte value.
       
 
  * Adjust_Max_Speedup_Rate
@@ -559,6 +559,13 @@ Obj Transforms:
       
       * scaling_factor
         - Float, the amount to boost the speedup rate by. Eg. 2 will reduce the delay between ticks to 125 ms. Practical limit may be set by game frame rate, eg. approximately 15x at 60 fps.
+      
+
+ * Disable_Asteroid_Respawn
+
+    Requires: x3story.obj
+
+      Stops any newly destroyed asteroids from being set to respawn. This can be set temporarily when wishing to clear out some unwanted asteroids. It is not recommended to leave this transform applied long term.
       
 
  * Disable_Combat_Music
@@ -598,6 +605,13 @@ Obj Transforms:
         - If True, Seta will not turn off when a priority message is received, such as a police notice of being scanned.
       * on_collision_warning
         - If True, Seta will not turn off when a near collision occurs.
+      
+
+ * Stop_GoD_From_Removing_Stations
+
+    Requires: x3story.obj
+
+      Stops the GoD engine from removing stations which are nearly full on products or nearly starved of resources for extended periods of time.  This will not affect stations already removed or in the process of being removed.
       
 
 
@@ -1398,3 +1412,6 @@ Change Log:
    - Added Disable_Combat_Music.
    - Added Remove_Sound.
    - Added Remove_Combat_Beep.
+ * 2.21:
+   - Added Stop_GoD_From_Removing_Stations.
+   - Added Disable_Asteroid_Respawn.
