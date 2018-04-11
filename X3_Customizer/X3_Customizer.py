@@ -1,5 +1,5 @@
 '''
-X3 Customizer v2.21
+X3 Customizer v2.22
 ------------------
 
 This tool will read in source files from X3, perform transforms on them,
@@ -28,15 +28,14 @@ Usage:
 
 Setup:
   * Transforms will operate on source files (eg. tships.txt) which
-  need to be set up prior to running this tool. Source files can be
-  extracted using X3 Editor 2 if needed. Source files may be provided
-  after any other mods have been applied.
+  are either provided as loose files, or extracted automatically from the
+  game's cat/dat files.
 
-  * Source files need to be located in a folder underneath the 
+  * Loose source files need to be located in a folder underneath the 
   specified AP addon directory, and will have an internal folder
-  structure matching that of the files in the normal addon directory.
-  A special case is made for .obj files in the L folder above the
-  addon directory; these should be placed in source_folder/L.
+  structure matching that of the files in the normal addon
+  or TC directory.
+  Eg. <game path>/addon/<source_folder>/types/TShips.txt
 
   * The user must write a Python script which will specify paths
   and control the customizer by calling transforms. This script
@@ -46,10 +45,11 @@ Setup:
   set of transforms, which can be checked for futher examples of
   how to use most transforms available.
 
-  * Output files will be generated in the addon directory matching
-  the folder structure in the source folder. Non-transformed files
-  will generate output files. Files which do not have a name matching
-  the requirement of any transform will be ignored and not copied.
+  * Output files will be generated generally in the addon directory,
+  though some may be placed under the main game directory, based
+  on where X3 looks for the files.
+  Files in the source folder which do not have a name matching the
+  requirement of any transform will be ignored and not copied.
   In some cases, files may be generated one directory up, in the
   presumed Terran Conflict folder.
 
@@ -82,13 +82,13 @@ Setup:
   </code>
 
 '''
-#TODO: maybe remove version tag from title, just leave in change log.
-#Note: the above comment gets printed to the markdown file, so avoid
-# having a 4-space indent because text will get code blocked.
-#-Need to also avoid this 4-space group across newlines, annoyingly.
-#-Spaces in text being put into a list seems okay.
-#-In general, check changes in markdown (can use Visual Studio plugin)
-# to verify they look okay.
+# TODO: maybe remove version tag from title, just leave in change log.
+# Note: the above comment gets printed to the markdown file, so avoid
+#  having a 4-space indent because text will get code blocked.
+# -Need to also avoid this 4-space group across newlines, annoyingly.
+# -Spaces in text being put into a list seems okay.
+# -In general, check changes in markdown (can use Visual Studio plugin)
+#  to verify they look okay.
 
 '''
 TODO transforms:
@@ -99,8 +99,21 @@ TODO transforms:
 -Add option for xrm bounties to not spam the player log with messages.
 '''
 
+# Note: for organization, some files were moved into subfolders and
+#  set up as packages.
+# Because visual studio isn't very smart with package imports, and since
+#  this project is not expected to be imported as a package by any
+#  external tools, and since the entry function shares a name with the
+#  main project folder, the top level is not packaged.
+# Subpackages should be found naturally without having to mess around
+#  with sys paths, since they are directly under this folder.
+# Imports of the packages can just be done directly, not relative, relying
+#  on them being found early in the search paths (avoiding conflicts with
+#  any standard packages and such).
+
 import sys, os
-#Load up the file manager.
+
+# Load up the file manager.
 import File_Manager
 
 def Run(args):
@@ -109,20 +122,20 @@ def Run(args):
     This expect a single argument: the name of the .py file to load
     which specifies file paths and the transforms to run.
     '''
-    #If only one arg available, it is the autofilled file name,
-    # so user gave nothing.
+    # If only one arg available, it is the autofilled file name,
+    #  so user gave nothing.
     if len(args) == 1:
-        #Set the module to User_Transforms.py by default.
+        # Set the module to User_Transforms.py by default.
         args.append('User_Transforms.py')
 
-        #Print some semi-informative message.
-        #-Removed in favor of default.
-        #print('Please provide the name of a transform specification module.')
+        # Print some semi-informative message.
+        # -Removed in favor of default.
+        # print('Please provide the name of a transform specification module.')
 
     if len(args) > 2:
         print('Error: expecting 1 argument, 2 were given.')
 
-    #Check for a help request.
+    # Check for a help request.
     elif args[1] == '-help':
         help_lines = [
             '',
@@ -137,41 +150,40 @@ def Run(args):
         print('\n'.join(help_lines))
 
     else:
-        #The arg should be a python module.
-        #This may include pathing, though is generally not expected to.
+        # The arg should be a python module.
+        # This may include pathing, though is generally not expected to.
         user_module_name = args[1]
 
         if not user_module_name.endswith('.py'):
             print('Error: expecting the name of a python module, ending in .py.')
             return
 
-        #Check for file existence.
+        # Check for file existence.
         if not os.path.exists(user_module_name):
             print('Error: {} not found.'.format(user_module_name))
             return
 
         print('Attempting to run {}'.format(user_module_name))
       
-        #Attempt to load the module.
-        #This will kick off all of the transforms as a result.
+        # Attempt to load the module.
+        # This will kick off all of the transforms as a result.
         import importlib        
         module = importlib.machinery.SourceFileLoader(
-            #Provide the name sys will use for this module.
-            #Use the basename to get rid of any path, and prefix
-            # to ensure the name is unique.
+            # Provide the name sys will use for this module.
+            # Use the basename to get rid of any path, and prefix
+            #  to ensure the name is unique.
             'user_module_' + os.path.basename(user_module_name), 
             user_module_name
             ).load_module()
 
-    #Run any needed cleanup.
+    # Run any needed cleanup.
     File_Manager.Cleanup()
         
-    #Everything should now be done.
-    #Can open most output files in X3 Editor to verify results.
+    # Everything should now be done.
+    # Can open most output files in X3 Editor to verify results.
     File_Manager.Write_Files()
 
     print('Transforms complete')
     
 if __name__ == '__main__':
     Run(sys.argv)
-

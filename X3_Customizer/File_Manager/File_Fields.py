@@ -109,16 +109,16 @@ Note on scene files:
 
 '''
 
-#T file names, and named fields of interest.
-#The original files contain semicolon delimited lines; the index to each field
-# is given a string name here for easier reference.
-#This dict will be keyed by a T file name, with an inner dict keyed by
-# field name and the index of the field.
-#This will also define the min number of entries per line, to help identify which
-# lines hold data and which are headers. Equivelent to number of ';' +1.
+# T file names, and named fields of interest.
+# The original files contain semicolon delimited lines; the index to each field
+#  is given a string name here for easier reference.
+# This dict will be keyed by a T file name, with an inner dict keyed by
+#  field name and the index of the field.
+# This will also define the min number of entries per line, to help identify which
+#  lines hold data and which are headers. Equivelent to number of ';' +1.
 T_file_name_field_dict_dict = {
     'Globals.txt' : {
-        #Global lines are short, just 2 values and newline.
+        # Global lines are short, just 2 values and newline.
         'min_data_entries': 3,
         0  : 'name',
         1  : 'value',
@@ -205,7 +205,7 @@ T_file_name_field_dict_dict = {
         },
     'TMissiles.txt' : {
         'min_data_entries': 5,
-        #37 fields total
+        # 37 fields total
         0  : 'model_scene',    #String or int
         2  : 'rotation_x',     #rpm = 60 * this value
         3  : 'rotation_y',
@@ -247,8 +247,8 @@ T_file_name_field_dict_dict = {
         'min_data_entries': 5,
         0  : 'model_file',  #Int.
         1  : 'picture_id',
-        #Dynamic number of fields, seemingly due to turret or other variation.
-        #Positive indices will count forward, negatives will count backwards.
+        # Dynamic number of fields, seemingly due to turret or other variation.
+        # Positive indices will count forward, negatives will count backwards.
         2 : 'yaw',  #rpm = 60 * this value
         3 : 'pitch',
         4 : 'roll',
@@ -259,19 +259,19 @@ T_file_name_field_dict_dict = {
         9 : 'engine_sound', #Int
         11 : 'engine_effect_color', #Int
         12 : 'engine_effect_glow', #Int
-        #Power for recharging shields.
-        #Exact recharge rate also depends on shield types and number.
+        # Power for recharging shields.
+        # Exact recharge rate also depends on shield types and number.
         13 : 'shield_power',
         14 : 'sound_volumne_min',
         15 : 'sound_volumne_max',
         16 : 'ship_scene',    #String or int
         17 : 'cockpit_scene', #String or int
         18 : 'laser_compatibility_flags', #32-bit 1-hot flags for lasers equippable, signed.
-        #Total weapon energy storable.
-        #Called kW, even though that is not a unit of energy...
+        # Total weapon energy storable.
+        # Called kW, even though that is not a unit of energy...
         20 : 'weapon_energy', 
-        #Float, multiplier on weapon_energy to determine recharge rate.
-        # eg. 0.01 on transports, 0.025 on fighters.
+        # Float, multiplier on weapon_energy to determine recharge rate.
+        #  eg. 0.01 on transports, 0.025 on fighters.
         21 : 'weapon_recharge_factor', 
         22 : 'shield_type', #Integer, 0-5, where 0 is 1mj and 5 is 2gj
         23 : 'max_shields', #Integer, typically 1-5
@@ -291,7 +291,7 @@ T_file_name_field_dict_dict = {
         50 : 'variation_index', #Int, the variation type of the ship, eg. 1 for vanguard.
         51 : 'angular_acceleration',
         52 : 'obj_type',      #Ship alternate category, eg. 'OBJ_SHIP_TL' for transport ship
-        # Note: 53-X (96?) appear to be cockpits/turrets/guns.
+        #  Note: 53-X (96?) appear to be cockpits/turrets/guns.
         -11: 'volume', #Int; often 1, but may be related to marine capacity according to a forum post.
         -10: 'relative_value_npc',
         -9 : 'price_modifier_1',
@@ -301,7 +301,7 @@ T_file_name_field_dict_dict = {
         -5 : 'minimum_notoriety',
         -4 : 'video_id',
         -3 : 'skin_index',
-        #Name is the last field before the newline.
+        # Name is the last field before the newline.
         -2 : 'name',
         },
     'TShields.txt': {
@@ -328,7 +328,7 @@ T_file_name_field_dict_dict = {
         19 : 'skin_index',
         -2: 'name',
         },
-    #Catchall for the TWare files; individual links filled in further below.
+    # Catchall for the TWare files; individual links filled in further below.
     'TWare_.txt':{
         'min_data_entries': 5,
         0  : 'model_file',  #Int.
@@ -377,28 +377,28 @@ T_file_name_field_dict_dict = {
         -2: 'name',
         },
     'WareLists.txt':{
-        #Empty entries may just be a count (0) and their slash_index (includes newline).
-        #Note that this is small enough to match the header, so expect the
-        # header line to be returned to any calling code.
+        # Empty entries may just be a count (0) and their slash_index (includes newline).
+        # Note that this is small enough to match the header, so expect the
+        #  header line to be returned to any calling code.
         'min_data_entries': 2,
-        #Int, the number of wares in the list, prior to the index.
-        #Adjust this if changing ware count.
+        # Int, the number of wares in the list, prior to the index.
+        # Adjust this if changing ware count.
         0 : 'ware_count',
-        #String, a forward slash followed by the integer index, and then a
-        # newline (combined, since there is no semicolon at the end like with
-        # other files). May include a random comment before the newline, and
-        # is probably just a comment in general.
-        # Indices appear to always be in order, starting from 0.
+        # String, a forward slash followed by the integer index, and then a
+        #  newline (combined, since there is no semicolon at the end like with
+        #  other files). May include a random comment before the newline, and
+        #  is probably just a comment in general.
+        #  Indices appear to always be in order, starting from 0.
         -1: 'slash_index_comment',  
         },
-    #Note: it appears the jobs file has two formats, one (maybe for ap)
-    # which has 4 more fields inserted somewhere and throwing off later flags.
-    #The AP new fields are at: [70,105,123,128], and will shift down
-    # the TC values correspondingly.
-    #These offsets will be for the short/TC form (which xrm uses and seems
-    # to work okay), and the fluff entries will be noted and used when
-    # parsing if needed to shift entry names.
-    #Set an initial empty dict for the ap fields; build it further below.
+    # Note: it appears the jobs file has two formats, one (maybe for ap)
+    #  which has 4 more fields inserted somewhere and throwing off later flags.
+    # The AP new fields are at: [70,105,123,128], and will shift down
+    #  the TC values correspondingly.
+    # These offsets will be for the short/TC form (which xrm uses and seems
+    #  to work okay), and the fluff entries will be noted and used when
+    #  parsing if needed to shift entry names.
+    # Set an initial empty dict for the ap fields; build it further below.
     'Jobs.txt.ap' : {
         'min_data_entries': 5,
         },
@@ -406,7 +406,7 @@ T_file_name_field_dict_dict = {
         'min_data_entries': 5,
         'lines_tc': 130,
         'lines_ap': 134,
-        #Provide the replacement dict to use in the ap case.
+        # Provide the replacement dict to use in the ap case.
         'ap_name' : 'Jobs.txt.ap',
         0 : 'id',                   #Integer
         1 : 'name',                 #String, name of the job entry
@@ -415,11 +415,11 @@ T_file_name_field_dict_dict = {
         4 : 'script',               #String
         5 : 'script_config',        #String
         6 : 'name_id',              #Integer; the in-game displayed name.
-        #Int; if not 0, the override name to use.
-        # Unclear on relation to name_id.
+        # Int; if not 0, the override name to use.
+        #  Unclear on relation to name_id.
         8 : 'override_name',       
-        #These fields affect display and announcement name, being
-        # prefixed or suffixed to the name_id text/voice.
+        # These fields affect display and announcement name, being
+        #  prefixed or suffixed to the name_id text/voice.
         9 : 'show_race',           #0 or 1; for display name in game.
         10: 'show_corperation',    #0 or 1; for display name in game.
         11: 'show_ship_type',      #0 or 1; for display name in game.
@@ -430,7 +430,7 @@ T_file_name_field_dict_dict = {
         16: 'idle_rate',           #Int, generally 0-10 or so.
         17: 'respawn_time',        #Integer, appears to be in seconds.
         18: 'ship_type_name',  #String, optional name of ship to spawn. -1 if unused.
-        #Ship types to allow, given as standard type name for coding convenience.
+        # Ship types to allow, given as standard type name for coding convenience.
         19: 'SG_SH_M1', #0 or 1
         20: 'SG_SH_M2', #0 or 1
         21: 'SG_SH_M3', #0 or 1
@@ -472,11 +472,11 @@ T_file_name_field_dict_dict = {
         57: 'variant_tanker_xl',
         58: 'variant_super_freighter_xl',
         59: 'variant_advanced',
-        #Hue/saturation are generally -1, sometimes 0, and may be unused.
-        #The spray shop supports 0-360 hue, -256 to 256 saturation.
-        #Could consider playing with this at some point, maybe randomizing,
-        # though given ships of a job will always be the same, and variation
-        # would only be across jobs.
+        # Hue/saturation are generally -1, sometimes 0, and may be unused.
+        # The spray shop supports 0-360 hue, -256 to 256 saturation.
+        # Could consider playing with this at some point, maybe randomizing,
+        #  though given ships of a job will always be the same, and variation
+        #  would only be across jobs.
         60: 'hue',
         61: 'saturation',
         63: 'select_owners_sector',     #0 or 1
@@ -525,11 +525,11 @@ T_file_name_field_dict_dict = {
         126: 'classification_trader',
         127: 'classification_civilian',
         128: 'classification_fighter',
-        #129 is the last entry, seen to be a 0 with newline generally.
+        # 129 is the last entry, seen to be a 0 with newline generally.
         },
 }
 
-#Fill in the TWare file entries.
+# Fill in the TWare file entries.
 for tware_name in [
     'TWareB.txt',
     'TWareE.txt',
@@ -540,18 +540,17 @@ for tware_name in [
     ]:
     T_file_name_field_dict_dict[tware_name] = T_file_name_field_dict_dict['TWare_.txt']
     
-#Build an ap-specific dict for the jobs file, with inserted lines.
+# Build an ap-specific dict for the jobs file, with inserted lines.
 for tc_line_number, field in T_file_name_field_dict_dict['Jobs.txt'].items():
-    #Skip special entries.
+    # Skip special entries.
     if isinstance(tc_line_number, str):
         continue
-    #Get the line number offset adjustment for ap.
+    # Get the line number offset adjustment for ap.
     ap_line_number = tc_line_number + sum(
-        #This will sum up all of the AP lines that the tc_line_number
-        # has reached. Eg. on tc reaching 70, an offset of 1 is applied;
-        # on tc reaching 105, an offset of 2 is applied.
+        # This will sum up all of the AP lines that the tc_line_number
+        #  has reached. Eg. on tc reaching 70, an offset of 1 is applied;
+        #  on tc reaching 105, an offset of 2 is applied.
         [1 for x in [70,105,123,128] if tc_line_number >= x])
     T_file_name_field_dict_dict['Jobs.txt.ap'][ap_line_number] = field
     
-
 

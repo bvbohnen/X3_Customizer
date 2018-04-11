@@ -5,8 +5,7 @@
     <ProjectGuid>f321f45f-39ee-4cc8-91e7-bfec28462c97</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>X3_Customizer.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <SearchPath>..\..\X3_Customizer</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>X3_Customizer</Name>
@@ -25,52 +24,64 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="File_Manager\Cat_Reader.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Change_Log.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="File_Patcher.py" />
+    <Compile Include="Common\__init__.py" />
+    <Compile Include="File_Manager\File_Types.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="File_Manager\__init__.py" />
+    <Compile Include="File_Manager\File_Patcher.py" />
+    <Compile Include="File_Manager\Source_Reader.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Make_Documentation.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="File_Fields.py">
+    <Compile Include="File_Manager\File_Fields.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="File_Manager.py">
+    <Compile Include="File_Manager\File_Manager.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Scaling_Equations.py" />
-    <Compile Include="Transforms.py">
+    <Compile Include="Transforms\Scaling_Equations.py" />
+    <Compile Include="Common\Settings.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="T_Backgrounds.py" />
-    <Compile Include="T_Director.py" />
-    <Compile Include="T_Factories.py">
+    <Compile Include="Transforms\__init__.py" />
+    <Compile Include="Transforms\T_Backgrounds.py" />
+    <Compile Include="Transforms\T_Director.py" />
+    <Compile Include="Transforms\T_Factories.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="T_Gates.py" />
-    <Compile Include="T_Globals.py" />
-    <Compile Include="T_Jobs.py" />
-    <Compile Include="T_Missiles.py" />
-    <Compile Include="T_Obj_Code.py">
+    <Compile Include="Transforms\T_Gates.py" />
+    <Compile Include="Transforms\T_Globals.py" />
+    <Compile Include="Transforms\T_Jobs.py" />
+    <Compile Include="Transforms\T_Missiles.py" />
+    <Compile Include="Transforms\T_Obj_Code.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="T_Scripts.py">
+    <Compile Include="Transforms\T_Scripts.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="T_Shields.py">
+    <Compile Include="Transforms\T_Shields.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="T_Ships.py" />
-    <Compile Include="T_Ships_Variants.py">
+    <Compile Include="Transforms\T_Ships.py" />
+    <Compile Include="Transforms\T_Ships_Variants.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="T_Sounds.py">
+    <Compile Include="Transforms\T_Sounds.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="T_Universe.py" />
-    <Compile Include="T_Wares.py" />
-    <Compile Include="T_Weapons.py" />
-    <Compile Include="T_Weapons_Fitter.py" />
+    <Compile Include="Transforms\T_Universe.py" />
+    <Compile Include="Transforms\T_Wares.py" />
+    <Compile Include="Transforms\T_Weapons.py" />
+    <Compile Include="Transforms\T_Weapons_Fitter.py" />
     <Compile Include="User_Transforms_Build_Patches.py">
       <SubType>Code</SubType>
     </Compile>
@@ -78,11 +89,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="User_Transforms_Mine.py" />
-    <Compile Include="Flags.py" />
+    <Compile Include="Common\Flags.py" />
     <Compile Include="X3_Customizer.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Common\" />
+    <Folder Include="File_Manager\" />
     <Folder Include="source\" />
+    <Folder Include="Transforms\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="source\Khaak_m6_scene.bod" />

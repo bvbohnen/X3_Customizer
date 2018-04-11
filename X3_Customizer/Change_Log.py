@@ -112,8 +112,14 @@ Change Log:
  * 2.21:
    - Added Stop_GoD_From_Removing_Stations.
    - Added Disable_Asteroid_Respawn.
+ * 2.22
+   - Rewrite of much of the file loading system.
+   - Added support for loading source files from cat/dat pairs, when the file
+     is not found in the specified source folder.
+   - Message log, as well as a log of files written, will now be written
+     to a log folder customized by Set_Path.
 '''
-#Note: changes moved here for organization, and to make them easier to
-#break out during documentation generation.
-#TODO: think of a better way to version track than using a hand
-# edit of the x3_customizer docstring.
+# Note: changes moved here for organization, and to make them easier to
+# break out during documentation generation.
+# TODO: think of a better way to version track than using a hand
+#  edit of the x3_customizer docstring.

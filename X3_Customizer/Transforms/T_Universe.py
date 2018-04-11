@@ -165,41 +165,41 @@ remains unfound.
 '''
 from File_Manager import *
 import os
-from T_Director import Make_Director_Shell
+from .T_Director import Make_Director_Shell
 
 
 @Check_Dependencies('x3_universe.xml','0001-L044.xml','7027-L044.xml','7360-L044.xml')
 def Color_Sector_Names(
-    #Specify the color to use for each race/affiliation.
-    #To save some implementation time, races should be defined by their code number
-    # in the universe file.
+    # Specify the color to use for each race/affiliation.
+    # To save some implementation time, races should be defined by their code number
+    #  in the universe file.
     Race_color_letters = {
-            #argon
+            # argon
             '1': 'B',
-            #boron
+            # boron
             '2': 'G',
-            #split
+            # split
             '3': 'M',
-            #paranid
+            # paranid
             '4': 'C',
-            #teladi
+            # teladi
             '5': 'Y',
-            #xenon
+            # xenon
             '6': 'R',
-            #kha'ak
+            # kha'ak
             '7': 'R',
-            #pirates
+            # pirates
             '8': 'R',
-            #goner
+            # goner
             '9': 'B',
-            #unknown; leave uncolored or just use grey. Code is more consistent
-            # for now to just use grey.
+            # unknown; leave uncolored or just use grey. Code is more consistent
+            #  for now to just use grey.
             '14': 'A',
-            #Terran (ATF)
+            # Terran (ATF)
             '17': 'W',
-            #Terran (USC)
+            # Terran (USC)
             '18': 'W',
-            #Yaki
+            # Yaki
             '19': 'R',
         }
     ):
@@ -217,122 +217,122 @@ def Color_Sector_Names(
     '''
     import re
 
-    #Open the universe file and scan through it to find sector owners.
-    #This could be done with a fuller xml parser, but since the operation is simple just
-    # do a quick pattern check on each line.
-    #TODO: maybe also parse some other map files, eg War_Effort which has a different
-    # race ownership for sector used in the Final Fury plot that switches from
-    # unknown to Argon (Unknown in x3_universe, Argon in War_Effort).
+    # Open the universe file and scan through it to find sector owners.
+    # This could be done with a fuller xml parser, but since the operation is simple just
+    #  do a quick pattern check on each line.
+    # TODO: maybe also parse some other map files, eg War_Effort which has a different
+    #  race ownership for sector used in the Final Fury plot that switches from
+    #  unknown to Argon (Unknown in x3_universe, Argon in War_Effort).
     sector_id_color_dict = {}
-    #Loop over the universe lines.
+    # Loop over the universe lines.
     for line in Load_File('x3_universe.xml').text.splitlines():
 
-        #Expect every system declaration line to have a 'size' field.
+        # Expect every system declaration line to have a 'size' field.
         if 'size=' in line:
 
-            #Verify by the line also defining generic missions chances.
+            # Verify by the line also defining generic missions chances.
             if 'qtrade=' not in line:
-                print('Skipped {}, parsing error.'.__name__)
+                print('Skipped Color_Sector_Names, parsing error.')
                 return
 
-            #Find the x,y,r terms.
+            # Find the x,y,r terms.
             field_dict = Parse_universe_line(line)
 
-            #Determine the sector code in the language file.
-            #This starts with prefix 102.
+            # Determine the sector code in the language file.
+            # This starts with prefix 102.
             id = '102{:02d}{:02d}'.format(
-                #Add 1 to these to match up with the language file.
-                #Put y first.
+                # Add 1 to these to match up with the language file.
+                # Put y first.
                 int(field_dict['y']) +1 , 
                 int(field_dict['x']) +1 )
 
-            #Look up the color letter and store it.
+            # Look up the color letter and store it.
             sector_id_color_dict[id] = Race_color_letters[field_dict['r']]
 
 
-    #Now that all sector names and color codes are recorded, go through the
-    # text files.
-    #This will begin edits in the sector name section, identified by
-    # start and end codes.
-    #Note: a language file may have definitions broken up across multiple
-    # Sectornames blocks with different ids.
+    # Now that all sector names and color codes are recorded, go through the
+    #  text files.
+    # This will begin edits in the sector name section, identified by
+    #  start and end codes.
+    # Note: a language file may have definitions broken up across multiple
+    #  Sectornames blocks with different ids.
     start_code = 'title="Boardcomp. Sectornames"'
     end_code   = '</page>'
 
-    #Loop over the language files to edit.
-    #Try to edit 0001 directly for now; don't use 9961 as intermediary.
+    # Loop over the language files to edit.
+    # Try to edit 0001 directly for now; don't use 9961 as intermediary.
     for text_file_name in ['0001-L044.xml','7027-L044.xml','7360-L044.xml']: #'9961-L044.xml'
         
-        #Break the text into lines, for easier editing.
+        # Break the text into lines, for easier editing.
         file_contents = Load_File(text_file_name)
         line_list = file_contents.text.splitlines()
         start_found = False
 
-        #Loop over the lines by index.
+        # Loop over the lines by index.
         for index, this_line in enumerate(line_list):
 
-            #Skip empty lines (do a quick split to toss white space).
+            # Skip empty lines (do a quick split to toss white space).
             if not this_line.split():
                 continue
             
-            #Look for the start line if not found.
+            # Look for the start line if not found.
             if not start_found:
                 if start_code in this_line:
                     start_found = True
-                #Can skip the rest of this line.
+                # Can skip the rest of this line.
                 continue
 
-            #Look for the end code.
+            # Look for the end code.
             if end_code in this_line:
-                #Unflag the start, so that the loop will search for the
-                # next sector name block (if any).
+                # Unflag the start, so that the loop will search for the
+                #  next sector name block (if any).
                 start_found = False
                 continue
 
-            #Otherwise, this line should be of a format like:
-            # <t id="1020101">Kingdom End</t>
-            #or
-            # <t id="1020117">{7,1020000}</t>
-            #The latter case is a redirection to another line, and
-            # can be ignored for coloring (the line redirected to should
-            # have the color applied). Currently this appears to only be
-            # used for unknown sector for the example colored sectors mod,
-            # though may show up elsewhere in some text files for xrm.
-            #Start by getting the quoted id.
-            #Use regex search, pattern on quotes around numbers.
+            # Otherwise, this line should be of a format like:
+            #  <t id="1020101">Kingdom End</t>
+            # or
+            #  <t id="1020117">{7,1020000}</t>
+            # The latter case is a redirection to another line, and
+            #  can be ignored for coloring (the line redirected to should
+            #  have the color applied). Currently this appears to only be
+            #  used for unknown sector for the example colored sectors mod,
+            #  though may show up elsewhere in some text files for xrm.
+            # Start by getting the quoted id.
+            # Use regex search, pattern on quotes around numbers.
             match_object = re.search(r'"([0-9]*)"', this_line)
             assert match_object != None
-            #The id should be the only match, which can be obtained by
-            # using .group(1) (group 0 is the whole string apparently).
+            # The id should be the only match, which can be obtained by
+            #  using .group(1) (group 0 is the whole string apparently).
             id = match_object.group(1)
 
-            #If there is no color for this sector id, skip it.
-            #(This occurs for eg. Unknown Sector, which has a special code not
-            # assigned to any particular real sector).
+            # If there is no color for this sector id, skip it.
+            # (This occurs for eg. Unknown Sector, which has a special code not
+            #  assigned to any particular real sector).
             if id not in sector_id_color_dict:
                 continue
 
-            #Look up the color letter; it should hopefully be found.
+            # Look up the color letter; it should hopefully be found.
             color = sector_id_color_dict[id]
 
-            #Now look up the right side to wrap in color formatting.
-            #Use regex, pattern on the '>' and '<', numbers, letters, spaces,
-            # braces, parenthesis (use \ to escape them) allowed. Also add
-            # some special chars as needed, eg. ' and ,.
+            # Now look up the right side to wrap in color formatting.
+            # Use regex, pattern on the '>' and '<', numbers, letters, spaces,
+            #  braces, parenthesis (use \ to escape them) allowed. Also add
+            #  some special chars as needed, eg. ' and ,.
             match_object = re.search(r">([A-Za-z0-9\s\(\)/{}',-]*)<", this_line)
             assert match_object != None
             sector_name = match_object.group(1)
 
-            #There may be comments or references in the sector name, but it
-            # should be okay to just wrap it all in the text color blindly.
+            # There may be comments or references in the sector name, but it
+            #  should be okay to just wrap it all in the text color blindly.
 
-            #Do a replacement and put it back.
+            # Do a replacement and put it back.
             line_list[index] = this_line.replace(sector_name, r'\033{}{}\033X'.format(
                 color,
                 sector_name
                 ))
 
-        #Put the lines back. Keep an ending newline, since some original files had that.
+        # Put the lines back. Keep an ending newline, since some original files had that.
         file_contents.text = '\n'.join(line_list)+'\n'
                 
     return
@@ -345,14 +345,15 @@ def Restore_Aldrin_rock():
     sector layout.
     Note: only works on a new game.
     '''
-    #Similar to X3_Director, do a text search and replace.
-    #Since the text is long, put it at the end of this module.
+    # Similar to X3_Director, do a text search and replace.
+    # Since the text is long, put it at the end of this module.
     original_text, replacement_text = Get_Aldrin_rock_texts()
     
     file_contents = Load_File('x3_universe.xml')
-    #Verify the original_block is present (matches succesfully).
+    # Verify the original_block is present (matches succesfully).
     if not file_contents.text.count(original_text) == 1:
-        print('Skipped {}, format of source not as expected from XRM.'.__name__)
+        print('Skipped Restore_Aldrin_rock,'
+              ' format of source not as expected from XRM.')
         return
     file_contents.text = file_contents.text.replace(original_text, replacement_text)
         
@@ -372,27 +373,27 @@ def Restore_Hub_Music(
         and change the music for an existing save game. This is not reversable
         at this time.
     '''
-    #Pick a queue name for this; also use as file name.
+    # Pick a queue name for this; also use as file name.
     cue_name = 'X3_Customizer_Restore_Hub_Music'
 
-    #Clean out old director file if requested.
+    # Clean out old director file if requested.
     if _cleanup:
         Make_Director_Shell(cue_name, _cleanup = True)
         return
 
-    #Do the test replacement, as above, keying off of sector
-    # 13,8, the Hub sector.
+    # Do the test replacement, as above, keying off of sector
+    #  13,8, the Hub sector.
     original_text    = '<o t="1" x="13" y="8" r="14" size="10000000" m="0"'
     replacement_text = '<o t="1" x="13" y="8" r="14" size="10000000" m="8302"'
 
     file_contents = Load_File('x3_universe.xml')
-    #Verify the original_block is present (matches succesfully).
+    # Verify the original_block is present (matches succesfully).
     if not file_contents.text.count(original_text) == 1:
-        print('Skipped {}, format of source not as expected from XRM.'.__name__)
+        print('Skipped Restore_Hub_Music, format of source not as expected from XRM.')
         return
     file_contents.text = file_contents.text.replace(original_text, replacement_text)
 
-    #When a save already has the wrong music, apply a patch.
+    # When a save already has the wrong music, apply a patch.
     if apply_to_existing_save:
         Change_Sector_Music(
             sector_x = 13, 
@@ -400,9 +401,9 @@ def Restore_Hub_Music(
             music_id = 8302, 
             cue_name = cue_name)
     else:
-        #TODO: delete the file made above, if it exists.
-        #May need to add support for a cleanup function to be called for
-        # transforms that were not otherwise used, to clean out old files.
+        # TODO: delete the file made above, if it exists.
+        # May need to add support for a cleanup function to be called for
+        #  transforms that were not otherwise used, to clean out old files.
         pass
 
     
@@ -421,27 +422,27 @@ def Restore_M148_Music(
         and change the music for an existing save game. This is not reversable
         at this time.
     '''
-    #Pick a queue name for this; also use as file name.
+    # Pick a queue name for this; also use as file name.
     cue_name = 'X3_Customizer_Restore_M148_Music'
 
-    #Clean out old director file if requested.
+    # Clean out old director file if requested.
     if _cleanup:
         Make_Director_Shell(cue_name, _cleanup = True)
         return
 
-    #Do the test replacement, as above, keying off of sector
-    # 14,8, the M148 sector.
+    # Do the test replacement, as above, keying off of sector
+    #  14,8, the M148 sector.
     original_text    = '<o t="1" x="14" y="8" r="1" size="22500000" m="8100"'
     replacement_text = '<o t="1" x="14" y="8" r="1" size="22500000" m="8509"'
 
     file_contents = Load_File('x3_universe.xml')
-    #Verify the original_block is present (matches succesfully).
+    # Verify the original_block is present (matches succesfully).
     if not file_contents.text.count(original_text) == 1:
-        print('Skipped {}, format of source not as expected from XRM.'.__name__)
+        print('Skipped Restore_M148_Music, format of source not as expected from XRM.')
         return
     file_contents.text = file_contents.text.replace(original_text, replacement_text)
 
-    #When a save already has the wrong music, apply a patch.
+    # When a save already has the wrong music, apply a patch.
     if apply_to_existing_save:
         Change_Sector_Music(
             sector_x = 14, 
@@ -449,7 +450,7 @@ def Restore_M148_Music(
             music_id = 8509, 
             cue_name = cue_name)
     else:
-        #TODO: delete the file made above, if it exists.
+        # TODO: delete the file made above, if it exists.
         pass
     
 
@@ -458,8 +459,10 @@ def Change_Sector_Music(
         sector_x, 
         sector_y, 
         music_id,
-        cue_name = None, 
-        _cleanup = False
+        cue_name = None,
+        # Do not put _ on cleanup, since it cannot be automated without
+        #  knowing the other input args.
+        cleanup = False
         ):
     '''
     Generic transform to change the music for a given sector.
@@ -477,27 +480,27 @@ def Change_Sector_Music(
       - String, name to use for the director cue and the generated
         file. This should be different than any used earlier in
         a given saved game.
-    * _cleanup:
+    * cleanup:
       - Bool, if True any prior generated file for this cue_name will
         be deleted. This must be done manually since this tool does
         not track files generated on prior runs.
     '''
-    #Clean out old director file if requested.
-    if _cleanup:
+    # Clean out old director file if requested.
+    if cleanup:
         Make_Director_Shell(cue_name, _cleanup = True)
         return
-    #When a save already has the wrong music, apply a patch.
-    #Lay out the body of the director command.
-    #This is packed into a do_all block.
-    #XRMINST.xml does this as well, and can be used as a reference maybe.
-    #The director manual says only x,y needed, which is good since the hub
-    # sector name is unclear.
+    # When a save already has the wrong music, apply a patch.
+    # Lay out the body of the director command.
+    # This is packed into a do_all block.
+    # XRMINST.xml does this as well, and can be used as a reference maybe.
+    # The director manual says only x,y needed, which is good since the hub
+    #  sector name is unclear.
     text = r'<alter_sector x="{}" y="{}" music="{}"/>'.format(
         sector_x,
         sector_y,
         music_id,
         )
-    #Make the file.
+    # Make the file.
     Make_Director_Shell(cue_name, text)
 
     
@@ -506,19 +509,19 @@ def Parse_universe_line(line):
     Parse a line from the universe file.
     Returns a dict, keyed by field name; values are raw text, typically integers.
     '''
-    #Convert the different fields into a dict.
+    # Convert the different fields into a dict.
     field_dict = {}
 
-    #Line format is similar to (with some fields removed): 
-    # <o t="1" x="14" y="10" r="18" size="15000000" m="0" p="-1">
-    #Remove the '<o' and '>', and the quotes.
+    # Line format is similar to (with some fields removed): 
+    #  <o t="1" x="14" y="10" r="18" size="15000000" m="0" p="-1">
+    # Remove the '<o' and '>', and the quotes.
     line = line.replace('<o','').replace('>','').replace('"','')
 
-    #Loop over the entries in the line by splitting on spaces.
+    # Loop over the entries in the line by splitting on spaces.
     for entry in line.split():
-        #Split on the '='.
+        # Split on the '='.
         entry_split = entry.split('=')
-        #The left side is the entry name, right side is value.
+        # The left side is the entry name, right side is value.
         field_dict[entry_split[0]] = entry_split[1]
 
     return field_dict
@@ -526,10 +529,10 @@ def Parse_universe_line(line):
 
 
 def Get_Aldrin_rock_texts():
-    #Texts taken from XRM (called original) and TC plots for AP (called replacement).
-    #Replacement text includes the 'SS_SPECIAL_ASTEROIDMOON', but the entire block is included
-    # since all of the rocks and factories around the Aldrin rock need position adjustments
-    # as well.
+    # Texts taken from XRM (called original) and TC plots for AP (called replacement).
+    # Replacement text includes the 'SS_SPECIAL_ASTEROIDMOON', but the entire block is included
+    #  since all of the rocks and factories around the Aldrin rock need position adjustments
+    #  as well.
     original_text = '''		<o t="2" s="0" neb="0" stars="0"/>
 		<o t="3" s="7" x="177236584" y="-1088110584" z="-1012326949" color="1973775"/>
 		<o t="3" s="41" x="516165787" y="1281056167" z="-122990315" color="1320995"/>

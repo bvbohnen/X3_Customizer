@@ -2,8 +2,8 @@
 Transforms to globals.
 '''
 from File_Manager import *
-import Flags
-
+from Common import Flags
+from collections import OrderedDict
 
 #Transporter distance adjustment.
 #TODO, SG_MAX_DISTANCE_BEAMING

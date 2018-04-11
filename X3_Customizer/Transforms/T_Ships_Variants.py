@@ -6,16 +6,16 @@ probably keying off cases where [basic] is selected, and a specific ship
 is not identified.
 '''
 from File_Manager import *
-from T_Director import *
-import Flags
+from .T_Director import *
+from Common import Flags
 import math
 from collections import defaultdict
 import copy
-from T_Ships import *
-from T_Wares import *
-#-Removed; no longer rely on scripts.
-#from T_Scripts import *
-#from T_Scripts import _Include_Script_To_Update_Ship_Variants
+from .T_Ships import *
+from .T_Wares import *
+# -Removed; no longer rely on scripts.
+# from T_Scripts import *
+# from T_Scripts import _Include_Script_To_Update_Ship_Variants
 
 '''
 Notes on adding new ship variants:
@@ -178,9 +178,9 @@ def Add_Ship_Trade_Variants(
         )
 
     
-#Set up a dict matching variant names to their indices in tships.
-#This is used to parse transform input args; most logic should use
-# indices to stay generic.
+# Set up a dict matching variant names to their indices in tships.
+# This is used to parse transform input args; most logic should use
+#  indices to stay generic.
 variant_name_index_dict = {
     'basic'              : 0,
     'vanguard'           : 1,
@@ -192,20 +192,20 @@ variant_name_index_dict = {
     'tanker'             : 7,
     'tanker xl'          : 14,
     'super freighter xl' : 15,
-    #TODO: maybe include other variants from the base files, but
-    # they are not common enough to really generate ships for.
+    # TODO: maybe include other variants from the base files, but
+    #  they are not common enough to really generate ships for.
     }
-#For convenience, build the reverse lookup dict. -Removed.
+# For convenience, build the reverse lookup dict. -Removed.
 variant_index_type_dict = {x:y for y,x in variant_name_index_dict.items()}
 
 
-#Keep a global dict with the varient modifiers.
-#This is only calculated on the first call, to avoid generated variants
-# from being seen in the analysis in later calls.
+# Keep a global dict with the varient modifiers.
+# This is only calculated on the first call, to avoid generated variants
+#  from being seen in the analysis in later calls.
 variant_id_field_ratios_dict_dict = None
 
-# Global tracker of all ships added in prior transforms, to be
-# included in generated director scripts.
+#  Global tracker of all ships added in prior transforms, to be
+#  included in generated director scripts.
 prior_new_variants = []
 
 
@@ -240,14 +240,14 @@ def Add_Ship_Variants(
         race_types = None,
         price_multiplier = 1,
         blacklist = None,
-        #Set the variants to ignore.
-        #These will not be used in analysis, will not be used as base ships,
-        # and will generally be skipped.
+        # Set the variants to ignore.
+        # These will not be used in analysis, will not be used as base ships,
+        #  and will generally be skipped.
         variant_indices_to_ignore = [
-            #Avoid mk 1 ships, so as not to make variants of them, as that
-            # gets confusing. Eg. 'colossus mk 1' becomes 'colossus raider'
-            # because the variant flag gets overwritten.
-            #This is mostly for xrm.
+            # Avoid mk 1 ships, so as not to make variants of them, as that
+            #  gets confusing. Eg. 'colossus mk 1' becomes 'colossus raider'
+            #  because the variant flag gets overwritten.
+            # This is mostly for xrm.
             8,
             ],
         variant_indices_to_reset_on_base_ships = [
@@ -361,119 +361,119 @@ def Add_Ship_Variants(
     '''
     global prior_new_variants
     
-    # Location for the director script that will load the new ships.
-    # This should match the cue name.
+    #  Location for the director script that will load the new ships.
+    #  This should match the cue name.
     director_loader_base_name = 'X3_Customizer_Update_Variants'
     director_loader_path = os.path.join('director', director_loader_base_name+'.xml')
 
-    # General cleanup code to delete old files.
+    #  General cleanup code to delete old files.
     if _cleanup:
         if os.path.exists(director_loader_path):
             os.remove(director_loader_path)
         return
 
 
-    # To add the variants to shipyards in game, a script has been set
-    # up for running from the game script editor.
-    # This is a shared called with Remove_Ship_Variants, adding the
-    # script if either transform gets used.
-    # -Removed, switching to director script style.
-    #_Include_Script_To_Update_Ship_Variants()
+    #  To add the variants to shipyards in game, a script has been set
+    #  up for running from the game script editor.
+    #  This is a shared called with Remove_Ship_Variants, adding the
+    #  script if either transform gets used.
+    #  -Removed, switching to director script style.
+    # _Include_Script_To_Update_Ship_Variants()
 
 
-    # Fix some tships inconsistencies with variant numbers, if needed.
+    #  Fix some tships inconsistencies with variant numbers, if needed.
     if prepatch_ship_variant_inconsistencies:
-        #Include the xrm fixes as well, by default.
+        # Include the xrm fixes as well, by default.
         Patch_Ship_Variant_Inconsistencies(include_xrm_fixes = True)
             
     
-    #Make an empty blacklist list if needed.
+    # Make an empty blacklist list if needed.
     if blacklist == None:
         blacklist = []
         
-    #Translate the input variant names to indices.
-    #Catch any error and return early.
+    # Translate the input variant names to indices.
+    # Catch any error and return early.
     error = _Standardize_Variant_Types_List(variant_types)
     if error:
         return
 
-    #Rename to clarify these as indices.
+    # Rename to clarify these as indices.
     variant_indices_to_generate = variant_types
                 
-    #Suffixes to use for generated ship naming.
+    # Suffixes to use for generated ship naming.
     variant_index_suffix_dict = _Get_Variant_Suffixes()
 
-    #Set up a list of mining equipment to add to mining variants.
-    #Goal is to correct the cost adjustment to subtract off mining gear,
-    # then add it back later.
-    #TODO: look this up dynamically, in case mods swap miners around,
-    # or other custom equipment needs to be captured.
-    # For now, miners are a special case.
+    # Set up a list of mining equipment to add to mining variants.
+    # Goal is to correct the cost adjustment to subtract off mining gear,
+    #  then add it back later.
+    # TODO: look this up dynamically, in case mods swap miners around,
+    #  or other custom equipment needs to be captured.
+    #  For now, miners are a special case.
     mining_equipment = [
-        #For now, hardcode these.
+        # For now, hardcode these.
         'SS_WARE_ORECOLLECTOR',
         'SS_WARE_TECH275', #Mineral scanner.
         'SS_WARE_SW_SPECIAL_1', #Special command software
         ]
 
-    #Get the cost of equipment for miners.
-    #-Not needed; equipment cost is not part of ship base price, but gets
-    # added at purchase time, so don't worry about it here.
-    #miner_cost_adjustment = Get_Ware_Cost(mining_equipment)
+    # Get the cost of equipment for miners.
+    # -Not needed; equipment cost is not part of ship base price, but gets
+    #  added at purchase time, so don't worry about it here.
+    # miner_cost_adjustment = Get_Ware_Cost(mining_equipment)
 
 
-    #Note the variation indices belonging to some of the redundantly
-    # suffixed ships, eg. hyperion vanguard and notus hauler.
-    #These can get replaced with 0 when no basic version is available
-    # and the base ship used had one of that variant ids.
-    #The main goal is to avoid having eg. two Hyperion Vaguard ships,
-    # one with id 16 and one with the normal id.
-    #redundant_variant_indices = [
-    #    16, #Vanguard
-    #    19, #Hauler
-    #    ]
-    #Update: this is not consistent across mods. Switch to just allowing
-    # any ship not in the user variant list to be selected as a new
-    # base (with preference for variant 20).
+    # Note the variation indices belonging to some of the redundantly
+    #  suffixed ships, eg. hyperion vanguard and notus hauler.
+    # These can get replaced with 0 when no basic version is available
+    #  and the base ship used had one of that variant ids.
+    # The main goal is to avoid having eg. two Hyperion Vaguard ships,
+    #  one with id 16 and one with the normal id.
+    # redundant_variant_indices = [
+    #     16, #Vanguard
+    #     19, #Hauler
+    #     ]
+    # Update: this is not consistent across mods. Switch to just allowing
+    #  any ship not in the user variant list to be selected as a new
+    #  base (with preference for variant 20).
 
 
-    #Set the ship types that will be used for analysis of each
-    # variant type.
-    #The main goal here is to omit some outliers, such as the sentinel
-    # varients in xrm for transports and corvettes which involves heavy
-    # modifications to turrets/etc. which aren't easily captured.
-    #Note: this isn't super safe across heavy modding, but it is 
-    # probably good for the general case to improve results, 
-    # eg. have more reasonable sentinels.
-    #TODO: maybe swap to checking which ship type is most common
-    # for each variant, and using that instead (or maybe the
-    # 2 most common). This might backfire for eg. xrm sentinels,
-    # though, if they are more numerous than any individual
-    # fighter type, so fighters would need to be lumped together.
+    # Set the ship types that will be used for analysis of each
+    #  variant type.
+    # The main goal here is to omit some outliers, such as the sentinel
+    #  varients in xrm for transports and corvettes which involves heavy
+    #  modifications to turrets/etc. which aren't easily captured.
+    # Note: this isn't super safe across heavy modding, but it is 
+    #  probably good for the general case to improve results, 
+    #  eg. have more reasonable sentinels.
+    # TODO: maybe swap to checking which ship type is most common
+    #  for each variant, and using that instead (or maybe the
+    #  2 most common). This might backfire for eg. xrm sentinels,
+    #  though, if they are more numerous than any individual
+    #  fighter type, so fighters would need to be lumped together.
     analysis_combat_ship_types = [
-        #Focus on fighters, the main ship type with variants.
+        # Focus on fighters, the main ship type with variants.
         'SG_SH_M3',
         'SG_SH_M4',
         'SG_SH_M5',
         ]
     analysis_trade_ship_types = [
         'SG_SH_TS',
-        #Could ignore TPs, but hauler is a common variant.
+        # Could ignore TPs, but hauler is a common variant.
         'SG_SH_TP',
         ]
-    #Build a convenience dict matching variants to ship types.
+    # Build a convenience dict matching variants to ship types.
     variant_analysis_ship_type_list_dict = {
         variant_name_index_dict['vanguard']           : analysis_combat_ship_types,
         variant_name_index_dict['sentinel']           : analysis_combat_ship_types,
         variant_name_index_dict['raider']             : analysis_combat_ship_types,
-        #Hauler will compare against combat and/or trade ships.
-        #In practice, trade ships in xrm have too big a buff from
-        # the hauler suffix (mostly in massive shield boosts), which
-        # doesn't map well to combat ships (where shields get super
-        # important).
-        #Scale using only combat ships for this, which feels much
-        # better (balanced and thematic, with haulers getting more
-        # cargo and a small shield buff for penalties most elsewhere).
+        # Hauler will compare against combat and/or trade ships.
+        # In practice, trade ships in xrm have too big a buff from
+        #  the hauler suffix (mostly in massive shield boosts), which
+        #  doesn't map well to combat ships (where shields get super
+        #  important).
+        # Scale using only combat ships for this, which feels much
+        #  better (balanced and thematic, with haulers getting more
+        #  cargo and a small shield buff for penalties most elsewhere).
         variant_name_index_dict['hauler']             : analysis_combat_ship_types,
         variant_name_index_dict['miner']              : analysis_trade_ship_types,
         variant_name_index_dict['super freighter']    : analysis_trade_ship_types,
@@ -483,7 +483,7 @@ def Add_Ship_Variants(
         }
 
 
-    #Define the race ships which will be analyzed for setting modifiers.
+    # Define the race ships which will be analyzed for setting modifiers.
     races_for_modifiers = [
         'Argon', 
         'Boron', 
@@ -498,78 +498,78 @@ def Add_Ship_Variants(
         'Terran', 
         'Yaki',
         ]
-    #If a race_list wasn't given, set it to the above.
+    # If a race_list wasn't given, set it to the above.
     if race_types == None:
         race_types = races_for_modifiers
 
 
-    #Build a list of all ship names.
-    #This is used later to ensure generated names have no conflicts
-    # with existing names.
+    # Build a list of all ship names.
+    # This is used later to ensure generated names have no conflicts
+    #  with existing names.
     ship_names_list = []
     for ship_dict in Load_File('TShips.txt'):
         ship_names_list.append(ship_dict['name'])
 
     
-    #Build a (name,race) : variant index : ship_list dictionary.
-    #The stored ships will use their line dicts, for easier analysis.
-    #Variant index is used instead of type, since some indices may not
-    # be named above (eg. heavy/advanced variants).
-    #To distinguish ships of the same general type, the name_id will be used,
-    # and race is appended to distinguish pirate variants from others.
-    # Eg. all standard Mercury variants use the same name_id, despite
-    # having different internal names, so this will gather all Mercuries 
-    # together.
+    # Build a (name,race) : variant index : ship_list dictionary.
+    # The stored ships will use their line dicts, for easier analysis.
+    # Variant index is used instead of type, since some indices may not
+    #  be named above (eg. heavy/advanced variants).
+    # To distinguish ships of the same general type, the name_id will be used,
+    #  and race is appended to distinguish pirate variants from others.
+    #  Eg. all standard Mercury variants use the same name_id, despite
+    #  having different internal names, so this will gather all Mercuries 
+    #  together.
     name_variant_id_ship_dict_dict_dict = defaultdict(dict)
     for ship_dict in Load_File('TShips.txt'):
 
-        #Skip those without cargo.
+        # Skip those without cargo.
         if int(ship_dict['cargo_min']) == 0:
             continue
-        #Skip those without extensions.
+        # Skip those without extensions.
         if int(ship_dict['speed_tunings']) == 0:
             continue
         if int(ship_dict['rudder_tunings']) == 0:
             continue
-        #Skip those not of a standard race.
+        # Skip those not of a standard race.
         race_type = Flags.Race_code_name_dict[int(ship_dict['race'])]
         if race_type not in races_for_modifiers:
             continue
-        #Skip those blacklisted.
+        # Skip those blacklisted.
         if ship_dict['name'] in blacklist:
             continue
         
-        #Grab the variant index.
+        # Grab the variant index.
         variation_index = int(ship_dict['variation_index'])
 
-        #If this is an index to ignore, skip it.
+        # If this is an index to ignore, skip it.
         if variation_index in variant_indices_to_ignore:
             continue
 
-        #If not including advanced/misc variants as base, ignore
-        # them here.
-        #This will only prune out the 20 variant.
-        #-Removed, unnecessary, skipping is handled later.
-        #if not include_advanced_ships and variation_index == 20:
-        #and variation_index not in variant_index_type_dict):
-        #    continue
+        # If not including advanced/misc variants as base, ignore
+        #  them here.
+        # This will only prune out the 20 variant.
+        # -Removed, unnecessary, skipping is handled later.
+        # if not include_advanced_ships and variation_index == 20:
+        # and variation_index not in variant_index_type_dict):
+        #     continue
 
-        #Determine the name tuple for this ship.
-        #Combine name_id with race.
+        # Determine the name tuple for this ship.
+        # Combine name_id with race.
         key = (ship_dict['name_id'], race_type)
 
-        #Error if a ship with this key already found somehow, eg. the
-        # same race has another ship of the same name and variant.
+        # Error if a ship with this key already found somehow, eg. the
+        #  same race has another ship of the same name and variant.
         assert variation_index not in name_variant_id_ship_dict_dict_dict[key]
         
-        #Everything else should be fairly safe to add in.
+        # Everything else should be fairly safe to add in.
         name_variant_id_ship_dict_dict_dict[key][variation_index] = ship_dict
 
 
     
-    #Define the fields being modified.
-    #Aim to use existing field names where reasonable, though shielding will
-    # need special handling to deal with cases where shield type changes.
+    # Define the fields being modified.
+    # Aim to use existing field names where reasonable, though shielding will
+    #  need special handling to deal with cases where shield type changes.
     fields_to_modify = [
         'yaw',
         'pitch',
@@ -579,34 +579,34 @@ def Add_Ship_Variants(
         'shield_power',
         'weapon_energy',
         'weapon_recharge_factor',
-        #To be safe, check speed/rudder extensions, since these appear to
-        # vary on some pirate variants.
-        #It may be best to wrap these into speed/turning directly.
-        #-Removed, handled with speed and turning.
-        #'speed_tunings',
-        #'rudder_tunings',
-        #It is possible that cargo min may get boosted on average more
-        # than cargo max, which for select ships could make the min
-        # overtake the max.  Fix that below at some point.
+        # To be safe, check speed/rudder extensions, since these appear to
+        #  vary on some pirate variants.
+        # It may be best to wrap these into speed/turning directly.
+        # -Removed, handled with speed and turning.
+        # 'speed_tunings',
+        # 'rudder_tunings',
+        # It is possible that cargo min may get boosted on average more
+        #  than cargo max, which for select ships could make the min
+        #  overtake the max.  Fix that below at some point.
         'cargo_min',
         'cargo_max',
         'hull_strength',
         'angular_acceleration',
-        #Both values should be the same, but easier to modify separately
-        # to avoid a special case.
+        # Both values should be the same, but easier to modify separately
+        #  to avoid a special case.
         'relative_value_npc',
         'relative_value_player',
-        #Shielding will be a special case, relying on both
-        # shield_type and max_shields.
+        # Shielding will be a special case, relying on both
+        #  shield_type and max_shields.
         'shielding',
-        #To handle tankers in xrm, also track ware size changes.
-        #Without reducing this, tankers are overpowered a bit.
+        # To handle tankers in xrm, also track ware size changes.
+        # Without reducing this, tankers are overpowered a bit.
         'cargo_size',
         ]
 
-    #For ease later, ensure the shield_conversion_ratios entries map to
-    # the fields 1:1.  Most of them will map, but a couple were simplified
-    # for user input.
+    # For ease later, ensure the shield_conversion_ratios entries map to
+    #  the fields 1:1.  Most of them will map, but a couple were simplified
+    #  for user input.
     if 'cargo' in shield_conversion_ratios:
         shield_conversion_ratios['cargo_min'] = shield_conversion_ratios['cargo']
         shield_conversion_ratios['cargo_max'] = shield_conversion_ratios['cargo']
@@ -615,61 +615,61 @@ def Add_Ship_Variants(
         shield_conversion_ratios['relative_value_player'] = shield_conversion_ratios['price']
 
     
-    #Can now gather the variation statistics.
-    #Check if the global dict has these already.  If not, need to calculate
-    # them on the first call.
+    # Can now gather the variation statistics.
+    # Check if the global dict has these already.  If not, need to calculate
+    #  them on the first call.
     global variant_id_field_ratios_dict_dict
     if variant_id_field_ratios_dict_dict == None:
 
-        #Note that some variant ship lists may be very sparse, maybe
-        # only one entry for special cases. This code should work in
-        # those cases regardless.
+        # Note that some variant ship lists may be very sparse, maybe
+        #  only one entry for special cases. This code should work in
+        #  those cases regardless.
     
-        #Goal is to build a list of ratios for each variant type and each
-        # variant field. Eg. ['raider']['speed'] = [1.1, 1.15], from
-        # which averages can be calculated later.
-        #Populate this with initial entries for all variants.
+        # Goal is to build a list of ratios for each variant type and each
+        #  variant field. Eg. ['raider']['speed'] = [1.1, 1.15], from
+        #  which averages can be calculated later.
+        # Populate this with initial entries for all variants.
         variant_id_field_ratios_list_dict_dict = defaultdict(lambda: defaultdict(list))
 
-        #Loop over the ship names and their variants.
+        # Loop over the ship names and their variants.
         for ship_name, variant_id_ship_dict_dict in name_variant_id_ship_dict_dict_dict.items():
 
-            #If there is no base variant to compare against, skip.
-            #This occurs for heavy ships or similar.
+            # If there is no base variant to compare against, skip.
+            # This occurs for heavy ships or similar.
             if 0 not in variant_id_ship_dict_dict:
                 continue
             basic_dict = variant_id_ship_dict_dict[0]
             
 
-            #Loop over all variants, not just those being added.
-            #Since this is only run once, it needs to gather everything
-            # needed for any future transform calls.
-            #Cover everything from 1-19.
+            # Loop over all variants, not just those being added.
+            # Since this is only run once, it needs to gather everything
+            #  needed for any future transform calls.
+            # Cover everything from 1-19.
             for variant_index in range(1,20):
 
-                #Skip if this ship type is not being used in analysis of this
-                # variant type.
-                #When a type list is not available, all types are allowed.
+                # Skip if this ship type is not being used in analysis of this
+                #  variant type.
+                # When a type list is not available, all types are allowed.
                 if variant_index in variant_analysis_ship_type_list_dict:
                     if basic_dict['subtype'] not in variant_analysis_ship_type_list_dict[variant_index]:
                         continue
 
-                #Skip if this variant not present for this ship.
+                # Skip if this variant not present for this ship.
                 if variant_index not in variant_id_ship_dict_dict:
                     continue
                 variant_dict = variant_id_ship_dict_dict[variant_index]
 
-                #Can now grab ratios, since both the variant and the base
-                # ship exist.
-                #Loop over the fields of interest.
+                # Can now grab ratios, since both the variant and the base
+                #  ship exist.
+                # Loop over the fields of interest.
                 for field in fields_to_modify:
 
-                    #Grab the value for the base ship and the variant.
-                    #Special handling on shields.
+                    # Grab the value for the base ship and the variant.
+                    # Special handling on shields.
                     if field == 'shielding':
-                        #Calculate shielding for basic and variant.
-                        #This has some copy/paste, but not worth trying to
-                        # set up code sharing on this.
+                        # Calculate shielding for basic and variant.
+                        # This has some copy/paste, but not worth trying to
+                        #  set up code sharing on this.
                         basic_shield_slots = int(basic_dict['max_shields'])
                         basic_shield_size  = Flags.Shield_type_size_dict[
                                 int(basic_dict['shield_type'])]
@@ -680,43 +680,43 @@ def Add_Ship_Variants(
                                 int(variant_dict['shield_type'])]
                         variant_value = variant_shield_slots * variant_shield_size
 
-                    #Special handling on speed tuning related values.
+                    # Special handling on speed tuning related values.
                     elif field in ['speed', 'acceleration']:
-                        #Wrap tunings into the values, to capture their variation
-                        # at the same time.
+                        # Wrap tunings into the values, to capture their variation
+                        #  at the same time.
                         basic_value   = (int(basic_dict[field]) 
                                          * (1 + int(basic_dict['speed_tunings'])/10))
                         variant_value = (int(variant_dict[field]) 
                                          * (1 + int(variant_dict['speed_tunings'])/10))
                     
 
-                    #Special handling on rudder tuning related values.
-                    #TODO: Should angular acceleration be included here?
+                    # Special handling on rudder tuning related values.
+                    # TODO: Should angular acceleration be included here?
                     elif field in ['yaw', 'pitch', 'roll']:
-                        #Wrap tunings into the values, to capture their variation
-                        # at the same time.
+                        # Wrap tunings into the values, to capture their variation
+                        #  at the same time.
                         basic_value   = (float(basic_dict[field]) 
                                          * (1 + int(basic_dict['rudder_tunings'])/10))
                         variant_value = (float(variant_dict[field]) 
                                          * (1 + int(variant_dict['rudder_tunings'])/10))
 
 
-                    #-Removed; equipment is not part of base cost, so no special
-                    # adjustment needed here for miners.
+                    # -Removed; equipment is not part of base cost, so no special
+                    #  adjustment needed here for miners.
                     ##Special handling on value/cost, if this is a miner.
-                    #elif (field in ['relative_value_npc', 'relative_value_player']
-                    #and variant_type == 'miner'):
-                    #    #Get the normal values.
-                    #    basic_value   = int(basic_dict[field])
-                    #    variant_value = int(variant_dict[field])
-                    #    #Subtract off the mining equipment pricing from
-                    #    # the variant.
-                    #    ...
+                    # elif (field in ['relative_value_npc', 'relative_value_player']
+                    # and variant_type == 'miner'):
+                    #     #Get the normal values.
+                    #     basic_value   = int(basic_dict[field])
+                    #     variant_value = int(variant_dict[field])
+                    #     #Subtract off the mining equipment pricing from
+                    #     # the variant.
+                    #     ...
                     
                     else:
-                        #Grab the field values directly.
-                        #Might be int or float, try both.
-                        #TODO: think about how to put back correctly.
+                        # Grab the field values directly.
+                        # Might be int or float, try both.
+                        # TODO: think about how to put back correctly.
                         try:
                             basic_value   = int(basic_dict[field])
                             variant_value = int(variant_dict[field])
@@ -724,65 +724,65 @@ def Add_Ship_Variants(
                             basic_value   = float(basic_dict[field])
                             variant_value = float(variant_dict[field])
 
-                    #This could be 0 in the special case of cargo size.
-                    #Manually handle that case.
+                    # This could be 0 in the special case of cargo size.
+                    # Manually handle that case.
                     if basic_value == 0:
                         ratio = 1
                     else:
                         ratio = variant_value / basic_value
 
-                    #Some debug checks for oddball cases.
+                    # Some debug checks for oddball cases.
                     if field == 'speed_tunings' and ratio != 1:
                         stop = 1
                     if field == 'rudder_tunings' and ratio != 1:
                         stop = 1
-                    #There may be an odd outlier on one of the metrics.
+                    # There may be an odd outlier on one of the metrics.
                     if ratio > 20:
                         stop = 1
 
-                    #Calculate the ratio and store it.
+                    # Calculate the ratio and store it.
                     variant_id_field_ratios_list_dict_dict[variant_index][field].append(ratio)
 
-                #TODO:
-                #Gather ship ware lists, and look for differences.
-                #Eg. miner variants should have extra mining equipment.
+                # TODO:
+                # Gather ship ware lists, and look for differences.
+                # Eg. miner variants should have extra mining equipment.
 
 
-        #From the lists, can now calculate average ratios.
+        # From the lists, can now calculate average ratios.
         variant_id_field_ratios_dict_dict = {}
-        #Loop over the variants.
+        # Loop over the variants.
         for variant_index, field_ratios_list_dict in variant_id_field_ratios_list_dict_dict.items():
-            #Set up a dict for this variant.
+            # Set up a dict for this variant.
             variant_id_field_ratios_dict_dict[variant_index] = {}
 
-            #Prune any outliers.
-            #XRM, for instance, has sentinel versions of transports that
-            # have very large ratios on weapon energy (>200x or so).
-            #Anything that varies by more than 10x, either direction, will
-            # get pruned. Some super freighters and such can vary by
-            # 6x or so on shields or cost.
+            # Prune any outliers.
+            # XRM, for instance, has sentinel versions of transports that
+            #  have very large ratios on weapon energy (>200x or so).
+            # Anything that varies by more than 10x, either direction, will
+            #  get pruned. Some super freighters and such can vary by
+            #  6x or so on shields or cost.
             outlier_max = 10
             outlier_min = 1/outlier_max
 
-            #To determine the ships to ignore, get the indices, so that
-            # all field lists can skip the right entries.
+            # To determine the ships to ignore, get the indices, so that
+            #  all field lists can skip the right entries.
             indices_to_skip = set()
-            #Loop over the fields and ratios to check them.
+            # Loop over the fields and ratios to check them.
             for field, ratio_list in field_ratios_list_dict.items():
 
-                #Special case: allow price outliers.
+                # Special case: allow price outliers.
                 if field in ['relative_value_npc', 'relative_value_player']:
                     continue
 
                 for ratio_index, ratio in enumerate(ratio_list):
-                    #Skip if this is an outlier.
+                    # Skip if this is an outlier.
                     if ratio > outlier_max or ratio < outlier_min:
                         indices_to_skip.add(ratio_index)
 
 
-            #Loop over the fields and ratio lists again.
+            # Loop over the fields and ratio lists again.
             for field, ratio_list in field_ratios_list_dict.items():
-                #Get all entries that are not being skipped.
+                # Get all entries that are not being skipped.
                 ratios_to_average = [x 
                                      for i,x in enumerate(ratio_list) 
                                      if i not in indices_to_skip]
@@ -791,26 +791,26 @@ def Add_Ship_Variants(
 
 
 
-        #Apply a special fix for cargo min/max, unifying the ratios so
-        # that adjustments can be made safely to all ships (eg. those with
-        # min and max set the same).
-        #These changes could be averaged, but that may lead to oddities,
-        # eg. if min changes a lot and max does not, this will result in
-        # an excessive boost to max.
-        #For now, just apply the max ratio to the min.
+        # Apply a special fix for cargo min/max, unifying the ratios so
+        #  that adjustments can be made safely to all ships (eg. those with
+        #  min and max set the same).
+        # These changes could be averaged, but that may lead to oddities,
+        #  eg. if min changes a lot and max does not, this will result in
+        #  an excessive boost to max.
+        # For now, just apply the max ratio to the min.
         for field_ratios_dict in variant_id_field_ratios_dict_dict.values():
-            #cargo_ratio = field_ratios_dict['cargo_min'] + field_ratios_dict['cargo_max']/2
+            # cargo_ratio = field_ratios_dict['cargo_min'] + field_ratios_dict['cargo_max']/2
             field_ratios_dict['cargo_min'] = field_ratios_dict['cargo_max']
                 
 
-    #Print these out if desired.
+    # Print these out if desired.
     if print_variant_modifiers:
         Write_Summary_Line('\nShip variant modifiers:')
 
         for variant_id, field_ratios_dict in sorted(variant_id_field_ratios_dict_dict.items()):
             Write_Summary_Line('  Variant {} ({})'.format(
                 variant_id,
-                #Give the variant name as well, if known.
+                # Give the variant name as well, if known.
                 variant_index_type_dict[variant_id] 
                 if variant_id in variant_index_type_dict 
                 else ''
@@ -820,260 +820,260 @@ def Add_Ship_Variants(
 
 
 
-    #Now that the modifiers are known, need to determine the base ships to
-    # add variants for.
-    #Keep a list of the new ships being created.
+    # Now that the modifiers are known, need to determine the base ships to
+    #  add variants for.
+    # Keep a list of the new ships being created.
     new_ships_list = []
-    #Keep a list of the new miner variants, which will have an ore collector
-    # and mineral scanner and special command software added as built-in equipment.
-    #TODO: These should also have the mobile drilling system added as a compatibility
-    # if possible, though that can be kicked down the road.
+    # Keep a list of the new miner variants, which will have an ore collector
+    #  and mineral scanner and special command software added as built-in equipment.
+    # TODO: These should also have the mobile drilling system added as a compatibility
+    #  if possible, though that can be kicked down the road.
     new_miners_list = []
 
-    #Loop over the ship names.
-    #Each gets considered separately.
+    # Loop over the ship names.
+    # Each gets considered separately.
     for name_id, variant_id_ship_dict_dict in name_variant_id_ship_dict_dict_dict.items():
 
-        #The base variant will either be the actual base, or potentially
-        # a non-standard variant (eg. heavy/20 or special hauler/19).
+        # The base variant will either be the actual base, or potentially
+        #  a non-standard variant (eg. heavy/20 or special hauler/19).
         if 0 in variant_id_ship_dict_dict:
             basic_dict = variant_id_ship_dict_dict[0]
 
-        #If not allowing advanced ships to act as a base, skip variants
-        # for this ship.
+        # If not allowing advanced ships to act as a base, skip variants
+        #  for this ship.
         elif not include_advanced_ships:
             continue
 
-        #Favor the 20 case as an alternative.
+        # Favor the 20 case as an alternative.
         elif 20 in variant_id_ship_dict_dict:
-            #Do not need to reclassify this as variant 0; it shouldn't
-            # have a suffix (the 0001 test file doesn't go high enough
-            # for a 20 suffix).
+            # Do not need to reclassify this as variant 0; it shouldn't
+            #  have a suffix (the 0001 test file doesn't go high enough
+            #  for a 20 suffix).
             basic_dict = variant_id_ship_dict_dict[20]
 
-        #Two options here: find any existing variant, or try to find
-        # a variant not being added in this call.
-        #The latter might work, and was tried before, but the former is
-        # probably more straightforward.
+        # Two options here: find any existing variant, or try to find
+        #  a variant not being added in this call.
+        # The latter might work, and was tried before, but the former is
+        #  probably more straightforward.
         else:
-            #Pick the highest variant index in general.
+            # Pick the highest variant index in general.
             basic_dict = None
             for test_index in range(19,0,-1):
                 if test_index in variant_id_ship_dict_dict:
                     basic_dict = variant_id_ship_dict_dict[test_index]
                     break
 
-            #If here, it is possible a mod added ships with higher
-            # variants, eg. explorers in xrm being variant 25.
-            #Just skip these cases.
+            # If here, it is possible a mod added ships with higher
+            #  variants, eg. explorers in xrm being variant 25.
+            # Just skip these cases.
             if basic_dict == None:
                 continue
                 
-            #Maybe reclassify this as variant 0, the base.
-            #This will also stip off redundant suffixes from some ships.
-            #Eg. if basing off Hyperion Vanguard, change it to Hyperion
-            # before making variants.
-            #Control this from an input arg, since this feature is somewhat
-            # unsafe if a mod is using non-standard variants to control
-            # ship spawning, and so should be kept minimalist.
+            # Maybe reclassify this as variant 0, the base.
+            # This will also stip off redundant suffixes from some ships.
+            # Eg. if basing off Hyperion Vanguard, change it to Hyperion
+            #  before making variants.
+            # Control this from an input arg, since this feature is somewhat
+            #  unsafe if a mod is using non-standard variants to control
+            #  ship spawning, and so should be kept minimalist.
             if test_index in variant_indices_to_reset_on_base_ships:
                 basic_dict['variation_index'] = str(0)
-                #Update the variant_id_ship_dict_dict to reflect this change,
-                # in case it matters ever.
+                # Update the variant_id_ship_dict_dict to reflect this change,
+                #  in case it matters ever.
                 del(variant_id_ship_dict_dict[test_index])
                 variant_id_ship_dict_dict[0] = basic_dict
-                #TODO: maybe print a warning about the replacement.
+                # TODO: maybe print a warning about the replacement.
 
 
-        #-Removed; this method tried to find a ship not having a variant
-        # generated to use as the base.
+        # -Removed; this method tried to find a ship not having a variant
+        #  generated to use as the base.
         ##Looking up non-standard variants is kinda tricky to do programmatically.
         ##Can convert the variant type keys into sets, and look for difference.
-        #elif set(variant_id_ship_dict_dict) - set(variant_index_type_dict):
-        #
-        #    #Find the first non-standard variant.
-        #    #To ensure this is the same on every run (in case there are
-        #    # several to pick from), sort by variant index.
-        #    basic_dict = None
-        #    for variant_index, basic_dict in sorted(variant_id_ship_dict_dict.items()):
-        #        if variant_index not in variant_index_type_dict:
-        #            break
-        #    #Error check.
-        #    assert basic_dict != None
-        #    #This shouldn't occur unless advanced ships were included.
-        #    assert include_advanced_ships
-        #
-        #    #If this has a redundant variant index, can assign it to 0 to
-        #    # avoid a generated variant having overlap with the redundant
-        #    # name, or possibly to 20 to clarify it as special.
-        #    # Go with 0 for now.
-        #    #Eg. if basing off Hyperion Vanguard, change it to Hyperion
-        #    # before making variants.
-        #    if int(basic_dict['variation_index']) in redundant_variant_indices:
-        #        basic_dict['variation_index'] = str(0)
-        #        del(variant_id_ship_dict_dict[variant_index])
-        #        variant_id_ship_dict_dict[0] = basic_dict
-        #
-        #else:
-        #    #Nothing was found for the base type.
-        #    #Here, a base will need to be generated be downscaling an existing
-        #    # variant.
-        #    #TODO. Just print a quick warning for now and skip ahead.
-        #    # This did not come up during testing, but may occur for some
-        #    # mod combo out there.
-        #    print('Warning, no basic version found for {}, skipping'.format
-        #          (name_id))
-        #    continue
+        # elif set(variant_id_ship_dict_dict) - set(variant_index_type_dict):
+        # 
+        #     #Find the first non-standard variant.
+        #     #To ensure this is the same on every run (in case there are
+        #     # several to pick from), sort by variant index.
+        #     basic_dict = None
+        #     for variant_index, basic_dict in sorted(variant_id_ship_dict_dict.items()):
+        #         if variant_index not in variant_index_type_dict:
+        #             break
+        #     #Error check.
+        #     assert basic_dict != None
+        #     #This shouldn't occur unless advanced ships were included.
+        #     assert include_advanced_ships
+        # 
+        #     #If this has a redundant variant index, can assign it to 0 to
+        #     # avoid a generated variant having overlap with the redundant
+        #     # name, or possibly to 20 to clarify it as special.
+        #     # Go with 0 for now.
+        #     #Eg. if basing off Hyperion Vanguard, change it to Hyperion
+        #     # before making variants.
+        #     if int(basic_dict['variation_index']) in redundant_variant_indices:
+        #         basic_dict['variation_index'] = str(0)
+        #         del(variant_id_ship_dict_dict[variant_index])
+        #         variant_id_ship_dict_dict[0] = basic_dict
+        # 
+        # else:
+        #     #Nothing was found for the base type.
+        #     #Here, a base will need to be generated be downscaling an existing
+        #     # variant.
+        #     #TODO. Just print a quick warning for now and skip ahead.
+        #     # This did not come up during testing, but may occur for some
+        #     # mod combo out there.
+        #     print('Warning, no basic version found for {}, skipping'.format
+        #           (name_id))
+        #     continue
 
 
-        #TODO:
-        #Consider pruning out any redundant_variant_indices somehow, perhaps
-        # converting them to standard indices if there was a proper base
-        # version of the ship.
-        #Eg. vanilla has a kite and kite vanguard (index 16), where the vanguard
-        # could be swapped to index 1 to fill the role of the standard vanguard,
-        # blocking generation of a new one.
-        #In this case, only the swap in the variant_id_ship_dict_dict is
-        # needed; the ship itself can remain 16.
-        #The problem with this is that some of these special variants don't
-        # actually exist in game, resulting in a gap in the generated
-        # variants needlessly, eg. with the colossus hauler.
-        #The other problem is that in some cases the variant is excessively
-        # powerful and probably best ignored if possible, eg. with the kite
-        # vanguard.
-        #For now, just allow redundancies.
+        # TODO:
+        # Consider pruning out any redundant_variant_indices somehow, perhaps
+        #  converting them to standard indices if there was a proper base
+        #  version of the ship.
+        # Eg. vanilla has a kite and kite vanguard (index 16), where the vanguard
+        #  could be swapped to index 1 to fill the role of the standard vanguard,
+        #  blocking generation of a new one.
+        # In this case, only the swap in the variant_id_ship_dict_dict is
+        #  needed; the ship itself can remain 16.
+        # The problem with this is that some of these special variants don't
+        #  actually exist in game, resulting in a gap in the generated
+        #  variants needlessly, eg. with the colossus hauler.
+        # The other problem is that in some cases the variant is excessively
+        #  powerful and probably best ignored if possible, eg. with the kite
+        #  vanguard.
+        # For now, just allow redundancies.
         
 
-        #Skip if this is not a ship type to modify.
+        # Skip if this is not a ship type to modify.
         if (basic_dict['subtype'] not in ship_types
         and basic_dict['name'] not in ship_types):
             continue
 
-        # Skip if this is not a race to add variants for.
+        #  Skip if this is not a race to add variants for.
         race_type = Flags.Race_code_name_dict[int(basic_dict['race'])]
         if race_type not in race_types:
             continue
 
-        #With the base type selected, can now start filling in the variants.
-        #Loop over the variants being added.
+        # With the base type selected, can now start filling in the variants.
+        # Loop over the variants being added.
         for variant_index in variant_indices_to_generate:
 
-            #Can skip this if the variant already exists.
+            # Can skip this if the variant already exists.
             if variant_index in variant_id_ship_dict_dict:
                 continue
 
-            #Need to skip if there is no scaling information for the
-            # requested variant.
+            # Need to skip if there is no scaling information for the
+            #  requested variant.
             if variant_index not in variant_id_field_ratios_dict_dict:
                 continue
 
-            #Make a copy of the basic_dict.
-            #Shallow copy should be fine for this, but deep copy to be
-            # safe in case of future code changes that might add annotation
-            # fields or similar.
+            # Make a copy of the basic_dict.
+            # Shallow copy should be fine for this, but deep copy to be
+            #  safe in case of future code changes that might add annotation
+            #  fields or similar.
             new_ship_dict = copy.deepcopy(basic_dict)
 
-            # Annotate it with the basic_dict's name, which will be the
-            # template name used in matching to shipyards to include
-            # this new variant.
+            #  Annotate it with the basic_dict's name, which will be the
+            #  template name used in matching to shipyards to include
+            #  this new variant.
             new_ship_dict.template_name = basic_dict['name']
 
-            #Need to edit the name.
-            #Add the predefined suffix for the variant type.
+            # Need to edit the name.
+            # Add the predefined suffix for the variant type.
             new_name = new_ship_dict['name'] + variant_index_suffix_dict[variant_index]
-            #Toss an error if the name is taken; it shouldn't be, but be safe.
+            # Toss an error if the name is taken; it shouldn't be, but be safe.
             if new_name in ship_names_list:
                 raise Exception('Variant name {} already taken.'.format(new_name))
             new_ship_dict['name'] = new_name
 
-            #Record the variant index for this ship, for recognition in game
-            # and also in future transform calls.
+            # Record the variant index for this ship, for recognition in game
+            #  and also in future transform calls.
             new_ship_dict['variation_index'] = str(variant_index)
 
-            #For modifiers, shields should be edited first, since the amount of
-            # shielding actually modified will be used to adjust the speed
-            # modifier for this ship.
-            #Indent this just for clarity.
+            # For modifiers, shields should be edited first, since the amount of
+            #  shielding actually modified will be used to adjust the speed
+            #  modifier for this ship.
+            # Indent this just for clarity.
             if 1:
-                #Preference here is to modify the number of shield slots,
-                # but it will be important to also be able to swap shield
-                # type for better accuracy, since some cases may have base
-                # ships with only a single shield slot (eg. 1x1GJ), which
-                # can't be downscaled for raider variants without changing
-                # type.
-                #This should only need to search 1 step up/down at most, and
-                # should try to avoid having an excess shield count.
-                # The typical high shield counts are around 6 in game.
+                # Preference here is to modify the number of shield slots,
+                #  but it will be important to also be able to swap shield
+                #  type for better accuracy, since some cases may have base
+                #  ships with only a single shield slot (eg. 1x1GJ), which
+                #  can't be downscaled for raider variants without changing
+                #  type.
+                # This should only need to search 1 step up/down at most, and
+                #  should try to avoid having an excess shield count.
+                #  The typical high shield counts are around 6 in game.
 
-                #Grab the shield ratio.
+                # Grab the shield ratio.
                 ratio = variant_id_field_ratios_dict_dict[variant_index]['shielding']
 
-                #Look up the starting slots and size.
+                # Look up the starting slots and size.
                 shield_slots = int(new_ship_dict['max_shields'])
                 shield_type = int(new_ship_dict['shield_type'])
                 shield_size  = Flags.Shield_type_size_dict[shield_type]
 
-                #Calculate the starting and target shield values.
+                # Calculate the starting and target shield values.
                 start_value = shield_slots * shield_size
                 target_value = start_value * ratio
 
-                #Make a small support function.
-                #This will add or remove shields until a min error
-                # has been found.
+                # Make a small support function.
+                # This will add or remove shields until a min error
+                #  has been found.
                 def Find_min_error(shield_size):
                     'Returns (error, shield_slots to use)'
 
-                    #Start from 1 shield, go up.
+                    # Start from 1 shield, go up.
                     shield_slots = 1
 
-                    #Calc the initial error.
+                    # Calc the initial error.
                     error = abs(target_value - shield_slots * shield_size)
 
-                    #Loop until error gets worse.
-                    #TODO: maybe try to limit adjustment so that the
-                    # new shield value is between the original shield value
-                    # and the target (eg. if target is +20%, keep in the
-                    # 0-20% range, don't go to 25%). This probably doesn't
-                    # make much difference, though, and might be more
-                    # interesting to allow overshoot.
+                    # Loop until error gets worse.
+                    # TODO: maybe try to limit adjustment so that the
+                    #  new shield value is between the original shield value
+                    #  and the target (eg. if target is +20%, keep in the
+                    #  0-20% range, don't go to 25%). This probably doesn't
+                    #  make much difference, though, and might be more
+                    #  interesting to allow overshoot.
                     while 1:
-                        #Add a shield.
+                        # Add a shield.
                         new_shield_slots = shield_slots + 1
 
-                        #Calculate the shielding at this step.
+                        # Calculate the shielding at this step.
                         new_shielding = new_shield_slots * shield_size
-                        #Calc error.
+                        # Calc error.
                         new_error = abs(target_value - new_shielding)
 
-                        #If error got worse, done.
+                        # If error got worse, done.
                         if new_error > error:
                             break
 
-                        #Record this point and loop.
+                        # Record this point and loop.
                         error = new_error
                         shield_slots = new_shield_slots
 
                     return error, shield_slots
 
 
-                #Get the error at the start size.
+                # Get the error at the start size.
                 shield_type_0 = shield_type
                 shield_size_0 = shield_size
                 error_0, shield_slots_0 = Find_min_error(shield_size_0)
 
-                #Try +1
+                # Try +1
                 shield_type_1 = shield_type + 1
-                #Skip if there is no +1, eg. this was already 2GJ.
+                # Skip if there is no +1, eg. this was already 2GJ.
                 if shield_type_1 in Flags.Shield_type_size_dict:
                     shield_size_1 = Flags.Shield_type_size_dict[shield_type_1]
                     error_1, shield_slots_1 = Find_min_error(shield_size_1)
                 else:
-                    #Just set error as higher so this doesn't get used.
+                    # Just set error as higher so this doesn't get used.
                     error_1 = error_0 +1
 
-                #Try -1
+                # Try -1
                 shield_type_2 = shield_type - 1
-                #Check this as above.
+                # Check this as above.
                 if shield_type_2 in Flags.Shield_type_size_dict:
                     shield_size_2 = Flags.Shield_type_size_dict[shield_type_2]
                     error_2, shield_slots_2 = Find_min_error(shield_size_2)
@@ -1081,53 +1081,53 @@ def Add_Ship_Variants(
                     error_2 = error_0 +1
 
 
-                #Now need to pick the best that didn't go over the
-                # shield count limit.
-                #8 is the highest seen in xrm for a semi-normal ship,
-                # though 7 is the typical max.
-                #Be lenient here and allow 8 for better matching.
+                # Now need to pick the best that didn't go over the
+                #  shield count limit.
+                # 8 is the highest seen in xrm for a semi-normal ship,
+                #  though 7 is the typical max.
+                # Be lenient here and allow 8 for better matching.
                 shield_slots_limit = 8
-                #Start with same shield size.
+                # Start with same shield size.
                 best_type = shield_type_0
                 best_size = shield_size_0
                 best_slots = shield_slots_0
                 best_error = error_0
-                #Swap to +1 if it was better.
+                # Swap to +1 if it was better.
                 if error_1 < best_error and shield_slots_1 <= shield_slots_limit:
                     best_type = shield_type_1
                     best_size = shield_size_1
                     best_slots = shield_slots_1
                     best_error = error_1
-                #Swap to -1 if it was better.
+                # Swap to -1 if it was better.
                 if error_2 < best_error and shield_slots_2 <= shield_slots_limit:
                     best_type = shield_type_2
                     best_size = shield_size_2
                     best_slots = shield_slots_2
                     best_error = error_2
 
-                #Can now apply the new shield type.
+                # Can now apply the new shield type.
                 new_ship_dict['max_shields'] = str(best_slots)
                 new_ship_dict['shield_type'] = str(best_type)
 
 
-                #The final shield value may be significantly off from the
-                # targetted value.
-                #To avoid a ship with a too-high shield being too strong,
-                # or a too-low shield being too weak, can rescale the ship
-                # attributes based on the error here.
+                # The final shield value may be significantly off from the
+                #  targetted value.
+                # To avoid a ship with a too-high shield being too strong,
+                #  or a too-low shield being too weak, can rescale the ship
+                #  attributes based on the error here.
 
-                #Calculate the actual ratio applied to shielding.
+                # Calculate the actual ratio applied to shielding.
                 actual_ratio = best_size * best_slots / start_value
-                #Calculate the error, as the amount of desired shield change
-                # that was not applied.
-                #Eg. if 1.15 was desired, and 1.10 was applied, this will
-                # be 0.05.  This is negative in overshoot cases.
+                # Calculate the error, as the amount of desired shield change
+                #  that was not applied.
+                # Eg. if 1.15 was desired, and 1.10 was applied, this will
+                #  be 0.05.  This is negative in overshoot cases.
                 shield_ratio_error = ratio - actual_ratio
                 
-                #-Removed; no longer map to speed directly like this, since
-                # it doesn't work well when small shield adjustments cause
-                # large speed corrections. Instead use an input arg with
-                # direct percent mappings.
+                # -Removed; no longer map to speed directly like this, since
+                #  it doesn't work well when small shield adjustments cause
+                #  large speed corrections. Instead use an input arg with
+                #  direct percent mappings.
                 ##If this ratio is too high, the ship is overshielded and
                 ## needs a speed reduction.
                 ##If this ratio is too low, the ship is undershielded and
@@ -1149,59 +1149,59 @@ def Add_Ship_Variants(
                 ## It should be fine in both cases.
                 ##Calculate the shield part of it here, speed part of it later.
                 ##Also do an error check if ratio == 1 (and avoid /0 error).
-                #if ratio == 1:
-                #    assert actual_ratio == 1
-                #    amount_of_shield_ratio_applied = 1
-                #else:
-                #    amount_of_shield_ratio_applied = (1-actual_ratio) / (1-ratio)
+                # if ratio == 1:
+                #     assert actual_ratio == 1
+                #     amount_of_shield_ratio_applied = 1
+                # else:
+                #     amount_of_shield_ratio_applied = (1-actual_ratio) / (1-ratio)
 
 
-            #Loop over the modifiers.
+            # Loop over the modifiers.
             for field, ratio in variant_id_field_ratios_dict_dict[variant_index].items():
 
-                #Skip shielding; it was already handled.
+                # Skip shielding; it was already handled.
                 if field == 'shielding':
                     continue
 
-                #May be float or int. Use try/except to catch this.
+                # May be float or int. Use try/except to catch this.
                 try:
                     value = int(new_ship_dict[field])
 
-                    #Do any adjustment based on shield_conversion_ratios if there
-                    # was innaccuracy in the shield adjustment.
+                    # Do any adjustment based on shield_conversion_ratios if there
+                    #  was innaccuracy in the shield adjustment.
                     if field in shield_conversion_ratios:
-                        #Add the ratio error, at some conversion rate.
+                        # Add the ratio error, at some conversion rate.
                         ratio += shield_ratio_error * shield_conversion_ratios[field]
 
-                    #-Removed; speed no longer scaled directly by shield error.
+                    # -Removed; speed no longer scaled directly by shield error.
                     ##If this is speed/acceleration, handle it specially.
-                    #if field in ['speed','acceleration']:
-                    #    #Determine how much of the ratio to apply.
-                    #    #Basically, take difference from 1, scale that diff
-                    #    # by how much of the shield diff was applied, and
-                    #    # then add back the 1.
-                    #    actual_ratio = (ratio -1) * amount_of_shield_ratio_applied +1
-                    #    value *= actual_ratio
+                    # if field in ['speed','acceleration']:
+                    #     #Determine how much of the ratio to apply.
+                    #     #Basically, take difference from 1, scale that diff
+                    #     # by how much of the shield diff was applied, and
+                    #     # then add back the 1.
+                    #     actual_ratio = (ratio -1) * amount_of_shield_ratio_applied +1
+                    #     value *= actual_ratio
 
-                    #Support an additional scaling on price.
+                    # Support an additional scaling on price.
                     if field in ['relative_value_npc','relative_value_player']:
                         value *= ratio * price_multiplier
 
                     else:
-                        #Direct ratio application.
+                        # Direct ratio application.
                         value *= ratio
 
-                    #Round it.
-                    #Some special cases will have a coarse rounding.
-                    #Cargo is probably the most important to refine right
-                    # now, and maybe hull; others can be tweaked later.
+                    # Round it.
+                    # Some special cases will have a coarse rounding.
+                    # Cargo is probably the most important to refine right
+                    #  now, and maybe hull; others can be tweaked later.
                     if field in ['cargo_min','cargo_max']:
-                        #Since some adjustments are small percentages,
-                        # don't want to over-round here.
+                        # Since some adjustments are small percentages,
+                        #  don't want to over-round here.
                         if value > 10000:
                             value = math.ceil(value/500)*500
                         elif value > 1000:
-                            #Nearest 50 is common for cargo.
+                            # Nearest 50 is common for cargo.
                             value = math.ceil(value/50)*50
                         elif value > 500:
                             value = math.ceil(value/10)*10
@@ -1209,22 +1209,22 @@ def Add_Ship_Variants(
                             value = round(value)
                             
                     elif field == 'cargo_size':
-                        #Need to bound cargo size to the 0-5 range, just in
-                        # case a scout tanker tried to reduce it.
+                        # Need to bound cargo size to the 0-5 range, just in
+                        #  case a scout tanker tried to reduce it.
                         value = max(0, value)
                         value = min(5, value)
-                        #It is probably safe to round this.
-                        #One special falcon increases cargo size, but not enough
-                        # to pull up the average ratio where cargo size will
-                        # be increased ever.
-                        #Tankers in xrm reduce cargo size, commonly enough that
-                        # the ratio should drop the size here by 1 tick.
-                        #Can check these in game to make sure there are no
-                        # oddities for now.
+                        # It is probably safe to round this.
+                        # One special falcon increases cargo size, but not enough
+                        #  to pull up the average ratio where cargo size will
+                        #  be increased ever.
+                        # Tankers in xrm reduce cargo size, commonly enough that
+                        #  the ratio should drop the size here by 1 tick.
+                        # Can check these in game to make sure there are no
+                        #  oddities for now.
                         value = round(value)
 
                     elif field == 'hull':
-                        #Hull scaling copied from the hull transform above.
+                        # Hull scaling copied from the hull transform above.
                         if value > 10000:
                             value = math.ceil(value/1000)*1000
                         elif value > 1000:
@@ -1232,63 +1232,63 @@ def Add_Ship_Variants(
                         else:
                             value = math.ceil(value/10)*10
                     else:
-                        #Others get simple rounding.
+                        # Others get simple rounding.
                         value = round(value)
 
-                    #Put it back.
+                    # Put it back.
                     new_ship_dict[field] = str(int(value))
 
                 except ValueError:
-                    #Floats will not have as complicated rounding, since
-                    # they don't get displayed directly in game.
+                    # Floats will not have as complicated rounding, since
+                    #  they don't get displayed directly in game.
                     value = float(new_ship_dict[field]) * ratio
                                                 
-                    #Put it back.
-                    #Aim for no more than 7 decimal places.
-                    #Use 6, as in the tunings transform.
+                    # Put it back.
+                    # Aim for no more than 7 decimal places.
+                    # Use 6, as in the tunings transform.
                     new_ship_dict[field] = str('{0:.6f}'.format(value))
 
 
-            #Name is updated and modifiers applied, so the new ship
-            # should be ready.
+            # Name is updated and modifiers applied, so the new ship
+            #  should be ready.
             new_ships_list.append(new_ship_dict)
-            #Record miners.
-            #TODO: maybe generalize this to record variants per type, and
-            # then in a later step add in generic wares.
+            # Record miners.
+            # TODO: maybe generalize this to record variants per type, and
+            #  then in a later step add in generic wares.
             if variant_index == variant_name_index_dict['miner']:
                 new_miners_list.append(new_ship_dict)
 
                 
-    # Get the director text for adding these new variants to
-    # shipyards.
+    #  Get the director text for adding these new variants to
+    #  shipyards.
     text = Generate_Director_Text_To_Update_Shipyards(
-        # Ensure any ships added on prior transforms are
-        # included in the generated text still, instead of getting
-        # lost.
+        #  Ensure any ships added on prior transforms are
+        #  included in the generated text still, instead of getting
+        #  lost.
         new_ships_list + prior_new_variants,
-        # Add an extra 3 indents.
+        #  Add an extra 3 indents.
         indent_level = 3
         )
 
-    # Stick the cue_index on the end of the cue name, to help ensure the
-    # cue will be unique and will fire (eg. wasn't fire previously in a
-    # given save).
-    #Make the file.
+    #  Stick the cue_index on the end of the cue name, to help ensure the
+    #  cue will be unique and will fire (eg. wasn't fire previously in a
+    #  given save).
+    # Make the file.
     Make_Director_Shell(director_loader_base_name + '_' + str(cue_index), text,
                         file_name = director_loader_base_name +'.xml')
 
 
-    #All new ships will be put at the bottom of the tships dict_list.
+    # All new ships will be put at the bottom of the tships dict_list.
     Add_Entries_To_T_File('TShips.txt', new_ships_list)
 
-    #Note how many ships were added.
+    # Note how many ships were added.
     if print_variant_count:
         Write_Summary_Line('Number of new variants added: {}'.format(len(new_ships_list)))
 
-    # Update the prior variant list with these new ones.
+    #  Update the prior variant list with these new ones.
     prior_new_variants += new_ships_list
 
-    #Add miner equipment.
+    # Add miner equipment.
     if add_mining_equipment:
         Add_Ship_Equipment(
             ship_types = [x['name'] for x in new_miners_list],
@@ -1297,8 +1297,8 @@ def Add_Ship_Variants(
 
     return
 
-# Global tracker for which variants have been removed on
-# prior calls to Remove_Ship_Variants.
+#  Global tracker for which variants have been removed on
+#  prior calls to Remove_Ship_Variants.
 prior_removed_variants = []
 
 @Check_Dependencies('TShips.txt')
@@ -1356,11 +1356,11 @@ def Remove_Ship_Variants(
     * print_variant_count:
       - If True, the number of removed variants is printed to the summary file.
     '''
-    # The general method here will be to leave the variants mostly intact
-    # in the tships file, to avoid game problems when loading saves with
-    # those ships present, as well as preserving ordering for later ships
-    # in tships (which could otherwise lead to ships changing type or the
-    # game crashing).
+    #  The general method here will be to leave the variants mostly intact
+    #  in the tships file, to avoid game problems when loading saves with
+    #  those ships present, as well as preserving ordering for later ships
+    #  in tships (which could otherwise lead to ships changing type or the
+    #  game crashing).
     '''
     Two general options here:
     1) Set the removed ships to some special variant id which will be
@@ -1389,135 +1389,135 @@ def Remove_Ship_Variants(
     '''
     global prior_removed_variants
     
-    # Location for the director script that will load the new ships.
-    # This should match the cue name.
+    #  Location for the director script that will load the new ships.
+    #  This should match the cue name.
     director_loader_base_name = 'X3_Customizer_Remove_Variants'
     director_loader_path = os.path.join('director', director_loader_base_name+'.xml')
 
-    # General cleanup code to delete old files.
+    #  General cleanup code to delete old files.
     if _cleanup:
         if os.path.exists(director_loader_path):
             os.remove(director_loader_path)
         return
 
-    # Some of this code is shared with Add_Ship_Variants; major
-    # chunks have been moved to shared functions.
+    #  Some of this code is shared with Add_Ship_Variants; major
+    #  chunks have been moved to shared functions.
 
-    # Make sure the script is included to update the variants.
-    # -Removed, switching to director script style.
-    #_Include_Script_To_Update_Ship_Variants()
+    #  Make sure the script is included to update the variants.
+    #  -Removed, switching to director script style.
+    # _Include_Script_To_Update_Ship_Variants()
     
-    #Make an empty blacklist list if needed.
+    # Make an empty blacklist list if needed.
     if blacklist == None:
         blacklist = []
         
-    #Translate the input variant names to indices.
-    #Catch any error and return early.
+    # Translate the input variant names to indices.
+    # Catch any error and return early.
     error = _Standardize_Variant_Types_List(variant_types)
     if error:
         return
 
-    #Suffixes to use for generated ship naming.
+    # Suffixes to use for generated ship naming.
     variant_index_suffix_dict = _Get_Variant_Suffixes()
     
-    # Build a list of variant ships to be removed in the
-    # director script.
+    #  Build a list of variant ships to be removed in the
+    #  director script.
     removed_variants = []
     
-    # Go through the tships list.
+    #  Go through the tships list.
     for ship_dict in Load_File('TShips.txt'):
 
-        # Skip those not of a standard race.
+        #  Skip those not of a standard race.
         race_type = Flags.Race_code_name_dict[int(ship_dict['race'])]
         if race_type not in race_types:
             continue
-        # Skip those blacklisted.
+        #  Skip those blacklisted.
         if ship_dict['name'] in blacklist:
             continue        
-        # Skip if this is not a ship type to modify.
+        #  Skip if this is not a ship type to modify.
         if (ship_dict['subtype'] not in ship_types
         and ship_dict['name'] not in ship_types):
             continue
                 
-        # Grab the variant index.
+        #  Grab the variant index.
         variation_index = int(ship_dict['variation_index'])
         
-        # Skip if this is not a variant to remove.
+        #  Skip if this is not a variant to remove.
         if variation_index not in variant_types:
             continue
 
-        # When here, this ship needs to be removed.
-        # Update the race to 0.
+        #  When here, this ship needs to be removed.
+        #  Update the race to 0.
         ship_dict['race'] = '0'
 
-        # Update the ware size (should be 0 currently).
-        # (Note: 'cargo_size' is the size the ship can hold; 'cargo_size_unused'
-        #  is the size of the ship when in a cargo bay, which is meaningless.)
-        # If this transform was run multiple times, this may have been changed,
-        #  but that isn't expected in general. Disable the assertion for now,
-        #  just in case.
-        #assert ship_dict['cargo_size_unused'] == '0'
-        # The size to use is somewhat up in the air.
-        # The game will translate this into a transport_class constant, so
-        #  checking for the specific constant used here will not work well.
-        # Also, transport classes can be changed around by mods, eg. XRM switches
-        #  them up. The ST class, 5, seems to be matched up by vanilla and xrm,
-        #  so try using that here.
-        # -Removed, no longer use a script to handle this.
-        #ship_dict['cargo_size_unused'] = '5'
+        #  Update the ware size (should be 0 currently).
+        #  (Note: 'cargo_size' is the size the ship can hold; 'cargo_size_unused'
+        #   is the size of the ship when in a cargo bay, which is meaningless.)
+        #  If this transform was run multiple times, this may have been changed,
+        #   but that isn't expected in general. Disable the assertion for now,
+        #   just in case.
+        # assert ship_dict['cargo_size_unused'] == '0'
+        #  The size to use is somewhat up in the air.
+        #  The game will translate this into a transport_class constant, so
+        #   checking for the specific constant used here will not work well.
+        #  Also, transport classes can be changed around by mods, eg. XRM switches
+        #   them up. The ST class, 5, seems to be matched up by vanilla and xrm,
+        #   so try using that here.
+        #  -Removed, no longer use a script to handle this.
+        # ship_dict['cargo_size_unused'] = '5'
         
-        # Add to the removed variants list.
+        #  Add to the removed variants list.
         removed_variants.append(ship_dict)
 
 
-    # Knowing the ships to remove, can now generate a director
-    # script which will handle the removals from shipyards.
+    #  Knowing the ships to remove, can now generate a director
+    #  script which will handle the removals from shipyards.
     text = Generate_Director_Text_To_Update_Shipyards(
-        # Ensure any ships removed on prior transforms are
-        # included in the generated text still, instead of getting
-        # lost.
+        #  Ensure any ships removed on prior transforms are
+        #  included in the generated text still, instead of getting
+        #  lost.
         removed_variants + prior_removed_variants,
         removal_mode = True,
-        # Add an extra 3 indents.
+        #  Add an extra 3 indents.
         indent_level = 3
         )
 
-    # Stick the cue_index on the end of the cue name, to help ensure the
-    # cue will be unique and will fire (eg. wasn't fire previously in a
-    # given save).
-    #Make the file.
+    #  Stick the cue_index on the end of the cue name, to help ensure the
+    #  cue will be unique and will fire (eg. wasn't fire previously in a
+    #  given save).
+    # Make the file.
     Make_Director_Shell(director_loader_base_name + '_' + str(cue_index), text,
                         file_name = director_loader_base_name +'.xml')
 
 
-    # Update the tracker with removed variants.
+    #  Update the tracker with removed variants.
     prior_removed_variants += removed_variants
 
-    #Note how many ships were removed.
+    # Note how many ships were removed.
     if print_variant_count:
         Write_Summary_Line('Number of variants removed: {}'.format(
             len(removed_variants)))
 
-    # That should be all that is needed for now.
-    # Other details are handled in the update script.
+    #  That should be all that is needed for now.
+    #  Other details are handled in the update script.
     return
 
 
 
     
 def _Get_Variant_Suffixes():
-    #Suffixes to use for generated ship naming.
-    #This is just laid out manually, to make it clear and tweak the
-    # xl entries to distinguish them, while keeping suffixes short
-    # and expressive.
-    #Names are generally uppercase, so maintain that here.
-    #Limitations on ship names are unknown; there seems to be room
-    # for a moderate number of letters.  Try to limit to ~6 here.
-    #Stick an underscore, since that is common in existing names.
-    #These should cover all possible variants 1-19, in case mods
-    # add new ones in that range.
+    # Suffixes to use for generated ship naming.
+    # This is just laid out manually, to make it clear and tweak the
+    #  xl entries to distinguish them, while keeping suffixes short
+    #  and expressive.
+    # Names are generally uppercase, so maintain that here.
+    # Limitations on ship names are unknown; there seems to be room
+    #  for a moderate number of letters.  Try to limit to ~6 here.
+    # Stick an underscore, since that is common in existing names.
+    # These should cover all possible variants 1-19, in case mods
+    #  add new ones in that range.
     variant_index_suffix_dict = {
-        #Set up some nice names for basic variants.
+        # Set up some nice names for basic variants.
         variant_name_index_dict['basic']              : '_BASIC',
         variant_name_index_dict['vanguard']           : '_VAN',
         variant_name_index_dict['sentinel']           : '_SENT',
@@ -1529,7 +1529,7 @@ def _Get_Variant_Suffixes():
         variant_name_index_dict['tanker xl']          : '_TANKXL',
         variant_name_index_dict['super freighter xl'] : '_SFRXL',
     }
-    #Fill out with generics for the rest.
+    # Fill out with generics for the rest.
     for i in range(20):
         if i not in variant_index_suffix_dict:
             variant_index_suffix_dict[i] = '_VAR{}'.format(i)
@@ -1545,21 +1545,21 @@ def _Standardize_Variant_Types_List(variant_types):
     for index, input_arg in enumerate(variant_types):
         error = False
 
-        #Check for a string.
+        # Check for a string.
         if isinstance(input_arg, str):
-            #Error if this is not a name in the table.
+            # Error if this is not a name in the table.
             if input_arg not in variant_name_index_dict:
                 error = True
             else:
-                #Replace with the table value.
+                # Replace with the table value.
                 variant_types[index] = variant_name_index_dict[input_arg]
 
         else:
-            #Verify this is in the 1-19 range.
+            # Verify this is in the 1-19 range.
             if not isinstance(input_arg , int) or input_arg < 1 or input_arg > 19:
                 error = True
 
-        #Common error catch.
+        # Common error catch.
         if error:
             print('Add_Ship_Variants Error, variant type {} not understood.'.format(
                 input_arg))
@@ -1852,6 +1852,6 @@ Update:
         
 '''
 
-#TODO: method to disable variants no longer wanted, but are present
-# in a save game and cannot be safely removed, since ship identifiers
-# tend to be based on line number in tships.
+# TODO: method to disable variants no longer wanted, but are present
+#  in a save game and cannot be safely removed, since ship identifiers
+#  tend to be based on line number in tships.

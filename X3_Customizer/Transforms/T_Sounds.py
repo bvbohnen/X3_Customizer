@@ -55,9 +55,15 @@ def Remove_Sound(
 
     # Now, if no file is present, make an empty one, otherwise the
     # file should already be an empty one from a prior run.
-    if not os.path.exists(file_path):
-        with open(file_path, 'w') as file:
-            pass
+    #if not os.path.exists(file_path):
+    #    with open(file_path, 'w') as file:
+    #        pass
+    # Switch to making a better tracked file object.
+    File_Manager.Add_File(
+        file_name,
+        Misc_File(
+            virtual_path_name = os.path.relpath(file_path, Settings.Get_X3_Folder()),
+            text = ''))
 
     return
 

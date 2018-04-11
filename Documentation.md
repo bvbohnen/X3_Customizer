@@ -1,4 +1,4 @@
-X3 Customizer v2.21
+X3 Customizer v2.22
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
@@ -12,13 +12,13 @@ Usage:
    - Generates documentation for this project, as markdown supporting files README.md and Documentation.md.
 
 Setup:
-  * Transforms will operate on source files (eg. tships.txt) which need to be set up prior to running this tool. Source files can be extracted using X3 Editor 2 if needed. Source files may be provided after any other mods have been applied.
+  * Transforms will operate on source files (eg. tships.txt) which are either provided as loose files, or extracted automatically from the game's cat/dat files.
 
-  * Source files need to be located in a folder underneath the specified AP addon directory, and will have an internal folder structure matching that of the files in the normal addon directory. A special case is made for .obj files in the L folder above the addon directory; these should be placed in source_folder/L.
+  * Loose source files need to be located in a folder underneath the specified AP addon directory, and will have an internal folder structure matching that of the files in the normal addon or TC directory. Eg. <game path>/addon/<source_folder>/types/TShips.txt
 
   * The user must write a Python script which will specify paths and control the customizer by calling transforms. This script will be called by the customizer and run once. The quickest way to set this up would be to edit the example file. Included in the repository is User_Transforms_Mine, the author's personal set of transforms, which can be checked for futher examples of how to use most transforms available.
 
-  * Output files will be generated in the addon directory matching the folder structure in the source folder. Non-transformed files will generate output files. Files which do not have a name matching the requirement of any transform will be ignored and not copied. In some cases, files may be generated one directory up, in the presumed Terran Conflict folder.
+  * Output files will be generated generally in the addon directory, though some may be placed under the main game directory, based on where X3 looks for the files. Files in the source folder which do not have a name matching the requirement of any transform will be ignored and not copied. In some cases, files may be generated one directory up, in the presumed Terran Conflict folder.
 
   * Warning: Generated output will overwrite any existing files.
 
@@ -55,17 +55,28 @@ Setup methods:
 
        Sets the pathing to be used for file loading and writing.
    
-       * path_to_addon_folder:
+       * path_to_addon_folder
          - Path to the X3 AP addon folder, containing the source_folder. Output files will be written relative to here.
          - If this is not the addon folder, a warning will be printed but operation will continue, writing files to this folder, though files will need to be moved to the proper addon folder to be applied to the game. Some generated files may be placed in the directory above this folder, eg. the expected TC directory.
    
-       * source_folder:
+       * source_folder
          - Subfolder in the addon directory containing unmodified files, internally having the same folder structure as addon to be used when writing out transform results.
          - Folder will be created if it does not exist, and may be populated with any source files that can be extracted from the primary folders and are needed by transforms.
+         - Defaults to 'x3_customizer_source_files'.
          - (eg. output to addon	ypes will source from input in addon\source_folder	ypes).
    
-       * summary_file:
-         - Path and name for where a summary file will be written, with any transform results. Defaults to 'X3_Customizer_summary.txt' in the addon directory.
+       * log_folder
+         - String, the path to the folder to place any output logs in, or to read prior output logs from.
+         - Defaults to 'x3_customizer_logs'.
+   
+       * summary_file
+         - Name for where a summary file will be written, with any transform results, relative to the log folder.
+         - Defaults to 'X3_Customizer_summary.txt'.
+   
+       * log_file
+         - Name for where a json log file will be written, including a summary of files written.
+         - This is also the file which will be read for any log from a prior run.
+         - Defaults to 'X3_Customizer_log.json'.
        
 
 
@@ -985,7 +996,7 @@ Universe Transforms:
         - Integer, 5 digit value of the music to use, matching an mp3 file in the soundtrack folder.
       * cue_name:
         - String, name to use for the director cue and the generated file. This should be different than any used earlier in a given saved game.
-      * _cleanup:
+      * cleanup:
         - Bool, if True any prior generated file for this cue_name will be deleted. This must be done manually since this tool does not track files generated on prior runs.
       
 
@@ -1297,23 +1308,23 @@ Example input file, User_Transforms_Example.py:
     the AP directory and running some simple transforms.
     '''
     
-    #Import all transform functions.
+    # Import all transform functions.
     from Transforms import *
     
     Set_Path(
-        #Set the path to the AP addon folder.
+        # Set the path to the AP addon folder.
         path_to_addon_folder = r'D:\Steam\SteamApps\common\x3 terran conflict\addon',
-        #Set the subfolder with the source files to be modified.
+        # Set the subfolder with the source files to be modified.
         source_folder = 'vanilla_source'
     )
     
-    #Speed up interceptors by 50%.
+    # Speed up interceptors by 50%.
     Adjust_Ship_Speed(adjustment_factors_dict = {'SG_SH_M4' : 1.5})
     
-    #Increase frigate laser regeneration by 50%.
+    # Increase frigate laser regeneration by 50%.
     Adjust_Ship_Laser_Recharge(adjustment_factors_dict = {'SG_SH_M7': 1.5})
     
-    #Reduce OOS damage by 30%.
+    # Reduce OOS damage by 30%.
     Adjust_Weapon_OOS_Damage(scaling_factor = 0.7)
 
 ***
@@ -1415,3 +1426,7 @@ Change Log:
  * 2.21:
    - Added Stop_GoD_From_Removing_Stations.
    - Added Disable_Asteroid_Respawn.
+ * 2.22
+   - Rewrite of much of the file loading system.
+   - Added support for loading source files from cat/dat pairs, when the file is not found in the specified source folder.
+   - Message log, as well as a log of files written, will now be written to a log folder customized by Set_Path.

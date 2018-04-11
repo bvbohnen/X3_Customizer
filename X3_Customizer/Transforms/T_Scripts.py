@@ -7,9 +7,9 @@ Modified scripts will tend to be handled with patches, while original
 scripts will just be moved to the scripts folder.
 '''
 from File_Manager import *
+from File_Manager.File_Patcher import *
 import os
 import shutil
-from File_Patcher import *
 
 #TODO: script to switch drone factories to using the food of their
 # race, instead of all using split food. Same for satellites and
@@ -75,7 +75,7 @@ def Add_Script(
 
     # The file is present here in scripts, so can reuse the dest_path.
     this_dir = os.path.normpath(os.path.dirname(__file__))
-    source_path = os.path.join(this_dir, 'source', script_name)
+    source_path = os.path.join(this_dir, '..', 'source', script_name)
     
     # Continue based on if removal is being done or not.
     if not remove:

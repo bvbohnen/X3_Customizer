@@ -95,6 +95,10 @@ For applying the diff as a patch, can  use third party code.
 Ultimately, a very simple patch application function will be written,
 since it can be debugged easily that way.
 
+TODO:
+Consider support for applying multiple patches to a single file, perhaps
+by doing some sort of patch join and applying a single unified patch (so
+that original file line numbers aren't changed by prior patches).
 '''
 from File_Manager import *
 import os
@@ -103,7 +107,7 @@ import xml.etree.ElementTree
 from xml.dom import minidom
 import re
 This_dir = os.path.normpath(os.path.dirname(__file__))
-
+from .Source_Reader import File_Missing_Exception
 
 def Make_Patch(file_name, verify = False, reformat_xml = False):
     '''
@@ -200,7 +204,7 @@ def Apply_Patch(file_name, reformat_xml = False):
     Returns the modified text.
     '''
     # Error if the patch file not found.
-    patch_path = os.path.join(This_dir, 'patches', file_name + '.patch')
+    patch_path = os.path.join(This_dir, '..', 'patches', file_name + '.patch')
     if not os.path.exists(patch_path):
         print('Error: patch for file {} not found in /patches'.format(file_name))
         return

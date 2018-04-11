@@ -101,7 +101,7 @@ Note:
 '''
 import os
 from File_Manager import *
-
+from Common.Settings import Settings
 
 @Check_Dependencies('TBackgrounds.txt')
 def Set_Minimum_Fade_Distance(distance_in_km = 3):
@@ -116,17 +116,17 @@ def Set_Minimum_Fade_Distance(distance_in_km = 3):
     * distance_in_km : 
       - Minimum fade distance, in km.
     '''
-    #Loop over the backgrounds.
+    # Loop over the backgrounds.
     for this_dict in Load_File('TBackgrounds.txt'):
-        #Look up existing fade.
+        # Look up existing fade.
         fade_start_km = int(this_dict['fadeout_start']) / 1000 / 500
         fade_end_km   = int(this_dict['fadeout_end'])   / 1000 / 500
-        #Apply minimum fade distance.
-        #Adjust start and end (to avoid end being closer than start).
+        # Apply minimum fade distance.
+        # Adjust start and end (to avoid end being closer than start).
         fade_start_km = max(fade_start_km, distance_in_km)
         fade_end_km   = max(fade_end_km, distance_in_km)
-        #Put them back.
-        #Convert to 1/500-m units.
+        # Put them back.
+        # Convert to 1/500-m units.
         this_dict['fadeout_start'] = str(int(fade_start_km * 1000 * 500))
         this_dict['fadeout_end']   = str(int(fade_end_km * 1000 * 500))
 
@@ -151,22 +151,22 @@ def Adjust_Fade_Start_End_Gap(
           - fade_gap_max_func = lambda start: 20
     '''
     for this_dict in Load_File('TBackgrounds.txt'):
-        #Look up existing fade.
+        # Look up existing fade.
         fade_start_km = int(this_dict['fadeout_start']) / 1000 / 500
         fade_end_km   = int(this_dict['fadeout_end'])   / 1000 / 500
         
-        #Current gap may be 0 if a min was applied, but that is okay,
-        # it gets increased here.
+        # Current gap may be 0 if a min was applied, but that is okay,
+        #  it gets increased here.
         gap = fade_end_km - fade_start_km
-        #Apply minimum gap first.
+        # Apply minimum gap first.
         gap = max(gap, fade_gap_min_func(fade_start_km))
-        #Now apply the max (may put a cap on the min if less than that min).
+        # Now apply the max (may put a cap on the min if less than that min).
         gap = min(gap, fade_gap_max_func(fade_start_km))
-        #Apply the gap to fade_end.
+        # Apply the gap to fade_end.
         fade_end_km = fade_start_km + gap
 
-        #Put them back.
-        #Convert to 1/500-m units.
+        # Put them back.
+        # Convert to 1/500-m units.
         this_dict['fadeout_start'] = str(int(fade_start_km * 1000 * 500))
         this_dict['fadeout_end']   = str(int(fade_end_km * 1000 * 500))
 
@@ -192,7 +192,7 @@ def Adjust_Particle_Count(
     '''
     for this_dict in Load_File('TBackgrounds.txt'):
         density = int(this_dict['fog_density'])
-        #Add the base value to the fog scaled value.
+        # Add the base value to the fog scaled value.
         num_particles = base_count + density * fog_factor
         this_dict['num_particles'] = str(int(num_particles))
 
@@ -200,17 +200,17 @@ def Adjust_Particle_Count(
         
 @Check_Dependencies('TBackgrounds.txt')
 def Remove_Stars_From_Foggy_Sectors(
-    #The fog requirement for star removal; all backgrounds affected need a
-    # fog above this much.
-    #This is not as important as fade distance in general, it seems.
-    # Set to 12, which is used by a background that shares images with the
-    #  background used by Maelstrom, which should be faded.
+    # The fog requirement for star removal; all backgrounds affected need a
+    #  fog above this much.
+    # This is not as important as fade distance in general, it seems.
+    #  Set to 12, which is used by a background that shares images with the
+    #   background used by Maelstrom, which should be faded.
     fog_requirement = 12,
-    #The highest fade distance to allow; all backgrounds affected need a
-    # fade_start under this value (to prevent star removal in high visibility
-    # sectors). In km.
+    # The highest fade distance to allow; all backgrounds affected need a
+    #  fade_start under this value (to prevent star removal in high visibility
+    #  sectors). In km.
     fade_distance_requirement_km = 60,
-    #Special flag to clean out old files.
+    # Special flag to clean out old files.
     _cleanup = False
     ):
     '''
@@ -229,137 +229,149 @@ def Remove_Stars_From_Foggy_Sectors(
          fade_start under this value (to prevent star removal in high visibility
          sectors). In km.
     '''
-    #Define the nebulae directory, to which empty star files will be written.
+    # Define the nebulae directory, to which empty star files will be written.
+    # This is relative to the addon folder, for now, which is the working
+    #  directory.
     nebulae_directory = os.path.join('..','objects','environments','nebulae')
 
-    #Nested function to clean up any old files.
-    #Optionally, will not delete files in images_allowing_star_removal_list.
+    # Nested function to clean up any old files.
+    # Optionally, will not delete files in images_allowing_star_removal_list.
     def Cleanup(images_allowing_star_removal_list = []):
 
-        #To avoid having to pull star images from all possible background images,
-        # the Remove_stars_from_foggy_sectors transform will only create empty
-        # star files. However, a previous run may have made such files which
-        # will not be wanted on this run, so need to clean them out.
-        #Check if the directory exists (if not, can return).
+        # To avoid having to pull star images from all possible background images,
+        #  the Remove_stars_from_foggy_sectors transform will only create empty
+        #  star files. However, a previous run may have made such files which
+        #  will not be wanted on this run, so need to clean them out.
+        # Check if the directory exists (if not, can return).
         if not os.path.exists(nebulae_directory):
             return
 
-        #Get all folders in that directory.
-        #This will get a list of all files and folders, and filter out non-folders.
+        # Get all folders in that directory.
+        # This will get a list of all files and folders, and filter out non-folders.
         folder_list = [name for name in os.listdir(nebulae_directory) if os.path.isdir(
                                             os.path.join(nebulae_directory, name))]
 
-        #Note: folder names should always match image names.
-        #Loop over the folders.
+        # Note: folder names should always match image names.
+        # Loop over the folders.
         for image_name in folder_list:
 
-            #Get the expected name of the star file.
-            #This is always based on the image name, with some prefix and suffix.
+            # Get the expected name of the star file.
+            # This is always based on the image name, with some prefix and suffix.
             star_file_name = 'nebula_{}_stars_01.bob'.format(image_name)
             star_path = os.path.join(nebulae_directory, image_name, star_file_name)
 
-            #Check if the star file exists, and is not one of those to be kept.
+            # Check if the star file exists, and is not one of those to be kept.
             if (os.path.exists(star_path) 
             and image_name not in images_allowing_star_removal_list):
-                #Remove the file if it is size 0ish.  Maybe give a little slack for file
-                # overhead; star files with content are around 40 kB.
-                #Larger files will be left in place for now, to avoid accidental
-                # deletion of something important.
+                # Remove the file if it is size 0ish.  Maybe give a little slack for file
+                #  overhead; star files with content are around 40 kB.
+                # Larger files will be left in place for now, to avoid accidental
+                #  deletion of something important.
                 if os.path.getsize(star_path) < 10:
                     os.remove(star_path)
               
-    #When being called for cleanup, run the Cleanup function and return.
+    # When being called for cleanup, run the Cleanup function and return.
     if _cleanup:
         Cleanup()
         return
     
-    #Nested function to generate empty star files.
-    #Placed here to keep code near Cleanup, since there is some overlap
-    # in folder naming and such.
+    # Nested function to generate empty star files.
+    # Placed here to keep code near Cleanup, since there is some overlap
+    #  in folder naming and such.
     def Make_Empty_Star_Files(images_allowing_star_removal_list):
-        #Check if the directory exists (if not, make it).
+        # Check if the directory exists (if not, make it).
         if not os.path.exists(nebulae_directory):
             os.makedirs(nebulae_directory)
 
-        #Loop over the images to remove stars from.
+        # Loop over the images to remove stars from.
         for image_name in images_allowing_star_removal_list:
 
-            #Get the expected name of the star file.
-            #This is always based on the image name, with some prefix and suffix.
+            # Get the expected name of the star file.
+            # This is always based on the image name, with some prefix and suffix.
             star_file_name = 'nebula_{}_stars_01.bob'.format(image_name)
             star_folder = os.path.join(nebulae_directory, image_name)
             star_path = os.path.join(star_folder, star_file_name)
 
-            #Check if the folder exists; make it if not.
+            # Check if the folder exists; make it if not.
             if not os.path.exists(star_folder):
                 os.makedirs(star_folder)
 
-            #Check if the star file doesn't exists.
-            #If it does exist, it may have actual data, so this will avoid
-            # overwriting it. TODO: maybe do a size check, and throw a
-            # warning if skipping replacement.
-            if not os.path.exists(star_path):
-                #Make a dummy file.
-                with open(star_path, 'w') as file:
-                    pass
+            # Check if the star file doesn't exists.
+            # If it does exist, it may have actual data, so this will avoid
+            #  overwriting it. TODO: maybe do a size check, and throw a
+            #  warning if skipping replacement.
+            #if not os.path.exists(star_path):
+                #with open(star_path, 'w') as file:
+                #    pass
+
+            # Make a dummy file, always for now.
+            # To ensure this gets tracked elsewhere, create a Misc_File
+            #  object in the File_Manager; though more complicated,
+            #  this helps some other code.
+            File_Manager.Add_File(
+                star_file_name,
+                Misc_File(
+                    virtual_path_name = os.path.relpath(
+                        star_path, Settings.Get_X3_Folder()),
+                    text = ''))
 
     
-    #Note: the following are a bunch of options tried out for various ways
-    # of setting fade and fog values.
-    #To avoid complicating the transform call, only the best options have
-    # been selected to be function inputs, when using star removal from
-    # foggy sectors.
-    #TODO: clean all this up, maybe.
+    # Note: the following are a bunch of options tried out for various ways
+    #  of setting fade and fog values.
+    # To avoid complicating the transform call, only the best options have
+    #  been selected to be function inputs, when using star removal from
+    #  foggy sectors.
+    # TODO: clean all this up, maybe.
     
-    #If star display should be disabled in heavily fogged sectors.
-    #This will always remove display in any sector that has fade less than
-    # Fade_removal_distance, after performing the above transform on fade amounts.
-    #Note: this also makes use of the Remove_fade_unless_background_image_is_fog flag,
-    # and will not remove stars unless the sector image has a 'fog' style name.
-    #Remove_stars_from_foggy_sectors = True
-    #Rename these to the same names that used to be used internally to this code,
-    # in case this code is ever expanded in the future to keep naming clear.
+    # If star display should be disabled in heavily fogged sectors.
+    # This will always remove display in any sector that has fade less than
+    #  Fade_removal_distance, after performing the above transform on fade amounts.
+    # Note: this also makes use of the Remove_fade_unless_background_image_is_fog flag,
+    #  and will not remove stars unless the sector image has a 'fog' style name.
+    # Remove_stars_from_foggy_sectors = True
+    # Rename these to the same names that used to be used internally to this code,
+    #  in case this code is ever expanded in the future to keep naming clear.
     remove_stars_fog_requirement = fog_requirement
     remove_stars_fade_distance_requirement_km = fade_distance_requirement_km
 
-    #Which adjustment to use.
-    #0: Set fade distance by fog density (feels best so far).
-    #1: Set fog density by fade distance (doesn't feel like enough fog for some distances).
-    #2: Extend fade distance when fog density is <= some threshold; no other changes.
-    #3: Remove fade entirely (fog effects otherwise unchanged).
-    #4: Remove fade when the background image will have stars, otherwise no change.
-    #   For use with Remove_stars_from_foggy_sectors.
+    # Which adjustment to use.
+    # 0: Set fade distance by fog density (feels best so far).
+    # 1: Set fog density by fade distance (doesn't feel like enough fog for some distances).
+    # 2: Extend fade distance when fog density is <= some threshold; no other changes.
+    # 3: Remove fade entirely (fog effects otherwise unchanged).
+    # 4: Remove fade when the background image will have stars, otherwise no change.
+    #    For use with Remove_stars_from_foggy_sectors.
     Fade_fog_adjustment_type = 4
-    #Distance to use for fading when fade effects should be removed, in km.
-    #This should be far enough that the player will never be further than this from
-    # any object.
+    # Distance to use for fading when fade effects should be removed, in km.
+    # This should be far enough that the player will never be further than this from
+    #  any object.
     Fade_removal_distance = 200
-    #If fade should be disabled for sectors that don't have 'fog' in their image name,
-    # to try to avoid fading occurring in front of a star field.
-    # Note: 'fog' images may still have stars in them, so this is not perfect.
+    # If fade should be disabled for sectors that don't have 'fog' in their image name,
+    #  to try to avoid fading occurring in front of a star field.
+    #  Note: 'fog' images may still have stars in them, so this is not perfect.
     Remove_fade_unless_background_image_is_fog = True
 
-    #Per fade-type settings, keeping them split out for better organization.
+    # Per fade-type settings, keeping them split out for better organization.
     if Fade_fog_adjustment_type == 0:
-        #Distance to start fading out when fog is 50 (highest value seen).
+        # Distance to start fading out when fog is 50 (highest value seen).
         Fade_Start_km_at_50_fog = 15
-        #Distance to end fading out when fog is 50, if type 1.
+        # Distance to end fading out when fog is 50, if type 1.
         Fade_End_km_at_50_fog = 30
-        #Distance to start fading as fog goes to 0.
+        # Distance to start fading as fog goes to 0.
         Fade_Start_km_near_0_fog = 100
     elif Fade_fog_adjustment_type == 1:
         Fade_Start_km_at_50_fog = 15
         Fade_End_km_at_50_fog = 30
         Fade_Start_km_near_0_fog = 100
-        #Minimum difference between fade start and end to allow; end will get
-        # boosted to meet this if needed.
+        # Minimum difference between fade start and end to allow; end will get
+        #  boosted to meet this if needed.
         Min_distance_km_fade_start_to_end = 5
     elif Fade_fog_adjustment_type == 2:
-        #The fog density at or above which fade will be kept, below which fade is removed.
-        #Set 0 to only allow fade is sectors with at least some fog.
-        #Can set negative to disable fade entirely, but Fade_fog_adjustment_type == 3 does
-        # that more clearly.
-        #Try out ~20 for now
+        # The fog density at or above which fade will be kept, below which fade is removed.
+        # Set 0 to only allow fade is sectors with at least some fog.
+        # Can set negative to disable fade entirely, but Fade_fog_adjustment_type == 3 does
+        #  that more clearly.
+        # Try out ~20 for now
         Min_fog_density_to_allow_fade = 0
     elif Fade_fog_adjustment_type == 3:
         pass
@@ -369,23 +381,23 @@ def Remove_Stars_From_Foggy_Sectors(
 
     tbackgrounds_dict_list = Load_File('TBackgrounds.txt')
     
-    #Go through tbackgrounds and figuring out which entries
-    # share background images.
-    #This will key by image name, and have a list of backgrounds using
-    # that image.
+    # Go through tbackgrounds and figuring out which entries
+    #  share background images.
+    # This will key by image name, and have a list of backgrounds using
+    #  that image.
     image_background_list_dict = {}
-    #This will key by background name, and hold the basic properties
-    # of interest.
+    # This will key by background name, and hold the basic properties
+    #  of interest.
     background_properties_dict_dict = {}
     for this_dict in tbackgrounds_dict_list:
-        #Get the image string.
+        # Get the image string.
         image = this_dict['image']
-        #Add the background to this image's list, making a new entry if needed.
+        # Add the background to this image's list, making a new entry if needed.
         if image not in image_background_list_dict:
             image_background_list_dict[image] = []
         image_background_list_dict[image].append(this_dict['name'])
 
-        #Record some background properties.
+        # Record some background properties.
         background_properties_dict_dict[this_dict['name']] = {
             'image'        : image,
             'fog_density'  : int(this_dict['fog_density']),
@@ -394,13 +406,13 @@ def Remove_Stars_From_Foggy_Sectors(
             }
 
 
-    #Can now build a set of images which are candidates for star removal
-    # based on fogging. Always make this list even if not removing stars,
-    # since it is used for cleaning out old files as well.
+    # Can now build a set of images which are candidates for star removal
+    #  based on fogging. Always make this list even if not removing stars,
+    #  since it is used for cleaning out old files as well.
     images_allowing_star_removal_list = []
     for image, background_list in image_background_list_dict.items():
-        #Determine the minimum fog density and maximum fade_start out of all 
-        # backgrounds using this image.
+        # Determine the minimum fog density and maximum fade_start out of all 
+        #  backgrounds using this image.
         min_fog = 100
         max_fade_start = 0
         for background in background_list:
@@ -409,47 +421,47 @@ def Remove_Stars_From_Foggy_Sectors(
             max_fade_start = max(max_fade_start, 
                                     background_properties_dict_dict[background]['fade_start_km'])
 
-        #Allow star removal only if both fog is above a threshold and
-        # fade is within a threshold.
-        #Eg. don't remove stars if there is not enough fog effect to cover
-        # for the dark background, and also don't remove if the sector
-        # had full view distance.
+        # Allow star removal only if both fog is above a threshold and
+        #  fade is within a threshold.
+        # Eg. don't remove stars if there is not enough fog effect to cover
+        #  for the dark background, and also don't remove if the sector
+        #  had full view distance.
         if min_fog >= remove_stars_fog_requirement:
             if max_fade_start <= remove_stars_fade_distance_requirement_km:
-                #Also check for 'fog' in the image name, if requested.
+                # Also check for 'fog' in the image name, if requested.
                 if Remove_fade_unless_background_image_is_fog == False or 'fog' in image:
                     images_allowing_star_removal_list.append(image)
 
                         
 
-    #To avoid having to pull star images from all possible background images,
-    # the Remove_stars_from_foggy_sectors transform will only create empty
-    # star files. However, a previous run may have made such files which
-    # will not be wanted on this run, so need to clean them out.
-    #To save some file accesses, inform this of the list of images
-    # to be kept.
+    # To avoid having to pull star images from all possible background images,
+    #  the Remove_stars_from_foggy_sectors transform will only create empty
+    #  star files. However, a previous run may have made such files which
+    #  will not be wanted on this run, so need to clean them out.
+    # To save some file accesses, inform this of the list of images
+    #  to be kept.
     Cleanup(images_allowing_star_removal_list)                    
-    #Generate the empty star files.
+    # Generate the empty star files.
     Make_Empty_Star_Files(images_allowing_star_removal_list)
 
 
-    #Loop over the backgrounds to handle fade.
+    # Loop over the backgrounds to handle fade.
     for this_dict in tbackgrounds_dict_list:
   
-        #Look up existing fade.
+        # Look up existing fade.
         fade_start_km = int(this_dict['fadeout_start']) / 1000 / 500
         fade_end_km   = int(this_dict['fadeout_end'])   / 1000 / 500
         density = int(this_dict['fog_density'])
 
         if Fade_fog_adjustment_type == 0:
-            #Calculate fade values.
+            # Calculate fade values.
             if density == 0:
-                #Remove fade
+                # Remove fade
                 fade_start_km = Fade_removal_distance
                 fade_end_km = Fade_removal_distance
             else:
-                #Start at base value for 50 density, add more for density under 50,
-                # up to +Fade_Start_km_near_0_fog km.
+                # Start at base value for 50 density, add more for density under 50,
+                #  up to +Fade_Start_km_near_0_fog km.
                 fade_start_km  = Fade_Start_km_at_50_fog + Fade_Start_km_near_0_fog * (1 - density/50)
                 fade_end_km    = Fade_End_km_at_50_fog   + Fade_Start_km_near_0_fog * (1 - density/50)
                                 
@@ -457,60 +469,59 @@ def Remove_Stars_From_Foggy_Sectors(
         elif Fade_fog_adjustment_type == 1:
             start_density = density #For debug view
 
-            #Calculate density based on fade start.
-            #Over Fade_Start_km_near_0_fog, want density 0 (and to boost up fade).
+            # Calculate density based on fade start.
+            # Over Fade_Start_km_near_0_fog, want density 0 (and to boost up fade).
             if fade_start_km >= Fade_Start_km_near_0_fog:
                 density = 0
-                #Remove fade
+                # Remove fade
                 fade_start_km = Fade_removal_distance
                 fade_end_km   = Fade_removal_distance
             else:
-                #Density is 50 at Fade_Start_km_at_50_fog, goes down as
-                # the fade goes up.
+                # Density is 50 at Fade_Start_km_at_50_fog, goes down as
+                #  the fade goes up.
                 density = 50 * (1 - (fade_start_km - Fade_Start_km_at_50_fog) 
                                     / (Fade_Start_km_near_0_fog - Fade_Start_km_at_50_fog))
-                #Keep density floored at 0.
+                # Keep density floored at 0.
                 density = max(0, density)
 
 
-            #Check if fade_end needs a boost.
+            # Check if fade_end needs a boost.
             if fade_end_km < fade_start_km + Min_distance_km_fade_start_to_end:
-                #This will keep a little variation by just adding on the
-                # minimum amount.
+                # This will keep a little variation by just adding on the
+                #  minimum amount.
                 fade_end_km += Min_distance_km_fade_start_to_end
                 this_dict['fadeout_end']   = str(int(fade_end_km * 1000 * 500))
                                    
 
         elif Fade_fog_adjustment_type == 2:
-            #Only do fade boost on density 0.
+            # Only do fade boost on density 0.
             if density == 0:
                 fade_start_km = Fade_removal_distance
                 fade_end_km = Fade_removal_distance
 
         elif Fade_fog_adjustment_type == 3:
-            #Remove fade entirely.
+            # Remove fade entirely.
             fade_start_km = Fade_removal_distance
             fade_end_km = Fade_removal_distance
                 
         elif Fade_fog_adjustment_type == 4:
-            #Check if the background image will not have stars removed.
+            # Check if the background image will not have stars removed.
             if this_dict['image'] not in images_allowing_star_removal_list:
-                #Remove fading in this case; treat sector as clear.
+                # Remove fading in this case; treat sector as clear.
                 fade_start_km = Fade_removal_distance
                 fade_end_km = Fade_removal_distance
 
                     
         if Remove_fade_unless_background_image_is_fog:
-            #Turn off any fading if the background image doesn't have 'fog' in it.
+            # Turn off any fading if the background image doesn't have 'fog' in it.
             if 'fog' not in this_dict['image']:
                 fade_start_km = Fade_removal_distance
                 fade_end_km = Fade_removal_distance
                 
-        #Put it all back.
+        # Put it all back.
         this_dict['fog_density']   = str(int(density))
-        #Convert to 1/500-m units.
+        # Convert to 1/500-m units.
         this_dict['fadeout_start'] = str(int(fade_start_km * 1000 * 500))
         this_dict['fadeout_end']   = str(int(fade_end_km * 1000 * 500))
             
     return
-

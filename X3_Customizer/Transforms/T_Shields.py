@@ -5,7 +5,7 @@ size is completely unintuitive considering shields are named
 after their sizes.
 '''
 from File_Manager import *
-import Flags
+from Common import Flags
 import math
 
 
@@ -21,9 +21,8 @@ def Adjust_Shield_Regen(
     '''
     for this_dict in Load_File('TShields.txt'):
         if scaling_factor != 1:
-            #Grab the shield efficiency, as a float.
+            # Grab the shield efficiency, as a float.
             value = float(this_dict['efficiency'])
             new_value = value * scaling_factor
-            #Put it back, with 1 decimal place.
+            # Put it back, with 1 decimal place.
             this_dict['efficiency'] = str('{0:.1f}'.format(new_value))
-

@@ -4,12 +4,13 @@ These are generally targetted at specific lines of the original input.
 
 '''
 import copy
+import os
 from File_Manager import *
 from copy import copy
 from collections import defaultdict
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
-import Flags
+from Common import Flags
 
 @Check_Dependencies('3.01 Generic Missions.xml')
 def Adjust_Generic_Missions(
@@ -66,7 +67,7 @@ def Adjust_Generic_Missions(
         typical highest in vanilla AP. Default False.
     '''
     import xml.etree.ElementTree
-    #Translate the base chance codes to category names.
+    # Translate the base chance codes to category names.
     code_category_dict = {
         'TXXX': 'Trade',
         'XFXX': 'Fight',
@@ -74,90 +75,90 @@ def Adjust_Generic_Missions(
         'XXXT': 'Think',
         }
 
-    #The general format of the line being edited looks like:
-    #<set_value name="this.L2M104A" exact="1" chance="{player.sector.quota.TXXX}*20"/>
-    #Could consider using proper xml parsing for this, but for now just
-    # do it a brute force way.
+    # The general format of the line being edited looks like:
+    # <set_value name="this.L2M104A" exact="1" chance="{player.sector.quota.TXXX}*20"/>
+    # Could consider using proper xml parsing for this, but for now just
+    #  do it a brute force way.
 
-    #Get the base file content.
+    # Get the base file content.
     file_contents = Load_File('3.01 Generic Missions.xml')
-    #Make a copy of text for editing.
+    # Make a copy of text for editing.
     new_file_text = copy(file_contents.text)
 
-    #Loop over the lines.
+    # Loop over the lines.
     for line in file_contents.text.splitlines():
-        #Skip lines without 'chance' in them.
+        # Skip lines without 'chance' in them.
         if 'chance="{' not in line:
             continue
-        #Skip lines that are commented.
+        # Skip lines that are commented.
         if line.strip().startswith('<!--'):
             continue
-        #Verify this line looks as expected.
+        # Verify this line looks as expected.
         assert 'set_value' in line
         assert 'player.sector.quota.' in line
 
 
-        #Parse the line xml.
+        # Parse the line xml.
         element = xml.etree.ElementTree.fromstring(line)
-        #print(element.items())
+        # print(element.items())
         
-        #Pick apart the components.
-        #Cue name has the form 'this.L2M104A', so remove the 'this.'.
+        # Pick apart the components.
+        # Cue name has the form 'this.L2M104A', so remove the 'this.'.
         cue_name = element.get('name').replace('this.','')
 
-        #Category and chance has the form '{player.sector.quota.TXXX}*20'
+        # Category and chance has the form '{player.sector.quota.TXXX}*20'
         chance_text = element.get('chance')
 
-        #Pull out the original multiplier, in the 0-100 range.
+        # Pull out the original multiplier, in the 0-100 range.
         multiplier_str = chance_text.split('*')[1]
 
-        #Pull out the category.
+        # Pull out the category.
         category_code = chance_text.split('}')[0].replace('{player.sector.quota.','')
         category = code_category_dict[category_code]
         
 
-        #Determine the adjustment factor to use.
+        # Determine the adjustment factor to use.
         adjustment = None
         if cue_name in adjustment_dict:
             adjustment = adjustment_dict[cue_name]
-        #Check the category next.
+        # Check the category next.
         elif category in adjustment_dict:
             adjustment = adjustment_dict[category]
 
-        #If there is no adjustment to apply, continue.
+        # If there is no adjustment to apply, continue.
         if adjustment == None:
             continue
 
-        #Adjust the multiplier, round, and floor to 0.
+        # Adjust the multiplier, round, and floor to 0.
         new_multiplier = round(int(multiplier_str) * adjustment)
         new_multiplier = max(0, new_multiplier)
-        #Optionally cap at 100.
+        # Optionally cap at 100.
         if cap_at_100:
             new_multiplier = min(100, new_multiplier)
-        #Actual max is unknown, though comments suggest base chances are
-        # up to 700, which then get multiplied to 70k, suggesting a
-        # 32-bit value is used for the chance in the game interpreter.
+        # Actual max is unknown, though comments suggest base chances are
+        #  up to 700, which then get multiplied to 70k, suggesting a
+        #  32-bit value is used for the chance in the game interpreter.
 
-        #Edit the chance field with the new multiplier.
+        # Edit the chance field with the new multiplier.
         new_chance_text = chance_text.replace(multiplier_str, str(new_multiplier))
-        #Put it back.
+        # Put it back.
         element.set('chance', new_chance_text)
-        #print(element.items())
+        # print(element.items())
 
             
-        #Need to set this to unicode, otherwise it returns a byte
-        # string and not a normal string.
-        #Also, note that this will return the node attributes in
-        # sorted order; there is no clean way to preserve the 
-        # original order. This is a little uglier than intended,
-        # but shouldn't really matter.
+        # Need to set this to unicode, otherwise it returns a byte
+        #  string and not a normal string.
+        # Also, note that this will return the node attributes in
+        #  sorted order; there is no clean way to preserve the 
+        #  original order. This is a little uglier than intended,
+        #  but shouldn't really matter.
         new_line = xml.etree.ElementTree.tostring(element, encoding="unicode")
 
-        #Replace the original with the new line.
-        #Ignore leading white space in the original, so it gets preserved.
+        # Replace the original with the new line.
+        # Ignore leading white space in the original, so it gets preserved.
         new_file_text = new_file_text.replace(line.strip(), new_line)
 
-    #Update the file text with the changes.
+    # Update the file text with the changes.
     file_contents.text = new_file_text
 
 
@@ -184,15 +185,15 @@ def Standardize_Tunings(
       - Int, the number of tunings in each rudder crate. Default 3.
 
     '''
-    #Make sure the input is an integer.
+    # Make sure the input is an integer.
     assert isinstance(enging_tuning_crates, int)
     assert isinstance(rudder_tuning_crates, int)
     assert isinstance(engine_tunings_per_crate, int)
     assert isinstance(rudder_tunings_per_crate, int)
 
-    #The section of code to modify in the original file looks like:
-    #(Note, since this is used as a replacement, indentation whitespace needs
-    # to be exact.)
+    # The section of code to modify in the original file looks like:
+    # (Note, since this is used as a replacement, indentation whitespace needs
+    #  to be exact.)
     original_text = '''<do_all exact="8" counter="placing4">
                 <find_sector name="ASP.Tuningsector{counter@placing4}" sector="{player.sector}" min="1" race="pirate"/>
                 <do_if value="{sector.exists@ASP.Tuningsector{counter@placing4}}" exact="1">
@@ -210,20 +211,20 @@ def Standardize_Tunings(
                   </do_any>
                 </do_if>
               </do_all>'''
-    #To standardize tunings to roughly the average case, maybe slightly
-    # above for ease of the transform, can change the number of
-    # loops from 8 to 4, chance the inner do_any to do_all so that each
-    # loop creates one of each tuning type, and change the min/max
-    # tunings to 4, eg. 16 engine and 16 rudder tunings.
-    #Update: revisit this, since it spawns pairs of tunings in the same
-    # sector instead of spreading them out more.
-    #Update: running "find_sector name="ASP.Tuningsector{counter@placing4}"" after
-    # having done it previously appears to cause the file to not load, so just
-    # copying the inner body and looping 4 times is not enough.
-    #Try copying the entire thing, giving the second copy a different
-    # counter, each loop running 4 times separately.
-    #TODO: optionally set the outer loop to 2 and do 2 iterations of each of the crates, 
-    # one at 3 and one at 4 tunings, to get the proper average.
+    # To standardize tunings to roughly the average case, maybe slightly
+    #  above for ease of the transform, can change the number of
+    #  loops from 8 to 4, chance the inner do_any to do_all so that each
+    #  loop creates one of each tuning type, and change the min/max
+    #  tunings to 4, eg. 16 engine and 16 rudder tunings.
+    # Update: revisit this, since it spawns pairs of tunings in the same
+    #  sector instead of spreading them out more.
+    # Update: running "find_sector name="ASP.Tuningsector{counter@placing4}"" after
+    #  having done it previously appears to cause the file to not load, so just
+    #  copying the inner body and looping 4 times is not enough.
+    # Try copying the entire thing, giving the second copy a different
+    #  counter, each loop running 4 times separately.
+    # TODO: optionally set the outer loop to 2 and do 2 iterations of each of the crates, 
+    #  one at 3 and one at 4 tunings, to get the proper average.
     replacement_text = ('''<do_all exact="ENGINE_CRATES" counter="placing4">
                 <find_sector name="ASP.Tuningsector{counter@placing4}" sector="{player.sector}" min="1" race="pirate"/>
                 <do_if value="{sector.exists@ASP.Tuningsector{counter@placing4}}" exact="1">
@@ -248,39 +249,39 @@ def Standardize_Tunings(
                   </do_any>
                 </do_if>
               </do_all>'''
-            #Do replacements of text, instead of using normal format specifier
-            # due to brackets in the original text.
+            # Do replacements of text, instead of using normal format specifier
+            #  due to brackets in the original text.
             .replace('ENGINE_CRATES', str(enging_tuning_crates))
             .replace('RUDDER_CRATES', str(rudder_tuning_crates))
             .replace('ENGINE_TUNES', str(engine_tunings_per_crate))
             .replace('RUDDER_TUNES', str(rudder_tunings_per_crate))
             )
               
-    #Grab the sector management file.
+    # Grab the sector management file.
     file_contents = Load_File('3.08 Sector Management.xml')
-    #Verify the original_block is present (matches succesfully).
+    # Verify the original_block is present (matches succesfully).
     assert file_contents.text.count(original_text) == 1
     file_contents.text = file_contents.text.replace(original_text, replacement_text)
 
-    #-Removed; old line-by-line method didn't scale well.
+    # -Removed; old line-by-line method didn't scale well.
     ##Define the modifications as a special dict of fields.
-    #transform_dict = {
-    #    #Start edits when seeing this line.
-    #    'start_line' : '<do_all exact="8" counter="placing4">',
-    #    #Indexes are line offsets from start, values are functions to be applied to the
-    #    # line to obtain the replacement line, or the key of another entry which
-    #    # contains the desired function (for function sharing).
-    #    #Swap loop count.
-    #    0  : lambda line : line.replace('8','4'),
-    #    #Switch to do_all, opener and closer.
-    #    3  : lambda line : line.replace('do_any','do_all'),
-    #    14 : 3,
-    #    #Switch to always getting 4 tunings.
-    #    7  : lambda line : line.replace('2','4').replace('5','4'),
-    #    12 : 7,
-    #    }
+    # transform_dict = {
+    #     #Start edits when seeing this line.
+    #     'start_line' : '<do_all exact="8" counter="placing4">',
+    #     #Indexes are line offsets from start, values are functions to be applied to the
+    #     # line to obtain the replacement line, or the key of another entry which
+    #     # contains the desired function (for function sharing).
+    #     #Swap loop count.
+    #     0  : lambda line : line.replace('8','4'),
+    #     #Switch to do_all, opener and closer.
+    #     3  : lambda line : line.replace('do_any','do_all'),
+    #     14 : 3,
+    #     #Switch to always getting 4 tunings.
+    #     7  : lambda line : line.replace('2','4').replace('5','4'),
+    #     12 : 7,
+    #     }
     ##Apply the transform rules.
-    #Apply_transform_to_lines(line_list, transform_dict)
+    # Apply_transform_to_lines(line_list, transform_dict)
 
 
     
@@ -290,13 +291,13 @@ def Convoys_made_of_race_ships():
     If convoy defense missions should use the convoy's race to select their ship type.
     The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
     '''        
-    #Swap this particular line to use the convoy race instead of default.
-    #This line should occur twice, for the trader and its escorts.
+    # Swap this particular line to use the convoy race instead of default.
+    # This line should occur twice, for the trader and its escorts.
     original_text = '''<param name="Maker Race" value="default" comment="The race of the ship maker"/>'''
     replacement_text = '''<param name="Maker Race" value="{value@L2M119.Convoy Race}" comment="The race of the ship maker"/>'''
-    #Grab the director file.
+    # Grab the director file.
     file_contents = Load_File('2.119 Trade Convoy.xml')
-    #Verify the original_block is present (matches succesfully).
+    # Verify the original_block is present (matches succesfully).
     assert file_contents.text.count(original_text) == 2
     file_contents.text = file_contents.text.replace(original_text, replacement_text)
 
@@ -305,16 +306,16 @@ def Convoys_made_of_race_ships():
     
 @Check_Dependencies('3.05 Gamestart Missions.xml')
 def Standardize_Start_Plot_Overtunings(
-    #Pick what fraction of the maximum overtunings to give.
-    #Overtuning will be set to some % of the maximum, which should roughly
-    # correspond with moderate reloading (since the default loadout algorithm
-    # makes higher tunings exponentially less likely in some manner, requiring
-    # likely many reloads).
-    #Eg. a maxed hyperion would be 250 m/s, but half max would be 210, which
-    # is easy to reach with light reloading.
-    #Checking forums, 230+ hyperions are often reported, which would require
-    # 9 overtunes out of 12, or 75%.
-    #Somewhere in between these points is probably reasonable.
+    # Pick what fraction of the maximum overtunings to give.
+    # Overtuning will be set to some % of the maximum, which should roughly
+    #  correspond with moderate reloading (since the default loadout algorithm
+    #  makes higher tunings exponentially less likely in some manner, requiring
+    #  likely many reloads).
+    # Eg. a maxed hyperion would be 250 m/s, but half max would be 210, which
+    #  is easy to reach with light reloading.
+    # Checking forums, 230+ hyperions are often reported, which would require
+    #  9 overtunes out of 12, or 75%.
+    # Somewhere in between these points is probably reasonable.
     fraction_of_max = 0.70
     ):
     '''
@@ -328,14 +329,14 @@ def Standardize_Start_Plot_Overtunings(
         Default of 0.7 is set to mimic moderate game reloading results.
     '''
 
-    #Sections of interest (in different locations) are,
-    # for Kea:
+    # Sections of interest (in different locations) are,
+    #  for Kea:
     original_kea = '''<create_ship name="this.reward" dockobject="this.dock" typename="SS_SH_T_M3P_ENH" race="player">
                         <equipment loadout="default">
                           <ware typename="SS_WARE_TECH213" exact="18"/>
                           <ware typename="SS_WARE_TECH246" exact="9"/>
                         </equipment>'''
-    #And, for Hyperion:
+    # And, for Hyperion:
     original_hyp = '''<create_ship name="this.reward" dockobject="this.dock" typename="SS_SH_P_M6_ADV" race="player">
                               <equipment loadout="default">
                                 <ware typename="SS_WARE_TECH213" exact="12"/>
@@ -348,20 +349,20 @@ def Standardize_Start_Plot_Overtunings(
                                 <ware typename="SS_WARE_TECH246" exact="5"/>
                               </equipment>
                             </create_ship>'''
-    #Rudder is SS_WARE_TECH246, engine is SS_WARE_TECH213.
-    #Editing can either focus on giving max loadout and reducing the tunings,
-    # or inserting lines to remove the default tuning counts and then add in
-    # the full base tunings with some reduced number of overtunings.
-    #Go with the second option, since there are examples online, eg.
-    # https://forum.egosoft.com/viewtopic.php?t=376828
-    #Note: the above example appears like it might be buggy, since it removes
-    # tunings based on player.ship, not the spawned ship; replace it with a
-    # fixed count maybe, eg. the max possible tunings, and rely on it to floor
-    # at 0.
-    #Update: setting large negative values seems to bug out the file, such that game
-    # doesn't load it for whatever reason. Try to set negative value exactly matching
-    # that of the ship's max normal tunings (maybe there is a check during parsing).
-    #Kea: Normal max 15 engine, 15 rudder.
+    # Rudder is SS_WARE_TECH246, engine is SS_WARE_TECH213.
+    # Editing can either focus on giving max loadout and reducing the tunings,
+    #  or inserting lines to remove the default tuning counts and then add in
+    #  the full base tunings with some reduced number of overtunings.
+    # Go with the second option, since there are examples online, eg.
+    #  https://forum.egosoft.com/viewtopic.php?t=376828
+    # Note: the above example appears like it might be buggy, since it removes
+    #  tunings based on player.ship, not the spawned ship; replace it with a
+    #  fixed count maybe, eg. the max possible tunings, and rely on it to floor
+    #  at 0.
+    # Update: setting large negative values seems to bug out the file, such that game
+    #  doesn't load it for whatever reason. Try to set negative value exactly matching
+    #  that of the ship's max normal tunings (maybe there is a check during parsing).
+    # Kea: Normal max 15 engine, 15 rudder.
     replacement_kea = '''<create_ship name="this.reward" dockobject="this.dock" typename="SS_SH_T_M3P_ENH" race="player">
                         <equipment loadout="default">
                           <ware typename="SS_WARE_TECH213" exact="-15"/>
@@ -372,8 +373,8 @@ def Standardize_Start_Plot_Overtunings(
                             round(15 + 18 * fraction_of_max),
                             round(15 + 9 * fraction_of_max)
                             )
-    #Hyperion, normal max 15 engine, 18 rudder.
-    #Perseus, normal max 12 engine, 12 rudder.
+    # Hyperion, normal max 15 engine, 18 rudder.
+    # Perseus, normal max 12 engine, 12 rudder.
     replacement_hyp = '''<create_ship name="this.reward" dockobject="this.dock" typename="SS_SH_P_M6_ADV" race="player">
                               <equipment loadout="default">
                                 <ware typename="SS_WARE_TECH213" exact="-15"/>
@@ -396,9 +397,9 @@ def Standardize_Start_Plot_Overtunings(
                             round(12 + 5 * fraction_of_max),
                             )
             
-    #Grab the sector management file.
+    # Grab the sector management file.
     file_contents = Load_File('3.05 Gamestart Missions.xml')
-    #Verify the original_block is present (matches succesfully).
+    # Verify the original_block is present (matches succesfully).
     assert file_contents.text.count(original_kea) == 1
     assert file_contents.text.count(original_hyp) == 1
     file_contents.text = (file_contents.text
@@ -416,33 +417,33 @@ def Make_Director_Shell(cue_name, body_text = None, file_name = None, _cleanup =
     Optionally, delete any old file previously generated instead of
     creating one.
     '''
-    # Set the default file name.
+    #  Set the default file name.
     if not file_name:
         file_name = cue_name + '.xml'
     assert '.xml' in file_name
 
-    # Get the path to the file to generate.
+    #  Get the path to the file to generate.
     file_path = os.path.join('Director', file_name)
-    # If in cleanup mode, check for the file and delete it if found.
+    #  If in cleanup mode, check for the file and delete it if found.
     if _cleanup:
         if os.path.exists(file_path):
             os.remove(file_path)
         return
     
-    # Double check the director folder exists.
+    #  Double check the director folder exists.
     if not os.path.exists('Director'):
         os.mkdir('Director')
 
-    #Copied shell text from a patch script that cleared invulnerable station flags.
-    #This will make the queue name and text body replaceable.
-    #Since the shell text naturally has {} in it, don't use format here, just
-    # use replace.
-    #Update: the 'check' term in the cue definition indicates what to do when
-    # the first condition check fails; in the invuln-station-fix, it is set to
-    # cancel, indicating that when it checks on a new game (player age check
-    # fails) it will cancel and not run the cue.
-    # To ensure these cues do run on new games, do not use a check value, or
-    # set it to none, which should put the cue on a constant recheck.
+    # Copied shell text from a patch script that cleared invulnerable station flags.
+    # This will make the queue name and text body replaceable.
+    # Since the shell text naturally has {} in it, don't use format here, just
+    #  use replace.
+    # Update: the 'check' term in the cue definition indicates what to do when
+    #  the first condition check fails; in the invuln-station-fix, it is set to
+    #  cancel, indicating that when it checks on a new game (player age check
+    #  fails) it will cancel and not run the cue.
+    #  To ensure these cues do run on new games, do not use a check value, or
+    #  set it to none, which should put the cue on a constant recheck.
     shell_text = r'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <?xml-stylesheet href="director.xsl" type="text/xsl" ?>
 <director name="template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="director.xsd">
@@ -469,10 +470,13 @@ def Make_Director_Shell(cue_name, body_text = None, file_name = None, _cleanup =
 </director>
 '''.replace('INSERT_CUE_NAME', cue_name).replace('INSERT_BODY', body_text)
 
-    #Path to the director folder and write the file, with this queue name.
-    #Working directory should alrady be the addon directory, so dig down 1 folder.
-    with open(file_path, 'w') as file:
-        file.write(shell_text)
+    # Path to the director folder and write the file, with this queue name.
+    # Working directory should alrady be the addon directory, so dig down 1 folder.
+    #with open(file_path, 'w') as file:
+    #    file.write(shell_text)
+    # Switch to making a file object.
+    File_Manager.Add_File(
+        file_name, Misc_File(virtual_path_name = file_path, text = shell_text))
 
 
         
@@ -498,9 +502,9 @@ def Generate_Director_Text_To_Update_Shipyards(
     The returned text will be wrapped in a do_all block.
     '''
 
-    # This will eventually be xml, so do it using a list of xml nodes
-    # to be placed inside of a do_all block.
-    # This should be a lot more elegant than raw text strings.
+    #  This will eventually be xml, so do it using a list of xml nodes
+    #  to be placed inside of a do_all block.
+    #  This should be a lot more elegant than raw text strings.
     do_all_root = ET.Element('do_all',{})
 
     '''
@@ -530,53 +534,53 @@ def Generate_Director_Text_To_Update_Shipyards(
      Update: option (1) is comparatively super fast.
     '''
 
-    # To speed up the script, try to add all new objects together
-    #  which share the same template object, and also categorize
-    #  by race.
-    # Note: in removal mode, there are no template objects to worry
-    #  about; just put the ware itself in the template for that case,
-    #  to get reuse of the match code.
-    # Make a race : template_name : new_wares_sublist dict.
+    #  To speed up the script, try to add all new objects together
+    #   which share the same template object, and also categorize
+    #   by race.
+    #  Note: in removal mode, there are no template objects to worry
+    #   about; just put the ware itself in the template for that case,
+    #   to get reuse of the match code.
+    #  Make a race : template_name : new_wares_sublist dict.
     race_template_wares_list_dict_dict = defaultdict(
                                         lambda : defaultdict(list))
 
     for ware_dict in new_wares_list:
-        # Get the race as a string, using director race names.
+        #  Get the race as a string, using director race names.
         race_type = Flags.Director_race_code_name_dict[int(ware_dict['race'])]
         race_template_wares_list_dict_dict[
             race_type][
-                # Use the template name, or ware name if removing it.
+                #  Use the template name, or ware name if removing it.
                 ware_dict.template_name if removal_mode == False else ware_dict['name']
                 ].append(ware_dict)
 
 
-    # For removal mode, much of this code will be the same until getting
-    #  into the do_if node when a template name is matched.
+    #  For removal mode, much of this code will be the same until getting
+    #   into the do_if node when a template name is matched.
 
-    # Loop over the races.
+    #  Loop over the races.
     for race, template_wares_list_dict in race_template_wares_list_dict_dict.items():
 
-        # For fun, toss up a help message to say what is happening.
-        # -Removed; the game basically freezes while this runs, so the
-        # display doesn't show up until after it completes. Can still
-        # put a final message.
-        #help_node = ET.Element('show_help',{
-        #    'text' : 'Updating {} shipyards with new wares.'.format(race),
-        #    # Try out 5 seconds or so.
-        #    'duration' : '5000'})
-        #do_all_root.append(help_node)
+        #  For fun, toss up a help message to say what is happening.
+        #  -Removed; the game basically freezes while this runs, so the
+        #  display doesn't show up until after it completes. Can still
+        #  put a final message.
+        # help_node = ET.Element('show_help',{
+        #     'text' : 'Updating {} shipyards with new wares.'.format(race),
+        #     # Try out 5 seconds or so.
+        #     'duration' : '5000'})
+        # do_all_root.append(help_node)
 
-        # Gather a list of all shipyards for this race.
-        # Example:
-        # <find_station group="Shipyards" multiple="1">
-        #     <sector x="0" y="0"/>
-        #     <jumps max="100"/>
-        # </find_station>
-        # Note: groups appear to be sticky, as in multiple commands with
-        # the same group will append to it, so after each shipyard group
-        # is handled the group should be cleared out.
-        # Note: when looking for terrans, also match with atf, which can
-        # be done using the special 'terrangroup' flag.
+        #  Gather a list of all shipyards for this race.
+        #  Example:
+        #  <find_station group="Shipyards" multiple="1">
+        #      <sector x="0" y="0"/>
+        #      <jumps max="100"/>
+        #  </find_station>
+        #  Note: groups appear to be sticky, as in multiple commands with
+        #  the same group will append to it, so after each shipyard group
+        #  is handled the group should be cleared out.
+        #  Note: when looking for terrans, also match with atf, which can
+        #  be done using the special 'terrangroup' flag.
         station_node = ET.Element('find_station',{
             'group' : 'Shipyards',
             'multiple' : '1',
@@ -586,120 +590,120 @@ def Generate_Director_Text_To_Update_Shipyards(
         station_node.extend( [
             ET.Element('sector',{'x' : '0','y' : '0'}),
             ET.Element('jumps',{'max' : '100'}),
-            # -Removed; ware check doesn't appear to work with multi match.
-            # This is leftover from trying style (2).
-            #ET.Element('ware',{'typename' : template_name,
-            #                   # Require at least 1 unit; otherwise this
-            #                   # seemed to be matching everything.
-            #                   'min'      : '1'}),
+            #  -Removed; ware check doesn't appear to work with multi match.
+            #  This is leftover from trying style (2).
+            # ET.Element('ware',{'typename' : template_name,
+            #                    # Require at least 1 unit; otherwise this
+            #                    # seemed to be matching everything.
+            #                    'min'      : '1'}),
             ])
 
-        # Set up a loop over the stations.
-        # Example:
-        # <do_all exact="{group.object.count@Shipyards}" counter="count">
+        #  Set up a loop over the stations.
+        #  Example:
+        #  <do_all exact="{group.object.count@Shipyards}" counter="count">
         loop_node = ET.Element('do_all',{
-            # Give the number of shipyards to count through.
+            #  Give the number of shipyards to count through.
             'exact' : '{group.object.count@Shipyards}',
-            # Name the counter.
+            #  Name the counter.
             'counter' : 'count'})
 
-        # Indent here to indicate inside the loop above.
+        #  Indent here to indicate inside the loop above.
         if 1:
-            # This string will be used to reference a given shipyard,
-            # by indexing into the Shipyards group based on the current
-            # counter value.
+            #  This string will be used to reference a given shipyard,
+            #  by indexing into the Shipyards group based on the current
+            #  counter value.
             shipyard = '{group.object.{counter@count}@Shipyards}'
 
-            # Loop over all of the templates to be checked.
+            #  Loop over all of the templates to be checked.
             for template_name, new_wares_list in template_wares_list_dict.items():
 
-                # Check if this shipyard has this ware as a product.
-                # Thankfully, there appears to be a convenient command
-                # for this, getting a boolean.
-                # Put this in a do_if node.
+                #  Check if this shipyard has this ware as a product.
+                #  Thankfully, there appears to be a convenient command
+                #  for this, getting a boolean.
+                #  Put this in a do_if node.
                 if_node = ET.Element('do_if',{
                     'value' : '{{object.products.{}.exists@{}}}'.format(
                         template_name,
                         shipyard
                         ),
                     'exact' : '1'})
-                # Add this to the loop.
+                #  Add this to the loop.
                 loop_node.append(if_node)
 
-                # Indent for the do_if block.
+                #  Indent for the do_if block.
                 if 1:
-                    # Loop over the new wares.
+                    #  Loop over the new wares.
                     for new_ware in new_wares_list:
 
-                        # In removal mode, it should be okay to remove the
-                        # product blindly.
+                        #  In removal mode, it should be okay to remove the
+                        #  product blindly.
                         if removal_mode:
-                            # Only need to give a typename here; amount 
-                            # doesn't matter since it does a full removal.
+                            #  Only need to give a typename here; amount 
+                            #  doesn't matter since it does a full removal.
                             remove_node = ET.Element('remove_products',{'object' : shipyard})
                             remove_node.append(ET.Element('ware',{
                                 'typename' : new_ware['name']}))
-                            # Stick in the outer do_if.
+                            #  Stick in the outer do_if.
                             if_node.append(remove_node)
 
                         else:
-                            # Aim is to add just 1 unit of product, and to not add
-                            #  any more if the station already has at least 1 unit.
-                            # This will require another do_if, conditioned on the
-                            #  product count.
-                            # Check if the ware doesn't exist.
+                            #  Aim is to add just 1 unit of product, and to not add
+                            #   any more if the station already has at least 1 unit.
+                            #  This will require another do_if, conditioned on the
+                            #   product count.
+                            #  Check if the ware doesn't exist.
                             inner_if_node = ET.Element('do_if',{
                                 'value' : '{{object.products.{}.exists@{}}}'.format(
                                     new_ware['name'],
                                     shipyard
                                     ),
                                 'exact' : '0'})
-                            # Stick in the outer do_if.
+                            #  Stick in the outer do_if.
                             if_node.append(inner_if_node)
 
-                            # Indent again.
+                            #  Indent again.
                             if 1:
-                                # Add the product to the current shipyard.
+                                #  Add the product to the current shipyard.
                                 insert_node = ET.Element('add_products',{'object' : shipyard})
                                 insert_node.append(ET.Element('ware',{
                                     'typename' : new_ware['name'],
-                                    # Give 1 unit, else shows up in game with 0.
+                                    #  Give 1 unit, else shows up in game with 0.
                                     'exact' : '1'}))
-                                # Stick inside the do_if.
+                                #  Stick inside the do_if.
                                 inner_if_node.append(insert_node)
                     
-        # Clear out the shipyard group.
+        #  Clear out the shipyard group.
         clear_node = ET.Element('remove_group',{'group' : 'Shipyards'})
             
-        # Stick these in the outer do_all.
+        #  Stick these in the outer do_all.
         do_all_root.append(station_node)
         do_all_root.append(loop_node)
         do_all_root.append(clear_node)
 
         
-    # Make a final status message.
+    #  Make a final status message.
     do_all_root.append( ET.Element('show_help',{
         'text' : 'Completed shipyard ware update.',
-        # Try out a few seconds.
-        # This seems to have the processing time counted against
-        # it, so should be longer than that.
-        # In testing, takes a few seconds to process.
+        #  Try out a few seconds.
+        #  This seems to have the processing time counted against
+        #  it, so should be longer than that.
+        #  In testing, takes a few seconds to process.
         'duration' : '6000'}))
 
 
-    # Send back the xml node if requested.
+    #  Send back the xml node if requested.
     if return_xml:
         return do_all_root
 
-    # Otherwise convert to text.
+    #  Otherwise convert to text.
     else:
-        # Give it some nice formatting.
+        #  Give it some nice formatting.
         xml_text = ET.tostring(do_all_root)
         minidom_root = minidom.parseString(xml_text)
         xml_text = minidom_root.toprettyxml(indent = indent_str)
 
-        # Post-process it to get rid of the xml declaration node, and add
-        # an extra indents.
+        #  Post-process it to get rid of the xml declaration node, and add
+        #  an extra indents.
         xml_lines = xml_text.splitlines()
         assert 'version' in xml_lines[0]
         xml_lines = xml_lines[1:]

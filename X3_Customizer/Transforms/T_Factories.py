@@ -2,8 +2,8 @@
 Transforms to factories.
 '''
 from File_Manager import *
-from T_Director import *
-import Flags
+from .T_Director import *
+from Common import Flags
 from collections import defaultdict
 import copy
 import os
@@ -97,7 +97,8 @@ def Add_More_Factory_Sizes(
     # Lay out some file paths, for cleanup.
     # Location for a ware template dummy.
     dummy_template_name = 'WareTemplate_x3c_dummy'
-    dummy_template_path = os.path.join('maps', dummy_template_name+'.xml')
+    dummy_template_file_name = dummy_template_name+'.xml'
+    dummy_template_path = os.path.join('maps', dummy_template_file_name)
 
     # Location for the director script that will load the dummy.
     # This should match the cue name.
@@ -391,8 +392,13 @@ def Add_More_Factory_Sizes(
 
     # This will go in the maps folder.
     # Write as direct utf-8 (most likely) byte string.
-    with open(dummy_template_path, 'wb') as file:
-        file.write(ET.tostring(element_root))
+    #with open(dummy_template_path, 'wb') as file:
+    #    file.write(ET.tostring(element_root))
+    # Switch to using a file object.
+    File_Manager.Add_File(
+        dummy_template_file_name,
+        Misc_File(virtual_path_name = dummy_template_path,
+                  text = ET.tostring(element_root)))
         
     # Prepare a director script to load the map file.
     # TODO: maybe clean out the cue_index-1 version of this, so a

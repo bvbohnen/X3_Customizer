@@ -218,28 +218,28 @@ from File_Manager import *
 import os
 import copy 
 
-#-Removed; Adjust_Gate_Rings is a more powerful version that can
-# do this as well.
-#@Check_Dependencies('TGates.txt')
-#def Swap_Standard_Gates_To_Terran_Gates():
-#    '''
-#    Changes standard gates into Terran gates, possibly helping reduce
-#    large ship suicides when entering a system.
-#    '''
-#    #Step through each line.
-#    for this_dict in Load_File('TGates.txt'):
-#        #Check if this is one of the standard gates.
-#        #Separate versions for each direction, though all use the same model.
-#        if this_dict['name'] in ['SS_WG_NORTH','SS_WG_EAST','SS_WG_SOUTH','SS_WG_WEST']:
-#            #Swap the scene file.
-#            this_dict['model_scene'] = r'patch20\terran_gate_scene'
+# -Removed; Adjust_Gate_Rings is a more powerful version that can
+#  do this as well.
+# @Check_Dependencies('TGates.txt')
+# def Swap_Standard_Gates_To_Terran_Gates():
+#     '''
+#     Changes standard gates into Terran gates, possibly helping reduce
+#     large ship suicides when entering a system.
+#     '''
+#     #Step through each line.
+#     for this_dict in Load_File('TGates.txt'):
+#         #Check if this is one of the standard gates.
+#         #Separate versions for each direction, though all use the same model.
+#         if this_dict['name'] in ['SS_WG_NORTH','SS_WG_EAST','SS_WG_SOUTH','SS_WG_WEST']:
+#             #Swap the scene file.
+#             this_dict['model_scene'] = r'patch20\terran_gate_scene'
             
 
 @Check_Dependencies('TGates.txt', 'TSpecial.txt')
 def Adjust_Gate_Rings(
     standard_ring_option = None,
     hub_ring_option = 'use_standard_ring',
-    #Special flag to clean out old files.
+    # Special flag to clean out old files.
     _cleanup = False
     ):
     '''
@@ -274,16 +274,16 @@ def Adjust_Gate_Rings(
           option used for the standard ring.
     '''
     
-    #If 'use_standard_ring_option' was selected for the hub option,
-    # do the copy here.
+    # If 'use_standard_ring_option' was selected for the hub option,
+    #  do the copy here.
     if hub_ring_option == 'use_standard_ring_option':
         hub_ring_option = standard_ring_option
 
 
-    #Get a path to the folder to place new scene files in.
-    #Just make use of the 'others' folder for now, in case generating
-    # a new folder causes issues for the game at run time (eg. slower
-    # performance on object lookups).
+    # Get a path to the folder to place new scene files in.
+    # Just make use of the 'others' folder for now, in case generating
+    #  a new folder causes issues for the game at run time (eg. slower
+    #  performance on object lookups).
     base_folder = os.path.join('..','objects','others')
 
     base_gate_names = [
@@ -291,32 +291,32 @@ def Adjust_Gate_Rings(
                 'terraformer_gate',
                 'argon_gate_inactive',
                 'terraformer_gate_inactive',
-                #Don't change terran gates for now; no particular
-                # need for it.
-                #'terran_catapult_gate',
-                #'terran_gate',
-                #'terran_gate_inactive',
+                # Don't change terran gates for now; no particular
+                #  need for it.
+                # 'terran_catapult_gate',
+                # 'terran_gate',
+                # 'terran_gate_inactive',
             ]
     
-    #File names to use for generated scenes.
-    #These get deleted on cleanup.
-    #Include the full path.
+    # File names to use for generated scenes.
+    # These get deleted on cleanup.
+    # Include the full path.
     file_names = { x : os.path.join(base_folder, 'x3c_{}_scene.bod'.format(x)) 
             for x in base_gate_names }
 
-    #Internal game file paths for these scenes, relative to the objects
-    # folder, with no suffix.
+    # Internal game file paths for these scenes, relative to the objects
+    #  folder, with no suffix.
     file_virtual_names = {
-        #Escape the backslash; only want one here.
+        # Escape the backslash; only want one here.
         x : 'others\\' + x
         for x in base_gate_names
         }
     
-    #When being called for cleanup, run the Cleanup function and return.
-    #This is low priority, since the generated scenes shouldn't interfere
-    # with anything else.
+    # When being called for cleanup, run the Cleanup function and return.
+    # This is low priority, since the generated scenes shouldn't interfere
+    #  with anything else.
     if _cleanup:
-        #Loop over the file names.
+        # Loop over the file names.
         for file_name in file_names.values():
             try:
                 os.remove(file_name)
@@ -324,17 +324,17 @@ def Adjust_Gate_Rings(
                 pass
         return
     
-    #Make the target folder if needed.
+    # Make the target folder if needed.
     if not os.path.exists(base_folder):
         os.mkdir(base_folder)
 
 
-    #Since there are multiple options for each gate, the approach here will
-    # be to build a small data structure representing the fields needed
-    # per gate scene file, and then to made edits to it based on the
-    # input args.
-    #Create the base scenes items.  There will be multiple portal objects
-    # to represent the portal offset needed.
+    # Since there are multiple options for each gate, the approach here will
+    #  be to build a small data structure representing the fields needed
+    #  per gate scene file, and then to made edits to it based on the
+    #  input args.
+    # Create the base scenes items.  There will be multiple portal objects
+    #  to represent the portal offset needed.
     base_gates = {
         'argon_gate' : {
             'gate' : _Scene_Item(
@@ -360,7 +360,7 @@ def Adjust_Gate_Rings(
                 rotation = (0,0,0,0)
             )},
     
-        #No portal on the catapult.
+        # No portal on the catapult.
         'terran_catapult_gate' : {
             'gate' : _Scene_Item(
                 base_object = r'others\terran_catapult_gate',
@@ -387,72 +387,72 @@ def Adjust_Gate_Rings(
     
     }
 
-    #Set up a default output gate dict. This one should be safe
-    # for direct editing.
+    # Set up a default output gate dict. This one should be safe
+    #  for direct editing.
     edited_gates = copy.deepcopy(base_gates)
 
 
-    #Loop over the options for the different gate types.
+    # Loop over the options for the different gate types.
     for option, gate_name in zip(
             [standard_ring_option, hub_ring_option],
             ['argon_gate', 'terraformer_gate']
             ):
-        #Grab the gate scene dict, from the editable versions.
+        # Grab the gate scene dict, from the editable versions.
         gate_scene = edited_gates[gate_name]
 
-        #Do rotations. These don't change position or portal.
+        # Do rotations. These don't change position or portal.
         if option == 'rotate_45':
             gate_scene['gate'].rotation = (.125,0,0,1)
         elif option == 'rotate_90':
             gate_scene['gate'].rotation = (.25,0,0,1)
 
-        #Do terran replacement.
+        # Do terran replacement.
         elif option == 'use_terran':
-            #Clear the existing items and grab the terran
-            # gate scene, copied for now in case later development
-            # will support chaining transforms.
+            # Clear the existing items and grab the terran
+            #  gate scene, copied for now in case later development
+            #  will support chaining transforms.
             gate_scene.clear()
             gate_scene.update(copy.deepcopy(base_gates['terran_gate']))
 
-        #Do rotated hub replacement.
+        # Do rotated hub replacement.
         elif option == 'use_reversed_hub':
-            #Start with a copy.
+            # Start with a copy.
             gate_scene.clear()
             gate_scene.update(copy.deepcopy(base_gates['terraformer_gate']))
-            #Do the 180 degree rotation.
+            # Do the 180 degree rotation.
             gate_scene['gate'].rotation = (.5,0,1,0)
 
-        #Do plain ring replacement.
+        # Do plain ring replacement.
         elif option == 'use_plain_ring':
-            #This will do a direct drop-in of the model file.
+            # This will do a direct drop-in of the model file.
             gate_scene['gate'].base_object = r'stations\others\terraformer_gate'
-            #Do the 180 degree rotation, to get the clean side of
-            # the gate facing the system.
+            # Do the 180 degree rotation, to get the clean side of
+            #  the gate facing the system.
             gate_scene['gate'].rotation = (.5,0,1,0)
 
-        #Remove the ring.
+        # Remove the ring.
         elif option == 'remove':
-            #Can either point to a dummy empty file, or delete the
-            # line for the ring. Go with the latter.
-            #Note that this does not affect the inactive gates, since
-            # otherwise they would just be invisible.
+            # Can either point to a dummy empty file, or delete the
+            #  line for the ring. Go with the latter.
+            # Note that this does not affect the inactive gates, since
+            #  otherwise they would just be invisible.
             del(gate_scene['gate'])
 
         elif option == None:
             continue
 
         else:
-            #If here, something went wrong.
+            # If here, something went wrong.
             print('Adjust_Gate_Rings error, gate option {} not understood'.format(
                 option))
-            #Stop the transform.
+            # Stop the transform.
             return
 
             
-    #Inactive versions are just the gates from above with the
-    # portals removed (and the particle effect on the terran
-    # gate removed as well for now).
-    #In case a gate was removed, these will grab from the base gates.
+    # Inactive versions are just the gates from above with the
+    #  portals removed (and the particle effect on the terran
+    #  gate removed as well for now).
+    # In case a gate was removed, these will grab from the base gates.
     for gate_name in ['argon_gate', 'terraformer_gate', 'terran_gate']:
         inactive_gate_name = gate_name + '_inactive'
         try:
@@ -462,83 +462,88 @@ def Adjust_Gate_Rings(
             edited_gates[inactive_gate_name] = {
                 'gate' : base_gates[gate_name]['gate']}
             
-    #Create the new scene files for all of these, regardless of which ones
-    # were changed for now.
+    # Create the new scene files for all of these, regardless of which ones
+    #  were changed for now.
     for gate_name, gate_dict in edited_gates.items():
         
-        #The gate_name should have a file name in file_names already,
-        # with full path, if they are ones being overwritten.
-        #This will skip terran gates.
+        # The gate_name should have a file name in file_names already,
+        #  with full path, if they are ones being overwritten.
+        # This will skip terran gates.
         if gate_name not in file_names:
             continue
         file_path = file_names[gate_name]
 
-        #Create the lines for the file.
+        # Create the lines for the file.
         output_lines = [
-            #Start with version.
+            # Start with version.
             'VER: 3;',
             ]
 
-        #Loop over the scene items. Order doesn't particularly matter,
-        # but can sort for consistency.
+        # Loop over the scene items. Order doesn't particularly matter,
+        #  but can sort for consistency.
         for index, (name, scene_item) in enumerate(sorted(gate_dict.items())):
 
-            #Create the object path line.
-            #Example: 'P 0; B others\argon_gate; N Bothers\argon_gate; b'
+            # Create the object path line.
+            # Example: 'P 0; B others\argon_gate; N Bothers\argon_gate; b'
             output_lines.append(
                 'P {}; B {}; b'.format(
                     index,
                     scene_item.base_object
                     ))
 
-            #Create the animation frame.
-            #Example: { 0x2002; 0; 0; 0; 0.000000; 0.000000; 0.000000; 0.000000; -1; -1; }
+            # Create the animation frame.
+            # Example: { 0x2002; 0; 0; 0; 0.000000; 0.000000; 0.000000; 0.000000; -1; -1; }
             output_lines.append(
-                #Note: format requires doubled {{ and }} to put in a single
-                # one.
+                # Note: format requires doubled {{ and }} to put in a single
+                #  one.
                 '{{ 0x2002; {}; {}; -1; -1; }}'.format(
-                    #Can directly string the position offsets.
+                    # Can directly string the position offsets.
                     '; '.join([str(x) for x in scene_item.position]),
-                    #Format the rotations into floats with a few decimals,
-                    # no more than 6 to limit to existing formats seen.
+                    # Format the rotations into floats with a few decimals,
+                    #  no more than 6 to limit to existing formats seen.
                     '; '.join(['{:.3f}'.format(x) for x in scene_item.rotation]),
                     ))
 
-        #Write the file.
-        with open(file_path, 'w') as file:
-            for line in output_lines:
-                file.write(line + '\n')
+        # Write the file.
+        #with open(file_path, 'w') as file:
+        #    for line in output_lines:
+        #        file.write(line + '\n')
+        # Switch to using a file object.
+        File_Manager.Add_File(
+            os.path.split(file_path)[1],
+            Misc_File(virtual_path_name = os.path.relpath(file_path, Settings.Get_X3_Folder()),
+                      text = '\n'.join(output_lines)))
 
 
-    #With the scene files created, now need to point the existing gates
-    # to use these scenes.
-    #Make a dict matching the old scene to new scene, which can be used
-    # for matching when doing edits on tgates and tspecial.
+    # With the scene files created, now need to point the existing gates
+    #  to use these scenes.
+    # Make a dict matching the old scene to new scene, which can be used
+    #  for matching when doing edits on tgates and tspecial.
     scene_replacement_dict = {
         r'others\argon_gate_scene'                : r'others\x3c_argon_gate_scene',
         r'patch20\argon_inactivegate'             : r'others\x3c_argon_gate_inactive_scene',
         r'others\terraformer_gate_active_scene'   : r'others\x3c_terraformer_gate_scene',
         r'others\terraformer_gate_inactive_scene' : r'others\x3c_terraformer_gate_inactive_scene',
-        #No changes to terran gates for now.
-        #r'others\terraformer_gate_inactive_scene' : r'others\x3c_terraformer_gate_inactive_scene',
-        #r'others\terran_catapult_gate_scene'      : r'others\x3c_terran_catapult_gate_scene',
-        #r'patch20\terran_gate_scene'              : r'others\x3c_terran_gate_scene',
+        # No changes to terran gates for now.
+        # r'others\terraformer_gate_inactive_scene' : r'others\x3c_terraformer_gate_inactive_scene',
+        # r'others\terran_catapult_gate_scene'      : r'others\x3c_terran_catapult_gate_scene',
+        # r'patch20\terran_gate_scene'              : r'others\x3c_terran_gate_scene',
         }
 
 
-    #Do tgates changes.
+    # Do tgates changes.
     for this_dict in Load_File('TGates.txt'):
-        #Check for a scene to be replaced, and replace it.
+        # Check for a scene to be replaced, and replace it.
         if this_dict['model_scene'] in scene_replacement_dict:
             this_dict['model_scene'] = scene_replacement_dict[this_dict['model_scene']]
     
-    #Do tspecial changes.
+    # Do tspecial changes.
     for this_dict in Load_File('TSpecial.txt'):
         if this_dict['model_scene'] in scene_replacement_dict:
             this_dict['model_scene'] = scene_replacement_dict[this_dict['model_scene']]
     
 
-    #That should be it.
+    # That should be it.
     return
 
 
