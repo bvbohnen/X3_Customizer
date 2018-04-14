@@ -1,4 +1,4 @@
-X3 Customizer 3.0
+X3 Customizer 3.1
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.
@@ -212,6 +212,10 @@ Obj Transforms:
  * Adjust_Max_Speedup_Rate
 
       Changes the rate at which SETA turns on. By default, it will accelerate by (selected SETA -1)/10 every 250 milliseconds. This transform will reduce the delay between speedup ticks.
+
+ * Allow_Valhalla_To_Jump_To_Gates
+
+      Removes a restriction on the Valhalla, or whichever ship is at offset 211 in tships, for jumping to gates. This should only be applied alongside another mod that either reduces the valhalla size, increases gate size, removes gate rings, or moves/removes the forward pylons, to avoid collision problems.
 
  * Disable_Asteroid_Respawn
 
@@ -628,3 +632,6 @@ Change Log:
    - Added hashes to log of files written, to recognize when they change externally.
    - Added executable generation using pyinstaller.
    - Added alternative scaling functions to bypass scipy requirement, which otherwise bloats the exe.
+ * 3.1
+   - Bugfix for gate edits, adding an end-of-file newline that x3 requires and was lost in the file system conversion.
+   - Added Allow_Valhalla_To_Jump_To_Gates.

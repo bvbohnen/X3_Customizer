@@ -144,8 +144,13 @@ class XML_File(Game_File):
         '''        
         # Open with the right encoding.
         with open(file_path, 'w', encoding = s.encoding) as file:   
-            # Just write as raw text.  
+            # Just write as raw text.
             file.write(s.text)
+            # To be safe, add a newline at the end if there isn't
+            #  one, since some files require this (eg. bods) to
+            #  be read correctly.
+            if not s.text.endswith('\n'):
+                file.write('\n')
 
         #-Removed; use text instead of xml.
         # Let the xml plugin pick the encoding to write out in.
@@ -409,7 +414,12 @@ class Misc_File(Game_File):
         if s.text != None:
             # Do a text write.
             with open(file_path, 'w') as file:
+                # To be safe, add a newline at the end if there isn't
+                #  one, since some files require this (eg. bods) to
+                #  be read correctly.
                 file.write(s.text)
+                if not s.text.endswith('\n'):
+                    file.write('\n')
         elif s.binary != None:
             # Do a binary write.
             with open(file_path, 'wb') as file:

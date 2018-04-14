@@ -128,6 +128,10 @@ Change Log:
    - Added executable generation using pyinstaller.
    - Added alternative scaling functions to bypass scipy requirement,
      which otherwise bloats the exe.
+ * 3.1
+   - Bugfix for gate edits, adding an end-of-file newline that x3
+     requires and was lost in the file system conversion.
+   - Added Allow_Valhalla_To_Jump_To_Gates.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

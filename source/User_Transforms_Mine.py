@@ -62,6 +62,8 @@ Stop_GoD_From_Removing_Stations()
 # Maybe stop asteroid respawn, if wanting to blow some up.
 # Disable_Asteroid_Respawn()
 
+# Test code for allowing valhallas to jump to gates.
+Allow_Valhalla_To_Jump_To_Gates()
 
 #####################################################
 # Background

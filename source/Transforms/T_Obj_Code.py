@@ -638,4 +638,47 @@ def Disable_Asteroid_Respawn(
     return
 
 
+@Check_Dependencies('L/x3story.obj')
+def Allow_Valhalla_To_Jump_To_Gates(
+    ):
+    '''
+    Removes a restriction on the Valhalla, or whichever ship is at
+    offset 211 in tships, for jumping to gates. This should only
+    be applied alongside another mod that either reduces the
+    valhalla size, increases gate size, removes gate rings,
+    or moves/removes the forward pylons, to avoid collision problems.
+    '''
+    '''
+    Code to edit is in SHIP.CanMoveThroughGates, which is a somewhat
+    convoluted function that returns 0 for ships of subtype 211,
+    and 1 otherwise.  This uses a jump table with an xjump with an
+    offset of 211, relying on all non-211 ships to be out of the
+    table range and use the default jump target.
+
+    Possible edits include:
+        - Changing the xjump from "xjump 1, 211" to "xjump 1, -1", so that
+        all ships will be out of range and use the default.
+        - Changing the return value on the valhalla path from a 0
+        to a 1.
+        - Changing the jump table entries to always go to the return-1
+        block.
+        - etc.
+
+    The simplest is probably just to change the return value.
+    '''
+    # Construct the patch.
+
+    patch = Obj_Patch(
+            file = 'L/x3story.obj',
+            offset = 0x000CED11,
+            # This pushes 0, returns, and checks a few later commands
+            #  for verification.
+            ref_code = hex2bin('01'+'83'+'32'+'000CED27'+'78'),
+            # Swap push 0 to push 1
+            new_code = hex2bin('02'),
+            )
+    Apply_Obj_Patch(patch)
+
+    return
+
 # TODO: asteroid/station respawn time edits.
