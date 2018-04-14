@@ -1,0 +1,491 @@
+'''
+Loads and stores source files to be modified, and writes them
+out when finished.
+'''
+
+from .File_Fields import *
+import os
+from collections import OrderedDict
+import inspect
+import shutil
+from Common import *
+from .Source_Reader import *
+from .File_Types import *
+from .Logs import *
+
+# TODO: move this somewhere more convenient, eg. the Settings module,
+#  though for now it is here since it calls Init afterward.
+def Set_Path(
+        # Force args to be kwargs, since that is safer if args are
+        #  added/removed in the future.
+        *,
+        path_to_x3_folder = None,
+        path_to_addon_folder = None,
+        path_to_output_folder = None,
+        path_to_source_folder = None,
+        # Backwards compatable version of source_folder.
+        source_folder = None,
+        path_to_log_folder = 'x3_customizer_logs',
+        summary_file = 'X3_Customizer_summary.txt',
+        log_file = 'X3_Customizer_log.json',
+    ):
+    '''
+    Sets the pathing to be used for file loading and writing.
+
+    * path_to_x3_folder
+      - Path to the X3 base folder, where the executable is located.
+      - Can be skipped if path_to_addon_folder provided.
+
+    * path_to_addon_folder
+      - Path to the X3 AP addon folder.
+      - Can be skipped if path_to_x3_folder provided.
+
+    * path_to_output_folder
+      - Optional, path to a folder to place output files in.
+      - Defaults to match path_to_x3_folder, so that outputs are
+        directly readable by the game.
+
+    * path_to_source_folder
+      - Optional, alternate folder which contains source files to be modified.
+      - Maybe be given as a relative path to the "addon" directory,
+        or as an absolute path.
+      - Files located here should have the same directory structure
+        as standard games files, eg. 'source_folder/types/Jobs.txt'.
+
+    * path_to_log_folder
+      - Path to the folder to place any output logs in, or
+        to read prior output logs from.
+      - Maybe be given as a relative path to the "addon" directory,
+        or as an absolute path.
+      - Defaults to 'x3_customizer_logs'.
+      - This should not be changed between runs, since recognition of
+        results from a prior customizer run depends on reading the
+        prior run's log file.
+
+    * summary_file
+      - Name for where a summary file will be written, with
+        any transform results, relative to the log folder.
+      - Defaults to 'X3_Customizer_summary.txt'.
+
+    * log_file
+      - Name for where a json log file will be written,
+        including a summary of files written.
+      - This is also the file which will be read for any log from
+        a prior run.
+      - Defaults to 'X3_Customizer_log.json'.
+    '''
+    Settings.Set_X3_Folder(path_to_x3_folder)
+    Settings.Set_Addon_Folder(path_to_addon_folder)
+    # Two ways to set source_folder for now.
+    # TODO: maybe trim the old one out.
+    Settings.Set_Source_Folder(source_folder)
+    Settings.Set_Source_Folder(path_to_source_folder)
+    Settings.Set_Output_Folder(path_to_output_folder)
+    Settings.Set_Log_Folder(path_to_log_folder)
+    Settings.Set_Message_File(summary_file)
+    Settings.Set_Log_File(log_file)
+
+    # Call to generic Init moved here, to ensure it is applied before
+    # any transforms which may not use input files.
+    Init()
+    return
+
+    
+# Make a set of all transform file names that may be used by transforms,
+#  used in filtering the source files tracked.
+# This gets filled in by decorators, which should all get processed before
+#  the first call to Init (through a call to Load_File) occurs and uses
+#  this set.
+# Update: may no longer be used.
+Transform_required_file_names = set()
+
+# Record a set of all transforms.
+# This is filled in by the decorator at startup.
+Transform_list = []
+
+# Record a set of transforms that were called.
+# Transforms not on this list at the end of a run may need to do
+#  cleanup of older files generated on prior runs.
+# This is filled in by the decorator.
+Transforms_names_run = set()
+
+
+# On the first call to Load_File from any transform, do some extra
+#  setup.
+First_call = True
+def Init():
+    'Initialize the file manager.'
+    # Safety check for First_call already being cleared, return early.
+    # TODO: remove this check, and remove all calls to Init except for that
+    #  in Set_Path, which should always be called before anything else
+    #  anyway.
+    global First_call
+    if not First_call:
+        return
+    First_call = False
+
+    # The file paths should be defined at this point. Error if not.
+    Settings.Verify_Setup()
+
+    # Read any old log file.
+    Log_Old.Load()
+
+    # Do some version patching as needed.
+    Version_Patch()
+
+    # Initialize the file system, now that paths are set in settings.
+    Source_Reader.Init()
+    
+    # Set the working directory to the AP directory.
+    # This makes it easier for transforms to generate any misc files.
+    os.chdir(Settings.Get_Addon_Folder())
+
+    return
+
+
+# Dict to hold file contents, as well as specify their full path.
+# Keyed by virtual path for the file.
+# This gets filled in by transforms as they load the files.
+# T files will generally be loaded into lists of dictionaries keyed by field
+#  name or index, with each list entry being a separate line.
+# XML files will generally be loaded as a XML_File object holding
+#  the encoding and raw text.
+# These are Game_File objects, and will record their relative path
+#  to be used during output.
+File_dict = {}
+
+def Add_File(game_file):
+    '''
+    Add a Game_File object to the File_dict.
+    '''
+    File_dict[game_file.virtual_path] = game_file
+
+# Decorator function for transforms to check if their required
+#  files are found, and have nice handling when not found.
+# The args will be the file names.
+# This is implemented as a two-stage decorator, the outer one handling
+#  the file check, the inner one returning the function.
+# Eg. decorators have one implicit input argument, the following object,
+#  such that "@dec func" is like "dec(func)".
+# To support input args, a two-stage decorator is used, such that
+#  "@dec(args) func" becomes "dec(args)(func)", where the decorator
+#  will return a nested decorator after handling args, and the nested
+#  decorator will accept the function as its arg.
+# To get the wrapped function's name and documentation preserved,
+#  use the 'wraps' decorator from functools.
+# Update: this will also support a keyword 'category' argument, which
+#  will be the documentation transform category override to use when
+#  the automated category is unwanted.
+from functools import wraps
+def Check_Dependencies(*file_names, category = None):
+    # Record the required file names to a set for use elsewhere.
+    Transform_required_file_names.update(file_names)
+
+    # Make the inner decorator function, capturing the wrapped function.
+    def inner_decorator(func):
+
+        # Attach the required file_names to the wrapped function,
+        #  since they are only available on function definition at the
+        #  moment, and will be checked at run time.
+        func._file_names = file_names
+        # Attach the override category to the function.
+        # TODO: maybe fill in the default category here, but for now
+        #  it is done in Make_Documentation.
+        func._category = category
+
+        # Record the transform function.
+        Transform_list.append(func)
+
+        # Set up the actual function that users will call, capturing
+        #  any args/kwargs.
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+
+            # On the first call, do some extra setup.
+            if First_call:
+                Init()
+
+            # Check if the settings are requesting transforms be
+            #  skipped, and return early if so.
+            if Settings.skip_all_transforms:
+                return
+
+            # Note this transform as being seen.
+            Transforms_names_run.add(func.__name__)
+            
+            # Loop over the required files.
+            for file_name in func._file_names:
+                # Do a test load; if succesful, the file was found.
+                try:
+                    Load_File(file_name)
+                except File_Missing_Exception:
+                    print('Skipped {}, required file {} not found.'.format(
+                        func.__name__,
+                        file_name
+                        ))
+                    # Return nothing and skip the call.
+                    return
+            # Return the normal function call results.
+            return func(*args, **kwargs)
+
+        # Return the callable function.
+        return wrapper
+
+    # Return the decorator to handle the function.
+    return inner_decorator
+
+
+def Load_File(file_name,
+              # TODO: rename this to be more generic.
+              return_game_file_file = False, 
+              return_text = False,
+              error_if_not_found = True):
+    '''
+    Returns the contents of the given file, either raw text for XML
+     or a dictionary for T files.
+    If the file has not been loaded yet, reads from the expected
+     source file.
+
+    * error_if_not_found
+      - Bool, if True and the file is not found, raises an exception,
+        else returns None.
+    * return_game_file_file
+      - Bool, if True, returns the Game_File object, else returns
+        the result of the Read_Data method of the file.
+    * return_text
+      - Bool, if True, returns the raw text of the loaded file,
+        without any edits from prior transforms applied.
+    '''
+    # If the file is not loaded, handle loading.
+    if file_name not in File_dict:
+
+        # Get the file using the source_reader, maybe pulling from
+        #  a cat/dat pair.
+        # Returns a Game_File object, of some subclass, or None
+        #  if not found.
+        game_file = Source_Reader.Read(file_name, error_if_not_found = False)
+
+        # Problem if the file isn't found.
+        if game_file == None:
+            if error_if_not_found:
+                raise File_Missing_Exception(
+                    'Could not find file {}'.format(file_name))
+            return None
+        
+        # Store the contents in the File_dict.
+        Add_File(game_file)
+
+
+    # Return the file contents.
+    if return_game_file_file:
+        return File_dict[file_name]
+    elif return_text:
+        return File_dict[file_name].text
+    else:
+        return File_dict[file_name].Read_Data()
+
+          
+def Cleanup():
+    '''
+    Handles cleanup of old transform files, undoing all file renames
+     and deleting prior outputs.
+    This is done blindly for now, regardless of it this run intends
+     to follow up by applying another renaming and writing new files
+     in place of the ones removed.
+    This should preceed a call to any call to Write_Files, though can
+     be run standalone to do a generic cleaning.
+    Preferably do this late in a run, so that files from a prior run
+     are not removed if the new run had an error during a transform.
+    '''
+    # Find all files generated on a prior run, that still appear to be
+    #  from that run (eg. were not changed externally), and remove
+    #  them.
+    for path in Log_Old.Get_File_Paths_From_Last_Run():
+        if os.path.exists(path):
+            os.remove(path)
+
+    # Find all renamed files, and name them back to their standard
+    #  form, which should normally be free after the deletions from above.
+    # If the standard form is occupied, it is likely it was overwritten
+    #  externally between runs; in this case the backup should not be
+    #  restored.
+    for original_path, renamed_path in Log_Old.Get_Renamed_File_Paths():
+        # Skip if the renamed file doesn't exist anymore for some reason.
+        if not os.path.exists(renamed_path):
+            continue
+        # Skip if the original file name is taken for some reason.
+        if os.path.exists(original_path):
+            continue
+        os.rename(renamed_path, original_path)
+            
+
+def Add_Source_Folder_Copies():
+    '''
+    Adds Misc_File objects which copy files from the user source
+     folders to the game folders.
+    This should only be called after transforms have been completed,
+     to avoid adding a copy of a file that was already loaded and
+     edited.
+    '''
+    # Some loose files may be present in the user source folder which
+    #  are intended to be moved into the main folders, whether transformed
+    #  or not, in keeping with behavior of older versions of the customizer.
+    # These will do direct copies.
+    for virtual_path, sys_path in Source_Reader.source_file_path_dict.items():
+        # Skip files already written.
+        if virtual_path in File_dict:
+            continue
+
+        # TODO:
+        # Skip files which do not match anything in the game cat files,
+        #  to avoid copying any misc stuff (backed up files, notes, etc.).
+        # This will need a function created to search cat files without
+        #  loading from them.
+
+        # Read the binary.
+        with open(sys_path, 'rb') as file:
+            binary = file.read()
+
+        # Create the game file.
+        Add_File(Misc_File(binary = binary, virtual_path = virtual_path))
+
+                
+def Write_Files():
+    '''
+    Write output files for all source file content used or
+     created by transforms.
+    Existing files which may conflict with the new writes will be renamed,
+     including files of the same name as well as their .pck versions.
+    '''
+    # Add copies of leftover files from the user source folder.
+    # Do this before the proper writeout, so it can reuse functionality.
+    Add_Source_Folder_Copies()
+
+    # Loop over the files that were loaded.
+    for file_name, file_object in File_dict.items():
+
+        # Look up the output path.
+        file_path = file_object.Get_Output_Path()
+        
+        # In case the target directory doesn't exist, such as on a
+        #  first run, make it.
+        folder_path, _ = os.path.split(file_path)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        # Rename any conflicting files, of same name or pck version.
+        # These should never be old versions of the customize output,
+        #  since the Cleanup call handled them.
+        file_path_pck = Unpacked_Path_to_Packed_Path(file_path)
+        for conflict_path in [file_path, file_path_pck]:
+
+            # Skip if no such file exists.
+            if not os.path.exists(conflict_path):
+                continue
+
+            # Get the backup path name.
+            backup_path = Get_Backed_Up_Sys_Path(conflict_path)
+            # Delete any old backup (this should be more or less safe,
+            #  hopefully, if other checks were good.)
+            if os.path.exists(backup_path):
+                os.remove(backup_path)
+            # Do the rename.
+            os.rename(conflict_path, backup_path)
+
+            # Record this to the log.
+            Log_New.Record_File_Path_Renamed(conflict_path, backup_path)
+
+
+        # Write out the file, using the object's individual method.
+        file_object.Write_File(file_path)
+
+        # Add this to the log, post-write for correct hash.
+        Log_New.Record_File_Path_Written(file_path)
+        
+        # Note: it is possible something will fail during a file write,
+        #  in which case some files will have been written but not others,
+        #  which can confuse any older logs (with old hashes).
+        # As a clumsy workaround, the log will be written out freshly
+        #  after every single written file for now.
+        Log_New.Store()
+
+    return
+
+
+def Copy_File(
+        source_virtual_path,
+        dest_virtual_path = None
+    ):
+    '''
+    Suport function to copy a file from a source folder under this project, 
+     to a dest folder. Typically used for scripts, objects, etc.
+
+    * source_virtual_path
+      - Virtual path for the source file, which matches the folder
+        structure in the project source folder.
+    * dest_virtual_path
+      - Virtual path for the dest location.
+      - If None, this defaults to match the source_virtual_path.
+    '''
+    # Normally, the dest will just match the source.
+    if dest_virtual_path == None:
+        dest_virtual_path = source_virtual_path
+
+    # Get the path for where to find the source file, and load
+    #  its binary.
+    with open(Virtual_Path_to_Project_Source_Path(source_virtual_path), 'rb') as file:
+        source_binary = file.read()
+
+    # Create a generic game object for this, using the dest path.
+    Add_File(Misc_File(virtual_path = dest_virtual_path, 
+                       binary = source_binary))
+
+    return
+
+
+def Version_Patch():
+    '''
+    Make any necessary changes to files and such when switching
+    customizer versions.
+    '''
+    # If there is no log of the last version run, this is either the
+    #  first run or the first in 2.23+.
+    # In this case, clean out some old files from prior versions which
+    #  used .x3c.bak as their renamed file suffix.
+    if Log_Old.version == None or Log_Old.version < 3:
+        pass
+
+        #-Removed; x3c.bak is used again, to avoid problem of the game
+        # trying to read files with an xml extension automatically.
+        #old_backup_suffix = '.x3c.bak'
+        #
+        ## Traverse the scripts folder.
+        #for dir_path, folder_names, file_names in os.walk(
+        #    os.path.join(Settings.Get_Addon_Folder(), 'scripts')):
+        #
+        #    # Loop over the file names.
+        #    for file_name in file_names:
+        #
+        #        # Skip those without the looked for suffix.
+        #        if not file_name.endswith(old_backup_suffix):
+        #            continue
+        #
+        #        path = os.path.join(dir_path, file_name)
+        #        original_path = path.replace(old_backup_suffix, '')
+        #
+        #        # There should be no non-suffixed version of the file,
+        #        #  since it was a pck that was moved to avoid conflict.
+        #        if os.path.exists(original_path):
+        #            # Toss a warning and otherwise skip ahead.
+        #            # (Note: currently, this will only get printed on the
+        #            #  first run, so the file might linger around in later
+        #            #  runs with no notices, but it should be okay as just
+        #            #  a loose file.)
+        #            print(('Warning: could not undo renaming of "{}"'
+        #                  ' from older version due to "{}" being occupied').format(
+        #                path, original_path))
+        #            continue
+        #
+        #        # Do the rename.
+        #        os.rename(path, original_path)
+

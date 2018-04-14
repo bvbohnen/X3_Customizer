@@ -1,51 +1,51 @@
-X3 Customizer v2.22
+X3 Customizer 3.0
 ------------------
 
-This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform. Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
+This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.
 
-This tool is written in Python, and tested on version 3.6. To run this script, the user will need to install Python.
+Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
+
+This tool is written in Python, and tested on version 3.6. As of customizer version 3, an executable is supplied for users who do not wish to run the Python source code directly.
 
 Usage:
- * "X3_Customizer <user_transform_module.py>"
-   - Runs the customizer, using the provided control module which will specify the path to the AP directory, the folder containing the source files to be modified, and the transforms to be run. See User_Transforms_Example.py for an example. Defaults to running 'User_Transforms.py' if an argument is not provided.
- * "Make_Documentation.py"
-   - Generates documentation for this project, as markdown supporting files README.md and Documentation.md.
 
-Setup:
+ * "X3_Customizer.bat [path to user_transform_module.py]"
+   - Call from the command line.
+   - Runs the customizer, using the provided python control module which will declare the path to the X3 directory and the transforms to be run.
+   - Call with '-h' to see any additional arguments.
+ * "source\X3_Customizer.py [path to user_transform_module.py]"
+   - As above, running the python source code directly.
+   - Supports general python imports in the control module.
+   - If the scipy package is available, this has additional features omitted from the executable due to file size.
+ * "source\Make_Documentation.py"
+   - Generates documentation for this project, as markdown formatted files README.md and Documentation.md.
+ * "source\Make_Executable.py"
+   - Generates a standalone executable and support files, placed in the bin folder. Requires the PyInstaller package be available.
+
+Setup and behavior:
+
   * Transforms will operate on source files (eg. tships.txt) which are either provided as loose files, or extracted automatically from the game's cat/dat files.
 
-  * Loose source files need to be located in a folder underneath the specified AP addon directory, and will have an internal folder structure matching that of the files in the normal addon or TC directory. Eg. <game path>/addon/<source_folder>/types/TShips.txt
+  * Source files are searched for in this priority order, where .pck versions of files take precedence:
+    - From an optional user specified source folder, with a folder structure matching the X3 directory structure (without 'addon' path). Eg. [source_folder]/types/TShips.txt
+    - From the normal x3 folders.
+    - From the incrementally indexed cat/dat files in the 'addon' folder.
+    - From the incrementally indexed cat/dat files in the base x3 folder.
+    - Note: any cat/dat files in the 'addon/mods' folder will be ignored, due to ambiguity on which if any might be selected in the game launcher.
 
-  * The user must write a Python script which will specify paths and control the customizer by calling transforms. This script will be called by the customizer and run once. The quickest way to set this up would be to edit the example file. Included in the repository is User_Transforms_Mine, the author's personal set of transforms, which can be checked for futher examples of how to use most transforms available.
+  * The user controls the customizer using a command script which will set the path to the X3 installation to customize (using the Set_Path function), and will call the desired transforms with any necessary parameters. This script is written using Python code, which will be executed by the customizer.
+  
+  * The key command script sections are:
+    - "from Transforms import *" to make all transform functions available.
+    - Call Set_Path to specify the X3 directory, along with some other path options. See documentation below for parameters.
+    - Call a series of transform functions, as desired.
+  
+  * The quickest way to set up a command script is to copy and edit the User_Transforms_Example.py file. Included in the repository is User_Transforms_Mine, the author's personal set of transforms, which can be checked for futher examples of how to use most transforms available.
 
-  * Output files will be generated generally in the addon directory, though some may be placed under the main game directory, based on where X3 looks for the files. Files in the source folder which do not have a name matching the requirement of any transform will be ignored and not copied. In some cases, files may be generated one directory up, in the presumed Terran Conflict folder.
+  * Transformed output files will be generated in an unpacked form in the x3 directories, or to a custom output direction set using Set_Path. Already existing files will be renamed, suffixing with '.x3c.bak', if they do not appear to have been created by the customizer on a prior run. A json log file will be written with information on which files were created or renamed.
 
-  * Warning: Generated output will overwrite any existing files.
-
-  Example directory:
-
-    <path to X3 installation>
-        addon
-            source_folder
-                maps
-                    x3_universe.xml
-                types
-                    TBullets.txt
-                    TLaser.txt
-                    TShips.txt
-                    TShips_backup.txt
-
-   This will write to the following files, overwriting any existing ones:   
-
-    <path to X3 installation>
-        addon
-            maps
-                x3_universe.xml
-            types
-                TBullets.txt
-                TLaser.txt
-                TShips.txt
-
+  * Warning: this tool will attempt to avoid unsafe behavior, but the user should back up irreplaceable files to be safe against bugs such as accidental overwrites of source files with transformed files.
+  
 
 Full documentation found in Documentation.md.
 
@@ -94,7 +94,7 @@ Director Transforms:
 
 ***
 
-Factorie Transforms:
+Factory Transforms:
 
  * Add_More_Factory_Sizes
 
@@ -242,10 +242,6 @@ Script Transforms:
 
       Adds Commodity Logistics Software, internal and external, to all equipment docks which stock Trade Command Software Mk2. This is implemented as a setup script which runs on the game loading. Once applied, this transform may be disabled to remove the script run time. This change is not reversable.
 
- * Add_Script
-
-      Add a script to the addon/scripts folder. If an existing xml version of the script already exists, it is overwritten. If an existing pck version of the script already exists, it is renamed with suffix '.x3c.bak'. Note: this is only for use with full scripts, not those defined by diffs from existing scripts.
-
  * Allow_CAG_Apprentices_To_Sell
 
       Allows Commercial Agents to sell factory products at pilot rank 0. May require CAG restart to take effect.
@@ -375,7 +371,7 @@ Sound Transforms:
 
  * Remove_Sound
 
-      Removes a sound by writing an empty file in its place, based on the sound's id. If a non-empty file is already present in the 's' folder, it will be backed up.
+      Removes a sound by writing an empty file in its place, based on the sound's id.
 
 
 ***
@@ -499,16 +495,17 @@ Example input file, User_Transforms_Example.py:
 
     '''
     Example for using the Customizer, setting a path to
-    the AP directory and running some simple transforms.
+    the X3 directory and running some simple transforms.
     '''
     
     # Import all transform functions.
     from Transforms import *
     
     Set_Path(
-        # Set the path to the AP addon folder.
+        # Set the path to the X3 installation folder.
         path_to_addon_folder = r'D:\Steam\SteamApps\common\x3 terran conflict\addon',
-        # Set the subfolder with the source files to be modified.
+        # Optional subfolder with high priority source files to be modified.
+        # By default, this is relative to the addon folder.
         source_folder = 'vanilla_source'
     )
     
@@ -524,17 +521,17 @@ Example input file, User_Transforms_Example.py:
 ***
 
 Change Log:
- * 1.x :
+ * 1.x
    - Original project development for private use.
- * 2.0 :
+ * 2.0
    - Restructuring of project for general use, isolating individual transforms, separating out transform calls, adding robustness. Filling out documentation generation.
- * 2.01:
+ * 2.01
    - Added Convert_Beams_To_Bullets.
- * 2.02:
+ * 2.02
    - Added Adjust_Generic_Missions.
    - Added new arguments to Enhance_Mosquito_Missiles.
    - Adjusted default ignored weapons for Convert_Beams_To_Bullets.
- * 2.03:
+ * 2.03
    - Added Add_Ship_Life_Support.
    - Added Adjust_Shield_Regen.
    - Added Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio.
@@ -543,42 +540,42 @@ Change Log:
    - New option for Adjust_Ship_Hull to scale repair lasers as well.
    - Several weapon transforms now ignore repair lasers by default.
    - Command line call defaults to User_Transforms.py if a file not given.
- * 2.04:
+ * 2.04
    - Added Add_Ship_Equipment.
    - Added XRM_Standardize_Medusa_Vanguard.
    - Added Add_Ship_Variants, Add_Ship_Combat_Variants, Add_Ship_Trade_Variants.
- * 2.05:
+ * 2.05
    - Updates to Add_Ship_Variants to refine is behavior and options.
    - Added in-game script for adding generated variants to shipyards.
    - XRM_Standardize_Medusa_Vanguard replaced with Patch_Ship_Variant_Inconsistencies.
- * 2.06:
+ * 2.06
    - Updated scaling equation fitter to be more robust; functionality unchanged.
    - Update to Adjust_Missile_Damage to standardize the scaling function to support typical tuning paramaters.
    - Added Expand_Bomber_Missiles.
    - Added Add_Ship_Cross_Faction_Missiles.
    - Add_Ship_Boarding_Pod_Support.
    - Changed documentation generator to include more text in the readme file, and to categorize transforms.
- * 2.07:
+ * 2.07
    - Minor tweak to Add_Ship_Variants, allowing selection of which variant will be set to 0 when an existing variant is used as a base ship.
    - Adjust_Missile_Damage has new parameters to scale missile ware volume and price in line with the damage adjustment.
- * 2.08:
+ * 2.08
    - Added Adjust_Gate_Rings.
    - Removed Swap_Standard_Gates_To_Terran_Gates, which is replaced by an option in the new transform.
- * 2.09:
+ * 2.09
    - Added Add_Job_Ship_Variants.
    - Added Change_Ware_Size.
    - Tweaked Add_Ship_Variants to specify shield_conversion_ratios in args.
    - Unedited source files will now be copied to the main directory, in case a prior run did edit them and needs overwriting.
- * 2.10:
+ * 2.10
    - New option added to Adjust_Gate_Rings, supporting a protrusionless ring.
    - Added Add_Script, generic transform to add pregenerated scripts.
    - Added Disable_OOS_War_Sector_Spawns.
    - Added Convert_Attack_To_Attack_Nearest.
    - Bugfix for when the first transform called does not have file dependencies.
    - Renames the script 'a.x3customizer.add.variants.to.shipyards.xml' to remove the 'a.' prefix.
- * 2.11:
+ * 2.11
    - Minor fix to rename .pck files in the addon/types folder that interfere with customized files.
- * 2.12:
+ * 2.12
    - Added Add_CLS_Software_To_More_Docks.
    - Added Remove_Khaak_Corvette_Spin.
    - Added option to Adjust_Ship_Laser_Recharge to adjust ship maximum laser energy as well.
@@ -588,39 +585,46 @@ Change Log:
    - Bugfix for file reading which broke in recent python update.
    - Added patch support for editing files without doing full original source uploads. Disable_OOS_War_Sector_Spawns now uses a patch.
    - Added support for automatically filling in the source folder with any necessary scripts.
- * 2.13:
+ * 2.13
    - Added Allow_CAG_Apprentices_To_Sell.
    - Added Increase_Escort_Engagement_Range.
    - Added Fix_OOS_Laser_Missile_Conflict.
- * 2.14:
+ * 2.14
    - Bugfix for Add_CLS_Software_To_More_Docks.
- * 2.15:
+ * 2.15
    - Added Change_Sector_Music.
- * 2.16:
+ * 2.16
    - Added Complex_Cleaner_Bug_Fix.
    - Added Complex_Cleaner_Use_Small_Cube.
- * 2.17:
+ * 2.17
    - Added Add_More_Factory_Sizes.
    - Added Remove_Ship_Variants.
    - Added Fleet_Interceptor_Bug_Fix.
    - Tweaked Adjust_Job_Count to support reducing counts to 0.
    - Switched Add_Ship_Variants to use a director script to update shipyards.
- * 2.18:
+ * 2.18
    - Bug fixes for the director scripts, to ensure they work on new games and on terran/atf shipyards with cross-faction wares.
- * 2.19:
+ * 2.19
    - Support added for editing .obj files containing game assembly code.
    - Added Adjust_Max_Seta.
    - Added Adjust_Max_Speedup_Rate.
    - Added Stop_Events_From_Disabling_Seta.
    - Added Set_Max_Marines.
- * 2.20:
+ * 2.20
    - Added Disable_Combat_Music.
    - Added Remove_Sound.
    - Added Remove_Combat_Beep.
- * 2.21:
+ * 2.21
    - Added Stop_GoD_From_Removing_Stations.
    - Added Disable_Asteroid_Respawn.
  * 2.22
    - Rewrite of much of the file loading system.
    - Added support for loading source files from cat/dat pairs, when the file is not found in the specified source folder.
    - Message log, as well as a log of files written, will now be written to a log folder customized by Set_Path.
+ * 3.0
+   - Major rewrite of the file handling system.
+   - Can now load original data from loose files in the game directories as well as the user source folder and cat/dat pairs.
+   - Normalized file creation in all transforms.
+   - Added hashes to log of files written, to recognize when they change externally.
+   - Added executable generation using pyinstaller.
+   - Added alternative scaling functions to bypass scipy requirement, which otherwise bloats the exe.
