@@ -132,6 +132,11 @@ Change Log:
    - Bugfix for gate edits, adding an end-of-file newline that x3
      requires and was lost in the file system conversion.
    - Added Allow_Valhalla_To_Jump_To_Gates.
+ * 3.2
+   - Added support for generating a zip file for release, containing
+     necessary binaries and related files.
+   - Converted patch creation from an input command script to a standalone
+     make script.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

@@ -4,8 +4,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>f321f45f-39ee-4cc8-91e7-bfec28462c97</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>X3_Customizer.py</StartupFile>
-    <SearchPath>..\..\X3_Customizer</SearchPath>
+    <StartupFile>Make_Release.py</StartupFile>
+    <SearchPath>..\..\X3_Customizer;..\control_scripts;..\control_scripts;..\input_scripts;..\input_scripts;..\input_scripts</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>X3_Customizer</Name>
@@ -23,6 +23,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\input_scripts\User_Transforms_Example.py">
+      <Link>User_Transforms_Example.py</Link>
+    </Compile>
+    <Compile Include="..\input_scripts\User_Transforms_Mine.py">
+      <Link>User_Transforms_Mine.py</Link>
+    </Compile>
     <Compile Include="File_Manager\Logs.py">
       <SubType>Code</SubType>
     </Compile>
@@ -54,6 +60,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Make_Executable.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Make_Patches.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Make_Release.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Transforms\Scaling_Equations.py" />
@@ -90,13 +102,6 @@
     <Compile Include="Transforms\T_Wares.py" />
     <Compile Include="Transforms\T_Weapons.py" />
     <Compile Include="Transforms\T_Weapons_Fitter.py" />
-    <Compile Include="User_Transforms_Build_Patches.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="User_Transforms_Example.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="User_Transforms_Mine.py" />
     <Compile Include="Common\Flags.py" />
     <Compile Include="X3_Customizer.py" />
   </ItemGroup>

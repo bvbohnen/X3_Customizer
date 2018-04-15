@@ -39,7 +39,7 @@ import File_Manager
 import sys, os
 from collections import OrderedDict
 
-def Make(args):
+def Make(*args):
 
     # TODO:
     # Make a variation on the simple doc which has some formatting for
@@ -296,7 +296,8 @@ def Make(args):
     # Need a newline before the code, otherwise the code block
     #  isn't made right away (the file header gets lumped with the above).
     Add_Line('')
-    with open('User_Transforms_Example.py', 'r') as file:
+    with open(os.path.join('..','input_scripts',
+                           'User_Transforms_Example.py'), 'r') as file:
         # Put in 4 indents to make a code block.
         Add_Lines(file.read(), indent_level = 4)
 

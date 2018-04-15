@@ -1,11 +1,15 @@
-X3 Customizer 3.1
+X3 Customizer 3.2
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.
 
 Source files will generally support any prior modding. Nearly all transforms support input arguments to set parameters and adjust behavior, according to user preferences. Most transforms will work on an existing save.
 
-This tool is written in Python, and tested on version 3.6. As of customizer version 3, an executable is supplied for users who do not wish to run the Python source code directly.
+This tool is written in Python, and tested on version 3.6. As of customizer version 3, an executable may be generated for users who do not wish to run the Python source code directly.
+
+This tool is designed for Albion Prelude v3.3. Most transforms will support prior versions of AP. TC is not directly supported currently due primarily to some path assumptions.
+
+Source code is hosted on github: https://github.com/bvbohnen/X3_Customizer Announcements are primarily made on the Egosoft forum: https://forum.egosoft.com/viewtopic.php?t=396158
 
 Usage:
 
@@ -18,9 +22,13 @@ Usage:
    - Supports general python imports in the control module.
    - If the scipy package is available, this has additional features omitted from the executable due to file size.
  * "source\Make_Documentation.py"
-   - Generates documentation for this project, as markdown formatted files README.md and Documentation.md.
+   - Generates updated documentation for this project, as markdown formatted files README.md and Documentation.md.
  * "source\Make_Executable.py"
    - Generates a standalone executable and support files, placed in the bin folder. Requires the PyInstaller package be available.
+ * "source\Make_Patches.py"
+   - Generates patch files for this project from some select modified game scripts. Requires the modified scripts be present in the patches folder; these scripts are not included in the repository.
+ * "source\Make_Release.py"
+   - Generates a zip file with all necessary binaries and source files for general release.
 
 Setup and behavior:
 
@@ -40,7 +48,7 @@ Setup and behavior:
     - Call Set_Path to specify the X3 directory, along with some other path options. See documentation below for parameters.
     - Call a series of transform functions, as desired.
   
-  * The quickest way to set up a command script is to copy and edit the User_Transforms_Example.py file. Included in the repository is User_Transforms_Mine, the author's personal set of transforms, which can be checked for futher examples of how to use most transforms available.
+  * The quickest way to set up a command script is to copy and edit the input_scripts/User_Transforms_Example.py file. Included in the repository is User_Transforms_Mine, the author's personal set of transforms, which can be checked for futher examples of how to use most transforms available.
 
   * Transformed output files will be generated in an unpacked form in the x3 directories, or to a custom output direction set using Set_Path. Already existing files will be renamed, suffixing with '.x3c.bak', if they do not appear to have been created by the customizer on a prior run. A json log file will be written with information on which files were created or renamed.
 
@@ -635,3 +643,6 @@ Change Log:
  * 3.1
    - Bugfix for gate edits, adding an end-of-file newline that x3 requires and was lost in the file system conversion.
    - Added Allow_Valhalla_To_Jump_To_Gates.
+ * 3.2
+   - Added support for generating a zip file for release, containing necessary binaries and related files.
+   - Converted patch creation from an input command script to a standalone make script.

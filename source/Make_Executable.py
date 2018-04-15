@@ -69,7 +69,7 @@ import subprocess
 
 This_dir = os.path.normpath(os.path.join(os.path.dirname(__file__)))
 
-def Run(*args):
+def Make(*args):
 
     # Scrap the first arg if it is a .py file; this is mostly because
     #  visual studio is set to insert it for normal customizer
@@ -363,12 +363,13 @@ def Run(*args):
 
     # Create a bat file for launching the exe from the top
     #  level directory.
-    with open(os.path.join(
-        This_dir, '..', 'Launch_X3_Customizer.bat'), 'w') as file:
-        file.write(
+    with open(os.path.join(This_dir, '..', 'Launch_X3_Customizer.bat'), 'w') as file:
+        file.write('\n'.join([
+            # Disable the echo of the command.
+            '@echo off',
             # Use '%*' to pass all command line args.
-            os.path.join('bin', program_name + '.exe') + ' %*'
-            )
+            os.path.join('bin', program_name + '.exe') + ' %*',
+            ]))
 
     # Restory any original workind directory, in case this function
     #  was called from somewhere else.
@@ -377,4 +378,4 @@ def Run(*args):
 
 if __name__ == '__main__':
     # Feed all args except the first (which is the file name).
-    Run(*sys.argv[1:])
+    Make(*sys.argv[1:])
