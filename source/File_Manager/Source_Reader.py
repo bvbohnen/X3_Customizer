@@ -11,11 +11,8 @@ from collections import OrderedDict
 from .File_Types import *
 from .File_Paths import *
 from .Cat_Reader import *
+from Common.Exceptions import File_Missing_Exception
 import gzip
-
-class File_Missing_Exception(Exception):
-    '''Exception raised when Load_File doesn't find the file.'''
-    pass
 
 
 class Source_Reader_class:
@@ -174,6 +171,8 @@ class Source_Reader_class:
         Contents may be binary or text, depending on the Game_File subclass.
         This will search for packed versions as well, automatically unzipping
          the contents.
+        If the file contents are empty, this returns None; this may occur
+         for LU dummy files.
          
         * virtual_path
           - String, virtual path of the file to look up.
@@ -321,10 +320,14 @@ class Source_Reader_class:
                     'Could not find a match for file {}'.format(file_name))
             return None
 
-
         # Decompress if needed.
         if file_binary_is_zipped:
             file_binary = gzip.decompress(file_binary)
+
+        # If the binary is an empty string, this is an LU dummy file,
+        #  so return None.
+        if not file_binary:
+            return None
 
         # Convert the binary into a Game_File object.
         # The object constructors will handle parsing of binary data,

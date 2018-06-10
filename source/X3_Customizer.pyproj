@@ -4,14 +4,14 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>f321f45f-39ee-4cc8-91e7-bfec28462c97</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Make_Release.py</StartupFile>
-    <SearchPath>..\..\X3_Customizer;..\control_scripts;..\control_scripts;..\input_scripts;..\input_scripts;..\input_scripts</SearchPath>
+    <StartupFile>X3_Customizer.py</StartupFile>
+    <SearchPath>..\..\X3_Customizer;..\control_scripts;..\control_scripts;..\input_scripts;..\input_scripts;..\input_scripts;..\input_scripts;..\input_scripts</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>X3_Customizer</Name>
     <RootNamespace>X3_Customizer</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>User_Transforms_Mine.py</CommandLineArguments>
+    <CommandLineArguments>..\input_scripts\Authors_Transforms.py -verbose -dev</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -23,11 +23,14 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\input_scripts\User_Transforms_Example.py">
-      <Link>User_Transforms_Example.py</Link>
+    <Compile Include="..\input_scripts\Authors_Transforms.py">
+      <Link>Authors_Transforms.py</Link>
     </Compile>
-    <Compile Include="..\input_scripts\User_Transforms_Mine.py">
-      <Link>User_Transforms_Mine.py</Link>
+    <Compile Include="..\input_scripts\Example_Transforms.py">
+      <Link>Example_Transforms.py</Link>
+    </Compile>
+    <Compile Include="Common\Exceptions.py">
+      <SubType>Code</SubType>
     </Compile>
     <Compile Include="File_Manager\Logs.py">
       <SubType>Code</SubType>
@@ -101,7 +104,6 @@
     <Compile Include="Transforms\T_Universe.py" />
     <Compile Include="Transforms\T_Wares.py" />
     <Compile Include="Transforms\T_Weapons.py" />
-    <Compile Include="Transforms\T_Weapons_Fitter.py" />
     <Compile Include="Common\Flags.py" />
     <Compile Include="X3_Customizer.py" />
   </ItemGroup>

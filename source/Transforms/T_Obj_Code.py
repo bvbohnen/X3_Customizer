@@ -22,6 +22,7 @@ exact pointers, to be resiliant against game patches.
     in the wildcarded slice.
 '''
 from File_Manager import *
+from Common import *
 import inspect
 # This function will convert hex strings to bytes objects.
 from binascii import unhexlify as hex2bin
@@ -82,7 +83,12 @@ def Apply_Obj_Patch(patch):
             caller_name = inspect.stack()[1][3]
         except:
             caller_name = '?'
-        print('Error: Obj patch reference code mismatch in {}.'.format(caller_name))
+
+        # Can raise a hard or soft error depending on mode.
+        if Settings.developer:
+            print('Error: Obj patch reference code mismatch in {}.'.format(caller_name))
+        else:
+            raise Obj_Patch_Exception()
         return
 
     # Do the insertion, building a new byte string.
@@ -97,7 +103,7 @@ def Apply_Obj_Patch(patch):
 
 
     
-@Check_Dependencies('L/x3story.obj')
+@Transform_Wrapper('L/x3story.obj', LU = False)
 def Adjust_Max_Seta(
         speed_factor = 10
     ):
@@ -168,7 +174,7 @@ def Adjust_Max_Seta(
 
 
 
-@Check_Dependencies('L/x3story.obj')
+@Transform_Wrapper('L/x3story.obj', LU = False)
 def Adjust_Max_Speedup_Rate(
         scaling_factor = 1
     ):
@@ -209,7 +215,7 @@ def Adjust_Max_Speedup_Rate(
     return
 
 
-@Check_Dependencies('L/x3story.obj')
+@Transform_Wrapper('L/x3story.obj', LU = False)
 def Stop_Events_From_Disabling_Seta(
         on_missile_launch = False,
         on_receiving_priority_message = False,
@@ -283,7 +289,7 @@ def Stop_Events_From_Disabling_Seta(
 
 
 
-@Check_Dependencies('L/x3story.obj')
+@Transform_Wrapper('L/x3story.obj', LU = False)
 def Set_Max_Marines(
         tm_count = 8,
         tp_count = 40,
@@ -368,7 +374,7 @@ def Set_Max_Marines(
 #-Removed; the function edited appears to not be used for in-sector
 # damage, and may be almost purely out of sector or special cases,
 # which isn't so useful.
-#@Check_Dependencies('L/x3story.obj')
+#@Transform_Wrapper('L/x3story.obj')
 #def Disable_Friendly_Fire(
 #    ):
 #    '''
@@ -436,7 +442,7 @@ def Set_Max_Marines(
 #    return
 
 
-@Check_Dependencies('L/x3story.obj')
+@Transform_Wrapper('L/x3story.obj', LU = False)
 def Disable_Combat_Music(
     ):
     '''
@@ -523,7 +529,7 @@ Characteristics of this task:
 		4) Game started with god enabled, then modded to skip all sectors. Success.
 '''
 
-@Check_Dependencies('L/x3story.obj')
+@Transform_Wrapper('L/x3story.obj', LU = False)
 def Stop_GoD_From_Removing_Stations(
     ):
     '''
@@ -588,7 +594,7 @@ def Stop_GoD_From_Removing_Stations(
     return
 
 
-@Check_Dependencies('L/x3story.obj')
+@Transform_Wrapper('L/x3story.obj', LU = False)
 def Disable_Asteroid_Respawn(
     ):
     '''
@@ -638,12 +644,12 @@ def Disable_Asteroid_Respawn(
     return
 
 
-@Check_Dependencies('L/x3story.obj')
+@Transform_Wrapper('L/x3story.obj', LU = False)
 def Allow_Valhalla_To_Jump_To_Gates(
     ):
     '''
     Removes a restriction on the Valhalla, or whichever ship is at
-    offset 211 in tships, for jumping to gates. This should only
+    offset 211 in tships, from jumping to gates. This should only
     be applied alongside another mod that either reduces the
     valhalla size, increases gate size, removes gate rings,
     or moves/removes the forward pylons, to avoid collision problems.

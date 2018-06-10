@@ -4,12 +4,9 @@ This will also hold some misc values, for lack of a better place
 to put them.
 '''
 
-# How many game updates occur per minute, used to define fire delays in real time.
+# How many game updates occur per minute, used to define fire delays
+#  in real time.
 Game_Ticks_Per_Minute = 1000*60
-
-# Name of the file holding coefficients for the curve fit on laser speed.
-# (This is unused; the complex curve fit did not work well. TODO: comment out.)
-Laser_Speed_Coefs_File_Name = 'X3_laser_speed_coefs.pickle'
 
 # The size of each shield type, where type is an integer, size is the MJ value.
 Shield_type_size_dict = {

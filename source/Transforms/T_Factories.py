@@ -22,7 +22,7 @@ size_field_ratios_dict_dict = None
 prior_new_factories = []
 
 
-@Check_Dependencies('types/TFactories.txt', 'maps/WareTemplate.xml')
+@Transform_Wrapper('types/TFactories.txt', 'maps/WareTemplate.xml')
 def Add_More_Factory_Sizes(
         factory_types = [
             # Skip mines to avoid affecting mineral output of asteroids.

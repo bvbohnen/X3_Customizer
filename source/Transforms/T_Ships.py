@@ -30,7 +30,7 @@ import os
 # Cut hull on the 'unknown object' M6 in XRM, which is around 25x higher
 #  than what is typical for an M6. Even a 90% reduction would be modest.
 
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Adjust_Ship_Hull(
     scaling_factor = 1,
     adjustment_factors_dict = {},
@@ -98,7 +98,7 @@ def Adjust_Ship_Hull(
 
 
             
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Adjust_Ship_Speed(
     scaling_factor = 1,
     adjustment_factors_dict = {}
@@ -143,7 +143,7 @@ def Adjust_Ship_Speed(
                 this_dict[field] = str(new_value)
 
             
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Adjust_Ship_Laser_Recharge(
     scaling_factor = 1,
     adjustment_factors_dict = {},
@@ -189,7 +189,7 @@ def Adjust_Ship_Laser_Recharge(
 
             
             
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Adjust_Ship_Pricing(
     scaling_factor = 1,
     adjustment_factors_dict = {}
@@ -221,7 +221,7 @@ def Adjust_Ship_Pricing(
 
 
                 
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Adjust_Ship_Shield_Regen(
     scaling_factor = 1,
     adjustment_factors_dict = {}
@@ -271,7 +271,7 @@ def Adjust_Ship_Shield_Regen(
                 
 
             
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Adjust_Ship_Shield_Slots(
     adjustment_factors_dict = {}
     ):
@@ -337,7 +337,7 @@ def Adjust_Ship_Shield_Slots(
             
 # TODO: maybe make this a general fix to ensure player and npc prices are the
 #  same, though bugs outside the pericles haven't been noticed.
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Fix_Pericles_Pricing():
     '''
     Applies a bug fix to the enhanced pericles, which has its
@@ -356,7 +356,7 @@ def Fix_Pericles_Pricing():
             break
 
        
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Patch_Ship_Variant_Inconsistencies(
         include_xrm_fixes = False
     ):
@@ -430,7 +430,7 @@ def Patch_Ship_Variant_Inconsistencies(
                 break
 
                 
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Boost_Truelight_Seeker_Shield_Reactor():
     '''
     Enhances the Truelight Seeker's shield reactor.
@@ -455,7 +455,7 @@ def Boost_Truelight_Seeker_Shield_Reactor():
             break
 
         
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Simplify_Engine_Trails(
         remove_trails = False
     ):
@@ -492,7 +492,7 @@ def Simplify_Engine_Trails(
             this_dict['particle_effect'] = '0'
                 
 
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Standardize_Ship_Tunings(
         engine_tunings = None,
         rudder_tunings = None,
@@ -584,7 +584,7 @@ def Standardize_Ship_Tunings(
 
             
 
-@Check_Dependencies('types/TShips.txt', 'types/WareLists.txt')
+@Transform_Wrapper('types/TShips.txt', 'types/WareLists.txt')
 def Add_Ship_Equipment(
         ship_types = [
             ],
@@ -629,6 +629,7 @@ def Add_Ship_Equipment(
     # Also record the line dicts, for copying later if needed.
     ware_list_list = []
     ware_line_dict_list = []
+    header_found = False
     for index, this_dict in enumerate(Load_File('types/WareLists.txt')):
 
         # Note: an oddity with the warelist is that the data lines and the
@@ -636,9 +637,10 @@ def Add_Ship_Equipment(
         #  need to be pruned here manually.
         # Can identify the header as having 2 entries, the second being just
         #  a newline.
-        if len(this_dict) == 2 and this_dict['slash_index_comment'] == '\n':
-            # This should be the first item.
-            assert index == 0
+        # Update: and oddity with LU is that the second line is a 0-entry
+        #  list, so only skip the first one.
+        if len(this_dict) == 2 and not header_found:
+            header_found = True
             continue
 
         # Get the wares, as a list of strings.
@@ -769,17 +771,14 @@ def Add_Ship_Equipment(
     if cap_ware_list_ids:
         # Note that since the header line gets returned, the actual ware
         #  list index is 1 less than the enumerated value.
+        header_found = False
         for index_p1, this_dict in enumerate(Load_File('types/WareLists.txt')):
             
-            # Note: an oddity with the warelist is that the data lines and the
-            #  header line can be the same size (2), so that header line will
-            #  need to be pruned here manually.
-            # Can identify the header as having 2 entries, the second being just
-            #  a newline.
-            if len(this_dict) == 2 and this_dict['slash_index_comment'] == '\n':
-                # This should be the first item.
-                assert index_p1 == 0
+            # Skip the header, as above.
+            if len(this_dict) == 2 and not header_found:
+                header_found = True
                 continue
+
             # Adjust to get the proper index.
             index = index_p1 -1
 
@@ -824,7 +823,7 @@ def Add_Ship_Equipment(
 
 
 
-@Check_Dependencies('types/TShips.txt', 'types/WareLists.txt')
+@Transform_Wrapper('types/TShips.txt', 'types/WareLists.txt')
 def Add_Ship_Life_Support(
         ship_types = [
             'SG_SH_M1',
@@ -860,7 +859,7 @@ def Add_Ship_Life_Support(
 
 
 
-@Check_Dependencies('types/TShips.txt', category = 'Missile')
+@Transform_Wrapper('types/TShips.txt', category = 'Missile')
 def Expand_Bomber_Missiles(
     include_bombers = True,
     include_frigates = True,
@@ -925,7 +924,7 @@ def Expand_Bomber_Missiles(
 
 
 
-@Check_Dependencies('types/TShips.txt', category = 'Missile')
+@Transform_Wrapper('types/TShips.txt', category = 'Missile')
 def Add_Ship_Cross_Faction_Missiles(
     race_types = [
         'Argon', 
@@ -1009,7 +1008,7 @@ def Add_Ship_Cross_Faction_Missiles(
     return
 
 
-@Check_Dependencies('types/TShips.txt', category = 'Missile')
+@Transform_Wrapper('types/TShips.txt', category = 'Missile')
 def Add_Ship_Boarding_Pod_Support(
     ship_types = [
         'SG_SH_M1',
@@ -1074,7 +1073,7 @@ def Add_Ship_Boarding_Pod_Support(
     return
 
 # TODO: patchify this.
-@Check_Dependencies()
+@Transform_Wrapper()
 def Remove_Khaak_Corvette_Spin():
     '''
     Remove the spin on the secondary hull of the Khaak corvette.

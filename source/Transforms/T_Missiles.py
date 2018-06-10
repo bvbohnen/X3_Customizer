@@ -38,7 +38,7 @@ from Common import Flags
 # TODO: add cargo volume adjustment, so that ships with
 #  heavily weakened missiles get more of them to fire before running
 #  out.
-@Check_Dependencies('types/Globals.txt', 'types/TMissiles.txt')
+@Transform_Wrapper('types/Globals.txt', 'types/TMissiles.txt')
 def Adjust_Missile_Damage(
     scaling_factor = 1,
     # If diminishing returns should be used, so that low damage
@@ -216,7 +216,7 @@ def Adjust_Missile_Damage(
     return
             
             
-@Check_Dependencies('types/TMissiles.txt')
+@Transform_Wrapper('types/TMissiles.txt')
 def Enhance_Mosquito_Missiles(
     acceleration_factor = 5,
     turn_rate_factor = 10,
@@ -275,7 +275,7 @@ def Enhance_Mosquito_Missiles(
 # -Removed for now; mostly just adds clutter, and didn't work well for
 #  xrm, probably since trails were edited such that the original ap
 #  trail isn't present at the original index.
-# @Check_Dependencies('types/TMissiles.txt')
+# @Transform_Wrapper('types/TMissiles.txt')
 # def Restore_Heavy_Missile_Trail():
 #     '''
 #     Minor transform to set heavy missile trails to those in vanilla AP.
@@ -294,7 +294,7 @@ def Enhance_Mosquito_Missiles(
 # XRM increases speeds, eg wasp being 834 instead of 560, which could
 #  afford to be reduced back down (since wasp appears to have better
 #  rpm for landing hits anyway).
-@Check_Dependencies('types/TMissiles.txt')
+@Transform_Wrapper('types/TMissiles.txt')
 def Adjust_Missile_Speed(
     # The adjustment factor. -25% felt like too little, so try -50%.
     scaling_factor = 0.5,
@@ -386,7 +386,7 @@ def Adjust_Missile_Speed(
     return
             
             
-@Check_Dependencies('types/TMissiles.txt')
+@Transform_Wrapper('types/TMissiles.txt')
 def Adjust_Missile_Range(
     # The adjustment factor. Cut in half for now.
     # -Half feels about right in game.

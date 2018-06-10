@@ -5,9 +5,16 @@ These transforms are those used by the author.
 # Import all transform functions.
 from Transforms import *
 
-# Select if this is modifying vanilla or XRM.
-XRM = True
-Vanilla = not XRM
+# Select if this is modifying vanilla or XRM or LU.
+#version = 'Vanilla'
+version = 'XRM'
+#version = 'LU'
+
+
+# Some convenience translation, to make easier if/else statements.
+Vanilla = version == 'Vanilla'
+XRM = version == 'XRM'
+LU = version == 'LU'
 
 if Vanilla:
     Set_Path(
@@ -20,50 +27,59 @@ elif XRM:
         #path_to_source_folder = 'xrm_source'
         #path_to_output_folder = 'custom_output'
     )
+elif LU:
+    Set_Path(
+        path_to_x3_folder = r'D:\Steam\SteamApps\common\x3 terran conflict LU',
+    )
+
+# Temp enable xrm transforms for lu to see what happens.
+#XRM = LU if LU else XRM
     
 Settings.use_scipy_for_scaling_equations = True
 Settings.show_scaling_plots = False
 
+
 #####################################################
 # Obj code file changes.
 
-# Bump up max seta.
-Adjust_Max_Seta(15)
-# Make seta speed up faster.
-Adjust_Max_Speedup_Rate(4)
-# Keep seta on in more situations.
-Stop_Events_From_Disabling_Seta(
-        on_missile_launch = True,
-        # Side note: not yet verified this one due to police not wanting
-        #  to scan.
-        on_receiving_priority_message = True,
-        # on_collision_warning = True,
-    )
+if Vanilla or XRM:
+    # Bump up max seta.
+    Adjust_Max_Seta(15)
+    # Make seta speed up faster.
+    Adjust_Max_Speedup_Rate(4)
+    # Keep seta on in more situations.
+    Stop_Events_From_Disabling_Seta(
+            on_missile_launch = True,
+            # Side note: not yet verified this one due to police not wanting
+            #  to scan.
+            on_receiving_priority_message = True,
+            # on_collision_warning = True,
+        )
 
-# Toy around with max marine counts.
-# Not too useful; mostly for fun.
-Set_Max_Marines(
-        tm_count      = 15,
-        tp_count      = 60,
-        m6_count      = 15,
-        capital_count = 60,
-        sirokos_count = 80,
-    )
+    # Toy around with max marine counts.
+    # Not too useful; mostly for fun.
+    Set_Max_Marines(
+            tm_count      = 15,
+            tp_count      = 60,
+            m6_count      = 15,
+            capital_count = 60,
+            sirokos_count = 80,
+        )
     
-# Disable combat music.
-# Disable_Combat_Music()
-# Similarly, disable the combat entrance beeping.
-# Remove_Combat_Beep()
+    # Disable combat music.
+    # Disable_Combat_Music()
+    # Similarly, disable the combat entrance beeping.
+    # Remove_Combat_Beep()
 
-# Stop GoD from deleting factories.
-# Note: not working in initial testing.
-Stop_GoD_From_Removing_Stations()
+    # Stop GoD from deleting factories.
+    # Note: not working in initial testing.
+    Stop_GoD_From_Removing_Stations()
 
-# Maybe stop asteroid respawn, if wanting to blow some up.
-# Disable_Asteroid_Respawn()
+    # Maybe stop asteroid respawn, if wanting to blow some up.
+    # Disable_Asteroid_Respawn()
 
-# Test code for allowing valhallas to jump to gates.
-Allow_Valhalla_To_Jump_To_Gates()
+    # Test code for allowing valhallas to jump to gates.
+    Allow_Valhalla_To_Jump_To_Gates()
 
 #####################################################
 # Background
@@ -110,23 +126,26 @@ Remove_Stars_From_Foggy_Sectors(
 #####################################################
 # Director
 
-# Set standardized tuning counts.
-Standardize_Tunings(
-    enging_tuning_crates = 4,
-    rudder_tuning_crates = 4,
-    engine_tunings_per_crate = 4,
-    rudder_tunings_per_crate = 3)
+if Vanilla or XRM:
+    # Set standardized tuning counts.
+    Standardize_Tunings(
+        enging_tuning_crates = 4,
+        rudder_tuning_crates = 4,
+        engine_tunings_per_crate = 4,
+        rudder_tunings_per_crate = 3)
+
+    # Set 70% of max overtuning for ships.
+    Standardize_Start_Plot_Overtunings(
+        fraction_of_max = 0.70)
 
 # Avoid dynamic convoys being mixed race for ships.
 Convoys_made_of_race_ships()
 
-# Set 70% of max overtuning for ships.
-Standardize_Start_Plot_Overtunings(
-    fraction_of_max = 0.70)
-
 # Adjust or disable generic missions.
-Disable_generic_missions = True
-if not Disable_generic_missions:
+if 1:
+    # Disable generic missions.
+    Disable_Generic_Missions()
+else:
     # Reduce odds of non-fight missions, or increase odds of fight missions.
     Adjust_Generic_Missions({
         # 'Trade': 0.3,
@@ -146,14 +165,7 @@ if not Disable_generic_missions:
         'L2M135': 0,
         })
 
-else:
-    # Disable generic missions.
-    Adjust_Generic_Missions({
-        'Trade': 0,
-        'Fight': 0,
-        'Build': 0,
-        'Think': 0,
-        })
+
 
 #####################################################
 # Gates
@@ -717,6 +729,11 @@ if XRM:
     # Adjust_Weapon_Fire_Rate(scaling_factor = 0.5)
     
 
+if LU:    
+    # Speed up fire rates; LU sets them rather low.
+    Adjust_Weapon_Fire_Rate(scaling_factor = 2)
+
+
 #####################################################
 # Missiles
 
@@ -1189,6 +1206,11 @@ if XRM:
     #     })
 
 
+if LU:
+    # Add life support to cap ships. This includes TLs by default.
+    Add_Ship_Life_Support()
+
+
 #####################################################
 # Wares
 if XRM:
@@ -1228,33 +1250,36 @@ if XRM:
 # Allow Attack to be used for group Attack Nearest on player ships.
 Convert_Attack_To_Attack_Nearest()
 
-# Add CLS software to more docks, so not stuck with shipping from
-#  Argon space.
-Add_CLS_Software_To_More_Docks()
+if Vanilla or XRM:
+    # Add CLS software to more docks, so not stuck with shipping from
+    #  Argon space.
+    Add_CLS_Software_To_More_Docks()
 
-# Stop infinite hostile spawns in war sectors when the player has
-#  ships there but is not present.
-Disable_OOS_War_Sector_Spawns()
+# The following don't work for LU.
+if Vanilla or XRM:
+    # Stop infinite hostile spawns in war sectors when the player has
+    #  ships there but is not present.
+    Disable_OOS_War_Sector_Spawns()
 
-# Make CAGs less frustrating to use for selling products, by
-#  allowing them to sell right away.
-Allow_CAG_Apprentices_To_Sell()
+    # Make CAGs less frustrating to use for selling products, by
+    #  allowing them to sell right away.
+    Allow_CAG_Apprentices_To_Sell()
 
-# Bump up the range escort ships respond to enemies.
-Increase_Escort_Engagement_Range(
-    small_range  = 3000,
-    medium_range = 4500,
-    long_range   = 7000,
-    )
+    # Bump up the range escort ships respond to enemies.
+    Increase_Escort_Engagement_Range(
+        small_range  = 3000,
+        medium_range = 4500,
+        long_range   = 7000,
+        )
 
-# Fix the OOS problem with missiles preventing laser fire.
-Fix_OOS_Laser_Missile_Conflict()
+    # Fix the OOS problem with missiles preventing laser fire.
+    Fix_OOS_Laser_Missile_Conflict()
 
-# Fix a couple bugs in the complex cleaner mod.
-Complex_Cleaner_Bug_Fix()
-# Make the mod use small cubes, to reduce visual footprint.
-Complex_Cleaner_Use_Small_Cube()
+    # Fix a couple bugs in the complex cleaner mod.
+    Complex_Cleaner_Bug_Fix()
+    # Make the mod use small cubes, to reduce visual footprint.
+    Complex_Cleaner_Use_Small_Cube()
 
-# Fix a bug with fleet logic for selecting interceptors
-#  against bombers.
-Fleet_Interceptor_Bug_Fix()
+    # Fix a bug with fleet logic for selecting interceptors
+    #  against bombers.
+    Fleet_Interceptor_Bug_Fix()

@@ -168,14 +168,19 @@ import os
 from .T_Director import Make_Director_Shell
 
 
-@Check_Dependencies('maps/x3_universe.xml',
-                    't/0001-L044.xml',
-                    't/7027-L044.xml',
-                    't/7360-L044.xml')
+@Transform_Wrapper(
+    'maps/x3_universe.xml',
+    't/0001-L044.xml',
+    't/7027-L044.xml',
+    't/7360-L044.xml',
+    # Currently doesn't support LU due to a different text file with the
+    #  sector names; could probably add support with a little effort.
+    LU = False
+    )
 def Color_Sector_Names(
     # Specify the color to use for each race/affiliation.
-    # To save some implementation time, races should be defined by their code number
-    #  in the universe file.
+    # To save some implementation time, races should be defined by their
+    #  code number in the universe file.
     Race_color_letters = {
             # argon
             '1': 'B',
@@ -341,7 +346,7 @@ def Color_Sector_Names(
     return
 
 
-@Check_Dependencies('maps/x3_universe.xml')
+@Transform_Wrapper('maps/x3_universe.xml', Vanilla = False, LU = False)
 def Restore_Aldrin_rock():
     '''
     Restors the big rock in Aldrin for XRM, reverting to the vanilla
@@ -361,7 +366,7 @@ def Restore_Aldrin_rock():
     file_contents.text = file_contents.text.replace(original_text, replacement_text)
         
     
-@Check_Dependencies('maps/x3_universe.xml')
+@Transform_Wrapper('maps/x3_universe.xml', Vanilla = False, LU = False)
 def Restore_Hub_Music(
     apply_to_existing_save = False
     ):
@@ -404,7 +409,7 @@ def Restore_Hub_Music(
         pass
 
     
-@Check_Dependencies('maps/x3_universe.xml')
+@Transform_Wrapper('maps/x3_universe.xml', Vanilla = False, LU = False)
 def Restore_M148_Music(
     apply_to_existing_save = False
     ):
@@ -445,7 +450,7 @@ def Restore_M148_Music(
         pass
     
 
-@Check_Dependencies()
+@Transform_Wrapper()
 def Change_Sector_Music(
         sector_x, 
         sector_y, 

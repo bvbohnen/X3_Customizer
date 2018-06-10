@@ -33,7 +33,7 @@ Increase_Tuning_Prices = True
 Tuning_cost_multiplier = 5
 '''
 
-@Check_Dependencies('types/TWareT.txt')
+@Transform_Wrapper('types/TWareT.txt')
 def Restore_Vanilla_Tuning_Pricing():
     '''
     Sets the price for ship tunings (engine, rudder, cargo) to those
@@ -53,7 +53,7 @@ def Restore_Vanilla_Tuning_Pricing():
 
 
 # TODO: dynamic ware file check based on the item being modified.
-@Check_Dependencies('types/TWareT.txt')
+@Transform_Wrapper('types/TWareT.txt')
 def Set_Ware_Pricing(
     # Dict of ware names and their relative values to use.
     name_price_dict = {},
@@ -116,7 +116,7 @@ def Set_Ware_Pricing(
 #  as npcs).
 # -Removing transform for now; it doesn't seem the problems are solvable
 #  when value:credit ratios are hardcoded.
-# @Check_Dependencies('types/TWareT.txt', 'TWareF.txt', 'TWareB.txt', 
+# @Transform_Wrapper('types/TWareT.txt', 'TWareF.txt', 'TWareB.txt', 
 #                     'TLaser.txt', 'TShields.txt', 'TMissiles.txt')
 # def Normalize_Player_And_NPC_Production_Rates(
 #     match_player_to_npc = False
@@ -148,7 +148,7 @@ def Set_Ware_Pricing(
 
 # Quick dummy transform, to help the File_Manager recognize these as files
 #  that may be changed.
-@Check_Dependencies(
+@Transform_Wrapper(
     'types/TWareT.txt', 'types/TLaser.txt', 'types/TShields.txt',
     'types/TMissiles.txt', 'types/TFactories.txt', 'types/TDocks.txt',
     'types/TWareF.txt', 'types/TWareB.txt', 'types/TWareE.txt',
@@ -157,7 +157,7 @@ def _dummy():
     return
 
 # No predetermined dependency on this one; check it live.
-@Check_Dependencies()
+@Transform_Wrapper()
 def Change_Ware_Size(
     ware_name = None,
     new_size = None,

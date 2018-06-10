@@ -12,7 +12,7 @@ from collections import OrderedDict
 #TODO, SG_MAX_VERTEXDIST_DOCKCOMPUTER
 
         
-@Check_Dependencies('types/TMissiles.txt', 'types/Globals.txt', category = 'Missile')
+@Transform_Wrapper('types/TMissiles.txt', 'types/Globals.txt', category = 'Missile')
 def Set_Missile_Swarm_Count(
         swarm_count = 5
     ):
@@ -66,7 +66,7 @@ def Set_Missile_Swarm_Count(
         
         
 
-@Check_Dependencies('types/Globals.txt', category = 'Missile')
+@Transform_Wrapper('types/Globals.txt', category = 'Missile')
 def Adjust_Missile_Hulls(
     scaling_factor = 1
     ):
@@ -133,7 +133,7 @@ def Adjust_Missile_Hulls(
             this_dict['value'] = str(int(new_value))
 
 
-@Check_Dependencies('types/Globals.txt')
+@Transform_Wrapper('types/Globals.txt')
 def Set_Communication_Distance(
         distance_in_km = 75
     ):
@@ -147,7 +147,7 @@ def Set_Communication_Distance(
     Set_Global('SG_MAX_DISTANCE_COMM', distance_in_km * 1000)
             
         
-@Check_Dependencies('types/Globals.txt')
+@Transform_Wrapper('types/Globals.txt')
 def Set_Complex_Connection_Distance(
         distance_in_km = 100
     ):
@@ -163,7 +163,7 @@ def Set_Complex_Connection_Distance(
     Set_Global('SG_MAX_DISTANCE_BUILDCOMPLEX', distance_in_km * 1000)
             
             
-@Check_Dependencies('types/Globals.txt')
+@Transform_Wrapper('types/Globals.txt')
 def Set_Dock_Storage_Capacity(
         player_factor = 3,
         npc_factor = 1,
@@ -185,7 +185,7 @@ def Set_Dock_Storage_Capacity(
     Set_Global('SG_NPC_HUB_STORAGE_FACTOR', hub_factor)
                 
             
-@Check_Dependencies('types/Globals.txt')
+@Transform_Wrapper('types/Globals.txt')
 def Adjust_Strafe(
         #Try out halving these, to make strafe less tempting, and less jumpy when in
         # a spacesuit.
@@ -209,7 +209,7 @@ def Adjust_Strafe(
                 
 
 #Generic transforms taking specific global named flags.
-@Check_Dependencies('types/Globals.txt')
+@Transform_Wrapper('types/Globals.txt')
 def Set_Global(field_name, value):
     '''
     Set a global flag to the given value.
@@ -227,7 +227,7 @@ def Set_Global(field_name, value):
             break
 
     
-@Check_Dependencies('types/Globals.txt')
+@Transform_Wrapper('types/Globals.txt')
 def Adjust_Global(field_name, scaling_factor):
     '''
     Adjust a global flag by the given multiplier.

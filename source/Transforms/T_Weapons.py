@@ -209,7 +209,7 @@ def Floor_Laser_Energy_To_Bullet_Energy():
 
 
 
-@Check_Dependencies('types/TBullets.txt', 'types/TLaser.txt')
+@Transform_Wrapper('types/TBullets.txt', 'types/TLaser.txt')
 def Adjust_Weapon_Fire_Rate(
     scaling_factor = 1,
     laser_name_adjustment_dict = {},
@@ -251,7 +251,7 @@ def Adjust_Weapon_Fire_Rate(
     # Used mainly to speed up checking for lasers than use ammo bullets.
     ammo_based_bullet_list = []
     # Loop over all bullets.
-    for this_dict, index in enumerate(tbullets_dict_list):
+    for index, this_dict in enumerate(tbullets_dict_list):
         # Unpack the flags.
         flags_dict = Flags.Unpack_Tbullets_Flags(this_dict)
         # If an ammo user, record its name.
@@ -299,6 +299,10 @@ def Adjust_Weapon_Fire_Rate(
         new_fire_delay = round(Flags.Game_Ticks_Per_Minute / this_fire_rate)
 
         # Store the updated value.
+        # TODO: add another adjustment to this if the related bullets were
+        #  already modified by another laser, in which case the laser fire
+        #  rate can be recalculated based on the new bullet damage to keep
+        #  dps constant (when considering the fire rate floor).
         this_dict['fire_delay'] = str(new_fire_delay)
 
         # Calculate the fire rate change factor, using the rounded delay.
@@ -346,7 +350,7 @@ def Adjust_Weapon_Fire_Rate(
 
 # Note: this function has been overhauled to remove IS DPS calculation;
 #  the original idea that ROF wasn't accounted for OOS was mistaken.
-@Check_Dependencies('types/TBullets.txt', 'types/TLaser.txt')
+@Transform_Wrapper('types/TBullets.txt', 'types/TLaser.txt')
 def Adjust_Weapon_OOS_Damage(
     scaling_factor = 1,
 
@@ -531,7 +535,7 @@ Coefficients for the formula are generated dynamically based on
 
 '''
 
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Adjust_Weapon_Shot_Speed(
     scaling_factor = 1,
     # Special dict entries will override the above formula.
@@ -694,7 +698,7 @@ def _Update_Bullet_Speed(bullet_dict, new_speed):
     bullet_dict['lifetime'] = str(int(new_lifetime))
 
             
-@Check_Dependencies('types/TBullets.txt', 'types/TLaser.txt')
+@Transform_Wrapper('types/TBullets.txt', 'types/TLaser.txt')
 def Adjust_Weapon_DPS(
     # A flat factor to use for damage adjustment.
     # This is applied after the scaling equation below, so that that
@@ -971,7 +975,7 @@ def Adjust_Weapon_DPS(
     Floor_Laser_Energy_To_Bullet_Energy()
 
 
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio(
     minimum_ratio = 1/20,
     ):
@@ -1005,7 +1009,7 @@ def Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio(
 
            
 
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Adjust_Beam_Weapon_Duration(
     bullet_name_adjustment_dict = {},
     # Don't modify repair lasers, mainly to avoid having to put this
@@ -1083,7 +1087,7 @@ def Adjust_Beam_Weapon_Duration(
 # TODO: consider a general transform to change bullet length, since it
 #  might be neat visually. Could limit bullet length based on fire
 #  rate and speed to ensure bullets aren't longer than their spacing.
-# @Check_Dependencies('types/TBullets.txt')
+# @Transform_Wrapper('types/TBullets.txt')
 # def Adjust_Beam_Weapon_Bullet_Length(
 #     scaling_factor = 10,
 #     beams_not_converted = [
@@ -1127,7 +1131,7 @@ def Adjust_Beam_Weapon_Duration(
 
 
                 
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Adjust_Beam_Weapon_Width(
     bullet_name_adjustment_dict = {}
     ):
@@ -1182,7 +1186,7 @@ def Adjust_Beam_Weapon_Width(
 # This will need some thought for shot speed, as well as picking the bullet
 #  effect to use (the laser bullet may not be well suited to standalone
 #  bullets).
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Convert_Beams_To_Bullets(
     beams_not_converted = None,
     speed_samples = 4,
@@ -1382,7 +1386,7 @@ def _Get_Bullet_Speed_By_Damage(bullet_dict, speed_samples, sample_type):
 
 
         
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Replace_Weapon_Shot_Effects(
     impact_replacement = None,
     launch_replacement = None
@@ -1404,7 +1408,7 @@ def Replace_Weapon_Shot_Effects(
             this_dict['launch_effect'] = str(launch_replacement)
 
             
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Remove_Weapon_Shot_Sound():
     '''
     Removes impact sound from bullets.
@@ -1416,7 +1420,7 @@ def Remove_Weapon_Shot_Sound():
         this_dict['impact_sound'] = '0'
 
             
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Adjust_Weapon_Range(
     lifetime_scaling_factor = 1,
     speed_scaling_factor = 1,
@@ -1448,7 +1452,7 @@ def Adjust_Weapon_Range(
 
             
         
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Adjust_Weapon_Energy_Usage(
     scaling_factor = 1,
     bullet_name_multiplier_dict = {},
@@ -1505,7 +1509,7 @@ Ammo_name_id_dict = {
     'Mass Driver Ammunition': 42,
     }
 
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Convert_Weapon_To_Energy(
     bullet_name_energy_dict = {}
     ):
@@ -1536,7 +1540,7 @@ def Convert_Weapon_To_Energy(
     Floor_Laser_Energy_To_Bullet_Energy()
 
             
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Convert_Weapon_To_Ammo(
     bullet_name_ammo_dict = {},
     energy_reduction_factor = 0.1
@@ -1586,7 +1590,7 @@ def Convert_Weapon_To_Ammo(
     Floor_Laser_Energy_To_Bullet_Energy()
 
             
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Clear_Weapon_Flag(flag_name):
     '''
     Clears a specified flag from all weapons.
@@ -1602,7 +1606,7 @@ def Clear_Weapon_Flag(flag_name):
         Flags.Pack_Tbullets_Flags(this_dict, flags_dict)
         
         
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Remove_Weapon_Charge_Up():
     '''
     Remove charge up from all weapons, to make PPCs and similar easier to use in
@@ -1617,7 +1621,7 @@ def Remove_Weapon_Charge_Up():
 # In XRM, Xenon beams do this equipment damage and are only notable for having
 #  this flag set. Try clearing it to see if this helps (as part of the
 #  general beam nerf).
-@Check_Dependencies('types/TBullets.txt')
+@Transform_Wrapper('types/TBullets.txt')
 def Remove_Weapon_Drain_Flag():
     '''
     Removes the weapon drain flag from any weapons.

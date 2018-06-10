@@ -12,6 +12,7 @@ from Common import *
 from .Source_Reader import *
 from .File_Types import *
 from .Logs import *
+from Common.Exceptions import *
 
 # TODO: move this somewhere more convenient, eg. the Settings module,
 #  though for now it is here since it calls Init afterward.
@@ -176,8 +177,37 @@ def Add_File(game_file):
 # Update: this will also support a keyword 'category' argument, which
 #  will be the documentation transform category override to use when
 #  the automated category is unwanted.
+# TODO: move to a different module, maybe, since this has grown beyond
+#  just being a file thing.
 from functools import wraps
-def Check_Dependencies(*file_names, category = None):
+def Transform_Wrapper(
+        *file_names, 
+        category = None, 
+        Vanilla = True,
+        XRM = True,
+        LU = True,
+    ):
+    '''
+    Wrapper function for transforms.
+
+    * file_names (args)
+      - Loose args should be names of required transform files, given
+        in the cat path format (forward slashes, etc.).
+    * category
+      - String, category of the transform; if not given, category
+        is set to the name of the containing module without the 'T_'
+        prefix and set to singular instead of plural.
+    * Vanilla
+      - Bool, if True then the transform should be compatable with
+        vanilla x3.
+    * XRM
+      - Bool, if True then the transform should be compatable with
+        XRM modded x3.
+    * LU
+      - Bool, if True then the transform should be compatable with
+        LU modded x3.
+    '''
+
     # Record the required file names to a set for use elsewhere.
     Transform_required_file_names.update(file_names)
 
@@ -188,10 +218,18 @@ def Check_Dependencies(*file_names, category = None):
         #  since they are only available on function definition at the
         #  moment, and will be checked at run time.
         func._file_names = file_names
+
         # Attach the override category to the function.
         # TODO: maybe fill in the default category here, but for now
         #  it is done in Make_Documentation.
         func._category = category
+
+        # Record the version compatability flags.
+        func._compatabilities = OrderedDict([
+            ('Vanilla', Vanilla),
+            ('XRM'    ,  XRM),
+            ('LU'     ,  LU),
+            ])
 
         # Record the transform function.
         Transform_list.append(func)
@@ -219,14 +257,43 @@ def Check_Dependencies(*file_names, category = None):
                 try:
                     Load_File(file_name)
                 except File_Missing_Exception:
-                    print('Skipped {}, required file {} not found.'.format(
+                    print('Skipped {}, required file {} not found or is empty.'.format(
                         func.__name__,
                         file_name
                         ))
                     # Return nothing and skip the call.
                     return
-            # Return the normal function call results.
-            return func(*args, **kwargs)
+
+            # Call the transform function, looking for exceptions.
+            # This will be the generally clean fallback when anything
+            #  goes wrong, so that other transforms can still be
+            #  attempted.
+            try:
+                results = func(*args, **kwargs)
+
+                # If here, ran succesfully.
+                if Settings.verbose:
+                    print('Succesfully ran {}'.format(
+                        func.__name__
+                        ))
+
+                # If the function is supposed to return anything, return it
+                #  here, though currently this is expected to always be None.
+                return results
+
+            except Exception as ex:
+                # When set to catch exceptions, just print a nice message.
+                if not Settings.developer:
+                    # Give the exception name.
+                    print('Skipped {} due to a {} exception.'.format(
+                        func.__name__,
+                        type(ex).__name__
+                        ))
+                else:
+                    # Reraise the exception.
+                    raise ex
+
+            return
 
         # Return the callable function.
         return wrapper
@@ -269,7 +336,7 @@ def Load_File(file_name,
         if game_file == None:
             if error_if_not_found:
                 raise File_Missing_Exception(
-                    'Could not find file {}'.format(file_name))
+                    'Could not find file {}, or file was empty'.format(file_name))
             return None
         
         # Store the contents in the File_dict.

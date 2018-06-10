@@ -1,7 +1,7 @@
 
 # Support easy import of some key functions used by transforms.
 from .File_Manager import Load_File
-from .File_Manager import Check_Dependencies
+from .File_Manager import Transform_Wrapper
 from .File_Manager import Cleanup
 from .File_Manager import Write_Files
 from .File_Manager import Copy_File

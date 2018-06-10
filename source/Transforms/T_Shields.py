@@ -9,7 +9,7 @@ from Common import Flags
 import math
 
 
-@Check_Dependencies('types/TShields.txt')
+@Transform_Wrapper('types/TShields.txt')
 def Adjust_Shield_Regen(
     scaling_factor = 1
     ):

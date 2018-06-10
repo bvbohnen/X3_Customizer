@@ -137,6 +137,11 @@ Change Log:
      necessary binaries and related files.
    - Converted patch creation from an input command script to a standalone
      make script.
+ * 3.3
+   - Bug fix in Adjust_Weapon_Fire_Rate.
+   - More graceful handling of failed transforms.
+   - Added flags on some transforms that are incompatible with LU.
+   - Added Disable_Generic_Missions, a wrapper over Adjust_Generic_Missions.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

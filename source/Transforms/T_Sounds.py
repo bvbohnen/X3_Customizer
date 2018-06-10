@@ -5,7 +5,7 @@ in the s folder.
 '''
 from File_Manager import *
 
-@Check_Dependencies()
+@Transform_Wrapper()
 def Remove_Sound(sound_id):
     '''
     Removes a sound by writing an empty file in its place, based
@@ -24,7 +24,7 @@ def Remove_Sound(sound_id):
     return
 
  
-@Check_Dependencies()
+@Transform_Wrapper()
 def Remove_Combat_Beep():
     '''
     Removes the beep that plays when entering combat.

@@ -20,11 +20,6 @@ This tool is designed for Albion Prelude v3.3. Most transforms will
 support prior versions of AP. TC is not directly supported currently
 due primarily to some path assumptions.
 
-Source code is hosted on github:
-https://github.com/bvbohnen/X3_Customizer
-Announcements are primarily made on the Egosoft forum:
-https://forum.egosoft.com/viewtopic.php?t=396158
-
 Usage:
 
  * "X3_Customizer.bat [path to user_transform_module.py]"
@@ -85,8 +80,8 @@ Setup and behavior:
     - Call a series of transform functions, as desired.
   
   * The quickest way to set up a command script is to
-  copy and edit the input_scripts/User_Transforms_Example.py file.
-  Included in the repository is User_Transforms_Mine, the author's
+  copy and edit the input_scripts/Example_Transforms.py file.
+  Included in the repository is Authors_Transforms, the author's
   personal set of transforms, which can be checked for futher examples
   of how to use most transforms available.
 
@@ -162,7 +157,7 @@ def Run():
         'user_module',
         help = 'Python module setting up paths and specifying'
                ' transforms to be run.'
-               ' Example in input_scripts/User_Transforms_Example.py.'
+               ' Example in input_scripts/Example_Transforms.py.'
                )
 
     # Flag to clean out old files.
@@ -191,7 +186,17 @@ def Run():
         help = 'Prints the paths used for each sourced file to the'
                ' general message log.')
     
-
+    argparser.add_argument(
+        '-dev', 
+        action='store_true',
+        help =  'Enables developer mode, which makes some changes to'
+                ' exception handling.')
+    
+    argparser.add_argument(
+        '-quiet', 
+        action='store_true',
+        help =  'Quiets some extra status messages.')
+    
     # Run the parser on the sys args.
     args = argparser.parse_args()
 
@@ -211,19 +216,30 @@ def Run():
     
     # Check for the clean option.
     if args.clean:
-        print('Enabling cleanup mode; transforms will be skipped.')
+        if not args.quiet:
+            print('Enabling cleanup mode; transforms will be skipped.')
         # Apply this to the settings, so that all transforms get
         #  skipped early.
         Settings.skip_all_transforms = True
 
     if args.ignore_loose_files:
-        print('Ignoring existing loose game files.')
+        if not args.quiet:
+            print('Ignoring existing loose game files.')
         Settings.ignore_loose_files = True
 
     if args.write_source_paths:
-        print('Adding source paths to the message log.')
+        if not args.quiet:
+            print('Adding source paths to the message log.')
         Settings.write_file_source_paths_to_message_log = True
 
+    if args.dev:
+        if not args.quiet:
+            print('Enabling developer mode.')
+        Settings.developer = True
+        
+    if args.quiet:
+        Settings.verbose = False
+        
     print('Attempting to run {}'.format(user_module_name))
       
     # Attempt to load the module.

@@ -103,7 +103,7 @@ import os
 from File_Manager import *
 from Common.Settings import Settings
 
-@Check_Dependencies('types/TBackgrounds.txt')
+@Transform_Wrapper('types/TBackgrounds.txt')
 def Set_Minimum_Fade_Distance(distance_in_km = 3):
     '''
     Sets a floor to fade distance, so that object do not appear
@@ -132,7 +132,7 @@ def Set_Minimum_Fade_Distance(distance_in_km = 3):
 
         
         
-@Check_Dependencies('types/TBackgrounds.txt')
+@Transform_Wrapper('types/TBackgrounds.txt')
 def Adjust_Fade_Start_End_Gap(
     fade_gap_min_func = lambda x: x*1, 
     fade_gap_max_func = lambda x: 20):
@@ -173,7 +173,7 @@ def Adjust_Fade_Start_End_Gap(
         
 
         
-@Check_Dependencies('types/TBackgrounds.txt')
+@Transform_Wrapper('types/TBackgrounds.txt')
 def Adjust_Particle_Count(
     base_count = 10,
     fog_factor = 0.5
@@ -198,7 +198,7 @@ def Adjust_Particle_Count(
 
                 
         
-@Check_Dependencies('types/TBackgrounds.txt')
+@Transform_Wrapper('types/TBackgrounds.txt')
 def Remove_Stars_From_Foggy_Sectors(
     # The fog requirement for star removal; all backgrounds affected need a
     #  fog above this much.

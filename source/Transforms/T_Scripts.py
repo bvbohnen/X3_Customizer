@@ -14,7 +14,7 @@ from File_Manager.File_Patcher import *
 # majaglit.
 
 
-@Check_Dependencies('scripts/!fight.war.protectsector.xml')
+@Transform_Wrapper('scripts/!fight.war.protectsector.xml', LU = False)
 def Disable_OOS_War_Sector_Spawns(
     ):
     '''
@@ -26,7 +26,7 @@ def Disable_OOS_War_Sector_Spawns(
     Apply_Patch('scripts/!fight.war.protectsector.xml')
 
     
-@Check_Dependencies('scripts/plugin.com.agent.main.xml')
+@Transform_Wrapper('scripts/plugin.com.agent.main.xml', LU = False)
 def Allow_CAG_Apprentices_To_Sell(
     ):
     '''
@@ -36,7 +36,7 @@ def Allow_CAG_Apprentices_To_Sell(
     Apply_Patch('scripts/plugin.com.agent.main.xml')
     
     
-@Check_Dependencies('scripts/!plugin.acp.fight.attack.object.xml')
+@Transform_Wrapper('scripts/!plugin.acp.fight.attack.object.xml', LU = False)
 def Fix_OOS_Laser_Missile_Conflict(
     ):
     '''
@@ -50,7 +50,7 @@ def Fix_OOS_Laser_Missile_Conflict(
     Apply_Patch('scripts/!plugin.acp.fight.attack.object.xml')
     
 
-@Check_Dependencies('scripts/!lib.fleet.shipsfortarget.xml')
+@Transform_Wrapper('scripts/!lib.fleet.shipsfortarget.xml', LU = False)
 def Fleet_Interceptor_Bug_Fix(
     ):
     '''
@@ -66,7 +66,7 @@ def Fleet_Interceptor_Bug_Fix(
     Apply_Patch('scripts/!lib.fleet.shipsfortarget.xml')
 
 
-@Check_Dependencies('scripts/!move.follow.template.xml')
+@Transform_Wrapper('scripts/!move.follow.template.xml', LU = False)
 def Increase_Escort_Engagement_Range(
     small_range  = 3000,
     medium_range = 4000,
@@ -109,7 +109,7 @@ def Increase_Escort_Engagement_Range(
             .replace('7011', str(long_range)))
     
 
-@Check_Dependencies()
+@Transform_Wrapper()
 def Convert_Attack_To_Attack_Nearest():
     '''
     Modifies the Attack command when used on an owned asset to instead
@@ -122,7 +122,7 @@ def Convert_Attack_To_Attack_Nearest():
         'scripts/!ship.cmd.attack.std.xml')
 
     
-@Check_Dependencies()
+@Transform_Wrapper()
 def Add_CLS_Software_To_More_Docks():
     '''
     Adds Commodity Logistics Software, internal and external, to all
@@ -136,7 +136,7 @@ def Add_CLS_Software_To_More_Docks():
 
         
     
-@Check_Dependencies('scripts/plugin.gz.CmpClean.Main.xml')
+@Transform_Wrapper('scripts/plugin.gz.CmpClean.Main.xml', LU = False)
 def Complex_Cleaner_Bug_Fix(
         # Note: no cleanup needed, since the unmodified script should
         # be present in the source_folder and it will just be moved
@@ -153,7 +153,7 @@ def Complex_Cleaner_Bug_Fix(
 
     
     
-@Check_Dependencies('scripts/plugin.gz.CmpClean.crunch.xml')
+@Transform_Wrapper('scripts/plugin.gz.CmpClean.crunch.xml', LU = False)
 def Complex_Cleaner_Use_Small_Cube(
         # Note: no cleanup needed, as above.
     ):
@@ -165,7 +165,7 @@ def Complex_Cleaner_Use_Small_Cube(
     Apply_Patch('scripts/plugin.gz.CmpClean.crunch.xml', reformat_xml = True)
         
 
-@Check_Dependencies()
+@Transform_Wrapper()
 def _Include_Script_To_Update_Ship_Variants():
     '''
     Adds the 'x3customizer.add.variants.to.shipyards' script to the
@@ -180,7 +180,7 @@ def _Include_Script_To_Update_Ship_Variants():
         'scripts/x3customizer.add.variants.to.shipyards.xml')
         
 
-@Check_Dependencies()
+@Transform_Wrapper()
 def _Include_Script_To_Update_Factory_Sizes():
     '''
     Adds the 'x3customizer.add.factories.to.shipyards' script to the

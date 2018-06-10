@@ -109,6 +109,7 @@ import re
 This_dir = os.path.normpath(os.path.dirname(__file__))
 from .Source_Reader import File_Missing_Exception
 from .File_Paths import *
+from Common import *
 
 def Make_Patch(virtual_path, verify = False, reformat_xml = False):
     '''
@@ -303,9 +304,24 @@ def Apply_Patch(virtual_path, reformat_xml = False):
             # in the patch.
             line_text = modified_file_lines.pop(line_number)
             ref_text = patch_line.replace('-','',1)
+
             if line_text != ref_text:
+                # Problem found.
+                # When developing, it can be useful to let this continue
+                #  so that a rebuilt text file can be checked to see how
+                #  it differs from expected.
+                # Otherwise, can just raise an exception.
+                if not Settings.developer:
+                    raise Text_Patch_Exception()
+
                 error = True
-                print('Error: patch line removal mismatch')
+                print(('File patcher mismatch: line {}, original {},'
+                           ' expected {}').format(
+                               line_number,
+                               line_text,
+                               ref_text
+                            ))
+
             # After the pop, line_number points to the next line (which
             # moved down an index), so leaving it unchanged should
             # support another pop following this.

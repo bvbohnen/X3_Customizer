@@ -60,6 +60,12 @@ class Settings_class:
       - Bool, if True and matplotlib and numpy are available, any
         generated scaling equations will be plotted (and their
         x and y vectors printed for reference).
+    * developer
+      - Bool, if True then enable some behavior meant just for development,
+        such as leaving exceptions uncaught or letting file patchers do
+        the best job they can when hitting problems.
+    * verbose
+      - Bool, if True some extra status messages may be printed.
     '''
     def __init__(s):
         s.path_to_addon_folder = None
@@ -77,6 +83,8 @@ class Settings_class:
         s.ignore_loose_files = False
         s.use_scipy_for_scaling_equations = True
         s.show_scaling_plots = False
+        s.developer = False
+        s.verbose = True
         
 
     def Set_Addon_Folder(s, path):

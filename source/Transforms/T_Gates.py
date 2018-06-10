@@ -220,7 +220,7 @@ import copy
 
 # -Removed; Adjust_Gate_Rings is a more powerful version that can
 #  do this as well.
-# @Check_Dependencies('types/TGates.txt')
+# @Transform_Wrapper('types/TGates.txt')
 # def Swap_Standard_Gates_To_Terran_Gates():
 #     '''
 #     Changes standard gates into Terran gates, possibly helping reduce
@@ -235,7 +235,7 @@ import copy
 #             this_dict['model_scene'] = r'patch20\terran_gate_scene'
             
 
-@Check_Dependencies('types/TGates.txt', 'types/TSpecial.txt')
+@Transform_Wrapper('types/TGates.txt', 'types/TSpecial.txt')
 def Adjust_Gate_Rings(
     standard_ring_option = None,
     hub_ring_option = 'use_standard_ring',

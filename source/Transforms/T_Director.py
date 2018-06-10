@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from Common import Flags
 
-@Check_Dependencies('director/3.01 Generic Missions.xml')
+@Transform_Wrapper('director/3.01 Generic Missions.xml')
 def Adjust_Generic_Missions(
     adjustment_dict = {},
     cap_at_100 = False
@@ -161,8 +161,23 @@ def Adjust_Generic_Missions(
     # Update the file text with the changes.
     file_contents.text = new_file_text
 
+    
+# Convenience version of the above to turn off all missions.
+@Transform_Wrapper('director/3.01 Generic Missions.xml')
+def Disable_Generic_Missions():
+    '''
+    Disable generic missions from spawning. Existing generic missions
+    will be left untouched.
+    '''
+    Adjust_Generic_Missions({
+        'Trade': 0,
+        'Fight': 0,
+        'Build': 0,
+        'Think': 0,
+        })
 
-@Check_Dependencies('director/3.08 Sector Management.xml')
+
+@Transform_Wrapper('director/3.08 Sector Management.xml', LU = False)
 def Standardize_Tunings(
     enging_tuning_crates = 4,
     rudder_tuning_crates = 4,
@@ -285,7 +300,7 @@ def Standardize_Tunings(
 
 
     
-@Check_Dependencies('director/2.119 Trade Convoy.xml')
+@Transform_Wrapper('director/2.119 Trade Convoy.xml')
 def Convoys_made_of_race_ships():
     '''
     If convoy defense missions should use the convoy's race to select their ship type.
@@ -304,7 +319,7 @@ def Convoys_made_of_race_ships():
 
 
     
-@Check_Dependencies('director/3.05 Gamestart Missions.xml')
+@Transform_Wrapper('director/3.05 Gamestart Missions.xml', LU = False)
 def Standardize_Start_Plot_Overtunings(
     # Pick what fraction of the maximum overtunings to give.
     # Overtuning will be set to some % of the maximum, which should roughly

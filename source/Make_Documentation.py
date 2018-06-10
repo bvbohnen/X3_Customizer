@@ -39,6 +39,8 @@ import File_Manager
 import sys, os
 from collections import OrderedDict
 
+this_dir = os.path.normpath(os.path.dirname(__file__))
+
 def Make(*args):
 
     # TODO:
@@ -149,21 +151,38 @@ def Make(*args):
 
         # If there are required files, print them.
         if hasattr(function, '_file_names'):
+
             # For markdown, don't want this attached to the file name,
             #  but also don't want it causing an extra list indent on
             #  the docstring. An extra newline and a healthy indent
             #  seems to work.
             Add_Line('', include_in_simple = False)
-            Add_Lines('{}Requires: {}'
-                        .format(
-                             indent * (indent_level + 1),
-                             # Join the required file names with commas if
-                             #  there are any, else print None.
-                             ', '.join(function._file_names) 
-                              if function._file_names else 'None'),
-                         indent_level +1,
-                         include_in_simple = False
-                         )
+            Add_Line('{}Requires: {}'.format(
+                    indent * (indent_level + 1),
+                    # Join the required file names with commas if
+                    #  there are any, else print None.
+                    ', '.join(function._file_names) 
+                    if function._file_names else 'None'),
+                indent_level +1,
+                include_in_simple = False
+                )
+
+            # Can add any incompatabilities as well, and stick these
+            #  in the simple version.
+            if any(x == False for x in function._compatabilities.values()):
+                Add_Line('', include_in_simple = True)
+                Add_Line('{}Incompatibilities: {}'.format(
+                        indent * (indent_level + 1),
+                        # Include the name tags for any False flags.
+                        # Original dict should hopefully have been in a nice
+                        #  order.
+                        ', '.join([x for x,y in function._compatabilities.items()
+                                   if y == False]) 
+                        ),
+                    indent_level +1,
+                    include_in_simple = True
+                    )
+
 
         # Stick another newline, then the function docstring, maybe
         #  truncated for the simple file.
@@ -201,7 +220,7 @@ def Make(*args):
 
     # Grab the various transform functions.
     # This can grab every item in Transforms that has been decorated with
-    #  Check_Dependencies.
+    #  Transform_Wrapper.
     # Pack these into an ordereddict, keyed by a tuple of 
     #  (home module name, function name), to enable different 
     #  sorting options.
@@ -292,12 +311,12 @@ def Make(*args):
     # The example will accompany the simple version, since it is a good way
     #  to express what the customizer is doing.
     Make_Horizontal_Line()
-    Add_Line('Example input file, User_Transforms_Example.py:')
+    Add_Line('Example input file, Example_Transforms.py:')
     # Need a newline before the code, otherwise the code block
     #  isn't made right away (the file header gets lumped with the above).
     Add_Line('')
-    with open(os.path.join('..','input_scripts',
-                           'User_Transforms_Example.py'), 'r') as file:
+    with open(os.path.join(this_dir,'..','input_scripts',
+                           'Example_Transforms.py'), 'r') as file:
         # Put in 4 indents to make a code block.
         Add_Lines(file.read(), indent_level = 4)
 
@@ -317,11 +336,11 @@ def Make(*args):
     
     # Write out the full doc.
     # Put these 1 directory up to separate from the code.
-    with open(os.path.join('..','Documentation.md'), 'w') as file:
+    with open(os.path.join(this_dir,'..','Documentation.md'), 'w') as file:
         file.write('\n'.join(doc_lines))
 
     # Write out the simpler readme.
-    with open(os.path.join('..','README.md'), 'w') as file:
+    with open(os.path.join(this_dir,'..','README.md'), 'w') as file:
         file.write('\n'.join(doc_short_lines))
 
 

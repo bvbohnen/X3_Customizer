@@ -1,4 +1,4 @@
-X3 Customizer 3.2
+X3 Customizer 3.3
 ------------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.
@@ -8,8 +8,6 @@ Source files will generally support any prior modding. Nearly all transforms sup
 This tool is written in Python, and tested on version 3.6. As of customizer version 3, an executable may be generated for users who do not wish to run the Python source code directly.
 
 This tool is designed for Albion Prelude v3.3. Most transforms will support prior versions of AP. TC is not directly supported currently due primarily to some path assumptions.
-
-Source code is hosted on github: https://github.com/bvbohnen/X3_Customizer Announcements are primarily made on the Egosoft forum: https://forum.egosoft.com/viewtopic.php?t=396158
 
 Usage:
 
@@ -208,9 +206,18 @@ Director Transforms:
       If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
       
 
+ * Disable_Generic_Missions
+
+    Requires: director/3.01 Generic Missions.xml
+
+      Disable generic missions from spawning. Existing generic missions will be left untouched.
+      
+
  * Standardize_Start_Plot_Overtunings
 
     Requires: director/3.05 Gamestart Missions.xml
+
+    Incompatibilities: LU
 
       Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
   
@@ -221,6 +228,8 @@ Director Transforms:
  * Standardize_Tunings
 
     Requires: director/3.08 Sector Management.xml
+
+    Incompatibilities: LU
 
       Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
   
@@ -573,6 +582,8 @@ Obj Transforms:
 
     Requires: L/x3story.obj
 
+    Incompatibilities: LU
+
       Changes the maximum SETA speed multiplier. Higher multipliers than the game default of 10 may cause oddities.
       
       * speed_factor
@@ -582,6 +593,8 @@ Obj Transforms:
  * Adjust_Max_Speedup_Rate
 
     Requires: L/x3story.obj
+
+    Incompatibilities: LU
 
       Changes the rate at which SETA turns on. By default, it will accelerate by (selected SETA -1)/10 every 250 milliseconds. This transform will reduce the delay between speedup ticks.
       
@@ -593,12 +606,16 @@ Obj Transforms:
 
     Requires: L/x3story.obj
 
-      Removes a restriction on the Valhalla, or whichever ship is at offset 211 in tships, for jumping to gates. This should only be applied alongside another mod that either reduces the valhalla size, increases gate size, removes gate rings, or moves/removes the forward pylons, to avoid collision problems.
+    Incompatibilities: LU
+
+      Removes a restriction on the Valhalla, or whichever ship is at offset 211 in tships, from jumping to gates. This should only be applied alongside another mod that either reduces the valhalla size, increases gate size, removes gate rings, or moves/removes the forward pylons, to avoid collision problems.
       
 
  * Disable_Asteroid_Respawn
 
     Requires: L/x3story.obj
+
+    Incompatibilities: LU
 
       Stops any newly destroyed asteroids from being set to respawn. This can be set temporarily when wishing to clear out some unwanted asteroids. It is not recommended to leave this transform applied long term.
       
@@ -607,12 +624,16 @@ Obj Transforms:
 
     Requires: L/x3story.obj
 
+    Incompatibilities: LU
+
       Turns off combat music, keeping the normal environment musc playing when nearing hostile objects. If applied to a saved game already in combat mode, combat music may continue to play for a moment. The beep on nearing an enemy will still be played.
       
 
  * Set_Max_Marines
 
     Requires: L/x3story.obj
+
+    Incompatibilities: LU
 
       Sets the maximum number of marines that each ship type can carry. These are byte values, signed, so max is 127.
       
@@ -632,6 +653,8 @@ Obj Transforms:
 
     Requires: L/x3story.obj
 
+    Incompatibilities: LU
+
       Stop SETA from being turned off automatically upon certain events, such as missile attacks.
       
       * on_missile_launch
@@ -645,6 +668,8 @@ Obj Transforms:
  * Stop_GoD_From_Removing_Stations
 
     Requires: L/x3story.obj
+
+    Incompatibilities: LU
 
       Stops the GoD engine from removing stations which are nearly full on products or nearly starved of resources for extended periods of time.  This will not affect stations already removed or in the process of being removed.
       
@@ -665,6 +690,8 @@ Script Transforms:
 
     Requires: scripts/plugin.com.agent.main.xml
 
+    Incompatibilities: LU
+
       Allows Commercial Agents to sell factory products at pilot rank 0. May require CAG restart to take effect.
       
 
@@ -672,12 +699,16 @@ Script Transforms:
 
     Requires: scripts/plugin.gz.CmpClean.Main.xml
 
+    Incompatibilities: LU
+
       Apply bug fixes to the Complex Cleaner mod. Designed for version 4.09 of that mod. Includes a fix for mistargetted a wrong hub in systems with multiple hubs, and a fix for some factories getting ignored when crunching. Patches plugin.gz.CmpClean.Main.xml.
       
 
  * Complex_Cleaner_Use_Small_Cube
 
     Requires: scripts/plugin.gz.CmpClean.crunch.xml
+
+    Incompatibilities: LU
 
       Forces the Complex Cleaner to use the smaller cube model always when combining factories. Patches plugin.gz.CmpClean.crunch.xml.
       
@@ -693,12 +724,16 @@ Script Transforms:
 
     Requires: scripts/!fight.war.protectsector.xml
 
+    Incompatibilities: LU
+
       Disables spawning of dedicated ships in the AP war sectors which attack player assets when the player is out-of-sector. By default, these ships scale up with player assets, and immediately respawn upon being killed. This patches '!fight.war.protectsector'.
       
 
  * Fix_OOS_Laser_Missile_Conflict
 
     Requires: scripts/!plugin.acp.fight.attack.object.xml
+
+    Incompatibilities: LU
 
       Allows OOS combat to include both missile and laser fire in the same attack round. In vanilla AP, a ship firing a missile will not fire its lasers for a full round, generally causing a large drop in damage output. With the change, adding missiles to OOS ships will not hurt their performance.
       
@@ -707,12 +742,16 @@ Script Transforms:
 
     Requires: scripts/!lib.fleet.shipsfortarget.xml
 
+    Incompatibilities: LU
+
       Apply bug fixes to the Fleet logic for selecting ships to launch at enemies. A mispelling of 'interecept' causes M6 ships to be launched against enemy M8s instead of interceptors. Patches !lib.fleet.shipsfortarget.xml.
       
 
  * Increase_Escort_Engagement_Range
 
     Requires: scripts/!move.follow.template.xml
+
+    Incompatibilities: LU
 
       Increases the distance at which escort ships will break and attack a target. In vanilla AP an enemy must be within 3km of the escort ship. This transform will give custom values based on the size of the escorted ship, small, medium (m6), or large (m7+).
       
@@ -1012,6 +1051,8 @@ Universe Transforms:
 
     Requires: maps/x3_universe.xml, t/0001-L044.xml, t/7027-L044.xml, t/7360-L044.xml
 
+    Incompatibilities: LU
+
       Colors sector names in the map based on race owners declared in the x3_universe file. Some sectors may remain uncolored if their name is not set in the standard way through text files. Only works on the English files, L044, for now. Note: searching sectors by typing a name will no longer work except on uncolored sectors, eg. unknown sectors.
   
       * race_color_letters:
@@ -1022,12 +1063,16 @@ Universe Transforms:
 
     Requires: maps/x3_universe.xml
 
+    Incompatibilities: Vanilla, LU
+
       Restors the big rock in Aldrin for XRM, reverting to the vanilla sector layout. Note: only works on a new game.
       
 
  * Restore_Hub_Music
 
     Requires: maps/x3_universe.xml
+
+    Incompatibilities: Vanilla, LU
 
       If Hub sector (13,8) music should be restored to that in AP. (XRM sets the track to 0.) Applies to new games, and optionally to an existing save.
   
@@ -1038,6 +1083,8 @@ Universe Transforms:
  * Restore_M148_Music
 
     Requires: maps/x3_universe.xml
+
+    Incompatibilities: Vanilla, LU
 
       If Argon Sector M148 (14,8) music should be restored to that in AP. (XRM changes this to the argon prime music.) Applies to new games, and optionally to an existing save.
       
@@ -1452,3 +1499,8 @@ Change Log:
  * 3.2
    - Added support for generating a zip file for release, containing necessary binaries and related files.
    - Converted patch creation from an input command script to a standalone make script.
+ * 3.3
+   - Bug fix in Adjust_Weapon_Fire_Rate.
+   - More graceful handling of failed transforms.
+   - Added flags on some transforms that are incompatible with LU.
+   - Added Disable_Generic_Missions, a wrapper over Adjust_Generic_Missions.

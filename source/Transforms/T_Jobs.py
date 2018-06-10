@@ -33,7 +33,7 @@ might be reduced more than Transporter jobs.
 from File_Manager import *
 
 
-@Check_Dependencies('types/Jobs.txt')
+@Transform_Wrapper('types/Jobs.txt')
 def Adjust_Job_Count(
     # Adjustment factors to apply, based on various race or name matches.
     # The first match will be used.
@@ -82,7 +82,7 @@ def Adjust_Job_Count(
 
                 
             
-@Check_Dependencies('types/Jobs.txt')
+@Transform_Wrapper('types/Jobs.txt')
 def Adjust_Job_Respawn_Time(
     time_adder_list = [('*', 1)],
     time_multiplier_list = [('*', 1)]
@@ -126,7 +126,7 @@ def Adjust_Job_Respawn_Time(
 
 
 
-@Check_Dependencies('types/Jobs.txt')
+@Transform_Wrapper('types/Jobs.txt')
 def Set_Job_Spawn_Locations(
     jobs_types = [],
     sector_flags_to_set = None,
@@ -216,7 +216,7 @@ def Set_Job_Spawn_Locations(
 
 
 
-@Check_Dependencies('types/Jobs.txt')
+@Transform_Wrapper('types/Jobs.txt')
 def Add_Job_Ship_Variants(
     jobs_types = [],
     ship_types = [

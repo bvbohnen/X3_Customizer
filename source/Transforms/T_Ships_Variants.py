@@ -118,7 +118,7 @@ If adding new variants programmatically, some issues to consider:
 
 '''
 
-@Check_Dependencies('types/TShips.txt', 'types/WareLists.txt', 'types/TWareT.txt')
+@Transform_Wrapper('types/TShips.txt', 'types/WareLists.txt', 'types/TWareT.txt')
 def Add_Ship_Combat_Variants(
         **kwargs
         ):
@@ -149,7 +149,7 @@ def Add_Ship_Combat_Variants(
         **kwargs
         )
     
-@Check_Dependencies('types/TShips.txt', 'types/WareLists.txt', 'types/TWareT.txt')
+@Transform_Wrapper('types/TShips.txt', 'types/WareLists.txt', 'types/TWareT.txt')
 def Add_Ship_Trade_Variants(
         **kwargs
         ):
@@ -209,7 +209,7 @@ variant_id_field_ratios_dict_dict = None
 prior_new_variants = []
 
 
-@Check_Dependencies('types/TShips.txt', 
+@Transform_Wrapper('types/TShips.txt', 
                     'types/WareLists.txt', 
                     'types/TWareT.txt')
 def Add_Ship_Variants(
@@ -1292,7 +1292,7 @@ def Add_Ship_Variants(
 #  prior calls to Remove_Ship_Variants.
 prior_removed_variants = []
 
-@Check_Dependencies('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt')
 def Remove_Ship_Variants(
         ship_types = [
             ],
