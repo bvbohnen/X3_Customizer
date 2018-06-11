@@ -67,6 +67,18 @@ class Settings_class:
     * verbose
       - Bool, if True some extra status messages may be printed.
     '''
+    '''
+    -Removed attributes, for now.
+
+    * t_folder_file_number
+      - String, 4-digit number to give to any generated xml file holding
+        override text in the addon/t folder.
+      - This should be set to avoid numbers in use by other mods, and
+        higher than those mods that might be overridden.
+      - See https://forum.egosoft.com/viewtopic.php?t=216690 for values
+        to be avoided.
+      - Default is 9997.
+    '''
     def __init__(s):
         s.path_to_addon_folder = None
         s.path_to_x3_folder = None
@@ -85,7 +97,17 @@ class Settings_class:
         s.show_scaling_plots = False
         s.developer = False
         s.verbose = True
+        #s.t_folder_file_number = '9997'
         
+
+    #def Get_Page_Text_File_Path(s):
+    #    '''
+    #    Returns the path to use for the custom page text file, to
+    #    be placed in the addon/t folder.
+    #    Path will be cat style, eg. '/t/9997-L044.xml'.
+    #    '''
+    #    return 't/' + s.t_folder_file_number + '-L044.xml'
+
 
     def Set_Addon_Folder(s, path):
         '''

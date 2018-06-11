@@ -1,6 +1,6 @@
 '''
 X3 Customizer
-------------------
+-----------------
 
 This tool will read in source files from X3, perform transforms on them,
 and write the results back out. Transforms will often perform complex
@@ -22,7 +22,7 @@ due primarily to some path assumptions.
 
 Usage:
 
- * "X3_Customizer.bat [path to user_transform_module.py]"
+ * "Launch_X3_Customizer.bat [path to user_transform_module.py]"
    - Call from the command line.
    - Runs the customizer, using the provided python control module
      which will declare the path to the X3 directory and the

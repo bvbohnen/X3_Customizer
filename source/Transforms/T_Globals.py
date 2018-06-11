@@ -122,7 +122,7 @@ def Adjust_Missile_Hulls(
         lines_to_add.append(this_line)
         
     # Add the entries to the t file.
-    Load_File('types/Globals.txt', return_game_file_file = True).Add_Entries(
+    Load_File('types/Globals.txt', return_game_file = True).Add_Entries(
         lines_to_add)
     
     # Pass 3: apply the transform normally, on the defaults or

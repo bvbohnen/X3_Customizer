@@ -282,7 +282,7 @@ def Add_More_Factory_Sizes(
     # with the new factory name.
     waretemplate_xml = Load_File('maps/WareTemplate.xml')
     # Parse the xml.
-    element_root = ET.fromstring(waretemplate_xml.text)
+    element_root = waretemplate_xml.Get_XML_Node()
 
     # Set up a dict matching factory name with its xml node.
     factory_name_node_dict = {}
@@ -343,7 +343,7 @@ def Add_More_Factory_Sizes(
     # Add the new factory nodes to the bottom of the xml split fire entry.
     element_root[0].extend(new_xml_nodes)
     # Update the file tracker.
-    waretemplate_xml.text = ET.tostring(element_root, encoding = 'unicode')
+    waretemplate_xml.Update_From_XML_Node(element_root)
 
 
     # Getting the game to update with the new waretemplates is somewhat 
@@ -402,7 +402,7 @@ def Add_More_Factory_Sizes(
                         file_name = director_loader_base_name +'.xml')
     
     # Add all of the new factories to tfactories.
-    Load_File('types/TFactories.txt', return_game_file_file = True).Add_Entries(
+    Load_File('types/TFactories.txt', return_game_file = True).Add_Entries(
         new_factories_list)
     
     # Add these factories to the prior new factories, to be seen

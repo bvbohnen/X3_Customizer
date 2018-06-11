@@ -42,11 +42,15 @@ Settings.show_scaling_plots = False
 #####################################################
 # Obj code file changes.
 
+# Bump up max seta.
+Adjust_Max_Seta(15)
+# Make seta speed up faster.
+Adjust_Max_Speedup_Rate(4)
+
+# Stop GoD from deleting factories.
+Stop_GoD_From_Removing_Stations()
+
 if Vanilla or XRM:
-    # Bump up max seta.
-    Adjust_Max_Seta(15)
-    # Make seta speed up faster.
-    Adjust_Max_Speedup_Rate(4)
     # Keep seta on in more situations.
     Stop_Events_From_Disabling_Seta(
             on_missile_launch = True,
@@ -54,7 +58,20 @@ if Vanilla or XRM:
             #  to scan.
             on_receiving_priority_message = True,
             # on_collision_warning = True,
+            # Side note: this one is not fully understood.
+            on_frame_input = True,
         )
+    
+    # Disable combat music.
+    Disable_Combat_Music()
+    # Similarly, disable the combat entrance beeping.
+    # Remove_Combat_Beep()
+
+    # Test code for allowing valhallas to jump to gates.
+    Allow_Valhalla_To_Jump_To_Gates()
+
+    # Maybe stop asteroid respawn, if wanting to blow some up.
+    # Disable_Asteroid_Respawn()
 
     # Toy around with max marine counts.
     # Not too useful; mostly for fun.
@@ -66,21 +83,6 @@ if Vanilla or XRM:
             sirokos_count = 80,
         )
     
-    # Disable combat music.
-    # Disable_Combat_Music()
-    # Similarly, disable the combat entrance beeping.
-    # Remove_Combat_Beep()
-
-    # Stop GoD from deleting factories.
-    # Note: not working in initial testing.
-    Stop_GoD_From_Removing_Stations()
-
-    # Maybe stop asteroid respawn, if wanting to blow some up.
-    # Disable_Asteroid_Respawn()
-
-    # Test code for allowing valhallas to jump to gates.
-    Allow_Valhalla_To_Jump_To_Gates()
-
 #####################################################
 # Background
 
@@ -193,12 +195,16 @@ elif XRM:
         # hub_ring_option = 'remove',
         )
 
+# LU uses orbs to replace gate fields, and removes rings.
+# Rings could be added back in using the transform, but can leave
+#  them alone for now.
     
 #####################################################
 # Universe
 
 if XRM:
     # Color sector names.
+    # TODO: make this work for vanilla/LU better.
     Color_Sector_Names()
 
     # Restore the aldrin rock for new games.
@@ -234,11 +240,12 @@ Set_Dock_Storage_Capacity(
 #####################################################
 # Factories
 
-# Flesh out the factory sizes.
-# Use linear cost here, to avoid the larger sizes being
-#  cheaper than buying many small ones. This is mainly for
-#  convenience, not balance.
-Add_More_Factory_Sizes(linear_cost_scaling = True, cue_index = 1)
+if Vanilla or XRM:
+    # Flesh out the factory sizes.
+    # Use linear cost here, to avoid the larger sizes being
+    #  cheaper than buying many small ones. This is mainly for
+    #  convenience, not balance.
+    Add_More_Factory_Sizes(linear_cost_scaling = True, cue_index = 1)
 
 
 #####################################################
@@ -379,6 +386,7 @@ if XRM:
         # This might only make sense when creating in sector and not gate.
         # docked_chance = 99,
         )
+
 
 #####################################################
 # Weapons
@@ -737,23 +745,24 @@ if LU:
 #####################################################
 # Missiles
 
-# Beef up mosquitos for better intercept.
-Enhance_Mosquito_Missiles()
+if Vanilla or XRM:
+    # Beef up mosquitos for better intercept.
+    Enhance_Mosquito_Missiles()
 
-# Apply general missile damage nerfs.
-Adjust_Missile_Damage(
-    # Try a 50% reduction on the high end missiles, though up to
-    #  80% works well.
-    scaling_factor = 0.5,
-    use_scaling_equation = True,
-    # Heavy missiles are in the 500k+ range or so.
-    target_damage_to_adjust = 500000,
-    # Keep fighter tier missiles roughly unchanged.
-    damage_to_keep_static = 50000,
-    # Try out scaling volume and price accordingly.
-    adjust_volume = True,
-    adjust_price = True,
-    print_changes = True)
+    # Apply general missile damage nerfs.
+    Adjust_Missile_Damage(
+        # Try a 50% reduction on the high end missiles, though up to
+        #  80% works well.
+        scaling_factor = 0.5,
+        use_scaling_equation = True,
+        # Heavy missiles are in the 500k+ range or so.
+        target_damage_to_adjust = 500000,
+        # Keep fighter tier missiles roughly unchanged.
+        damage_to_keep_static = 50000,
+        # Try out scaling volume and price accordingly.
+        adjust_volume = True,
+        adjust_price = True,
+        print_changes = True)
 
 if XRM:
     # XRM gives ships much larger missile loadouts, compounding problems
@@ -815,8 +824,9 @@ if XRM:
 #####################################################
 # Ships
 
-# Remove the bothersome khaak corvette hull spin.
-Remove_Khaak_Corvette_Spin()
+if Vanilla or XRM:
+    # Remove the bothersome khaak corvette hull spin.
+    Remove_Khaak_Corvette_Spin()
 
 
 if Vanilla:
@@ -1206,9 +1216,10 @@ if XRM:
     #     })
 
 
-if LU:
-    # Add life support to cap ships. This includes TLs by default.
-    Add_Ship_Life_Support()
+#if LU:
+#    # Add life support to cap ships. This includes TLs by default.
+#    # Mostly used for testing.
+#    Add_Ship_Life_Support()
 
 
 #####################################################
@@ -1253,6 +1264,7 @@ Convert_Attack_To_Attack_Nearest()
 if Vanilla or XRM:
     # Add CLS software to more docks, so not stuck with shipping from
     #  Argon space.
+    # May not be useful for LU.
     Add_CLS_Software_To_More_Docks()
 
 # The following don't work for LU.

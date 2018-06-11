@@ -154,7 +154,7 @@ def Make_Patch(virtual_path, verify = False, reformat_xml = False):
         # Look up the encoding on the source file, to be safe.
         # This is generally expected to be whatever was used as default
         # for scripts, which don't specify encoding; eg. utf-8.
-        encoding = Load_File(virtual_path, return_game_file_file = True).encoding
+        encoding = Load_File(virtual_path, return_game_file = True).encoding
 
         # Optionally try to reformat.
         # This will probably not end up being used, since attempts to
@@ -212,7 +212,7 @@ def Apply_Patch(virtual_path, reformat_xml = False):
      modified text, and updates the File_Manager object accordingly.
     Returns the modified text.
     Primarily intended for xml files, though should work on any
-     file using a 'text' field to track contents.
+     file with Get_Text and Update_From_Text methods.
     '''
     # Error if the patch file not found.
     patch_path = Virtual_Path_to_Project_Patch_Path(virtual_path) + '.patch'
@@ -225,8 +225,8 @@ def Apply_Patch(virtual_path, reformat_xml = False):
         patch_file_text = file.read()
 
     # Search out the source file.
-    source_game_file = Load_File(virtual_path, return_game_file_file = True)
-    source_file_text = source_game_file.text
+    source_game_file = Load_File(virtual_path, return_game_file = True)
+    source_file_text = source_game_file.Get_Text()
     
     # Do some extra handling of xml to standardize format.
     if virtual_path.endswith('.xml'):
@@ -348,8 +348,8 @@ def Apply_Patch(virtual_path, reformat_xml = False):
     if error:
         print('Skipping {} due to patch error'.format(virtual_path))
     else:
-        # Update the T file object directly.
-        source_game_file.text = modified_file_text
+        # Update the file object directly.
+        source_game_file.Update_From_Text(modified_file_text)
 
     # Also return a copy of the new text if desired.
     return modified_file_text

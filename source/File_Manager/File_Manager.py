@@ -139,7 +139,17 @@ def Init():
     
     # Set the working directory to the AP directory.
     # This makes it easier for transforms to generate any misc files.
+    # TODO: move away from doing this; all generated files should be
+    #  handled at the end, and file reads could also be normalized
+    #  to check this path when needed.
     os.chdir(Settings.Get_Addon_Folder())
+
+    #-Removed for now.
+    ## Generate an initial dummy file for all page text overrides.
+    #game_file = Page_Text_File(
+    #    virtual_path = Settings.Get_Page_Text_File_Path(),
+    #    )
+    #Add_File(game_file)
 
     return
 
@@ -157,9 +167,10 @@ File_dict = {}
 
 def Add_File(game_file):
     '''
-    Add a Game_File object to the File_dict.
+    Add a Game_File object to the File_dict, keyed by its virtual path.
     '''
     File_dict[game_file.virtual_path] = game_file
+
 
 # Decorator function for transforms to check if their required
 #  files are found, and have nice handling when not found.
@@ -271,9 +282,9 @@ def Transform_Wrapper(
             try:
                 results = func(*args, **kwargs)
 
-                # If here, ran succesfully.
+                # If here, ran successfully.
                 if Settings.verbose:
-                    print('Succesfully ran {}'.format(
+                    print('Successfully ran {}'.format(
                         func.__name__
                         ))
 
@@ -304,7 +315,7 @@ def Transform_Wrapper(
 
 def Load_File(file_name,
               # TODO: rename this to be more generic.
-              return_game_file_file = False, 
+              return_game_file = False, 
               return_text = False,
               error_if_not_found = True):
     '''
@@ -313,16 +324,29 @@ def Load_File(file_name,
     If the file has not been loaded yet, reads from the expected
      source file.
 
+    * file_name
+      - Name of the file, using the cat_path style (forward slashes,
+        no 'addon' folder).
+      - For the special text override file to go in the addon/t folder,
+        use 'text_override', which will be translated to the correct
+        name according to Settings.
     * error_if_not_found
       - Bool, if True and the file is not found, raises an exception,
         else returns None.
-    * return_game_file_file
+    * return_game_file
       - Bool, if True, returns the Game_File object, else returns
         the result of the Read_Data method of the file.
+      - Some file types will always return themselves.
     * return_text
       - Bool, if True, returns the raw text of the loaded file,
         without any edits from prior transforms applied.
     '''
+    # Special replacement: if the file_name is 'text_override', swap
+    #  to the name indicated by settings.
+    # -Removed for now.
+    #if file_name == 'text_override':
+    #    file_name = Settings.Get_Page_Text_File_Path()
+
     # If the file is not loaded, handle loading.
     if file_name not in File_dict:
 
@@ -344,7 +368,7 @@ def Load_File(file_name,
 
 
     # Return the file contents.
-    if return_game_file_file:
+    if return_game_file:
         return File_dict[file_name]
     elif return_text:
         return File_dict[file_name].text
@@ -428,8 +452,18 @@ def Write_Files():
     # Do this before the proper writeout, so it can reuse functionality.
     Add_Source_Folder_Copies()
 
+    # TODO: do a pre-pass on all files to do a test write, then if all
+    #  look good, do the actual writes and log updates, to weed out
+    #  bugs early.
+    # Maybe could do it Clang style with gibberish extensions, then once
+    #  all files, written, rename then properly.
+
     # Loop over the files that were loaded.
     for file_name, file_object in File_dict.items():
+
+        # Skip if not modified.
+        if not file_object.modified:
+            continue
 
         # Look up the output path.
         file_path = file_object.Get_Output_Path()
@@ -461,20 +495,23 @@ def Write_Files():
 
             # Record this to the log.
             Log_New.Record_File_Path_Renamed(conflict_path, backup_path)
-
+            
+            # Note: it is possible something will fail during a file write,
+            #  in which case some files will have been written but not others,
+            #  which can confuse any older logs (with old hashes).
+            # As a clumsy workaround, the log will be written out freshly
+            #  after every single written or renamed file for now.
+            Log_New.Store()
 
         # Write out the file, using the object's individual method.
         file_object.Write_File(file_path)
 
         # Add this to the log, post-write for correct hash.
         Log_New.Record_File_Path_Written(file_path)
-        
-        # Note: it is possible something will fail during a file write,
-        #  in which case some files will have been written but not others,
-        #  which can confuse any older logs (with old hashes).
-        # As a clumsy workaround, the log will be written out freshly
-        #  after every single written file for now.
+
+        # As above, refresh the log file.
         Log_New.Store()
+        
 
     return
 

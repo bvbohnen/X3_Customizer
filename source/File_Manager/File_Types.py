@@ -3,9 +3,11 @@ Classes to represent game files.
 '''
 import os
 from Common.Settings import Settings
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from . import File_Fields
 from .File_Paths import *
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
 
 class Game_File:
     '''
@@ -17,16 +19,22 @@ class Game_File:
     Attributes:
     * name
       - String, name of the file, without pathing, and uncompressed.
-      - This is the same as used in transform requirements and loads.
+      - Automatically parsed from virtual_path.
     * virtual_path
       - String, the path to the file in the game's virtual file system,
-        using forward slash separators, including name.
+        using forward slash separators, including name, uncompressed.
       - Does not include the 'addon' folder.
+      - This is the same as used in transform requirements and loads.
     * file_source_path
       - String, sys path where the file's original contents were read from,
         either a loose file or a cat file.
       - Mainly for debug checking.
       - None for generated files.
+    * modified
+      - Bool, if True then this file should be treated as modified,
+        to be written out.
+      - Files only read should leave this flag False.
+      - Pending development; defaults True for now.
     '''
     def __init__(
             s,
@@ -37,6 +45,7 @@ class Game_File:
         s.name = virtual_path.split('/')[-1]
         s.virtual_path = virtual_path
         s.file_source_path = file_source_path
+        s.modified = True
 
 
     def Get_Output_Path(s):
@@ -71,19 +80,58 @@ class XML_File(Game_File):
         #  requires the file be normalized to \n. When using bytes.decode,
         #  it does not do newline conversion, so that is done explicitly
         #  here.
-        s.text = file_binary.decode(s.encoding).replace('\r\n','\n')
+        s._text = file_binary.decode(s.encoding).replace('\r\n','\n')
 
         # -Removed; use text instead of xml.
         ## Parse the xml.
         #xml_tree = xml.etree.ElementTree.parse(file_path)
         #subdict[file_name] = xml_tree
 
+        # Set as unmodified, and rely on transforms to call the appropriate
+        #  methods when doing updates (instead of modifying text).
+        s.modified = False
+
             
     def Read_Data(s):
         'Return the contents to be sent for Load_File requests.'
         # For xml, this will be the full XML_File object so that its
         #  text field can be edited.
-        return s    
+        return s
+
+
+    def Get_Text(s):
+        '''
+        Returns the text for this xml file.
+        '''
+        return s._text
+
+
+    def Update_From_Text(s, new_text):
+        '''
+        Updates this xml file from a text block, likely the original
+        text with some edits.
+        '''
+        s.modified = True
+        s._text = new_text
+
+
+    def Get_XML_Node(s):
+        '''
+        Return an ElementTree node after parsing the current text
+        as xml.
+        '''        
+        return ET.fromstring(s._text)
+
+
+    def Update_From_XML_Node(s, element_root):
+        '''
+        Update the current text from an ElementTree xml node.
+        First line will be left unchanged.
+        '''
+        s.modified = True
+        s._text = (s._text.splitlines()[0] + '\n' 
+                   + ET.tostring(element_root, encoding = 'unicode'))
+        assert s._text.count('<?xml') == 1
 
 
     @staticmethod
@@ -145,11 +193,11 @@ class XML_File(Game_File):
         # Open with the right encoding.
         with open(file_path, 'w', encoding = s.encoding) as file:   
             # Just write as raw text.
-            file.write(s.text)
+            file.write(s._text)
             # To be safe, add a newline at the end if there isn't
             #  one, since some files require this (eg. bods) to
             #  be read correctly.
-            if not s.text.endswith('\n'):
+            if not s._text.endswith('\n'):
                 file.write('\n')
 
         #-Removed; use text instead of xml.
@@ -372,6 +420,9 @@ class Obj_File(Game_File):
     '''
     def __init__(s, file_binary, **kwargs):
         super().__init__(**kwargs)
+        # Expecting a bytearray input, not bytes (which are immutable
+        #  and more annoying to edit).
+        assert isinstance(file_binary, bytearray)
         s.binary = file_binary
 
     def Read_Data(s):
@@ -424,3 +475,95 @@ class Misc_File(Game_File):
             # Do a binary write.
             with open(file_path, 'wb') as file:
                 file.write(s.binary)
+
+
+#-Removed for now; this would need to be paired up with something
+# the loads the text (eg. a script) and override other text being
+# replaced, and it might be easier for now just to do direct
+# edits.         
+#class Page_Text_File(Game_File):
+#    '''
+#    A file to be placed in the addon/t folder, defining text strings.
+#    Preferably, all override or new text strings should share this one file,
+#    which the game will automatically use to override strings in other files.
+#
+#    Pending development to read in such files.
+#
+#    Attributes:
+#    * page_id_string_dict
+#      - Two layer dict; outer key is text page number, inner key is
+#        line number, and value is the string.
+#    '''
+#    def __init__(self, **kwargs):
+#        super().__init__(**kwargs)
+#        self.page_id_string_dict = defaultdict(dict)
+#        # Can treat as unmodified unless an item is added.
+#        self.modified = False
+#
+#
+#    def Add_Line(self, page, line, value):
+#        '''
+#        Record a new string at the given page and item id.
+#        '''
+#        self.page_id_string_dict[page][line] = value
+#        # Set modified, so this gets written out.
+#        self.modified = True
+#
+#
+#    def Read_Data(self):
+#        '''
+#        Returns self instead of captured data.  Use Add_Line to add
+#        or change entries.
+#        '''
+#        return self
+#
+#
+#    def Write_File(self, file_path):
+#        '''
+#        Encode these contents into xml and write to the file_path.
+#        '''
+#        # Output format should look like:
+#        # <?xml version="1.0" encoding="UTF-8"?>
+#        # <language id="44">
+#        # 	<page id="7778">
+#		#     <t id="61000">some string</t>
+#	    #   </page>
+#        # </language>
+#
+#        # Could do xml nodes, but raw strings is probably fine.
+#        output_lines = [
+#            '<?xml version="1.0" encoding="UTF-8"?>',
+#            '<language id="44">',
+#            ]
+#
+#        # Work through the pages and lines, sorted.
+#        for page, line_string_dict in sorted(self.page_id_string_dict.items()):
+#
+#            # Open the page node.
+#            output_lines.append('  <page id="{}">'.format(page))
+#
+#            # Fill in the lines.
+#            for line, string in sorted(line_string_dict.items()):
+#                output_lines.append('    <t id="{}">{}</t>'.format(
+#                    line, string))
+#
+#            # Close the page node.
+#            output_lines.append('  </page>')
+#        
+#
+#        # Close the language node.
+#        output_lines += [
+#            '</language>',
+#            ]
+#        
+#        # Open with the right encoding; match utf-8 used in the
+#        #  xml header.
+#        with open(file_path, 'w', encoding = 'utf-8') as file:
+#
+#            # Write the lines.
+#            file.write('\n'.join(output_lines))
+#
+#            # To be safe, add a newline at the end.
+#            file.write('\n')
+#
+#        return

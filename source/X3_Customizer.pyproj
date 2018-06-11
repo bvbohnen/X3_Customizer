@@ -11,7 +11,7 @@
     <Name>X3_Customizer</Name>
     <RootNamespace>X3_Customizer</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>..\input_scripts\Authors_Transforms.py -verbose -dev</CommandLineArguments>
+    <CommandLineArguments>..\input_scripts\Authors_Transforms.py -dev</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

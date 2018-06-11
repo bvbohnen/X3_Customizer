@@ -83,10 +83,10 @@ def Adjust_Generic_Missions(
     # Get the base file content.
     file_contents = Load_File('director/3.01 Generic Missions.xml')
     # Make a copy of text for editing.
-    new_file_text = copy(file_contents.text)
+    new_file_text = copy(file_contents.Get_Text())
 
     # Loop over the lines.
-    for line in file_contents.text.splitlines():
+    for line in file_contents.Get_Text().splitlines():
         # Skip lines without 'chance' in them.
         if 'chance="{' not in line:
             continue
@@ -159,7 +159,7 @@ def Adjust_Generic_Missions(
         new_file_text = new_file_text.replace(line.strip(), new_line)
 
     # Update the file text with the changes.
-    file_contents.text = new_file_text
+    file_contents.Update_From_Text(new_file_text)
 
     
 # Convenience version of the above to turn off all missions.
@@ -274,9 +274,10 @@ def Standardize_Tunings(
               
     # Grab the sector management file.
     file_contents = Load_File('director/3.08 Sector Management.xml')
-    # Verify the original_block is present (matches succesfully).
-    assert file_contents.text.count(original_text) == 1
-    file_contents.text = file_contents.text.replace(original_text, replacement_text)
+    # Verify the original_block is present (matches successfully).
+    assert file_contents.Get_Text().count(original_text) == 1
+    file_contents.Update_From_Text(
+        file_contents.Get_Text().replace(original_text, replacement_text))
 
     # -Removed; old line-by-line method didn't scale well.
     ##Define the modifications as a special dict of fields.
@@ -312,9 +313,10 @@ def Convoys_made_of_race_ships():
     replacement_text = '''<param name="Maker Race" value="{value@L2M119.Convoy Race}" comment="The race of the ship maker"/>'''
     # Grab the director file.
     file_contents = Load_File('director/2.119 Trade Convoy.xml')
-    # Verify the original_block is present (matches succesfully).
-    assert file_contents.text.count(original_text) == 2
-    file_contents.text = file_contents.text.replace(original_text, replacement_text)
+    # Verify the original_block is present (matches successfully).
+    assert file_contents.Get_Text().count(original_text) == 2
+    file_contents.Update_From_Text(
+        file_contents.Get_Text().replace(original_text, replacement_text))
 
 
 
@@ -414,12 +416,13 @@ def Standardize_Start_Plot_Overtunings(
             
     # Grab the sector management file.
     file_contents = Load_File('director/3.05 Gamestart Missions.xml')
-    # Verify the original_block is present (matches succesfully).
-    assert file_contents.text.count(original_kea) == 1
-    assert file_contents.text.count(original_hyp) == 1
-    file_contents.text = (file_contents.text
-                            .replace(original_kea, replacement_kea)
-                            .replace(original_hyp, replacement_hyp))
+    # Verify the original_block is present (matches successfully).
+    assert file_contents.Get_Text().count(original_kea) == 1
+    assert file_contents.Get_Text().count(original_hyp) == 1
+    file_contents.Update_From_Text = (
+        file_contents.Get_Text()
+            .replace(original_kea, replacement_kea)
+            .replace(original_hyp, replacement_hyp))
         
     return
 

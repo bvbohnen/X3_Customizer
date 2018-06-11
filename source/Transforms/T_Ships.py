@@ -762,7 +762,7 @@ def Add_Ship_Equipment(
 
 
     #  Add the entries to the t file.
-    Load_File('types/WareLists.txt', return_game_file_file = True).Add_Entries(
+    Load_File('types/WareLists.txt', return_game_file = True).Add_Entries(
         new_ware_line_dicts_list)
     
 

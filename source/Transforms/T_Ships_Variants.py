@@ -1269,7 +1269,7 @@ def Add_Ship_Variants(
 
 
     # All new ships will be put at the bottom of the tships dict_list.
-    Load_File('types/TShips.txt', return_game_file_file = True).Add_Entries(
+    Load_File('types/TShips.txt', return_game_file = True).Add_Entries(
         new_ships_list)
 
     # Note how many ships were added.

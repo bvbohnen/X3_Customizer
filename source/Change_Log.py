@@ -142,6 +142,13 @@ Change Log:
    - More graceful handling of failed transforms.
    - Added flags on some transforms that are incompatible with LU.
    - Added Disable_Generic_Missions, a wrapper over Adjust_Generic_Missions.
+ * 3.4
+   - Changes Obj patches to search for code patterns instead of using hard
+     offsets, to better adapt to different obj files.
+   - Enabled support for LU for Adjust_Max_Seta, Adjust_Max_Speedup_Rate,
+     and tentatively Stop_GoD_From_Removing_Stations.
+   - Added on_frame_input option to Stop_Events_From_Disabling_Seta,
+     allowing opening of menus while in seta.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

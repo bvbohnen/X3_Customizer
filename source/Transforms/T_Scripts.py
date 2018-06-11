@@ -101,9 +101,9 @@ def Increase_Escort_Engagement_Range(
     Apply_Patch('scripts/!move.follow.template.xml')
 
     # Can now grab the T file and do a replacement in its text.
-    source_t_file = Load_File('scripts/!move.follow.template.xml', 
-                              return_game_file_file = True)
-    source_t_file.text = (source_t_file.text
+    source_file = Load_File('scripts/!move.follow.template.xml', 
+                              return_game_file = True)
+    source_file.Update_From_Text(source_file.Get_Text()
             .replace('3011', str(small_range))
             .replace('4011', str(medium_range))
             .replace('7011', str(long_range)))

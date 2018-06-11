@@ -233,7 +233,7 @@ def Color_Sector_Names(
     #  unknown to Argon (Unknown in x3_universe, Argon in War_Effort).
     sector_id_color_dict = {}
     # Loop over the universe lines.
-    for line in Load_File('maps/x3_universe.xml').text.splitlines():
+    for line in Load_File('maps/x3_universe.xml').Get_Text().splitlines():
 
         # Expect every system declaration line to have a 'size' field.
         if 'size=' in line:
@@ -273,7 +273,7 @@ def Color_Sector_Names(
         
         # Break the text into lines, for easier editing.
         file_contents = Load_File(text_file_name)
-        line_list = file_contents.text.splitlines()
+        line_list = file_contents.Get_Text().splitlines()
         start_found = False
 
         # Loop over the lines by index.
@@ -341,7 +341,7 @@ def Color_Sector_Names(
                 ))
 
         # Put the lines back. Keep an ending newline, since some original files had that.
-        file_contents.text = '\n'.join(line_list)+'\n'
+        file_contents.Update_From_Text('\n'.join(line_list)+'\n')
                 
     return
 
@@ -358,12 +358,13 @@ def Restore_Aldrin_rock():
     original_text, replacement_text = Get_Aldrin_rock_texts()
     
     file_contents = Load_File('maps/x3_universe.xml')
-    # Verify the original_block is present (matches succesfully).
-    if not file_contents.text.count(original_text) == 1:
+    # Verify the original_block is present (matches successfully).
+    if not file_contents.Get_Text().count(original_text) == 1:
         print('Skipped Restore_Aldrin_rock,'
               ' format of source not as expected from XRM.')
         return
-    file_contents.text = file_contents.text.replace(original_text, replacement_text)
+    file_contents.Update_From_Text(
+        file_contents.Get_Text().replace(original_text, replacement_text))
         
     
 @Transform_Wrapper('maps/x3_universe.xml', Vanilla = False, LU = False)
@@ -389,11 +390,12 @@ def Restore_Hub_Music(
     replacement_text = '<o t="1" x="13" y="8" r="14" size="10000000" m="8302"'
 
     file_contents = Load_File('maps/x3_universe.xml')
-    # Verify the original_block is present (matches succesfully).
-    if not file_contents.text.count(original_text) == 1:
+    # Verify the original_block is present (matches successfully).
+    if not file_contents.Get_Text().count(original_text) == 1:
         print('Skipped Restore_Hub_Music, format of source not as expected from XRM.')
         return
-    file_contents.text = file_contents.text.replace(original_text, replacement_text)
+    file_contents.Update_From_Text(
+        file_contents.Get_Text().replace(original_text, replacement_text))
 
     # When a save already has the wrong music, apply a patch.
     if apply_to_existing_save:
@@ -432,11 +434,12 @@ def Restore_M148_Music(
     replacement_text = '<o t="1" x="14" y="8" r="1" size="22500000" m="8509"'
 
     file_contents = Load_File('maps/x3_universe.xml')
-    # Verify the original_block is present (matches succesfully).
-    if not file_contents.text.count(original_text) == 1:
+    # Verify the original_block is present (matches successfully).
+    if not file_contents.Get_Text().count(original_text) == 1:
         print('Skipped Restore_M148_Music, format of source not as expected from XRM.')
         return
-    file_contents.text = file_contents.text.replace(original_text, replacement_text)
+    file_contents.Update_From_Text(
+        file_contents.Get_Text().replace(original_text, replacement_text))
 
     # When a save already has the wrong music, apply a patch.
     if apply_to_existing_save:

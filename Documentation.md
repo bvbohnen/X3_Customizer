@@ -1,5 +1,5 @@
-X3 Customizer 3.3
-------------------
+X3 Customizer 3.4
+-----------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.
 
@@ -11,7 +11,7 @@ This tool is designed for Albion Prelude v3.3. Most transforms will support prio
 
 Usage:
 
- * "X3_Customizer.bat [path to user_transform_module.py]"
+ * "Launch_X3_Customizer.bat [path to user_transform_module.py]"
    - Call from the command line.
    - Runs the customizer, using the provided python control module which will declare the path to the X3 directory and the transforms to be run.
    - Call with '-h' to see any additional arguments.
@@ -46,7 +46,7 @@ Setup and behavior:
     - Call Set_Path to specify the X3 directory, along with some other path options. See documentation below for parameters.
     - Call a series of transform functions, as desired.
   
-  * The quickest way to set up a command script is to copy and edit the input_scripts/User_Transforms_Example.py file. Included in the repository is User_Transforms_Mine, the author's personal set of transforms, which can be checked for futher examples of how to use most transforms available.
+  * The quickest way to set up a command script is to copy and edit the input_scripts/Example_Transforms.py file. Included in the repository is Authors_Transforms, the author's personal set of transforms, which can be checked for futher examples of how to use most transforms available.
 
   * Transformed output files will be generated in an unpacked form in the x3 directories, or to a custom output direction set using Set_Path. Already existing files will be renamed, suffixing with '.x3c.bak', if they do not appear to have been created by the customizer on a prior run. A json log file will be written with information on which files were created or renamed.
 
@@ -582,8 +582,6 @@ Obj Transforms:
 
     Requires: L/x3story.obj
 
-    Incompatibilities: LU
-
       Changes the maximum SETA speed multiplier. Higher multipliers than the game default of 10 may cause oddities.
       
       * speed_factor
@@ -593,8 +591,6 @@ Obj Transforms:
  * Adjust_Max_Speedup_Rate
 
     Requires: L/x3story.obj
-
-    Incompatibilities: LU
 
       Changes the rate at which SETA turns on. By default, it will accelerate by (selected SETA -1)/10 every 250 milliseconds. This transform will reduce the delay between speedup ticks.
       
@@ -617,7 +613,7 @@ Obj Transforms:
 
     Incompatibilities: LU
 
-      Stops any newly destroyed asteroids from being set to respawn. This can be set temporarily when wishing to clear out some unwanted asteroids. It is not recommended to leave this transform applied long term.
+      Stops any newly destroyed asteroids from being set to respawn. This can be set temporarily when wishing to clear out some unwanted asteroids. It is not recommended to leave this transform applied long term, without some other method of replacing asteroids.
       
 
  * Disable_Combat_Music
@@ -663,13 +659,13 @@ Obj Transforms:
         - If True, Seta will not turn off when a priority message is received, such as a police notice of being scanned.
       * on_collision_warning
         - If True, Seta will not turn off when a near collision occurs.
+      * on_frame_input
+        - If True, the PerFrameInput function will not turn off seta, allowing menus to be opened.
       
 
  * Stop_GoD_From_Removing_Stations
 
     Requires: L/x3story.obj
-
-    Incompatibilities: LU
 
       Stops the GoD engine from removing stations which are nearly full on products or nearly starved of resources for extended periods of time.  This will not affect stations already removed or in the process of being removed.
       
@@ -1356,7 +1352,7 @@ Weapon Transforms:
 
 ***
 
-Example input file, User_Transforms_Example.py:
+Example input file, Example_Transforms.py:
 
     '''
     Example for using the Customizer, setting a path to
@@ -1504,3 +1500,7 @@ Change Log:
    - More graceful handling of failed transforms.
    - Added flags on some transforms that are incompatible with LU.
    - Added Disable_Generic_Missions, a wrapper over Adjust_Generic_Missions.
+ * 3.4
+   - Changes Obj patches to search for code patterns instead of using hard offsets, to better adapt to different obj files.
+   - Enabled support for LU for Adjust_Max_Seta, Adjust_Max_Speedup_Rate, and tentatively Stop_GoD_From_Removing_Stations.
+   - Added on_frame_input option to Stop_Events_From_Disabling_Seta, allowing opening of menus while in seta.

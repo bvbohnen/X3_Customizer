@@ -169,7 +169,9 @@ class Cat_Reader:
         # The data was encoded by xoring with 0x33, so apply this operation
         #  to every byte to decode.
         # Note: this method seems somewhat slow to run.
-        data = bytes(x ^ 0x33 for x in data)
+        # Use bytearray for this, since it can be useful elsewhere for
+        #  mutability (mainly obj code).
+        data = bytearray(x ^ 0x33 for x in data)
 
         # Numpy might be faster, but want to avoid non-standard packages.
         # Alternative: bytes objects are immutable like strings, so the
