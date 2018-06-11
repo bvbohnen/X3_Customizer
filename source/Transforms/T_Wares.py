@@ -33,11 +33,11 @@ Increase_Tuning_Prices = True
 Tuning_cost_multiplier = 5
 '''
 
-@Transform_Wrapper('types/TWareT.txt')
+@Transform_Wrapper('types/TWareT.txt', Vanilla = False, LU = False)
 def Restore_Vanilla_Tuning_Pricing():
     '''
     Sets the price for ship tunings (engine, rudder, cargo) to those
-    used in vanilla AP.
+    used in vanilla AP.  Meant for use with XRM.
     '''
     # Dict of ware names and their relative values to use,
     #  taken from the vanilla file in 02.cat.

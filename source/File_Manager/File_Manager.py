@@ -267,12 +267,31 @@ def Transform_Wrapper(
                 # Do a test load; if succesful, the file was found.
                 try:
                     Load_File(file_name)
+                # Catch file problems.
                 except File_Missing_Exception:
                     print('Skipped {}, required file {} not found or is empty.'.format(
                         func.__name__,
                         file_name
                         ))
                     # Return nothing and skip the call.
+                    return
+                # Catch gzip problems.
+                except Gzip_Exception:
+                    print('Skipped {}, required file {} failed during unzipping.'.format(
+                        func.__name__,
+                        file_name
+                        ))
+                    # Return nothing and skip the call.
+                    return
+                except Exception as ex:
+                    # Dev mode will reraise the exception.
+                    if Settings.developer:
+                        raise ex
+                    else:
+                        print('Skipped {}, unhandled exception.'.format(
+                            func.__name__,
+                            file_name
+                            ))
                     return
 
             # Call the transform function, looking for exceptions.
@@ -556,7 +575,7 @@ def Version_Patch():
     #  first run or the first in 2.23+.
     # In this case, clean out some old files from prior versions which
     #  used .x3c.bak as their renamed file suffix.
-    if Log_Old.version == None or Log_Old.version < 3:
+    if Log_Old.version == None or int(Log_Old.version.split('.')[0]) < 3:
         pass
 
         #-Removed; x3c.bak is used again, to avoid problem of the game

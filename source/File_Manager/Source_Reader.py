@@ -11,9 +11,16 @@ from collections import OrderedDict
 from .File_Types import *
 from .File_Paths import *
 from .Cat_Reader import *
-from Common.Exceptions import File_Missing_Exception
+from Common.Exceptions import File_Missing_Exception, Gzip_Exception
 import gzip
 
+# TODO: support for the x3 package manager generated twaret.pck, which
+#  uses something other than gzip (current guess is some sort of
+#  low level deflate through zlib).
+#import zlib
+# Little bit of test code to try out.
+#twaret_pck = open(r'C:\Base\x3 terran conflict xrm\addon\types\TWareT.pck','rb').read()
+#zlib.decompress(twaret_pck)
 
 class Source_Reader_class:
     '''
@@ -322,7 +329,18 @@ class Source_Reader_class:
 
         # Decompress if needed.
         if file_binary_is_zipped:
-            file_binary = gzip.decompress(file_binary)
+            # This might fail if python gzip has trouble with the file,
+            #  eg. one user reported an
+            try:
+                file_binary = gzip.decompress(file_binary)
+            except Exception as ex:
+                if Settings.developer:
+                    # Dev mode will give a little extra info.
+                    print('Gzip error for file {}'.format(file_name))
+                    raise ex
+                else:
+                    # Swap to a generic exception.
+                    raise Gzip_Exception()
 
         # If the binary is an empty string, this is an LU dummy file,
         #  so return None.

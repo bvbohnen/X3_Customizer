@@ -29,7 +29,7 @@ class Log:
 
     Attributes:
     * version
-      - Float, version of the customizer.
+      - String, version of the customizer.
     * file_paths_written_hash_dict
       - Dict, keyed by path to files written out by the customizer, holding
         the hash of the file data.
@@ -78,7 +78,8 @@ class Log:
         #for field, value in log_dict.items():
         #    setattr(s, field, value)
 
-        s.version = log_dict['version']
+        # For pre-3.4.1 support, cast version to a string from float.
+        s.version = str(log_dict['version'])
         # Handle hashes.
         for relative_path, hash in log_dict[
             'file_paths_written_hash_dict'].items():

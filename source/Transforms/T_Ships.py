@@ -337,10 +337,10 @@ def Adjust_Ship_Shield_Slots(
             
 # TODO: maybe make this a general fix to ensure player and npc prices are the
 #  same, though bugs outside the pericles haven't been noticed.
-@Transform_Wrapper('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt', XRM = False, LU = False)
 def Fix_Pericles_Pricing():
     '''
-    Applies a bug fix to the enhanced pericles, which has its
+    Applies a bug fix to the enhanced pericles in vanilla AP, which has its
     npc value set to 1/10 of player value, causing it price to be 1/10
     what it should be.
     Does nothing if the existing npc and player prices are matched.
@@ -430,12 +430,13 @@ def Patch_Ship_Variant_Inconsistencies(
                 break
 
                 
-@Transform_Wrapper('types/TShips.txt')
+@Transform_Wrapper('types/TShips.txt', XRM = False, LU = False)
 def Boost_Truelight_Seeker_Shield_Reactor():
     '''
     Enhances the Truelight Seeker's shield reactor.
-    In AP the TLS has a shield reactor only around 1/10 what is normal 
-    for similar ships; this applies a 10x increase.
+    In vanilla AP the TLS has a shield reactor only around 1/10 of what is 
+    normal for similar ships. This transform sets the TLS shield reactor
+    to be the same as the Centaur.
     If the TLS is already at least 1/5 of Centaur shielding, this
     transform is not applied.
     '''
@@ -451,7 +452,7 @@ def Boost_Truelight_Seeker_Shield_Reactor():
             shield_power = int(this_dict['shield_power'])
             # Apply change if not within 1/5 of the centaur shielding.
             if shield_power < centaur_shield_power / 5:
-                this_dict['shield_power'] = str(shield_power * 10)
+                this_dict['shield_power'] = str(centaur_shield_power)
             break
 
         

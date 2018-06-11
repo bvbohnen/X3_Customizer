@@ -845,7 +845,7 @@ if Vanilla:
     #  eg. springblossom will still be faster than other fast corvettes (and
     #  with frigate tier turrets with a large cargo hold, probably still
     #  stronger in a fight).
-    Adjust_Ship_Speed({
+    Adjust_Ship_Speed(adjustment_factors_dict = {
         'SS_SH_LOST_M6H': 0.5,
         'SS_SH_LOST_M3H': 0.5,
         })

@@ -19,3 +19,9 @@ class Text_Patch_Exception(Exception):
     Exception raised when an text patch (often xml) fails to find a
     matching reference line.
     '''
+    
+class Gzip_Exception(Exception):
+    '''
+    Exception raise when gzip runs into a problem decompressing a file.
+    '''
+    

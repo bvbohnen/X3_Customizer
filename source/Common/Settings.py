@@ -224,7 +224,8 @@ class Settings_class:
         # The X3 path should automatically be correct if the AP folder
         #  is correct.
         if not os.path.exists(s.path_to_addon_folder):
-            raise Exception('Path to the AP/addon folder appears invalid.')
+            raise Exception('Path to the AP/addon folder appears invalid'
+                            '(path: {})'.format(s.path_to_addon_folder))
 
         # Check for 01.cat, and that the path ends in 'addon'.
         # Print a warning but continue if anything looks wrong; the user may
