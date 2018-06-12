@@ -128,7 +128,6 @@ class Source_Reader_class:
                     s.Record_New_Source_File( os.path.abspath(
                         os.path.join(dir_path, file_name)))
 
-
             # Restore the working directory.
             os.chdir(original_cwd)
          

@@ -66,6 +66,9 @@ class Settings_class:
         the best job they can when hitting problems.
     * verbose
       - Bool, if True some extra status messages may be printed.
+    * allow_path_error
+      - Bool, if True then if the x3 path looks wrong, the customizer
+        will still attempt to run.
     '''
     '''
     -Removed attributes, for now.
@@ -98,6 +101,7 @@ class Settings_class:
         s.developer = False
         s.verbose = True
         #s.t_folder_file_number = '9997'
+        s.allow_path_error = False
         
 
     #def Get_Page_Text_File_Path(s):
@@ -185,6 +189,10 @@ class Settings_class:
         '''
         Sets the log folder path, relative to the addon folder if not absolute.
         '''
+        # Skip the cases where the addon folder isn't known, and let
+        #  the verifier catch errors.
+        if s.path_to_addon_folder == None:
+            return
         if os.path.isabs(path):
             s.path_to_log_folder = path
         else:
@@ -224,8 +232,11 @@ class Settings_class:
         # The X3 path should automatically be correct if the AP folder
         #  is correct.
         if not os.path.exists(s.path_to_addon_folder):
-            raise Exception('Path to the AP/addon folder appears invalid'
-                            '(path: {})'.format(s.path_to_addon_folder))
+            raise Exception(
+                'Path to the AP/addon folder appears to not exist.'
+                +'\n (x3 base path: {})'.format(s.path_to_x3_folder)
+                +'\n (x3 addon path: {})'.format(s.path_to_addon_folder)
+                )
 
         # Check for 01.cat, and that the path ends in 'addon'.
         # Print a warning but continue if anything looks wrong; the user may
@@ -233,9 +244,24 @@ class Settings_class:
         if any((not s.path_to_addon_folder.endswith('addon'),
                 not os.path.exists(os.path.join(s.path_to_addon_folder, '01.cat')))
                ):
-            print('Warning: Path to the AP\\addon folder appears wrong.\n'
-                  'Generated files may need manual moving to the correct folder.\n'
-                  'Automated source file extraction will fail.')
+            if s.allow_path_error:
+                print(  
+                    'Warning: Path to the AP/addon folder appears wrong.\n'
+                    'Generated files may need manual moving to the correct folder.\n'
+                    'Automated source file extraction will fail.'
+                    +'\n (x3 base path: {})'.format(s.path_to_x3_folder)
+                    +'\n (x3 addon path: {})'.format(s.path_to_addon_folder)
+                    )
+            else:
+                # Hard error.
+                # Users might mistakenly set the x3 base folder as the addon
+                #  folder, or similar issues, so this helps catch those
+                #  in a cleaner way.
+                raise Exception(
+                    'Path does not appear correct for the AP/addon folder.'
+                    +'\n (x3 base path: {})'.format(s.path_to_x3_folder)
+                    +'\n (x3 addon path: {})'.format(s.path_to_addon_folder)
+                    )
             
         #-Removed; source folder is now optional.
         #if not os.path.exists(s.path_to_source_folder):
@@ -245,6 +271,10 @@ class Settings_class:
         #    #raise Exception('Path to the source folder appears invalid.')
         #    print('Warning: Source folder {} not found and has been created'.format(
         #        s.path_to_source_folder))
+
+        # Error if no log folder exists.
+        if s.path_to_log_folder == None:
+            raise Exception('Log folder path not filled in.')
 
         # Create the log folder if it does not exist.
         if not os.path.exists(s.path_to_log_folder):

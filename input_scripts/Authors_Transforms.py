@@ -24,6 +24,7 @@ if Vanilla:
 elif XRM:
     Set_Path(
         path_to_x3_folder = r'C:\Base\x3 terran conflict xrm',
+        #path_to_addon_folder = r'C:\Base\x3 terran conflict xrm\addon',
         #path_to_source_folder = 'xrm_source'
         #path_to_output_folder = 'custom_output'
     )
@@ -34,9 +35,14 @@ elif LU:
 
 # Temp enable xrm transforms for lu to see what happens.
 #XRM = LU if LU else XRM
-    
-Settings.use_scipy_for_scaling_equations = True
-Settings.show_scaling_plots = False
+
+# Could disable scipy scaling equations; these are enabled by default
+#  if scipy available.   
+#Settings.use_scipy_for_scaling_equations = False
+
+# Can turn on plotting of scaling plots (assuming matplotlib available)
+#  to view curve fits.
+#Settings.show_scaling_plots = True
 
 
 #####################################################

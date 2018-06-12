@@ -75,16 +75,26 @@ def Set_Path(
         a prior run.
       - Defaults to 'X3_Customizer_log.json'.
     '''
-    Settings.Set_X3_Folder(path_to_x3_folder)
-    Settings.Set_Addon_Folder(path_to_addon_folder)
+    # Hide these behind None checks, to be extra safe; the Settings 
+    #  verification should catch problems.
+    if path_to_x3_folder != None:
+        Settings.Set_X3_Folder(path_to_x3_folder)
+    if path_to_addon_folder != None:
+        Settings.Set_Addon_Folder(path_to_addon_folder)
     # Two ways to set source_folder for now.
     # TODO: maybe trim the old one out.
-    Settings.Set_Source_Folder(source_folder)
-    Settings.Set_Source_Folder(path_to_source_folder)
-    Settings.Set_Output_Folder(path_to_output_folder)
-    Settings.Set_Log_Folder(path_to_log_folder)
-    Settings.Set_Message_File(summary_file)
-    Settings.Set_Log_File(log_file)
+    if source_folder != None:
+        Settings.Set_Source_Folder(source_folder)
+    if path_to_source_folder != None:
+        Settings.Set_Source_Folder(path_to_source_folder)
+    if path_to_output_folder != None:
+        Settings.Set_Output_Folder(path_to_output_folder)
+    if path_to_log_folder != None:
+        Settings.Set_Log_Folder(path_to_log_folder)
+    if summary_file != None:
+        Settings.Set_Message_File(summary_file)
+    if log_file != None:
+        Settings.Set_Log_File(log_file)
 
     # Call to generic Init moved here, to ensure it is applied before
     # any transforms which may not use input files.
@@ -137,13 +147,6 @@ def Init():
     # Initialize the file system, now that paths are set in settings.
     Source_Reader.Init()
     
-    # Set the working directory to the AP directory.
-    # This makes it easier for transforms to generate any misc files.
-    # TODO: move away from doing this; all generated files should be
-    #  handled at the end, and file reads could also be normalized
-    #  to check this path when needed.
-    os.chdir(Settings.Get_Addon_Folder())
-
     #-Removed for now.
     ## Generate an initial dummy file for all page text overrides.
     #game_file = Page_Text_File(
@@ -251,6 +254,9 @@ def Transform_Wrapper(
         def wrapper(*args, **kwargs):
 
             # On the first call, do some extra setup.
+            # Init normally runs earlier when the paths are set up,
+            #  but if a script forgot to set paths then init will end
+            #  up being called here.
             if First_call:
                 Init()
 

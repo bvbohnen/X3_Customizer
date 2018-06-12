@@ -256,6 +256,8 @@ def Get_Scaling_Fit(x_vec, y_vec, **kwargs):
         fit_equation = Get_Scipy_Scaling_Fit(x_vec, y_vec, **kwargs)
     else:
         fit_equation = Get_Linear_Scaling_Fit(x_vec, y_vec, **kwargs)
+        # TODO: maybe give a nice message if scipy was requested and
+        # is not available.
     
     # Calculate the data points for debug check.
     #final_y_vec = [fit_equation(x) for x in x_vec]

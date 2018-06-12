@@ -155,6 +155,10 @@ Change Log:
  * 3.4.2
    - Added support for x2 style pck files in loose folders (eg. should
      now work better with x3 plugin manager).
+ * 3.4.3
+   - Raises exception if the x3/addon path appears incorrect instead of
+     still attempting to run, unless -allow_path_error is enabled.
+   - Some other minor cleanup of exception handling on path problems.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

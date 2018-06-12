@@ -197,6 +197,31 @@ def Run():
         action='store_true',
         help =  'Quiets some extra status messages.')
     
+    argparser.add_argument(
+        '-allow_path_error', 
+        action='store_true',
+        help =  'Allows the customizer to attempt to run if the x3/addon'
+                ' path appears incorrect; may be used if the source folder'
+                ' contains all needed files, though generated files'
+                ' need to be moved manually to the x3 directory.')
+    
+    # TODO: maybe update this; currently scipy is default enabled, but
+    # could be force disabled for users with scipy installed but who don't
+    # want to use it.
+    #argparser.add_argument(
+    #    '-use_scipy', 
+    #    action='store_true',
+    #    help =  'Allows the scipy package to be used when generating'
+    #            ' smoothing functions; only supported when running the'
+    #            ' python source code with the scipy package installed.')
+        
+    argparser.add_argument(
+        '-test_run', 
+        action='store_true',
+        help =  'Performs a test run of the transforms, behaving like'
+                ' a normal run but not writing out results.')
+        
+    
     # Run the parser on the sys args.
     args = argparser.parse_args()
 
@@ -238,22 +263,45 @@ def Run():
         Settings.developer = True
         
     if args.quiet:
+        # No status message here, since being quiet.
         Settings.verbose = False
-        
-    print('Attempting to run {}'.format(user_module_name))
+           
+    if args.test_run:
+        if not args.quiet:
+            print('Performing test run.')
+        # This uses the disable_cleanup flag.
+        Settings.disable_cleanup_and_writeback = True
+                
+    if not args.quiet:
+        print('Attempting to run {}'.format(user_module_name))
       
-    # Attempt to load the module.
-    # This will kick off all of the transforms as a result.
-    import importlib        
-    module = importlib.machinery.SourceFileLoader(
-        # Provide the name sys will use for this module.
-        # Use the basename to get rid of any path, and prefix
-        #  to ensure the name is unique (don't want to collide
-        #  with other loaded modules).
-        'user_module_' + os.path.basename(user_module_name), 
-        user_module_name
-        ).load_module()
+    try:
+        # Attempt to load the module.
+        # This will kick off all of the transforms as a result.
+        import importlib        
+        module = importlib.machinery.SourceFileLoader(
+            # Provide the name sys will use for this module.
+            # Use the basename to get rid of any path, and prefix
+            #  to ensure the name is unique (don't want to collide
+            #  with other loaded modules).
+            'user_module_' + os.path.basename(user_module_name), 
+            user_module_name
+            ).load_module()
 
+    except Exception as ex:
+        # Make a nice message, to prevent a full stack trace being
+        #  dropped on the user.
+        print('Exception of type "{}" encountered.\n'.format(
+            type(ex).__name__))
+        ex_text = str(ex)
+        if ex_text:
+            print(ex_text)
+
+        # In dev mode, reraise the exception.
+        if Settings.developer:
+            raise ex
+        #else:
+        #    print('Enable developer mode for exception stack trace.')
 
     # If cleanup/writeback not disabled, run them.
     # These are mainly disabled by the patch builder.
@@ -265,7 +313,7 @@ def Run():
         # Can open most output files in X3 Editor to verify results.
         File_Manager.Write_Files()
 
-    print('Transforms complete')
+    #print('Run complete')
     
 if __name__ == '__main__':
     Run()
