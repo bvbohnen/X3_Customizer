@@ -14,13 +14,31 @@ from .Cat_Reader import *
 from Common.Exceptions import File_Missing_Exception, Gzip_Exception
 import gzip
 
-# TODO: support for the x3 package manager generated twaret.pck, which
-#  uses something other than gzip (current guess is some sort of
-#  low level deflate through zlib).
-#import zlib
-# Little bit of test code to try out.
-#twaret_pck = open(r'C:\Base\x3 terran conflict xrm\addon\types\TWareT.pck','rb').read()
-#zlib.decompress(twaret_pck)
+'''
+Notes on X3 Plugin Manager generated TWareT.pck file:
+    This file does not work with standard gzip, though does appear to
+    open with X3 Editor 2.
+    Exploration into reasons led down this path:
+        - Look through X3 Editor source code (c#) to trace compression.
+        - This uses x2fd.dll.
+        - Look through x2fd source code (c++).
+        - Find a file reading in catpck.cpp, function DecompressBuffer.
+
+    The apparent decompression used is:
+        magic_value = bytestream[0] ^ 0xC8
+        file_binary_demagicked = bytestream[1:] ^ magic_value
+        file_contents = gzip.decompress(file_binary_demagicked)
+
+    This does not match up with the magic values or approaches used
+    in the actual cat files (running magic value for cats, 0x33 for dats,
+    no dropping of the first byte), and the standalone pck files in scripts
+    are all plain gzipped.
+
+    At any rate, if normal gzip fails, this decompression can be applied
+    as a second pass to see if it works better.
+
+'''
+
 
 class Source_Reader_class:
     '''
@@ -166,6 +184,51 @@ class Source_Reader_class:
         virtual_path = System_Path_to_Virtual_Path(sys_path)
         s.source_file_path_dict[virtual_path] = sys_path
         
+
+    def Decompress(s, file_binary, virtual_path):
+        '''
+        Decompress the given binary using gzip.
+        This will attempt to decompress the binary as-is, and if failing,
+        will decompress as if an x2 file (gzipped with an xor pass and
+        prefix byte) to support X3 Plugin Manager generated pck files.
+
+        * file_binary
+          - Byte string or Bytearray with the original file binary data.
+        * virtual_path
+          - String, virtual path of the file to look up.
+          - Only used for printouts.
+        '''
+        try:
+            decompressed_binary = gzip.decompress(file_binary)
+        except:
+            # Print a nice message in dev mode to indicate this fallback
+            #  code is being used. TODO: remove this if code seems robust.
+            if Settings.developer:
+                print('First gzip pass on {} failed, attempting to apply'
+                     ' x2 style decompression.'\
+                    .format(virtual_path))
+
+            # Try method 2.  See notes way up above for what is
+            #  going on, but in short, the first byte xors with 0xC8
+            #  to get a magic value to Xor with all other bytes, then
+            #  that is all decompressed with gzip.
+            magic = file_binary[0] ^ 0xC8
+            file_binary = bytearray(x ^ magic for x in file_binary)
+
+            try:
+                # Toss the first byte for this.
+                decompressed_binary = gzip.decompress(file_binary[1:])
+            except Exception as ex:
+                if Settings.developer:
+                    # Dev mode will give a little extra info.
+                    print('Gzip error for file {}'.format(virtual_path))
+                    raise ex
+                else:
+                    # Swap to a generic exception.
+                    raise Gzip_Exception()
+
+        return decompressed_binary
+
 
     def Read(s, 
              virtual_path,
@@ -324,23 +387,12 @@ class Source_Reader_class:
         if file_binary == None:
             if error_if_not_found:
                 raise File_Missing_Exception(
-                    'Could not find a match for file {}'.format(file_name))
+                    'Could not find a match for file {}'.format(virtual_path))
             return None
 
         # Decompress if needed.
         if file_binary_is_zipped:
-            # This might fail if python gzip has trouble with the file,
-            #  eg. one user reported an
-            try:
-                file_binary = gzip.decompress(file_binary)
-            except Exception as ex:
-                if Settings.developer:
-                    # Dev mode will give a little extra info.
-                    print('Gzip error for file {}'.format(file_name))
-                    raise ex
-                else:
-                    # Swap to a generic exception.
-                    raise Gzip_Exception()
+            file_binary = s.Decompress(file_binary, virtual_path)
 
         # If the binary is an empty string, this is an LU dummy file,
         #  so return None.
