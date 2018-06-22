@@ -1,4 +1,4 @@
-X3 Customizer 3.4.3
+X3 Customizer 3.5
 -----------------
 
 This tool will read in source files from X3, perform transforms on them, and write the results back out. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.
@@ -8,6 +8,8 @@ Source files will generally support any prior modding. Nearly all transforms sup
 This tool is written in Python, and tested on version 3.6. As of customizer version 3, an executable may be generated for users who do not wish to run the Python source code directly.
 
 This tool is designed for Albion Prelude v3.3. Most transforms will support prior versions of AP. TC is not directly supported currently due primarily to some path assumptions.
+
+When used alongside the X3 Plugin Manager, run X3 Customizer 3.5 second, after the plugin manager is closed, since the plugin manager generates a TWareT.pck file when closed that doesn't capture changes in TWareT.txt.
 
 Usage:
 
@@ -55,280 +57,48 @@ Setup and behavior:
 
 Full documentation found in Documentation.md.
 
-
 ***
 
-Background Transforms:
+Example input file, Example_Transforms.py:
 
- * Adjust_Fade_Start_End_Gap
-
-      Adjust the gap between the start and end fade distance, changing how quickly objects will fade in. This will never affect fade_start, only fade_end.
-
- * Adjust_Particle_Count
-
-      Change the number of particles floating in space around the camera. Default game is 100, mods often set to 0, but can keep some small number for a feeling of speed.
-
- * Remove_Stars_From_Foggy_Sectors
-
-      Removes star backgrounds from sectors with significant fog and short fade distance. Fogged sectors sharing a background with an unfogged sector will not be modified, as the background needs to be edited for all sectors which use it. Fade is removed from sectors which will not have their stars removed.
-
- * Set_Minimum_Fade_Distance
-
-      Sets a floor to fade distance, so that object do not appear too closely. May be useful in some sectors with really short view distances, though may also want to keep those for variety. Note: max fade distance will be set to minimum fade distance if it would otherwise be lower. Recommend following this with a call to Adjust_Fade_Start_End_Gap.
-
-
-***
-
-Director Transforms:
-
- * Adjust_Generic_Missions
-
-      Adjust the spawn chance of various generic mission types, relative to each other. Note: decreasing chance on unwanted missions seems to work better than increasing chance on wanted missions.
-
- * Convoys_made_of_race_ships
-
-      If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
-
- * Disable_Generic_Missions
-
-      Disable generic missions from spawning. Existing generic missions will be left untouched.
-
- * Standardize_Start_Plot_Overtunings
-
-    Incompatibilities: LU
-
-      Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
-
- * Standardize_Tunings
-
-    Incompatibilities: LU
-
-      Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
+    '''
+    Example for using the Customizer, setting a path to
+    the X3 directory and running some simple transforms.
+    '''
+    
+    # Import all transform functions.
+    from X3_Customizer import *
+    
+    Set_Path(
+        # Set the path to the X3 installation folder.
+        path_to_x3_folder = r'D:\Steam\SteamApps\common\x3 terran conflict',
+    )
+    
+    # Speed up interceptors by 50%.
+    Adjust_Ship_Speed(adjustment_factors_dict = {'SG_SH_M4' : 1.5})
+    
+    # Increase frigate laser regeneration by 50%.
+    Adjust_Ship_Laser_Recharge(adjustment_factors_dict = {'SG_SH_M7': 1.5})
+    
+    # Reduce Out-of-sector damage by 30%.
+    Adjust_Weapon_OOS_Damage(scaling_factor = 0.7)
 
 
 ***
 
-Factory Transforms:
-
- * Add_More_Factory_Sizes
-
-      Adds factories of alternate sizes, from basic to XL. Price and volume of new sizes is based on the scaling common to existing factories. Factories will be added to existing shipyards the first time a game is loaded after running this transform; this may take several seconds to complete, during which time the game will be unresponsive. Warning: it is unsafe to remove factories once they have been added to an existing save.
-
-
-***
-
-Gate Transforms:
-
- * Adjust_Gate_Rings
-
-      Various options to modify gate rings, with the aim of reducing capital ship suicides when colliding with the pylons shortly after the player enters a sector. Includes ring removal, rotation, reversal, and model swaps. Inactive versions of gates will also be updated for consistency. When applied to an existing save, gate changes will appear on a sector change.
-
-
-***
-
-Global Transforms:
-
- * Adjust_Global
-
-      Adjust a global flag by the given multiplier. Generic transform works on any named global field.
-
- * Adjust_Strafe
-
-      Strafe adjustment factor. Note: this does not appear to have any effect during brief testing.
-
- * Set_Communication_Distance
-
-      Set max distance for opening communications with factories and ships.
-
- * Set_Complex_Connection_Distance
-
-      Set max range between factories in a complex. With complex cleaner and tubeless complexes, this can practically be anything, particularly useful when connecting up distant asteroids.
-
- * Set_Dock_Storage_Capacity
-
-      Change the capacity of storage docks: equipment docks, trading posts, etc.
-
- * Set_Global
-
-      Set a global flag to the given value. Generic transform works on any named global field.
-
-
-***
-
-Job Transforms:
-
- * Add_Job_Ship_Variants
-
-      Allows jobs to spawn with a larger selection of variant ships. This does not affect jobs with a preselected ship to spawn, only those with random selection. Variants are added when the basic version of the ship is allowed, to preserve cases where a variant has been preselected.
-
- * Adjust_Job_Count
-
-      Adjusts job ship counts using a multiplier. These will always have a minimum of 1. Jobs are matched by name or an attribute flag, eg. 'owner_pirate'. This will also increase the max number of jobs per sector accordingly.
-
- * Adjust_Job_Respawn_Time
-
-      Adjusts job respawn times, using an adder and multiplier on the existing respawn time.
-
- * Set_Job_Spawn_Locations
-
-      Sets the spawn location of ships created for jobs, eg. at a shipyard, at a gate, docked at a station, etc.
-
-
-***
-
-Missile Transforms:
-
- * Add_Ship_Boarding_Pod_Support
-
-      Adds boarding pod launch capability to selected classes of ships, eg. destroyers. Ships should support marines, so limit to M1, M2, M7, M6, TL, TM, TP.
-
- * Add_Ship_Cross_Faction_Missiles
-
-      Adds terran missile compatibility to commonwealth ships, and vice versa. Missiles are added based on category matching, eg. a terran ship that can fire light terran missiles will gain light commonwealth missiles. Note that AI ship loadouts may include any missile they can fire.
-
- * Adjust_Missile_Damage
-
-      Adjust missile damage values, by a flat scaler or configured scaling formula. 
-
- * Adjust_Missile_Hulls
-
-      Adjust the hull value for all missiles by the scaling factor. Does not affect boarding pod hulls.
-
- * Adjust_Missile_Range
-
-      Adjust missile range by changing lifetime, by a flat scaler or configured scaling formula. This is particularly effective for the re-lock missiles like flail, to reduce their ability to keep retargetting across a system, instead running out of fuel from the zigzagging.
-
- * Adjust_Missile_Speed
-
-      Adjust missile speeds, by a flat scaler or configured scaling formula.
-
- * Enhance_Mosquito_Missiles
-
-      Makes mosquito missiles more maneuverable, generally by increasing the turn rate or adding blast radius, to make anti-missile abilities more reliable.
-
- * Expand_Bomber_Missiles
-
-      Allows bombers and missile frigates to use a wider variety of missiles. Bombers will gain fighter tier missiles, while frigates will gain corvette tier missiles. Terran ships will gain Terran missiles. Note that AI ship loadouts may include any missile they can fire, such that bombers will have fewer heavy missiles and more standard missiles.
-
- * Set_Missile_Swarm_Count
-
-      Set the number of submissiles fired by swarm missiles. Submissile damage is adjusted accordingly to maintain overall damage.
-
-
-***
-
-Obj Transforms:
-
- * Adjust_Max_Seta
-
-      Changes the maximum SETA speed multiplier. Higher multipliers than the game default of 10 may cause oddities.
-
- * Adjust_Max_Speedup_Rate
-
-      Changes the rate at which SETA turns on. By default, it will accelerate by (selected SETA -1)/10 every 250 milliseconds. This transform will reduce the delay between speedup ticks.
-
- * Allow_Valhalla_To_Jump_To_Gates
-
-    Incompatibilities: LU
-
-      Removes a restriction on the Valhalla, or whichever ship is at offset 211 in tships, from jumping to gates. This should only be applied alongside another mod that either reduces the valhalla size, increases gate size, removes gate rings, or moves/removes the forward pylons, to avoid collision problems.
-
- * Disable_Asteroid_Respawn
-
-    Incompatibilities: LU
-
-      Stops any newly destroyed asteroids from being set to respawn. This can be set temporarily when wishing to clear out some unwanted asteroids. It is not recommended to leave this transform applied long term, without some other method of replacing asteroids.
-
- * Disable_Combat_Music
-
-    Incompatibilities: LU
-
-      Turns off combat music, keeping the normal environment musc playing when nearing hostile objects. If applied to a saved game already in combat mode, combat music may continue to play for a moment. The beep on nearing an enemy will still be played.
-
- * Set_Max_Marines
-
-    Incompatibilities: LU
-
-      Sets the maximum number of marines that each ship type can carry. These are byte values, signed, so max is 127.
-
- * Stop_Events_From_Disabling_Seta
-
-    Incompatibilities: LU
-
-      Stop SETA from being turned off automatically upon certain events, such as missile attacks.
-
- * Stop_GoD_From_Removing_Stations
-
-      Stops the GoD engine from removing stations which are nearly full on products or nearly starved of resources for extended periods of time.  This will not affect stations already removed or in the process of being removed.
-
-
-***
-
-Script Transforms:
+Customizer.Transforms.T Transforms:
 
  * Add_CLS_Software_To_More_Docks
 
       Adds Commodity Logistics Software, internal and external, to all equipment docks which stock Trade Command Software Mk2. This is implemented as a setup script which runs on the game loading. Once applied, this transform may be disabled to remove the script run time. This change is not reversable.
 
- * Allow_CAG_Apprentices_To_Sell
+ * Add_Job_Ship_Variants
 
-    Incompatibilities: LU
+      Allows jobs to spawn with a larger selection of variant ships. This does not affect jobs with a preselected ship to spawn, only those with random selection. Variants are added when the basic version of the ship is allowed, to preserve cases where a variant has been preselected.
 
-      Allows Commercial Agents to sell factory products at pilot rank 0. May require CAG restart to take effect.
+ * Add_More_Factory_Sizes
 
- * Complex_Cleaner_Bug_Fix
-
-    Incompatibilities: LU
-
-      Apply bug fixes to the Complex Cleaner mod. Designed for version 4.09 of that mod. Includes a fix for mistargetted a wrong hub in systems with multiple hubs, and a fix for some factories getting ignored when crunching. Patches plugin.gz.CmpClean.Main.xml.
-
- * Complex_Cleaner_Use_Small_Cube
-
-    Incompatibilities: LU
-
-      Forces the Complex Cleaner to use the smaller cube model always when combining factories. Patches plugin.gz.CmpClean.crunch.xml.
-
- * Convert_Attack_To_Attack_Nearest
-
-      Modifies the Attack command when used on an owned asset to instead enact Attack Nearest. In vanilla AP, such attack commands are quietly ignored. Intended for use when commanding groups, where Attack is available but Attack Nearest is not. This replaces '!ship.cmd.attack.std'.
-
- * Disable_OOS_War_Sector_Spawns
-
-    Incompatibilities: LU
-
-      Disables spawning of dedicated ships in the AP war sectors which attack player assets when the player is out-of-sector. By default, these ships scale up with player assets, and immediately respawn upon being killed. This patches '!fight.war.protectsector'.
-
- * Fix_OOS_Laser_Missile_Conflict
-
-    Incompatibilities: LU
-
-      Allows OOS combat to include both missile and laser fire in the same attack round. In vanilla AP, a ship firing a missile will not fire its lasers for a full round, generally causing a large drop in damage output. With the change, adding missiles to OOS ships will not hurt their performance.
-
- * Fleet_Interceptor_Bug_Fix
-
-    Incompatibilities: LU
-
-      Apply bug fixes to the Fleet logic for selecting ships to launch at enemies. A mispelling of 'interecept' causes M6 ships to be launched against enemy M8s instead of interceptors. Patches !lib.fleet.shipsfortarget.xml.
-
- * Increase_Escort_Engagement_Range
-
-    Incompatibilities: LU
-
-      Increases the distance at which escort ships will break and attack a target. In vanilla AP an enemy must be within 3km of the escort ship. This transform will give custom values based on the size of the escorted ship, small, medium (m6), or large (m7+).
-
-
-***
-
-Shield Transforms:
-
- * Adjust_Shield_Regen
-
-      Adjust shield regeneration rate by changing efficiency values.
-
-
-***
-
-Ship Transforms:
+      Adds factories of alternate sizes, from basic to XL. Price and volume of new sizes is based on the scaling common to existing factories. Factories will be added to existing shipyards the first time a game is loaded after running this transform; this may take several seconds to complete, during which time the game will be unresponsive. Warning: it is unsafe to remove factories once they have been added to an existing save.
 
  * Add_Ship_Combat_Variants
 
@@ -349,6 +119,66 @@ Ship Transforms:
  * Add_Ship_Variants
 
       Adds variants for various ships. Variant attribute modifiers are based on the average differences between existing variants and their basic ship, where only M3,M4,M5 are analyzed for combat variants, and only TS,TP are analyzed for trade variants, with Hauler being considered both a combat variant. Variants will be added to existing shipyards the first time a game is loaded after running this transform; this may take several seconds to complete, during which time the game will be unresponsive. Warning: it is unsafe to remove variants once they have been added to an existing save.
+
+ * Adjust_Beam_Weapon_Duration
+
+      Adjusts the duration of beam weapons. Shot damage will be applied over the duration of the beam, such that shorter beams will apply their damage more quickly. Longer duration beams are weaker against small targets which move out of the beam before its damage is fully applied. Beam range will remain unchanged. Note: this does not affect fire rate, so multiple beams may become active at the same time.
+
+ * Adjust_Beam_Weapon_Width
+
+      Adjusts the width of beam weapons. Narrower beams will have more trouble hitting small targets at a distance. In vanilla AP beam widths are generally set to 1, though in XRM the widths have much wider variety. This can be used to nerf anti-fighter defense of capital ships with beam mounts.
+
+ * Adjust_Fade_Start_End_Gap
+
+      Adjust the gap between the start and end fade distance, changing how quickly objects will fade in. This will never affect fade_start, only fade_end.
+
+ * Adjust_Gate_Rings
+
+      Various options to modify gate rings, with the aim of reducing capital ship suicides when colliding with the pylons shortly after the player enters a sector. Includes ring removal, rotation, reversal, and model swaps. Inactive versions of gates will also be updated for consistency. When applied to an existing save, gate changes will appear on a sector change.
+
+ * Adjust_Generic_Missions
+
+      Adjust the spawn chance of various generic mission types, relative to each other. Note: decreasing chance on unwanted missions seems to work better than increasing chance on wanted missions.
+
+ * Adjust_Global
+
+      Adjust a global flag by the given multiplier. Generic transform works on any named global field.
+
+ * Adjust_Job_Count
+
+      Adjusts job ship counts using a multiplier. These will always have a minimum of 1. Jobs are matched by name or an attribute flag, eg. 'owner_pirate'. This will also increase the max number of jobs per sector accordingly.
+
+ * Adjust_Job_Respawn_Time
+
+      Adjusts job respawn times, using an adder and multiplier on the existing respawn time.
+
+ * Adjust_Max_Seta
+
+      Changes the maximum SETA speed multiplier. Higher multipliers than the game default of 10 may cause oddities.
+
+ * Adjust_Max_Speedup_Rate
+
+      Changes the rate at which SETA turns on. By default, it will accelerate by (selected SETA -1)/10 every 250 milliseconds. This transform will reduce the delay between speedup ticks.
+
+ * Adjust_Missile_Damage
+
+      Adjust missile damage values, by a flat scaler or configured scaling formula. 
+
+ * Adjust_Missile_Range
+
+      Adjust missile range by changing lifetime, by a flat scaler or configured scaling formula. This is particularly effective for the re-lock missiles like flail, to reduce their ability to keep retargetting across a system, instead running out of fuel from the zigzagging.
+
+ * Adjust_Missile_Speed
+
+      Adjust missile speeds, by a flat scaler or configured scaling formula.
+
+ * Adjust_Particle_Count
+
+      Change the number of particles floating in space around the camera. Default game is 100, mods often set to 0, but can keep some small number for a feeling of speed.
+
+ * Adjust_Shield_Regen
+
+      Adjust shield regeneration rate by changing efficiency values.
 
  * Adjust_Ship_Hull
 
@@ -374,115 +204,9 @@ Ship Transforms:
 
       Adjust ship speed and acceleration, globally or per ship class.
 
- * Boost_Truelight_Seeker_Shield_Reactor
+ * Adjust_Strafe
 
-    Incompatibilities: XRM, LU
-
-      Enhances the Truelight Seeker's shield reactor. In vanilla AP the TLS has a shield reactor only around 1/10 of what is normal for similar ships. This transform sets the TLS shield reactor to be the same as the Centaur. If the TLS is already at least 1/5 of Centaur shielding, this transform is not applied.
-
- * Fix_Pericles_Pricing
-
-    Incompatibilities: XRM, LU
-
-      Applies a bug fix to the enhanced pericles in vanilla AP, which has its npc value set to 1/10 of player value, causing it price to be 1/10 what it should be. Does nothing if the existing npc and player prices are matched.
-
- * Patch_Ship_Variant_Inconsistencies
-
-      Applies some patches to some select inconsistencies in ship variants. Modified ships include the Baldric Miner and XRM Medusa Vanguard, both manually named instead of using the variant system. This is meant to be run prior to Add_Ship_Variants, to avoid the non-standard ships creating their own sub-variants. There may be side effects if the variant inconsistencies were intentional.
-
- * Remove_Khaak_Corvette_Spin
-
-      Remove the spin on the secondary hull of the Khaak corvette. The replacement file used is expected to work for vanilla, xrm, and other mods that don't change the model scene file.
-
- * Remove_Ship_Variants
-
-      Removes variants for selected ships. May be used after Add_Ship_Variants has already been applied to an existing save, to safely remove variants while leaving their tships entries intact. In this case, leave the Add_Ship_Variants call as it was previously with undesired variants, and use this tranform to prune the variants. Existing ships will remain in game, categorized as unknown race, though new ships will not spawn automatically. Variants will be removed from existing shipyards the first time a game is loaded after running this transform.
-
- * Simplify_Engine_Trails
-
-      Change engine trail particle effects to basic or none. This will switch to effect 1 for medium and light ships and 0 for heavy ships, as in vanilla AP.
-
- * Standardize_Ship_Tunings
-
-      Standardize max engine or rudder tuning amounts across all ships. Eg. instead of scouts having 25 and carriers having 5 engine runings, both will have some fixed number. Maximum ship speed and turn rate is kept constant, but minimum will change. If applied to an existing save, existing ships may end up overtuned; this is recommended primarily for new games, pending inclusion of a modification script which can recap ships to max tunings. Ships with 0 tunings will remain unedited.
-
-
-***
-
-Sound Transforms:
-
- * Remove_Combat_Beep
-
-      Removes the beep that plays when entering combat.
-
- * Remove_Sound
-
-      Removes a sound by writing an empty file in its place, based on the sound's id.
-
-
-***
-
-Universe Transforms:
-
- * Change_Sector_Music
-
-      Generic transform to change the music for a given sector. Currently, this only operates as a director script, and does not alter the universe file. To reverse the change, a new call must be made with a new cue name and the prior music_id.
-
- * Color_Sector_Names
-
-    Incompatibilities: LU
-
-      Colors sector names in the map based on race owners declared in the x3_universe file. Some sectors may remain uncolored if their name is not set in the standard way through text files. Only works on the English files, L044, for now. Note: searching sectors by typing a name will no longer work except on uncolored sectors, eg. unknown sectors.
-
- * Restore_Aldrin_rock
-
-    Incompatibilities: Vanilla, LU
-
-      Restors the big rock in Aldrin for XRM, reverting to the vanilla sector layout. Note: only works on a new game.
-
- * Restore_Hub_Music
-
-    Incompatibilities: Vanilla, LU
-
-      If Hub sector (13,8) music should be restored to that in AP. (XRM sets the track to 0.) Applies to new games, and optionally to an existing save.
-
- * Restore_M148_Music
-
-    Incompatibilities: Vanilla, LU
-
-      If Argon Sector M148 (14,8) music should be restored to that in AP. (XRM changes this to the argon prime music.) Applies to new games, and optionally to an existing save.
-
-
-***
-
-Ware Transforms:
-
- * Change_Ware_Size
-
-      Change the cargo size of a given ware.
-
- * Restore_Vanilla_Tuning_Pricing
-
-    Incompatibilities: Vanilla, LU
-
-      Sets the price for ship tunings (engine, rudder, cargo) to those used in vanilla AP.  Meant for use with XRM.
-
- * Set_Ware_Pricing
-
-      Sets ware pricing for the given ware list. Prices are the basic values in the T file, and have some adjustment before reaching the game pricing. Currently only works on tech wares in TWareT.txt.
-
-
-***
-
-Weapon Transforms:
-
- * Adjust_Beam_Weapon_Duration
-
-      Adjusts the duration of beam weapons. Shot damage will be applied over the duration of the beam, such that shorter beams will apply their damage more quickly. Longer duration beams are weaker against small targets which move out of the beam before its damage is fully applied. Beam range will remain unchanged. Note: this does not affect fire rate, so multiple beams may become active at the same time.
-
- * Adjust_Beam_Weapon_Width
-
-      Adjusts the width of beam weapons. Narrower beams will have more trouble hitting small targets at a distance. In vanilla AP beam widths are generally set to 1, though in XRM the widths have much wider variety. This can be used to nerf anti-fighter defense of capital ships with beam mounts.
+      Strafe adjustment factor. Note: this does not appear to have any effect during brief testing.
 
  * Adjust_Weapon_DPS
 
@@ -508,9 +232,57 @@ Weapon Transforms:
 
       Adjust weapon shot speeds. Range will remain constant. Beam weapons will not be affected.
 
+ * Allow_CAG_Apprentices_To_Sell
+
+    Incompatibilities: LU
+
+      Allows Commercial Agents to sell factory products at pilot rank 0. May require CAG restart to take effect.
+
+ * Allow_Valhalla_To_Jump_To_Gates
+
+    Incompatibilities: LU
+
+      Removes a restriction on the Valhalla, or whichever ship is at offset 211 in tships, from jumping to gates. This should only be applied alongside another mod that either reduces the valhalla size, increases gate size, removes gate rings, or moves/removes the forward pylons, to avoid collision problems.
+
+ * Boost_Truelight_Seeker_Shield_Reactor
+
+    Incompatibilities: XRM, LU
+
+      Enhances the Truelight Seeker's shield reactor. In vanilla AP the TLS has a shield reactor only around 1/10 of what is normal for similar ships. This transform sets the TLS shield reactor to be the same as the Centaur. If the TLS is already at least 1/5 of Centaur shielding, this transform is not applied.
+
+ * Change_Sector_Music
+
+      Generic transform to change the music for a given sector. Currently, this only operates as a director script, and does not alter the universe file. To reverse the change, a new call must be made with a new cue name and the prior music_id.
+
+ * Change_Ware_Size
+
+      Change the cargo size of a given ware.
+
  * Clear_Weapon_Flag
 
       Clears a specified flag from all weapons.
+
+ * Color_Sector_Names
+
+    Incompatibilities: LU
+
+      Colors sector names in the map based on race owners declared in the x3_universe file. Some sectors may remain uncolored if their name is not set in the standard way through text files. Only works on the English files, L044, for now. Note: searching sectors by typing a name will no longer work except on uncolored sectors, eg. unknown sectors.
+
+ * Complex_Cleaner_Bug_Fix
+
+    Incompatibilities: LU
+
+      Apply bug fixes to the Complex Cleaner mod. Designed for version 4.09 of that mod. Includes a fix for mistargetted a wrong hub in systems with multiple hubs, and a fix for some factories getting ignored when crunching. Patches plugin.gz.CmpClean.Main.xml.
+
+ * Complex_Cleaner_Use_Small_Cube
+
+    Incompatibilities: LU
+
+      Forces the Complex Cleaner to use the smaller cube model always when combining factories. Patches plugin.gz.CmpClean.crunch.xml.
+
+ * Convert_Attack_To_Attack_Nearest
+
+      Modifies the Attack command when used on an owned asset to instead enact Attack Nearest. In vanilla AP, such attack commands are quietly ignored. Intended for use when commanding groups, where Attack is available but Attack Nearest is not. This replaces '!ship.cmd.attack.std'.
 
  * Convert_Beams_To_Bullets
 
@@ -523,6 +295,104 @@ Weapon Transforms:
  * Convert_Weapon_To_Energy
 
       Converts the given weapons, determined by bullet type, to use energy instead of ammunition. Ammo type may support general wares, and will reduce a ware by 1 per 200 shots.
+
+ * Convoys_made_of_race_ships
+
+      If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
+
+ * Disable_Asteroid_Respawn
+
+    Incompatibilities: LU
+
+      Stops any newly destroyed asteroids from being set to respawn. This can be set temporarily when wishing to clear out some unwanted asteroids. It is not recommended to leave this transform applied long term, without some other method of replacing asteroids.
+
+ * Disable_Combat_Music
+
+    Incompatibilities: LU
+
+      Turns off combat music, keeping the normal environment musc playing when nearing hostile objects. If applied to a saved game already in combat mode, combat music may continue to play for a moment. The beep on nearing an enemy will still be played.
+
+ * Disable_Generic_Missions
+
+      Disable generic missions from spawning. Existing generic missions will be left untouched.
+
+ * Disable_OOS_War_Sector_Spawns
+
+    Incompatibilities: LU
+
+      Disables spawning of dedicated ships in the AP war sectors which attack player assets when the player is out-of-sector. By default, these ships scale up with player assets, and immediately respawn upon being killed. This patches '!fight.war.protectsector'.
+
+ * Enhance_Mosquito_Missiles
+
+      Makes mosquito missiles more maneuverable, generally by increasing the turn rate or adding blast radius, to make anti-missile abilities more reliable.
+
+ * Fix_OOS_Laser_Missile_Conflict
+
+    Incompatibilities: LU
+
+      Allows OOS combat to include both missile and laser fire in the same attack round. In vanilla AP, a ship firing a missile will not fire its lasers for a full round, generally causing a large drop in damage output. With the change, adding missiles to OOS ships will not hurt their performance.
+
+ * Fix_Pericles_Pricing
+
+    Incompatibilities: XRM, LU
+
+      Applies a bug fix to the enhanced pericles in vanilla AP, which has its npc value set to 1/10 of player value, causing it price to be 1/10 what it should be. Does nothing if the existing npc and player prices are matched.
+
+ * Fleet_Interceptor_Bug_Fix
+
+    Incompatibilities: LU
+
+      Apply bug fixes to the Fleet logic for selecting ships to launch at enemies. A mispelling of 'interecept' causes M6 ships to be launched against enemy M8s instead of interceptors. Patches !lib.fleet.shipsfortarget.xml.
+
+ * Increase_Escort_Engagement_Range
+
+    Incompatibilities: LU
+
+      Increases the distance at which escort ships will break and attack a target. In vanilla AP an enemy must be within 3km of the escort ship. This transform will give custom values based on the size of the escorted ship, small, medium (m6), or large (m7+).
+
+ * Keep_TLs_Hired_When_Empty
+
+      When a hired TL places its last station, it will remain hired until the player explicitly releases it instead of being automatically dehired.
+
+ * Kill_Spaceflies
+
+    Incompatibilities: LU
+
+      Kills active spaceflies by changing their "is disabled" script command to make them self destruct . Intended for use with games that have accumulated many stale spacefly swarms generated by Improved Races 2.0 or XRM or other mods, which add spacefly swarms each time a game is loaded, causing accumulating slowdown (eg. 85% SETA slowdown after 200 loads). Use Prevent_Accidental_Spacefly_Swarms to stop future spacefly accumulation, and this transform to clean out existing spaceflies.
+
+ * Patch_Ship_Variant_Inconsistencies
+
+      Applies some patches to some select inconsistencies in ship variants. Modified ships include the Baldric Miner and XRM Medusa Vanguard, both manually named instead of using the variant system. This is meant to be run prior to Add_Ship_Variants, to avoid the non-standard ships creating their own sub-variants. There may be side effects if the variant inconsistencies were intentional.
+
+ * Prevent_Accidental_Spacefly_Swarms
+
+      Prevents spaceflies from spawning swarms when created by a script using the 'create ship' command. Aimed at mods such as Improved Races 2.0 and XRM which create all ships, record data, and then destroy the ships, leaving behind the spacefly swarm, with swarms accumulating across game loads and slowing the game down.
+
+ * Remove_Combat_Beep
+
+      Removes the beep that plays when entering combat.
+
+ * Remove_Factory_Build_Cutscene
+
+    Incompatibilities: LU
+
+      Removes the cutscene that plays when placing factories by shortening the duration to 0.  Also prevents the player ship from being stopped. May still have some visible camera shifts for an instant.
+
+ * Remove_Khaak_Corvette_Spin
+
+      Remove the spin on the secondary hull of the Khaak corvette. The replacement file used is expected to work for vanilla, xrm, and other mods that don't change the model scene file.
+
+ * Remove_Ship_Variants
+
+      Removes variants for selected ships. May be used after Add_Ship_Variants has already been applied to an existing save, to safely remove variants while leaving their tships entries intact. In this case, leave the Add_Ship_Variants call as it was previously with undesired variants, and use this tranform to prune the variants. Existing ships will remain in game, categorized as unknown race, though new ships will not spawn automatically. Variants will be removed from existing shipyards the first time a game is loaded after running this transform.
+
+ * Remove_Sound
+
+      Removes a sound by writing an empty file in its place, based on the sound's id.
+
+ * Remove_Stars_From_Foggy_Sectors
+
+      Removes star backgrounds from sectors with significant fog and short fade distance. Fogged sectors sharing a background with an unfogged sector will not be modified, as the background needs to be edited for all sectors which use it. Fade is removed from sectors which will not have their stars removed.
 
  * Remove_Weapon_Charge_Up
 
@@ -540,39 +410,123 @@ Weapon Transforms:
 
       Replaces shot effects to possibly reduce lag. This appears to have little to no benefit in brief testing.
 
+ * Restore_Aldrin_rock
+
+    Incompatibilities: Vanilla, LU
+
+      Restors the big rock in Aldrin for XRM, reverting to the vanilla sector layout. Note: only works on a new game.
+
+ * Restore_Hub_Music
+
+    Incompatibilities: Vanilla, LU
+
+      If Hub sector (13,8) music should be restored to that in AP. (XRM sets the track to 0.) Applies to new games, and optionally to an existing save.
+
+ * Restore_M148_Music
+
+    Incompatibilities: Vanilla, LU
+
+      If Argon Sector M148 (14,8) music should be restored to that in AP. (XRM changes this to the argon prime music.) Applies to new games, and optionally to an existing save.
+
+ * Restore_Vanilla_Tuning_Pricing
+
+    Incompatibilities: Vanilla, LU
+
+      Sets the price for ship tunings (engine, rudder, cargo) to those used in vanilla AP.  Meant for use with XRM.
+
+ * Set_Communication_Distance
+
+      Set max distance for opening communications with factories and ships.
+
+ * Set_Complex_Connection_Distance
+
+      Set max range between factories in a complex. With complex cleaner and tubeless complexes, this can practically be anything, particularly useful when connecting up distant asteroids.
+
+ * Set_Dock_Storage_Capacity
+
+      Change the capacity of storage docks: equipment docks, trading posts, etc.
+
+ * Set_Global
+
+      Set a global flag to the given value. Generic transform works on any named global field.
+
+ * Set_Job_Spawn_Locations
+
+      Sets the spawn location of ships created for jobs, eg. at a shipyard, at a gate, docked at a station, etc.
+
+ * Set_Max_Marines
+
+    Incompatibilities: LU
+
+      Sets the maximum number of marines that each ship type can carry. These are byte values, signed, so max is 127.
+
+ * Set_Minimum_Fade_Distance
+
+      Sets a floor to fade distance, so that object do not appear too closely. May be useful in some sectors with really short view distances, though may also want to keep those for variety. Note: max fade distance will be set to minimum fade distance if it would otherwise be lower. Recommend following this with a call to Adjust_Fade_Start_End_Gap.
+
+ * Set_Ware_Pricing
+
+      Sets ware pricing for the given ware list. Prices are the basic values in the T file, and have some adjustment before reaching the game pricing. Currently only works on tech wares in TWareT.txt.
+
  * Set_Weapon_Minimum_Hull_To_Shield_Damage_Ratio
 
       Increases hull damage on weapons to achieve a specified hull:shield damage ratio requirement. Typical weapons are around a 1/6 ratio, though some weapons can be 1/100 or lower, such as ion weaponry. This transform can be used to give such weapons a viable hull damage amount.
 
+ * Simplify_Engine_Trails
+
+      Change engine trail particle effects to basic or none. This will switch to effect 1 for medium and light ships and 0 for heavy ships, as in vanilla AP.
+
+ * Standardize_Ship_Tunings
+
+      Standardize max engine or rudder tuning amounts across all ships. Eg. instead of scouts having 25 and carriers having 5 engine runings, both will have some fixed number. Maximum ship speed and turn rate is kept constant, but minimum will change. If applied to an existing save, existing ships may end up overtuned; this is recommended primarily for new games, pending inclusion of a modification script which can recap ships to max tunings. Ships with 0 tunings will remain unedited.
+
+ * Standardize_Start_Plot_Overtunings
+
+    Incompatibilities: LU
+
+      Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
+
+ * Standardize_Tunings
+
+    Incompatibilities: LU
+
+      Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
+
+ * Stop_Events_From_Disabling_Seta
+
+    Incompatibilities: LU
+
+      Stop SETA from being turned off automatically upon certain events, such as missile attacks.
+
+ * Stop_GoD_From_Removing_Stations
+
+      Stops the GoD engine from removing stations which are nearly full on products or nearly starved of resources for extended periods of time.  This will not affect stations already removed or in the process of being removed.
+
 
 ***
 
-Example input file, Example_Transforms.py:
+Missile Transforms:
 
-    '''
-    Example for using the Customizer, setting a path to
-    the X3 directory and running some simple transforms.
-    '''
-    
-    # Import all transform functions.
-    from Transforms import *
-    
-    Set_Path(
-        # Set the path to the X3 installation folder.
-        path_to_addon_folder = r'D:\Steam\SteamApps\common\x3 terran conflict\addon',
-        # Optional subfolder with high priority source files to be modified.
-        # By default, this is relative to the addon folder.
-        source_folder = 'vanilla_source'
-    )
-    
-    # Speed up interceptors by 50%.
-    Adjust_Ship_Speed(adjustment_factors_dict = {'SG_SH_M4' : 1.5})
-    
-    # Increase frigate laser regeneration by 50%.
-    Adjust_Ship_Laser_Recharge(adjustment_factors_dict = {'SG_SH_M7': 1.5})
-    
-    # Reduce OOS damage by 30%.
-    Adjust_Weapon_OOS_Damage(scaling_factor = 0.7)
+ * Add_Ship_Boarding_Pod_Support
+
+      Adds boarding pod launch capability to selected classes of ships, eg. destroyers. Ships should support marines, so limit to M1, M2, M7, M6, TL, TM, TP.
+
+ * Add_Ship_Cross_Faction_Missiles
+
+      Adds terran missile compatibility to commonwealth ships, and vice versa. Missiles are added based on category matching, eg. a terran ship that can fire light terran missiles will gain light commonwealth missiles. Note that AI ship loadouts may include any missile they can fire.
+
+ * Adjust_Missile_Hulls
+
+      Adjust the hull value for all missiles by the scaling factor. Does not affect boarding pod hulls.
+
+ * Expand_Bomber_Missiles
+
+      Allows bombers and missile frigates to use a wider variety of missiles. Bombers will gain fighter tier missiles, while frigates will gain corvette tier missiles. Terran ships will gain Terran missiles. Note that AI ship loadouts may include any missile they can fire, such that bombers will have fewer heavy missiles and more standard missiles.
+
+ * Set_Missile_Swarm_Count
+
+      Set the number of submissiles fired by swarm missiles. Submissile damage is adjusted accordingly to maintain overall damage.
+
 
 ***
 
@@ -706,3 +660,10 @@ Change Log:
  * 3.4.3
    - Raises exception if the x3/addon path appears incorrect instead of still attempting to run, unless -allow_path_error is enabled.
    - Some other minor cleanup of exception handling on path problems.
+ * 3.5
+   - Added Remove_Factory_Build_Cutscene.
+   - Added Keep_TLs_Hired_When_Empty.
+   - Added Kill_Spaceflies.
+   - Added Prevent_Accidental_Spacefly_Swarms.
+   - Restructured as a full Python package to support external imports and internal relative imports.
+   - Control scripts need to be swapped from importing Transforms to importing X3_Customizer.

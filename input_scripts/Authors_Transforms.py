@@ -3,7 +3,7 @@ These transforms are those used by the author.
 '''
 
 # Import all transform functions.
-from Transforms import *
+from X3_Customizer import *
 
 # Select if this is modifying vanilla or XRM or LU.
 #version = 'Vanilla'
@@ -49,17 +49,38 @@ elif LU:
 # Obj code file changes.
 
 # Bump up max seta.
-Adjust_Max_Seta(15)
+Adjust_Max_Seta(50)
 # Make seta speed up faster.
 Adjust_Max_Speedup_Rate(4)
 
 # Stop GoD from deleting factories.
 Stop_GoD_From_Removing_Stations()
 
+# Stop TLs from dehiring themselves when empty.
+Keep_TLs_Hired_When_Empty()
+
+# Experimental code to suppress complex connecting tubes.
+# May address poor complex scaling issues (pending tests).
+# Don't use; causes horrible framerates, and needs more exploration
+#  into what's going on or if this is useful.
+#_Prevent_Complex_Connectors()
+
+# Stop scripts using 'create ship' from accidentally leaving
+#  around spacefly swarms (often accumulating in the null sector).
+Prevent_Accidental_Spacefly_Swarms()
+
 if Vanilla or XRM:
+    
+    # Kill spaceflies spawned before Prevent_Accidental_Spacefly_Swarms
+    #  was added, lagging the game.
+    Kill_Spaceflies()
+
+    # Trim the cutscenes when building factories.
+    Remove_Factory_Build_Cutscene()
+
     # Keep seta on in more situations.
     Stop_Events_From_Disabling_Seta(
-            on_missile_launch = True,
+            on_missile_launch = False,
             # Side note: not yet verified this one due to police not wanting
             #  to scan.
             on_receiving_priority_message = True,
@@ -69,7 +90,7 @@ if Vanilla or XRM:
         )
     
     # Disable combat music.
-    Disable_Combat_Music()
+    # Disable_Combat_Music()
     # Similarly, disable the combat entrance beeping.
     # Remove_Combat_Beep()
 

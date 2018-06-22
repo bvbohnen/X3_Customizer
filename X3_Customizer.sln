@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "X3_Customizer", "source\X3_Customizer.pyproj", "{F321F45F-39EE-4CC8-91E7-BFEC28462C97}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "X3_Customizer", "X3_Customizer\X3_Customizer.pyproj", "{F321F45F-39EE-4CC8-91E7-BFEC28462C97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
