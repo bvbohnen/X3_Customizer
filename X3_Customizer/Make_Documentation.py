@@ -35,7 +35,7 @@ github, and the main documentation just because:
 import os
 import sys
 from pathlib import Path
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 # To support packages cross-referencing each other, set up this
 #  top level as a package, findable on the sys path.
@@ -152,7 +152,28 @@ def Make(*args):
 
         # Get the name as-is.
         # Put an asterix in front for markdown.
-        Add_Line('* ' + function.__name__, indent_level, 
+        name_line = '* ' + function.__name__
+        
+        # Can add any incompatabilities as well, and stick these
+        #  in the simple version.
+        if hasattr(function, '_compatabilities'):
+            # To avoid fluffing up the simple readme too much, these will
+            #  be placed on the same line as the name, following it in
+            #  parenthesis.
+            # Eg. 'Restore_Vanilla_Tuning_Pricing (incompatible with: Vanilla, LU)'
+            # TODO: consider if it would be better to give just compatibility
+            #  flags always (removes the 'incompatible with' phrase, but more
+            #  fluff for transforms that are always compatible).
+            if any(x == False for x in function._compatabilities.values()):
+                name_line += ' (incompatible with: {})'.format(
+                        # Include the name tags for any False flags.
+                        # Original dict should hopefully have been in a nice
+                        #  order.
+                        ', '.join([x 
+                            for x,y in function._compatabilities.items()
+                            if y == False]) 
+                        )
+        Add_Line(name_line, indent_level, 
                   include_in_simple = include_in_simple)
 
         # If there are required files, print them.
@@ -172,24 +193,7 @@ def Make(*args):
                 indent_level +1,
                 include_in_simple = False
                 )
-
-            # Can add any incompatabilities as well, and stick these
-            #  in the simple version.
-            if any(x == False for x in function._compatabilities.values()):
-                Add_Line('', include_in_simple = True)
-                Add_Line('{}Incompatibilities: {}'.format(
-                        indent * (indent_level + 1),
-                        # Include the name tags for any False flags.
-                        # Original dict should hopefully have been in a nice
-                        #  order.
-                        ', '.join([x for x,y in function._compatabilities.items()
-                                   if y == False]) 
-                        ),
-                    indent_level +1,
-                    include_in_simple = True
-                    )
-
-
+            
         # Stick another newline, then the function docstring, maybe
         #  truncated for the simple file.
         Add_Line('', include_in_simple = include_in_simple)
@@ -243,87 +247,35 @@ def Make(*args):
     # Grab the various transform functions.
     # This can grab every item in Transforms that has been decorated with
     #  Transform_Wrapper.
-    # Pack these into an ordereddict, keyed by a tuple of 
-    #  (home module name, function name), to enable different 
-    #  sorting options.
-    transform_modules_dict = OrderedDict()
+    category_transforms_dict = defaultdict(list)
     for item_name in dir(X3_Customizer.Transforms):
         item = getattr(X3_Customizer.Transforms, item_name)
 
-        # Check for the _file_names attribute, attached by the decorator.
-        if hasattr(item, '_file_names'):
-            # Skip if the file name starts with an underscore.
-            if item.__name__[0] == '_':
-                continue
-            # Record the transform.
-            transform_modules_dict[(item.__module__,item.__name__)] = item
-            
+        # Skip non-transforms.
+        # Can check for the _category attribute, attached by the decorator.
+        if not hasattr(item, '_category'):
+            continue
+        
+        # Skip if the file name starts with an underscore, indicating
+        #  an experimental transform.
+        if item.__name__[0] == '_':
+            continue
 
-    # -Removed, old raw alphabetical style.
-    ##Put a header for the transform list.
-    # Make_Horizontal_Line()
-    # Add_Line('Transform List:')
-    # Add_Line('')
-    # 
-    ##Go with alphabetical on transform name, item[0][1], eg. the
-    ## key's second field.
-    # for (module_name, transform_name), transform in sorted(transform_modules_dict.items(),
-    #                                      key = lambda x: x[0][1]):
-    #     #These will be in the simple file, though truncated.
-    #     Record_Func(transform, indent_level = 1, include_in_simple = True)
-            
-    # Could alphabetize these or maybe categorize by the T module they
-    #  come from.  Straight categorization by python module isn't very
-    #  friendly to breaking up modules for code organization, though.
-    # Solutions could be to explicitly categorize here, to explicitly
-    #  categorize in the transforms during setup, or to categorize by
-    #  the files being edited.
-    # The edited files get messy in some cases, eg. when modifying
-    #  language files, so is probably not the best idea.
-    # Categorizing at the transforms is difficult to edit if changing
-    #  around categories for any reason.
-    # Go with explicit module categorization here, mainly joining up 
-    #  modules with similar names. This can match the first word after
-    #  the 'T_'.
-    # In cases where the automatic category is unwanted, transforms may
-    #  specify an override category. This is in the transform._category
-    #  field.
-
-    # Set up a dict keyed by category.
-    category_name_transforms_dict_dict = OrderedDict()
-    # Loop over the modules.
-    for (module_name, transform_name), transform in transform_modules_dict.items():
-
-        # Get a truncated module_name, the first word
-        #  after the underscore.
-        category = module_name.split('_')[1]
-        # Drop the ending 's' if there was one (which was mostly present to
-        #  mimic the X3 source file names, eg. 'tships').
-        if category[-1] == 's':
-            category = category[0:-1]
-        # Special fix for 'Factorie' (after 's' removal).
-        if category == 'Factorie':
-            category = 'Factory'
-        # If the transform has an override category, use it.
-        if transform._category != None:
-            category = transform._category
-
-        # Create the category if needed.
-        if not category in category_name_transforms_dict_dict:
-            category_name_transforms_dict_dict[category] = OrderedDict()
-        # Add to the category by name.
-        category_name_transforms_dict_dict[category][transform_name] = transform
+        # Record this transform for the category.
+        category_transforms_dict[item._category].append(item)
+        
 
     # Can now print out by category.
-    for category, transform_dict in sorted(category_name_transforms_dict_dict.items()):
+    for category, transform_list in sorted(category_transforms_dict.items()):
     
         # Put a header for the category transform list.
         Make_Horizontal_Line()
         Add_Line('{} Transforms:'.format(category))
         Add_Line('')
 
-        # Loop over the transforms in the category.
-        for transform_name, transform in sorted(transform_dict.items()):
+        # Loop over the transforms in the category, sorted
+        #  by their name.
+        for transform in sorted(transform_list, key = lambda k: k.__name__):
             # Add the text.
             Record_Func(transform, indent_level = 1, include_in_simple = True)
             

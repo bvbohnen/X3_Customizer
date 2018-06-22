@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>f321f45f-39ee-4cc8-91e7-bfec28462c97</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Make_Patches.py</StartupFile>
+    <StartupFile>Main.py</StartupFile>
     <SearchPath>..\..\X3_Customizer;..\input_scripts</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>

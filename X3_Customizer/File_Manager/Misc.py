@@ -214,6 +214,7 @@ def Transform_Wrapper(
       - String, category of the transform; if not given, category
         is set to the name of the containing module without the 'T_'
         prefix and set to singular instead of plural.
+      - Subpackages of transforms should set this explicitly for now.
     * Vanilla
       - Bool, if True then the transform should be compatable with
         vanilla x3.
@@ -237,11 +238,32 @@ def Transform_Wrapper(
         func._file_names = file_names
 
         # Attach the override category to the function.
-        # TODO: maybe fill in the default category here, but for now
-        #  it is done in Make_Documentation.
-        func._category = category
+        if category != None:
+            func._category = category
+        else:
+
+            # Fill a default category from the module name.
+            func._category = func.__module__
+
+            # The module may have multiple package layers in it, so
+            #  get just the last one.
+            func._category = func._category.split('.')[-1]
+
+            # Remove a 'T_' prefix.
+            if func._category.startswith('T_'):
+                func._category = func._category.replace('T_','')
+
+            # Drop the ending 's' if there was one (which was mostly present to
+            #  mimic the X3 source file names, eg. 'tships').
+            if func._category[-1] == 's':
+                func._category = func._category[0:-1]
+            # Special fix for 'Factorie' (after 's' removal).
+            if func._category == 'Factorie':
+                func._category = 'Factory'
+
 
         # Record the version compatability flags.
+        # Keep this ordered for easy documentation generation.
         func._compatabilities = OrderedDict([
             ('Vanilla', Vanilla),
             ('XRM'    ,  XRM),
@@ -339,6 +361,17 @@ def Transform_Wrapper(
 
     # Return the decorator to handle the function.
     return inner_decorator
+
+
+def Set_Transform_Category(function, category):
+    '''
+    Sets the documentation category for the given function, similar
+    to when the decorator is called.
+    '''
+    # If a correct transform func was given, it will have the
+    #  appropriate category field.
+    assert hasattr(function, '_category')
+    function._category = category
 
 
 def Load_File(file_name,

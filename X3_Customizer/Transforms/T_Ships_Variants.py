@@ -1351,7 +1351,7 @@ def Remove_Ship_Variants(
     * print_variant_count:
       - If True, the number of removed variants is printed to the summary file.
     '''
-    #  The general method here will be to leave the variants mostly intact
+    # The general method here will be to leave the variants mostly intact
     #  in the tships file, to avoid game problems when loading saves with
     #  those ships present, as well as preserving ordering for later ships
     #  in tships (which could otherwise lead to ships changing type or the
@@ -1384,10 +1384,10 @@ def Remove_Ship_Variants(
     '''
     global prior_removed_variants
     
-    #  Some of this code is shared with Add_Ship_Variants; major
+    # Some of this code is shared with Add_Ship_Variants; major
     #  chunks have been moved to shared functions.
 
-    #  Make sure the script is included to update the variants.
+    # Make sure the script is included to update the variants.
     #  -Removed, switching to director script style.
     # _Include_Script_To_Update_Ship_Variants()
     
@@ -1404,57 +1404,57 @@ def Remove_Ship_Variants(
     # Suffixes to use for generated ship naming.
     variant_index_suffix_dict = _Get_Variant_Suffixes()
     
-    #  Build a list of variant ships to be removed in the
+    # Build a list of variant ships to be removed in the
     #  director script.
     removed_variants = []
     
-    #  Go through the tships list.
+    # Go through the tships list.
     for ship_dict in File_Manager.Load_File('types/TShips.txt'):
 
-        #  Skip those not of a standard race.
+        # Skip those not of a standard race.
         race_type = Flags.Race_code_name_dict[int(ship_dict['race'])]
         if race_type not in race_types:
             continue
-        #  Skip those blacklisted.
+        # Skip those blacklisted.
         if ship_dict['name'] in blacklist:
             continue        
-        #  Skip if this is not a ship type to modify.
+        # Skip if this is not a ship type to modify.
         if (ship_dict['subtype'] not in ship_types
         and ship_dict['name'] not in ship_types):
             continue
                 
-        #  Grab the variant index.
+        # Grab the variant index.
         variation_index = int(ship_dict['variation_index'])
         
-        #  Skip if this is not a variant to remove.
+        # Skip if this is not a variant to remove.
         if variation_index not in variant_types:
             continue
 
-        #  When here, this ship needs to be removed.
-        #  Update the race to 0.
+        # When here, this ship needs to be removed.
+        # Update the race to 0.
         ship_dict['race'] = '0'
 
-        #  Update the ware size (should be 0 currently).
-        #  (Note: 'cargo_size' is the size the ship can hold; 'cargo_size_unused'
+        # Update the ware size (should be 0 currently).
+        # (Note: 'cargo_size' is the size the ship can hold; 'cargo_size_unused'
         #   is the size of the ship when in a cargo bay, which is meaningless.)
-        #  If this transform was run multiple times, this may have been changed,
+        # If this transform was run multiple times, this may have been changed,
         #   but that isn't expected in general. Disable the assertion for now,
         #   just in case.
         # assert ship_dict['cargo_size_unused'] == '0'
         #  The size to use is somewhat up in the air.
         #  The game will translate this into a transport_class constant, so
         #   checking for the specific constant used here will not work well.
-        #  Also, transport classes can be changed around by mods, eg. XRM switches
+        # Also, transport classes can be changed around by mods, eg. XRM switches
         #   them up. The ST class, 5, seems to be matched up by vanilla and xrm,
         #   so try using that here.
         #  -Removed, no longer use a script to handle this.
         # ship_dict['cargo_size_unused'] = '5'
         
-        #  Add to the removed variants list.
+        # Add to the removed variants list.
         removed_variants.append(ship_dict)
 
 
-    #  Knowing the ships to remove, can now generate a director
+    # Knowing the ships to remove, can now generate a director
     #  script which will handle the removals from shipyards.
     text = Generate_Director_Text_To_Update_Shipyards(
         #  Ensure any ships removed on prior transforms are
@@ -1466,7 +1466,7 @@ def Remove_Ship_Variants(
         indent_level = 3
         )
 
-    #  Stick the cue_index on the end of the cue name, to help ensure the
+    # Stick the cue_index on the end of the cue name, to help ensure the
     #  cue will be unique and will fire (eg. wasn't fire previously in a
     #  given save).
     # Make the file.
@@ -1475,7 +1475,7 @@ def Remove_Ship_Variants(
                         file_name = director_loader_base_name +'.xml')
 
 
-    #  Update the tracker with removed variants.
+    # Update the tracker with removed variants.
     prior_removed_variants += removed_variants
 
     # Note how many ships were removed.
@@ -1483,8 +1483,8 @@ def Remove_Ship_Variants(
         File_Manager.Write_Summary_Line('Number of variants removed: {}'.format(
             len(removed_variants)))
 
-    #  That should be all that is needed for now.
-    #  Other details are handled in the update script.
+    # That should be all that is needed for now.
+    # Other details are handled in the update script.
     return
 
 

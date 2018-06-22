@@ -194,7 +194,7 @@ def Adjust_Strafe(
         big_ship_factor   = 1
     ):
     '''
-    Strafe adjustment factor.
+    Strafe adjustment factor.  Experimental.
     Note: this does not appear to have any effect during brief testing.
     
     * small_ship_factor:

@@ -148,6 +148,7 @@ def Set_Ware_Pricing(
 
 # Quick dummy transform, to help the File_Manager recognize these as files
 #  that may be changed.
+# TODO: rethink if this is needed or useful.
 @File_Manager.Transform_Wrapper(
     'types/TWareT.txt', 'types/TLaser.txt', 'types/TShields.txt',
     'types/TMissiles.txt', 'types/TFactories.txt', 'types/TDocks.txt',

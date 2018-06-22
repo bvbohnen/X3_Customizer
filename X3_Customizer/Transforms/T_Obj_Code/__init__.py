@@ -16,3 +16,9 @@ from .Misc import Allow_Valhalla_To_Jump_To_Gates
 from .Misc import Remove_Factory_Build_Cutscene
 from .Misc import Keep_TLs_Hired_When_Empty
 from .Misc import _Prevent_Complex_Connectors
+
+# Fill in the default documentation category for the transforms.
+# Use a dict copy, since this adds new locals.
+for _attr_name, _attr in dict(locals()).items():
+    if hasattr(_attr, '_category'):
+        _attr._category = 'Obj_Code'

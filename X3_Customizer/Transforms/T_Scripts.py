@@ -165,32 +165,33 @@ def Complex_Cleaner_Use_Small_Cube(
     Apply_Patch('scripts/plugin.gz.CmpClean.crunch.xml', reformat_xml = True)
         
 
-@File_Manager.Transform_Wrapper()
-def _Include_Script_To_Update_Ship_Variants():
-    '''
-    Adds the 'x3customizer.add.variants.to.shipyards' script to the
-    game, which will update shipyards with any added or removed
-    variants after calls to Add_Ship_Variants and Remove_Ship_Variants.
-    This is called automatically by the above transforms, and is not
-    intended for general direct calls.
-    The script must be manually called from the ingame script editor
-    currently, and will may take many seconds to complete an update.
-    '''
-    File_Manager.Copy_File(
-        'scripts/x3customizer.add.variants.to.shipyards.xml')
-        
-
-@File_Manager.Transform_Wrapper()
-def _Include_Script_To_Update_Factory_Sizes():
-    '''
-    Adds the 'x3customizer.add.factories.to.shipyards' script to the
-    game, which will update shipyards with any added factory sizes
-    after a call to Add_More_Factory_Sizes.
-    This is called automatically by the above transform, and is not
-    intended for general direct calls.
-    The script must be manually called from the ingame script editor
-    currently.
-    '''
-    File_Manager.Copy_File(
-        'scripts/x3customizer.add.factories.to.shipyards.xml')
+#-Removed; mission director used instead of standalone script.
+#@File_Manager.Transform_Wrapper()
+#def _Include_Script_To_Update_Ship_Variants():
+#    '''
+#    Adds the 'x3customizer.add.variants.to.shipyards' script to the
+#    game, which will update shipyards with any added or removed
+#    variants after calls to Add_Ship_Variants and Remove_Ship_Variants.
+#    This is called automatically by the above transforms, and is not
+#    intended for general direct calls.
+#    The script must be manually called from the ingame script editor
+#    currently, and will may take many seconds to complete an update.
+#    '''
+#    File_Manager.Copy_File(
+#        'scripts/x3customizer.add.variants.to.shipyards.xml')
+#        
+#
+#@File_Manager.Transform_Wrapper()
+#def _Include_Script_To_Update_Factory_Sizes():
+#    '''
+#    Adds the 'x3customizer.add.factories.to.shipyards' script to the
+#    game, which will update shipyards with any added factory sizes
+#    after a call to Add_More_Factory_Sizes.
+#    This is called automatically by the above transform, and is not
+#    intended for general direct calls.
+#    The script must be manually called from the ingame script editor
+#    currently.
+#    '''
+#    File_Manager.Copy_File(
+#        'scripts/x3customizer.add.factories.to.shipyards.xml')
     

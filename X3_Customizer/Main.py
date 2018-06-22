@@ -177,6 +177,16 @@ def Run(*args):
         ex_text = str(ex)
         if ex_text:
             print(ex_text)
+            
+        # For version 3.5, the 'from Transforms import *' input
+        #  format has changed to 'from X3_Customizer import *'.
+        # Check for that here to give a nice message.
+        with open(user_module_name, 'r') as file:
+            for line in file.read().splitlines():
+                if line.strip() == 'from Transforms import *':
+                    print(  'Please update "from Transforms import *"'
+                            ' to "from X3_Customizer import *".')
+
 
         # In dev mode, reraise the exception.
         if Settings.developer:
