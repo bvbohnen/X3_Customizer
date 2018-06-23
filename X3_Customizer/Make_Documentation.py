@@ -211,7 +211,10 @@ def Make(*args):
     # Grab the main docstring.
     # Add in the version number.
     main_doc = X3_Customizer.__doc__.replace(
-        'X3 Customizer', 'X3 Customizer {}'.format(X3_Customizer.Change_Log.Get_Version()))
+        'X3 Customizer', 
+        'X3 Customizer {}'.format(X3_Customizer.Change_Log.Get_Version()),
+        # Only change the first spot, the title line.
+        1)
     # TODO: figure out how to split off the example tree.
     Add_Lines(main_doc, merge_lines = True)
     
@@ -223,7 +226,7 @@ def Make(*args):
     # The example will accompany the simple version, since it is a good way
     #  to express what the customizer is doing.
     Make_Horizontal_Line()
-    Add_Line('Example input file, Example_Transforms.py:')
+    Add_Line('Example input file:')
     # Need a newline before the code, otherwise the code block
     #  isn't made right away (the file header gets lumped with the above).
     Add_Line('')
@@ -292,6 +295,9 @@ def Make(*args):
     # with open(os.path.join('..','License.txt'), 'r') as file:
     #     Add_Lines(file.read(), include_in_simple = False)
 
+    # Get a set of lines suitable for the egosoft forum thread,
+    #  using BB code.
+    doc_bb_lines = Get_BB_Text(doc_short_lines)
     
     # Write out the full doc.
     # Put these 1 directory up to separate from the code.
@@ -301,6 +307,12 @@ def Make(*args):
     # Write out the simpler readme.
     with open(os.path.join(this_dir,'..','README.md'), 'w') as file:
         file.write('\n'.join(doc_short_lines))
+        
+    # Write out the BB version, suitable for copy/paste.
+    with open(os.path.join(this_dir,'..','for_egosoft_forum.txt'), 'w') as file:
+        file.write('\n'.join(doc_bb_lines))
+
+    return
 
 
 def Merge_Lines(text_block):
@@ -402,6 +414,213 @@ def Merge_Lines(text_block):
         
     # Return as a raw text block.
     return '\n'.join(line_list)
+
+
+def Get_BB_Text(line_list):
+    '''
+    Converts a list of markdown suitable lines to forum BB code
+    suitable lines.
+    '''
+    # Version of short for forum BB code.
+    # To reduce complexity explosion for all these docs, this one modify
+    #  existing text rather than being generated on the first pass.
+    bb_lines = []
+
+    # Tag for if a list is in use.
+    list_active = False
+    # Tag for if a code section is in use.
+    code_active = False
+    # Tag for if the change log section is active.
+    changelog_active = False
+    # Tag for if a transform section is active.
+    transform_active = False
+    # The running line index, used to join list/code tags with
+    #  the next line if blank.
+    index = 0
+
+    def Add_Tag(tag):
+        '''
+        Pushes a tag, and advances past the next input line if it is blank,
+        or tries to replace the last line if blank.
+        '''
+        nonlocal index
+        # Can psuedo-join with the next line by just advancing the
+        #  index to skip it when blank.
+        if index + 1 < len(line_list) and not line_list[index + 1]:
+            index += 1
+            bb_lines.append(tag)
+        # Check if the prior line was blank and overwrite it.
+        elif bb_lines and not bb_lines[-1]:
+            bb_lines[-1] = tag
+        # Otherwise just add another line as normal.
+        else:
+            bb_lines.append(tag)
+        return
+
+    def Open_List():
+        'Open a new list.'
+        nonlocal list_active
+        if not list_active:
+            Add_Tag('[list]')
+            list_active = True
+
+    def Close_List():
+        'Close a current list.'
+        nonlocal list_active
+        if list_active:
+            Add_Tag('[/list]')
+            list_active = False
+
+    def Open_Code():
+        'Open a new code section.'
+        nonlocal code_active
+        if not code_active:
+            Add_Tag('[code]')
+            code_active = True
+
+    def Close_Code():
+        'Close a current code section.'
+        nonlocal code_active
+        if code_active:
+            Add_Tag('[/code]')
+            code_active = False
+
+    def Bold(string):
+        'Apply bold tags to a string.'
+        return '[b]{}[/b]'.format(string)
+    
+    def Underline(string):
+        'Apply underline tags to a string.'
+        return '[u]{}[/u]'.format(string)
+
+    def Color(string, color):
+        'Apply color tags to a string. Should go inside other tags.'
+        return '[color={}]{}[/color]'.format(color, string)
+
+    def Small(string):
+        'Apply small font tags to a string. Should go inside other tags.'
+        # Use BB default small/large sizes.
+        return '[size=10]{}[/size]'.format(string)
+
+    def Large(string):
+        'Apply large font tags to a string. Should go inside other tags.'
+        return '[size=24]{}[/size]'.format(string)
+
+    def Record(line):
+        'Record a line for the BB lines.'
+        bb_lines.append(line)
+        
+
+    # Work through the original lines, making edits and recording
+    #  the new lines.
+    # This will be index based, to support look-ahead and line skips.
+    while index < len(line_list):
+        line = line_list[index]
+
+        # Get a whitespace stripped version for convenience.
+        strip_line = line.strip()
+
+        # Empty lines get handled first.
+        if not strip_line:
+            Record('')
+        
+        # At every '***', any active list or code is closed.
+        elif strip_line == '***':
+            Close_Code()
+            Close_List()
+            changelog_active = False
+            transform_active = False
+            # Drop the *s for now.
+            Record('')
+
+        # Otherwise if code is active, leave the line unchanged.
+        elif code_active:
+            Record(line)
+            
+        # Special cases:
+        # Hype up the main heading.
+        elif line.startswith('X3 Customizer'):
+            # Note: tag order is somewhat strict (though in examples it
+            #  shouldn't be).
+            # Innermost is text size, then color, then bold.
+            line = Large(line)
+            # The color feels a little tacky; large/bold is enough.
+            #line = Color(line, 'yellow')
+            line = Bold(line)
+            Record(line)
+
+        # The underline under the heading can be swapped to a blank line.
+        # In markdown this boldens the line above it; in BB the bolding
+        #  is manual.
+        elif strip_line.startswith('---'):
+            Record('')
+
+        # The 'Full documentation...' line breaks out of a list.
+        elif strip_line.startswith('Full documentation'):
+            Close_List()
+            Record(line)
+
+        # Look for any line that is a term ending in ':', but not
+        #  starting with '*' or similar. This will be a header
+        #  for a list (or maybe code), including closing a prior list.
+        elif strip_line[0] not in ['-','*'] and strip_line[-1] == ':':
+            Close_List()
+            # Bold the list header.
+            Record( Bold( line) )
+
+            # The example input opens a code section, else open a list.
+            if strip_line.startswith('Example input file'):
+                Open_Code()
+            else:
+                Open_List()
+
+            # Note when in the change log, to suppress extra formatting.
+            if strip_line == 'Change Log:':
+                changelog_active = True
+
+            # Note when in a transform section, to add formatting.
+            if 'Transforms' in strip_line:
+                transform_active = True
+
+
+        # If the line starts with '*', it is a major list entry.
+        elif strip_line[0] == '*':
+
+            # Note: any format tags need to be applied after the *,
+            #  so prune the * first, handle formatting, then add
+            #  the [*] back on.
+            new_line = strip_line.replace('*','',1)
+
+            # Apply formatting.
+            if transform_active:
+                # Note: color appears not to work if there are other
+                #  tags inside it, so put color wrapper first.
+                # Note: color and underline is ugly; just do one or
+                #  the other.
+                new_line = Color(new_line, 'yellow')
+                #new_line = Underline(new_line)
+
+            # Make the change log items small.
+            if changelog_active:
+                new_line = Small(new_line)
+
+            # Stick the [*] back on.
+            Record('[*]' + new_line)
+
+        # Other lines can record as-is.
+        else:
+            # Make the change log items small.
+            if changelog_active:
+                line = Small(line)
+            Record(line)
+
+        # Advance the index for next iteration.
+        index += 1
+
+    # If a list is active at the end, close it.
+    Close_List()
+
+    return bb_lines
 
 
 if __name__ == '__main__':

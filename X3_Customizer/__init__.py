@@ -2,11 +2,13 @@
 X3 Customizer
 -----------------
 
-This tool will read in source files from X3, perform transforms on them,
-and write the results back out. Transforms will often perform complex
-or repetitive tasks succinctly, avoiding the need for hand editing of
-source files. Many transforms will also do analysis of game files, to
-intelligently select appropriate edits to perform.
+This tool will read in source files from X3, modify on them based on
+user selected transforms, and write the results back to the game directory.
+Transforms will often perform complex or repetitive tasks succinctly,
+avoiding the need for hand editing of source files. Many transforms
+will also do analysis of game files, to intelligently select appropriate
+edits to perform.  Some transforms carry out binary code edits, allowing
+for options not found elsewhere.
 
 Source files will generally support any prior modding. Nearly all transforms 
 support input arguments to set parameters and adjust behavior, according 
@@ -16,9 +18,9 @@ This tool is written in Python, and tested on version 3.6.
 As of customizer version 3, an executable may be generated for users
 who do not wish to run the Python source code directly.
 
-This tool is designed for Albion Prelude v3.3. Most transforms will
-support prior versions of AP. TC is not directly supported currently
-due primarily to some path assumptions.
+This tool is designed primarily for Albion Prelude v3.3. Most transforms
+will support prior or later versions of AP. TC is not supported currently
+due to some path assumptions.
 
 When used alongside the X3 Plugin Manager, run X3 Customizer second,
 after the plugin manager is closed, since the plugin manager generates a
