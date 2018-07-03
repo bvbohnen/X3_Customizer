@@ -1,4 +1,12 @@
+'''
+General support for obj patching.
 
+TODO: update patch application to be able to handle all patches for
+a transform in one call, in a way that will fail out safely with no
+patches applied if any patch has an error (as opposed to applying patches
+until one fails, leaving prior edits in place for a partially implemented
+transform).
+'''
 import inspect
 # This function will convert hex strings to bytes objects.
 from binascii import unhexlify as hex2bin
@@ -138,12 +146,15 @@ def Int_To_Hex_String(value, byte_count):
     return bin2hex(value.to_bytes(byte_count, byteorder = 'big')).decode()
     
 
-def Apply_Obj_Patch(patch):
+def Get_Matches(patch):
     '''
-    Patch an obj file using the defined patch.
+    Find locations in the obj code where a patch can be applied.
+    Returns a list of re match objects.
+
     This will search for the ref_code, using regex, and applies
     the patch where a match is found.
-    Error if 0 or 2+ matches found.
+    Error if the number of matches is not what the patch expects, or if
+    the match location doesn't match the reference code.
     '''
     file_contents = File_Manager.Load_File(patch.file)
 
@@ -191,7 +202,7 @@ def Apply_Obj_Patch(patch):
         return
     
 
-    # Loop over the matches to patch each of them.
+    # Loop over the matches to check each of them.
     for match in matches:
 
         # Grab the offset of the match.
@@ -212,24 +223,78 @@ def Apply_Obj_Patch(patch):
                 continue
 
             # Check mismatch.
+            # This exists as a redundant verification added during
+            #  code development to make sure the regex match location was
+            #  correct.
             original_byte = file_contents.binary[offset + index]
             if ref_byte != original_byte:
                 if Common.Settings.developer:
-                    print('Error: Obj patch regex verification mismatch'
-                         ' in {}.'.format(caller_name))
+                    print('Error: Obj patch regex verification mismatch')
                     return
                 else:
                     raise Common.Obj_Patch_Exception()
 
+    return matches
 
-        # Apply the patch, leaving wildcard entries unchanged.
-        # This will edit in place on the bytearray.
-        new_bytes = _String_To_Bytes(patch.new_code)
-        for index, new_byte in enumerate(new_bytes):
-            if new_byte == wildcard:
-                continue
-            file_contents.binary[offset + index] = new_byte
+
+def Apply_Obj_Patch(patch):
+    'Applies a single patch. Redirects to Apply_Obj_Patch_Group.'
+    Apply_Obj_Patch_Group([patch])
+
+
+def Apply_Obj_Patch_Group(patch_list):
+    '''
+    Applies a group of patches as a single unit.
+    If any patch runs into an error, no patch in the group will be applied.
+    '''
+    # Start with a search for matches.
+    # These calls may raise an exception on error, or could return None
+    #  in dev mode.
+    matches_list = []
+    for patch in patch_list:
+        matches_list.append(Get_Matches(patch))
+
+    # Return early on a None was returned.
+    if None in matches_list:
+
+        # Get the indices of the patches that had errors or no errors.
+        correct_patches = []
+        failed_patches  = []
+        for index, matches in enumerate(matches_list):
+            if matches == None:
+                failed_patches.append(index)
+            else:
+                correct_patches.append(index)
+
+        # Print them.
+        if Common.Settings.developer:
+            print('Correct patches : {}.'.format(
+                     correct_patches ))
+            print('Failed patches  : {}.'.format(
+                     failed_patches ))
+        return
+
+    # It should now be safe to apply all patches in the group.    
+    for patch, matches in zip(patch_list, matches_list):
+        file_contents = File_Manager.Load_File(patch.file)
+
+        # Loop over the matches to apply each of them.
+        for match in matches:
+
+            # Grab the offset of the match.
+            offset = match.start()
+
+            # Get the wildcard char, as an int (since the loop below unpacks
+            #  the byte string into ints automatically, and also pulls ints
+            #  from the original binary).
+            wildcard = str.encode('.')[0]
+            
+            # Apply the patch, leaving wildcard entries unchanged.
+            # This will edit in place on the bytearray.
+            new_bytes = _String_To_Bytes(patch.new_code)
+            for index, new_byte in enumerate(new_bytes):
+                if new_byte == wildcard:
+                    continue
+                file_contents.binary[offset + index] = new_byte
 
     return
-
-

@@ -401,14 +401,17 @@ class Source_Reader_class:
         # Convert the binary into a Game_File object.
         # The object constructors will handle parsing of binary data,
         #  so this just checks file extensions and picks the right class.
-        if file_extension == 'xml':
+        # Some special lookups will be done for select files.
+        if virtual_path == 'types/Globals.txt':
+            game_file_class = Globals_File       
+        elif file_extension == 'xml':
             game_file_class = XML_File         
         elif file_extension == 'obj':
             game_file_class = Obj_File
         elif file_extension == 'txt':
             game_file_class = T_File
         else:
-            raise Exception('File type for {} not understood.'.format(file_name))
+            raise Exception('File type for {} not understood.'.format(virtual_path))
 
         # Construct the game file.
         # These will also record the path used, to help know where to place

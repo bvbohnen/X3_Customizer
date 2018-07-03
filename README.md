@@ -1,4 +1,4 @@
-X3 Customizer 3.5.2
+X3 Customizer 3.6
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -7,9 +7,9 @@ Source files will generally support any prior modding. Nearly all transforms sup
 
 This tool is written in Python, and tested on version 3.6. As of customizer version 3, an executable may be generated for users who do not wish to run the Python source code directly.
 
-This tool is designed primarily for Albion Prelude v3.3. Most transforms will support prior or later versions of AP. TC is not supported currently due to some path assumptions.
+This tool is designed primarily for Albion Prelude v3.3. Most transforms will support prior or later versions of AP. TC 3.4 is tentatively supported for many transforms, though has not been thoroughly tested.
 
-When used alongside the X3 Plugin Manager, run X3 Customizer second, after the plugin manager is closed, since the plugin manager generates a TWareT.pck file when closed that doesn't capture changes in TWareT.txt.
+When used alongside the X3 Plugin Manager: run X3 Customizer second, after the plugin manager is closed, since the plugin manager generates a TWareT.pck file when closed that doesn't capture changes in TWareT.txt made by this tool.
 
 Usage:
 
@@ -44,13 +44,13 @@ Setup and behavior:
   * The user controls the customizer using a command script which will set the path to the X3 installation to customize (using the Set_Path function), and will call the desired transforms with any necessary parameters. This script is written using Python code, which will be executed by the customizer.
   
   * The key command script sections are:
-    - "from Transforms import *" to make all transform functions available.
-    - Call Set_Path to specify the X3 directory, along with some other path options. See documentation below for parameters.
+    - "from X3_Customizer import *" to make all transform functions available.
+    - Call Set_Path to specify the X3 directory, along with some other path options. See documentation for parameters.
     - Call a series of transform functions, as desired.
   
-  * The quickest way to set up a command script is to copy and edit the input_scripts/Example_Transforms.py file. Included in the repository is Authors_Transforms, the author's personal set of transforms, which can be checked for futher examples of how to use most transforms available.
+  * The quickest way to set up a command script is to copy and edit the input_scripts/Example_Transforms.py file. Included in the repository is Authors_Transforms, the author's personal set of transforms, which can be checked for futher examples.
 
-  * Transformed output files will be generated in an unpacked form in the x3 directories, or to a custom output direction set using Set_Path. Already existing files will be renamed, suffixing with '.x3c.bak', if they do not appear to have been created by the customizer on a prior run. A json log file will be written with information on which files were created or renamed.
+  * Transformed output files will be generated in an unpacked form in the x3 directories, or to a custom output directory set using Set_Path. Already existing files will be renamed, suffixing with '.x3c.bak', if they do not appear to have been created by the customizer on a prior run. A json log file will be written with information on which files were created or renamed.
 
   * Warning: this tool will attempt to avoid unsafe behavior, but the user should back up irreplaceable files to be safe against bugs such as accidental overwrites of source files with transformed files.
   
@@ -125,7 +125,7 @@ Director Transforms:
 
       Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
 
- * Standardize_Tunings (incompatible with: LU)
+ * Standardize_Tunings (incompatible with: LU, TC)
 
       Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
 
@@ -243,7 +243,7 @@ Missile Transforms:
 
 Obj_Code Transforms:
 
- * Adjust_Max_Seta
+ * Adjust_Max_Seta (incompatible with: TC)
 
       Changes the maximum SETA speed multiplier. Higher multipliers than the game default of 10 may cause oddities.
 
@@ -251,7 +251,7 @@ Obj_Code Transforms:
 
       Changes the rate at which SETA turns on. By default, it will accelerate by (selected SETA -1)/10 every 250 milliseconds. This transform will reduce the delay between speedup ticks.
 
- * Allow_Valhalla_To_Jump_To_Gates (incompatible with: LU)
+ * Allow_Valhalla_To_Jump_To_Gates (incompatible with: LU, TC)
 
       Removes a restriction on the Valhalla, or whichever ship is at offset 211 in tships, from jumping to gates. This should only be applied alongside another mod that either reduces the valhalla size, increases gate size, removes gate rings, or moves/removes the forward pylons, to avoid collision problems.
 
@@ -279,7 +279,7 @@ Obj_Code Transforms:
 
       Removes the cutscene that plays when placing factories by shortening the duration to 0.  Also prevents the player ship from being stopped. May still have some visible camera shifts for an instant.
 
- * Set_Max_Marines (incompatible with: LU)
+ * Set_Max_Marines (incompatible with: LU, TC)
 
       Sets the maximum number of marines that each ship type can carry. These are byte values, signed, so max is 127.
 
@@ -298,9 +298,9 @@ Script Transforms:
 
  * Add_CLS_Software_To_More_Docks
 
-      Adds Commodity Logistics Software, internal and external, to all equipment docks which stock Trade Command Software Mk2. This is implemented as a setup script which runs on the game loading. Once applied, this transform may be disabled to remove the script run time. This change is not reversable.
+      Adds Commodity Logistics Software, internal and external, to all equipment docks which stock Trade Command Software Mk2. This is implemented as a setup script which runs on the game loading. Once applied, this transform may be disabled to remove the script run time. This change is not easily reversable.
 
- * Allow_CAG_Apprentices_To_Sell (incompatible with: LU)
+ * Allow_CAG_Apprentices_To_Sell (incompatible with: LU, TC)
 
       Allows Commercial Agents to sell factory products at pilot rank 0. May require CAG restart to take effect.
 
@@ -316,19 +316,19 @@ Script Transforms:
 
       Modifies the Attack command when used on an owned asset to instead enact Attack Nearest. In vanilla AP, such attack commands are quietly ignored. Intended for use when commanding groups, where Attack is available but Attack Nearest is not. This replaces '!ship.cmd.attack.std'.
 
- * Disable_OOS_War_Sector_Spawns (incompatible with: LU)
+ * Disable_OOS_War_Sector_Spawns (incompatible with: LU, TC)
 
       Disables spawning of dedicated ships in the AP war sectors which attack player assets when the player is out-of-sector. By default, these ships scale up with player assets, and immediately respawn upon being killed. This patches '!fight.war.protectsector'.
 
- * Fix_OOS_Laser_Missile_Conflict (incompatible with: LU)
+ * Fix_OOS_Laser_Missile_Conflict (incompatible with: LU, TC)
 
-      Allows OOS combat to include both missile and laser fire in the same attack round. In vanilla AP, a ship firing a missile will not fire its lasers for a full round, generally causing a large drop in damage output. With the change, adding missiles to OOS ships will not hurt their performance.
+      Allows OOS combat to include both missile and laser fire in the same attack round. In vanilla AP, a ship firing a missile will not fire its lasers for a full round, generally causing a large drop in damage output. With the change, adding missiles to OOS ships should not hurt their performance.
 
- * Fleet_Interceptor_Bug_Fix (incompatible with: LU)
+ * Fleet_Interceptor_Bug_Fix (incompatible with: LU, TC)
 
       Apply bug fixes to the Fleet logic for selecting ships to launch at enemies. A mispelling of 'interecept' causes M6 ships to be launched against enemy M8s instead of interceptors. Patches !lib.fleet.shipsfortarget.xml.
 
- * Increase_Escort_Engagement_Range (incompatible with: LU)
+ * Increase_Escort_Engagement_Range (incompatible with: LU, TC)
 
       Increases the distance at which escort ships will break and attack a target. In vanilla AP an enemy must be within 3km of the escort ship. This transform will give custom values based on the size of the escorted ship, small, medium (m6), or large (m7+).
 
@@ -697,3 +697,7 @@ Change Log:
  * 3.5.2
    - Added documentation support for forum BB code.
    - Added _Benchmark_Gate_Traversal_Time for private use.
+ * 3.6
+   - Added initial support for Terran Conflict without AP installed.
+   - Refined handling obj patches failures, so that all patches for a given transform are skipped if any patch has an error.
+   - Increased robustness when Globals.txt does not have an expected field.

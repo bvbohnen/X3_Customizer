@@ -14,7 +14,8 @@ from ..File_Manager.File_Patcher import *
 # majaglit.
 
 
-@File_Manager.Transform_Wrapper('scripts/!fight.war.protectsector.xml', LU = False)
+@File_Manager.Transform_Wrapper('scripts/!fight.war.protectsector.xml', 
+                                LU = False, TC = False)
 def Disable_OOS_War_Sector_Spawns(
     ):
     '''
@@ -26,7 +27,8 @@ def Disable_OOS_War_Sector_Spawns(
     Apply_Patch('scripts/!fight.war.protectsector.xml')
 
     
-@File_Manager.Transform_Wrapper('scripts/plugin.com.agent.main.xml', LU = False)
+@File_Manager.Transform_Wrapper('scripts/plugin.com.agent.main.xml', 
+                                LU = False, TC = False)
 def Allow_CAG_Apprentices_To_Sell(
     ):
     '''
@@ -36,7 +38,8 @@ def Allow_CAG_Apprentices_To_Sell(
     Apply_Patch('scripts/plugin.com.agent.main.xml')
     
     
-@File_Manager.Transform_Wrapper('scripts/!plugin.acp.fight.attack.object.xml', LU = False)
+@File_Manager.Transform_Wrapper('scripts/!plugin.acp.fight.attack.object.xml', 
+                                LU = False, TC = False)
 def Fix_OOS_Laser_Missile_Conflict(
     ):
     '''
@@ -44,13 +47,14 @@ def Fix_OOS_Laser_Missile_Conflict(
     in the same attack round. In vanilla AP, a ship firing a 
     missile will not fire its lasers for a full round, generally 
     causing a large drop in damage output.
-    With the change, adding missiles to OOS ships will not hurt
+    With the change, adding missiles to OOS ships should not hurt
     their performance.
     '''
     Apply_Patch('scripts/!plugin.acp.fight.attack.object.xml')
     
 
-@File_Manager.Transform_Wrapper('scripts/!lib.fleet.shipsfortarget.xml', LU = False)
+@File_Manager.Transform_Wrapper('scripts/!lib.fleet.shipsfortarget.xml', 
+                                LU = False, TC = False)
 def Fleet_Interceptor_Bug_Fix(
     ):
     '''
@@ -66,7 +70,8 @@ def Fleet_Interceptor_Bug_Fix(
     Apply_Patch('scripts/!lib.fleet.shipsfortarget.xml')
 
 
-@File_Manager.Transform_Wrapper('scripts/!move.follow.template.xml', LU = False)
+@File_Manager.Transform_Wrapper('scripts/!move.follow.template.xml', 
+                                LU = False, TC = False)
 def Increase_Escort_Engagement_Range(
     small_range  = 3000,
     medium_range = 4000,
@@ -109,6 +114,7 @@ def Increase_Escort_Engagement_Range(
             .replace('7011', str(long_range)))
     
 
+# TODO: check if these script copies work okay in TC.
 @File_Manager.Transform_Wrapper()
 def Convert_Attack_To_Attack_Nearest():
     '''
@@ -129,7 +135,7 @@ def Add_CLS_Software_To_More_Docks():
     equipment docks which stock Trade Command Software Mk2.
     This is implemented as a setup script which runs on the game
     loading. Once applied, this transform may be disabled to remove
-    the script run time. This change is not reversable.
+    the script run time. This change is not easily reversable.
     '''
     File_Manager.Copy_File(
         'scripts/setup.x3customizer.add.cls.to.docks.xml')

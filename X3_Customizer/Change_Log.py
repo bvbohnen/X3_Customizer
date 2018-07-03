@@ -174,6 +174,11 @@ Change Log:
  * 3.5.2
    - Added documentation support for forum BB code.
    - Added _Benchmark_Gate_Traversal_Time for private use.
+ * 3.6
+   - Added initial support for Terran Conflict without AP installed.
+   - Refined handling obj patches failures, so that all patches for
+     a given transform are skipped if any patch has an error.
+   - Increased robustness when Globals.txt does not have an expected field.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

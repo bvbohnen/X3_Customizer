@@ -93,6 +93,29 @@ def _Prevent_Complex_Connectors():
                    popx       4
                    ret
 
+    Test result:
+        Massive fps slowdown when joining an older 256 stack factory
+        to a new one.
+        Theory: connectors are responsible for determining which factories
+        will not have collision detection with each other. With no
+        connections, the factory stack was calculating collision.
+        Similar fps drop (and similar amount) was noticed when destroying
+        the complex as well, leaving the factories loose but still stacked
+        on top of each other.
+
+        Updated theory: SA_CreateFactoryConnections may only
+        return key information such as tube subtype and positioning,
+        and doesn't create any objects.
+        Also, complex based slowdown was later tracked to SA_CleanUpObjects;
+        see further below.
+
+        TODO: look into complex Activation code, so that it will update
+        factory links even when no tube connections are present, to see
+        if this helps.
+
+        TODO: one fps problem is dealt with, try building a large complex
+        with this applied and see if there is progressive delay added
+        to gate traversal time.
     '''
     patch = Obj_Patch(
             file = 'L/x3story.obj',
@@ -118,7 +141,7 @@ def _Prevent_Complex_Connectors():
 
 
 
-@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False)
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
 def _Benchmark_Gate_Traversal_Time():
     '''
     Experimental.
@@ -144,6 +167,16 @@ def _Benchmark_Gate_Traversal_Time():
     Test results, using 2x256 factory complex:
         - Baseline: 75 seconds.
         - Removing SA_CleanUpObjects: near instant travel.
+
+    Performed a ~1 hour test in XRM on a 10 day old save, flying around
+    sectors, fighting, etc., with this applied.
+    No oddities were observed; objects were cleaned up just fine, save
+    file size was stable, game memory usage appeared the same as without
+    this edit (eg. starts at a base of 1.8 GB, climbs up to ~3.5 GB and then
+    does some sort of flush back down to ~1.8).
+
+    TODO: get more playtime in with this transform to establish higher
+    confidence of stability, and release for general use.
 
     '''
     remove_SA_CleanUpObjects = True

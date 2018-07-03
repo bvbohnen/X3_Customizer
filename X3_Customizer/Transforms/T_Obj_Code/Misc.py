@@ -59,10 +59,11 @@ TODO:
 '''
 from ... import File_Manager
 from ... import Common
+Settings = Common.Settings
 from .Obj_Shared import *
     
 
-@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False)
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
 def Set_Max_Marines(
         tm_count = 8,
         tp_count = 40,
@@ -85,7 +86,7 @@ def Set_Max_Marines(
     * sirokos_count
       - Int, marines carried by the Sirokos, or whichever ship is located
         at entry 263 in Tships (when starting count at 1).
-        Note: XRM does not use this slot in Tships.
+      - Note: XRM does not use this slot in Tships.
     '''
     # Make input args ints, limit to 1 to max_count.
     max_count = 127
@@ -152,11 +153,6 @@ def Set_Max_Marines(
     # Lay out the replacement region, capturing both values (otherwise
     #  ambiguity problems crop up).
     patch_fields = [
-        # Sirokos. Special case of SHIP.
-        # Only one value to patch.
-        ['05'  '1E'  '83''01''83''01''83''6E''0005''0F''0062', 
-         '..'+sirokos_count],
-
         # TM. Inherits from SHIP_BIG.
         ['05'  '08'    '5D''34''........''0D''0001''32''........'
          '05'  '08'    '14''0002''24''83''24''01''83''6E''0006''01', 
@@ -180,8 +176,15 @@ def Set_Max_Marines(
          '05'  '28'    '14''0002''24''83''24''01''83''6E''0007''0D', 
          '..'+tp_count+'..''..''........''..''....''..''........'
          '..'+tp_count],
-        ]
 
+        # Sirokos. Special case of SHIP.
+        # Only one value to patch.
+        # Note: removing this for TC is not enough to get the transform
+        #  working.
+        ['05'  '1E'  '83''01''83''01''83''6E''0005''0F''0062', 
+         '..'+sirokos_count],
+        ]
+    
     # Construct the patches.
     patch_list = []
     for ref_code, replacement in patch_fields:
@@ -194,8 +197,7 @@ def Set_Max_Marines(
    
 
     # Apply the patches.
-    for patch in patch_list:
-        Apply_Obj_Patch(patch)
+    Apply_Obj_Patch_Group(patch_list)
 
     return
 
@@ -451,7 +453,7 @@ def Disable_Asteroid_Respawn(
     return
 
 
-@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False)
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
 def Allow_Valhalla_To_Jump_To_Gates(
     ):
     '''
@@ -674,9 +676,8 @@ def Remove_Factory_Build_Cutscene(
                         + NOP * 10 ),
             ),
         ]
-    # Apply the patches.
-    for patch in patch_list:
-        Apply_Obj_Patch(patch)
+    # Apply the patches.    
+    Apply_Obj_Patch_Group(patch_list)
     return
 
 

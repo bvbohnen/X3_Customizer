@@ -8,6 +8,7 @@ In general, there are three types of paths:
 * cat_path:
   - Similar to virtual_path, but includes the 'addon' folder for some
     categories of files.
+  - In base TC mode, 'addon' should not be prefixed.
 * sys_path:
   - Real system path to where a file should be located.
   - Default is in the game directory where it can be found.
@@ -22,7 +23,8 @@ ugliness of written result).
 '''
 import sys
 import os
-from ..Common.Settings import Settings
+from .. import Common
+Settings = Common.Settings
 
 # Preset the directory where the customizer resides, which
 #  is one level up from here.
@@ -132,23 +134,25 @@ def Virtual_Path_to_Cat_Path(virtual_path):
     # Default cat path to match virtual path, for when 'addon' not needed.
     cat_path = virtual_path
         
-    # Get the folders that should be in the addon directory.
-    # These are just the first folders, in case of nesting, though
-    #  no nesting expected for any files expected to be transformed,
-    #  it can happen (eg. directory/images).
-    # Note: comparison should be case insensitive.
-    for test_folder in [
-            'cutscenes',
-            'director',
-            'maps',
-            't',
-            'types',
-            'scripts',
-        ]:
-        # On a match, prefix with the addon folder.
-        if path_start_folder.lower() == test_folder:
-            cat_path = 'addon/' + virtual_path
-            break
+    # Skip the 'addon' prefix for a base TC target.
+    if not Settings.target_base_tc:
+        # Get the folders that should be in the addon directory.
+        # These are just the first folders, in case of nesting, though
+        #  no nesting expected for any files expected to be transformed,
+        #  it can happen (eg. directory/images).
+        # Note: comparison should be case insensitive.
+        for test_folder in [
+                'cutscenes',
+                'director',
+                'maps',
+                't',
+                'types',
+                'scripts',
+            ]:
+            # On a match, prefix with the addon folder.
+            if path_start_folder.lower() == test_folder:
+                cat_path = 'addon/' + virtual_path
+                break
         
     return cat_path
 

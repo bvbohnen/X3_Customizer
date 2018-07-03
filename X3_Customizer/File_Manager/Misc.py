@@ -17,93 +17,6 @@ from .Source_Reader import *
 from .File_Types import *
 from .Logs import *
 
-# TODO: move this somewhere more convenient, eg. the Settings module,
-#  though for now it is here since it calls Init afterward.
-def Set_Path(
-        # Force args to be kwargs, since that is safer if args are
-        #  added/removed in the future.
-        *,
-        path_to_x3_folder = None,
-        path_to_addon_folder = None,
-        path_to_output_folder = None,
-        path_to_source_folder = None,
-        # Backwards compatable version of source_folder.
-        source_folder = None,
-        path_to_log_folder = 'x3_customizer_logs',
-        summary_file = 'X3_Customizer_summary.txt',
-        log_file = 'X3_Customizer_log.json',
-    ):
-    '''
-    Sets the pathing to be used for file loading and writing.
-
-    * path_to_x3_folder
-      - Path to the X3 base folder, where the executable is located.
-      - Can be skipped if path_to_addon_folder provided.
-
-    * path_to_addon_folder
-      - Path to the X3 AP addon folder.
-      - Can be skipped if path_to_x3_folder provided.
-
-    * path_to_output_folder
-      - Optional, path to a folder to place output files in.
-      - Defaults to match path_to_x3_folder, so that outputs are
-        directly readable by the game.
-
-    * path_to_source_folder
-      - Optional, alternate folder which contains source files to be modified.
-      - Maybe be given as a relative path to the "addon" directory,
-        or as an absolute path.
-      - Files located here should have the same directory structure
-        as standard games files, eg. 'source_folder/types/Jobs.txt'.
-
-    * path_to_log_folder
-      - Path to the folder to place any output logs in, or
-        to read prior output logs from.
-      - Maybe be given as a relative path to the "addon" directory,
-        or as an absolute path.
-      - Defaults to 'x3_customizer_logs'.
-      - This should not be changed between runs, since recognition of
-        results from a prior customizer run depends on reading the
-        prior run's log file.
-
-    * summary_file
-      - Name for where a summary file will be written, with
-        any transform results, relative to the log folder.
-      - Defaults to 'X3_Customizer_summary.txt'.
-
-    * log_file
-      - Name for where a json log file will be written,
-        including a summary of files written.
-      - This is also the file which will be read for any log from
-        a prior run.
-      - Defaults to 'X3_Customizer_log.json'.
-    '''
-    # Hide these behind None checks, to be extra safe; the Settings 
-    #  verification should catch problems.
-    if path_to_x3_folder != None:
-        Settings.Set_X3_Folder(path_to_x3_folder)
-    if path_to_addon_folder != None:
-        Settings.Set_Addon_Folder(path_to_addon_folder)
-    # Two ways to set source_folder for now.
-    # TODO: maybe trim the old one out.
-    if source_folder != None:
-        Settings.Set_Source_Folder(source_folder)
-    if path_to_source_folder != None:
-        Settings.Set_Source_Folder(path_to_source_folder)
-    if path_to_output_folder != None:
-        Settings.Set_Output_Folder(path_to_output_folder)
-    if path_to_log_folder != None:
-        Settings.Set_Log_Folder(path_to_log_folder)
-    if summary_file != None:
-        Settings.Set_Message_File(summary_file)
-    if log_file != None:
-        Settings.Set_Log_File(log_file)
-
-    # Call to generic Init moved here, to ensure it is applied before
-    # any transforms which may not use input files.
-    Init()
-    return
-
     
 # Make a set of all transform file names that may be used by transforms,
 #  used in filtering the source files tracked.
@@ -130,9 +43,6 @@ First_call = True
 def Init():
     'Initialize the file manager.'
     # Safety check for First_call already being cleared, return early.
-    # TODO: remove this check, and remove all calls to Init except for that
-    #  in Set_Path, which should always be called before anything else
-    #  anyway.
     global First_call
     if not First_call:
         return
@@ -203,6 +113,7 @@ def Transform_Wrapper(
         Vanilla = True,
         XRM = True,
         LU = True,
+        TC = True,
     ):
     '''
     Wrapper function for transforms.
@@ -224,6 +135,9 @@ def Transform_Wrapper(
     * LU
       - Bool, if True then the transform should be compatable with
         LU modded x3.
+    * TC
+      - Bool, if True then the transform should be compatable with
+        basic vanilla TC (without AP).
     '''
 
     # Record the required file names to a set for use elsewhere.
@@ -268,6 +182,7 @@ def Transform_Wrapper(
             ('Vanilla', Vanilla),
             ('XRM'    ,  XRM),
             ('LU'     ,  LU),
+            ('TC'     ,  TC),
             ])
 
         # Record the transform function.
@@ -333,6 +248,8 @@ def Transform_Wrapper(
                 results = func(*args, **kwargs)
 
                 # If here, ran successfully.
+                # (This may not be the case in dev mode, but that will
+                #  have other messages to indicate the problem.)
                 if Settings.verbose:
                     print('Successfully ran {}'.format(
                         func.__name__
@@ -654,3 +571,25 @@ def Version_Patch():
         #        # Do the rename.
         #        os.rename(path, original_path)
 
+
+def Unpack_Pck_Scripts():
+    '''
+    Small script to unpack gzipped pck files in the current directory.
+    Outputs are placed in scripts_pck_unpacked under this dir.
+    TODO: touch up and integrate nicely; this was originally just written
+    as a standalone to aid in grepping through packed scripts.
+    '''
+    from pathlib import Path
+    import gzip
+
+    output_path = Path('scripts_pck_unpacked')
+    # Assumes the output_path exists.
+    assert output_path.exists()
+
+    for pck_file_name in Path('.').glob('*.pck'):
+        print('Unpacking: ', pck_file_name)
+    
+        with open(pck_file_name, 'rb') as file:
+            unpacked_binary = gzip.decompress(file.read())
+        with open(output_path / pck_file_name.with_suffix('.xml'), 'wb') as file:
+            file.write(unpacked_binary)

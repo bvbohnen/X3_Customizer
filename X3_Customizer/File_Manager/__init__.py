@@ -5,7 +5,6 @@ from .Misc import Transform_Wrapper
 from .Misc import Cleanup
 from .Misc import Write_Files
 from .Misc import Copy_File
-from .Misc import Set_Path
 from .Misc import Add_File
 from .Logs import Write_Summary_Line
 from .File_Types import *

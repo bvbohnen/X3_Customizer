@@ -11,11 +11,17 @@ class Settings_class:
     '''
     Container for general settings, including system paths.
     Primarily used for organization convenience.
+    Paths tend to be filled in by a call to Set_Paths; some other
+    flags are initialized from command line arguments.
+    This can be modified by user scripts directly, if needed,
+    eg. "Settings.target_base_tc = True" to enable TC mode.
 
     Attributes:
     * path_to_addon_folder
       - String, the path to the addon folder.
       - Converted to a full path if a relative path was given.
+      - When target_base_tc is True, this will point to the base x3 folder
+        instead.
     * path_to_x3_folder
       - String, the path to the main x3 folder, one level above the addon
         folder.
@@ -59,7 +65,8 @@ class Settings_class:
     * show_scaling_plots
       - Bool, if True and matplotlib and numpy are available, any
         generated scaling equations will be plotted (and their
-        x and y vectors printed for reference).
+        x and y vectors printed for reference). Close the plot window
+        manually to continue transform processing.
     * developer
       - Bool, if True then enable some behavior meant just for development,
         such as leaving exceptions uncaught or letting file patchers do
@@ -69,6 +76,11 @@ class Settings_class:
     * allow_path_error
       - Bool, if True then if the x3 path looks wrong, the customizer
         will still attempt to run.
+    * target_base_tc
+      - Bool, if True then the target X3 version will be Terran Conflict
+        instead of Albion Prelude.
+      - Experimental; will generally replace the AP addon folder with
+        the base X3 folder to minimize code changes.
     '''
     '''
     -Removed attributes, for now.
@@ -102,6 +114,7 @@ class Settings_class:
         s.verbose = True
         #s.t_folder_file_number = '9997'
         s.allow_path_error = False
+        s.target_base_tc = False
         
 
     #def Get_Page_Text_File_Path(s):
@@ -117,9 +130,15 @@ class Settings_class:
         '''
         Sets the addon folder and x3 folder paths, from the addon folder
         initial path. Updates the path_to_source_folder if needed.
+        Error if target_base_tc is True.
         '''
         if path == None:
             return
+        # Error check after the None path; don't error when no path was
+        #  given.
+        if s.target_base_tc:
+            raise Exception(
+                'Path to x3 AP addon folder is not supported for base TC.')
         s.path_to_addon_folder = os.path.abspath(path)
         # Go up one level to get the base x3 folder (with some trimming
         #  to clean it up).
@@ -136,8 +155,17 @@ class Settings_class:
         if path == None:
             return
         s.path_to_x3_folder = os.path.abspath(path)
+
         # Go down one level for the addon folder.
-        s.path_to_addon_folder = os.path.abspath(os.path.join(path, 'addon'))
+        # In TC mode, this will say in the X3 folder; all file handling
+        #  that was relative to addon will instead just use the base
+        #  folder.
+        if not s.target_base_tc:
+            s.path_to_addon_folder = os.path.abspath(
+                os.path.join(path, 'addon'))
+        else:
+            s.path_to_addon_folder = s.path_to_x3_folder
+
         # Update the full source path.
         s.Update_Source_Folder_Path()
 
@@ -180,9 +208,11 @@ class Settings_class:
         Update the full source path if addon and source folders specified
         and source is relative.
         '''
-        if s.path_to_addon_folder != None and s._relative_source_folder != None:
+        if (s.path_to_addon_folder != None 
+        and s._relative_source_folder != None):
             s.path_to_source_folder = os.path.abspath(
-                os.path.join(s.path_to_addon_folder, s._relative_source_folder))
+                os.path.join(s.path_to_addon_folder, 
+                             s._relative_source_folder))
 
             
     def Set_Log_Folder(s, path):
@@ -228,41 +258,78 @@ class Settings_class:
         #if not s.path_to_source_folder:
         #    raise Exception('Folder with the source files not specified.')
 
-        # Verify the AP path looks correct.
-        # The X3 path should automatically be correct if the AP folder
-        #  is correct.
-        if not os.path.exists(s.path_to_addon_folder):
-            raise Exception(
-                'Path to the AP/addon folder appears to not exist.'
-                +'\n (x3 base path: {})'.format(s.path_to_x3_folder)
-                +'\n (x3 addon path: {})'.format(s.path_to_addon_folder)
-                )
+        # Messages will differ between AP and TC targets, so split some
+        #  of the checks here.
+        if not s.target_base_tc:
 
-        # Check for 01.cat, and that the path ends in 'addon'.
-        # Print a warning but continue if anything looks wrong; the user may
-        #  wish to have this tool generate files to a separate directory first.
-        if any((not s.path_to_addon_folder.endswith('addon'),
-                not os.path.exists(os.path.join(s.path_to_addon_folder, '01.cat')))
-               ):
-            if s.allow_path_error:
-                print(  
-                    'Warning: Path to the AP/addon folder appears wrong.\n'
-                    'Generated files may need manual moving to the correct folder.\n'
-                    'Automated source file extraction will fail.'
-                    +'\n (x3 base path: {})'.format(s.path_to_x3_folder)
-                    +'\n (x3 addon path: {})'.format(s.path_to_addon_folder)
-                    )
-            else:
-                # Hard error.
-                # Users might mistakenly set the x3 base folder as the addon
-                #  folder, or similar issues, so this helps catch those
-                #  in a cleaner way.
+            # Verify the AP path looks correct.
+            # The X3 path should automatically be correct if the AP folder
+            #  is correct.
+            if not os.path.exists(s.path_to_addon_folder):
                 raise Exception(
-                    'Path does not appear correct for the AP/addon folder.'
+                    'Path to the AP/addon folder appears to not exist.'
                     +'\n (x3 base path: {})'.format(s.path_to_x3_folder)
                     +'\n (x3 addon path: {})'.format(s.path_to_addon_folder)
                     )
+
+            # Check for 01.cat, and that the path ends in 'addon'.
+            # Print a warning but continue if anything looks wrong; the user
+            #  may wish to have this tool generate files to a separate
+            #  directory first.
+            if any((not s.path_to_addon_folder.endswith('addon'),
+                    not os.path.exists(os.path.join(
+                        s.path_to_addon_folder, '01.cat')))
+                   ):
+                if s.allow_path_error:
+                    print(  
+                        'Warning: Path to the AP/addon folder appears wrong.\n'
+                        'Generated files may need manual moving to the correct folder.\n'
+                        'Automated source file extraction may fail.'
+                        +'\n (x3 base path: {})'.format(s.path_to_x3_folder)
+                        +'\n (x3 addon path: {})'.format(s.path_to_addon_folder)
+                        )
+                else:
+                    # Hard error.
+                    # Users might mistakenly set the x3 base folder as the addon
+                    #  folder, or similar issues, so this helps catch those
+                    #  in a cleaner way.
+                    raise Exception(
+                        'Path does not appear correct for the AP/addon folder.'
+                        +'\n (x3 base path: {})'.format(s.path_to_x3_folder)
+                        +'\n (x3 addon path: {})'.format(s.path_to_addon_folder)
+                        )
+
+        else:
             
+            # Verify the X3 path looks correct.
+            if not os.path.exists(s.path_to_x3_folder):
+                raise Exception(
+                    'Path to the X3 folder appears to not exist.'
+                    +'\n (x3 base path: {})'.format(s.path_to_x3_folder)
+                    )            
+
+            # Check for 01.cat.
+            # Print a warning but continue if anything looks wrong; the user
+            #  may wish to have this tool generate files to a separate
+            #  directory first.
+            if not os.path.exists(
+                    os.path.join(s.path_to_addon_folder, '01.cat') ):
+
+                if s.allow_path_error:
+                    print(  
+                        'Warning: Path to the X3 folder appears wrong.\n'
+                        'Generated files may need manual moving to the correct folder.\n'
+                        'Automated source file extraction may fail.'
+                        +'\n (x3 base path: {})'.format(s.path_to_x3_folder)
+                        )
+                else:
+                    # Hard error.
+                    raise Exception(
+                        'Path does not appear correct for the X3 folder.'
+                        +'\n (x3 base path: {})'.format(s.path_to_x3_folder)
+                        )
+
+
         #-Removed; source folder is now optional.
         #if not os.path.exists(s.path_to_source_folder):
         #    # Create an empty source folder to capture any extracted files.
@@ -272,7 +339,7 @@ class Settings_class:
         #    print('Warning: Source folder {} not found and has been created'.format(
         #        s.path_to_source_folder))
 
-        # Error if no log folder exists.
+        # Error if no log folder was selected.
         if s.path_to_log_folder == None:
             raise Exception('Log folder path not filled in.')
 
@@ -343,3 +410,99 @@ class Settings_class:
 # General settings object, to be referenced by any place so interested.
 Settings = Settings_class()
 
+
+# This is the main access function input scripts are expected to use.
+# This docstring will be included in documentation.
+def Set_Path(
+        # Force args to be kwargs, since that is safer if args are
+        #  added/removed in the future.
+        *,
+        path_to_x3_folder = None,
+        path_to_addon_folder = None,
+        path_to_output_folder = None,
+        path_to_source_folder = None,
+        # Backwards compatable version of source_folder.
+        source_folder = None,
+        path_to_log_folder = 'x3_customizer_logs',
+        summary_file = 'X3_Customizer_summary.txt',
+        log_file = 'X3_Customizer_log.json',
+        enable_TC_mode = False,
+    ):
+    '''
+    Sets the paths to be used for file loading and writing.
+
+    * path_to_x3_folder
+      - Path to the X3 base folder, where the executable is located.
+      - Can be skipped if path_to_addon_folder provided.
+    * path_to_addon_folder
+      - Path to the X3 AP addon folder.
+      - Can be skipped if path_to_x3_folder provided.
+    * path_to_output_folder
+      - Optional, path to a folder to place output files in.
+      - Defaults to match path_to_x3_folder, so that outputs are
+        directly readable by the game.
+    * path_to_source_folder
+      - Optional, alternate folder which contains source files to be modified.
+      - Maybe be given as a relative path to the "addon" directory,
+        or as an absolute path.
+      - Files located here should have the same directory structure
+        as standard games files, eg. 'source_folder/types/Jobs.txt'.
+    * path_to_log_folder
+      - Path to the folder to place any output logs in, or
+        to read prior output logs from.
+      - Maybe be given as a relative path to the "addon" directory,
+        or as an absolute path.
+      - Defaults to 'x3_customizer_logs'.
+      - This should not be changed between runs, since recognition of
+        results from a prior customizer run depends on reading the
+        prior run's log file.
+    * summary_file
+      - Name for where a summary file will be written, with
+        any transform results, relative to the log folder.
+      - Defaults to 'X3_Customizer_summary.txt'.
+    * log_file
+      - Name for where a json log file will be written,
+        including a summary of files written.
+      - This is also the file which will be read for any log from
+        a prior run.
+      - Defaults to 'X3_Customizer_log.json'.      
+    * enable_TC_mode
+      - Bool, if True then the target X3 version will be Terran Conflict
+        instead of Albion Prelude.
+      - All files which would have been placed in the addon folder will
+        now be placed in the base x3 folder.
+      - Note: not all transforms have been tested for TC compatability.
+    '''
+    # Record the TC mode flag.
+    # TODO: maybe rename target_base_tc to be consistent.
+    # Do this before other calls, so that automated 'addon' path
+    #  handling gets changed.
+    Settings.target_base_tc = enable_TC_mode
+
+    # Hide these behind None checks, to be extra safe; the Settings 
+    #  verification should catch problems.
+    # TODO: maybe trim Nones from here if checked in the Settings methods.
+    if path_to_x3_folder != None:
+        Settings.Set_X3_Folder(path_to_x3_folder)
+    if path_to_addon_folder != None:
+        Settings.Set_Addon_Folder(path_to_addon_folder)
+    # Two ways to set source_folder for now.
+    # TODO: maybe trim the old one out.
+    if source_folder != None:
+        Settings.Set_Source_Folder(source_folder)
+    if path_to_source_folder != None:
+        Settings.Set_Source_Folder(path_to_source_folder)
+    if path_to_output_folder != None:
+        Settings.Set_Output_Folder(path_to_output_folder)
+    if path_to_log_folder != None:
+        Settings.Set_Log_Folder(path_to_log_folder)
+    if summary_file != None:
+        Settings.Set_Message_File(summary_file)
+    if log_file != None:
+        Settings.Set_Log_File(log_file)
+
+    # Note: verification is done at the first transform, not here,
+    #  so that any settings overwrites can be done after (or without)
+    #  the Set_Path call.
+
+    return

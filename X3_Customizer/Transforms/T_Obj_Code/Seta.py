@@ -3,7 +3,7 @@ from ... import File_Manager
 from ... import Common
 from .Obj_Shared import *
 
-@File_Manager.Transform_Wrapper('L/x3story.obj')
+@File_Manager.Transform_Wrapper('L/x3story.obj', TC = False)
 def Adjust_Max_Seta(
         speed_factor = 10,
     ):
@@ -88,7 +88,7 @@ def Adjust_Max_Seta(
                 file = 'L/x3story.obj',
                 #offsets = [0x001152BF],
                 # Existing code is 'pushb 10d', or b'050A'.
-                ref_code = '05' '0A' '16' '0054' '24' '0F' '0054',
+                ref_code = '05' '0A' '16' '0054' '24' '0F' '0054' '02' '06' '0096',
                 # Swap to something larger.
                 new_code = '05' + seta_hex,
                 ),
@@ -114,9 +114,8 @@ def Adjust_Max_Seta(
                 ),
         ]
 
-        # Apply the patches.
-        for patch in patch_list:
-            Apply_Obj_Patch(patch)
+        # Apply the patches.        
+        Apply_Obj_Patch_Group(patch_list)
 
     return
 
@@ -265,9 +264,8 @@ def Stop_Events_From_Disabling_Seta(
             ))        
         
 
-    # Apply the patches.
-    for patch in patch_list:
-        Apply_Obj_Patch(patch)
+    # Apply the patches.    
+    Apply_Obj_Patch_Group(patch_list)
 
     return
 

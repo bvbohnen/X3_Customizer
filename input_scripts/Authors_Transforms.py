@@ -9,12 +9,15 @@ from X3_Customizer import *
 #version = 'Vanilla'
 version = 'XRM'
 #version = 'LU'
+# Test flag to applying to base TC.
+#version = 'TC'
 
 
 # Some convenience translation, to make easier if/else statements.
 Vanilla = version == 'Vanilla'
 XRM = version == 'XRM'
 LU = version == 'LU'
+TC = version == 'TC'
 
 if Vanilla:
     Set_Path(
@@ -32,9 +35,18 @@ elif LU:
     Set_Path(
         path_to_x3_folder = r'D:\Steam\SteamApps\common\x3 terran conflict LU',
     )
+elif TC:
+    Set_Path(
+        path_to_x3_folder = r'D:\Steam\SteamApps\common\x3 terran conflict without AP',
+        enable_TC_mode = True
+    )
 
 # Temp enable xrm transforms for lu to see what happens.
 #XRM = LU if LU else XRM
+
+# Enable vanilla transforms for TC.
+if TC:
+    Vanilla = True
 
 # Could disable scipy scaling equations; these are enabled by default
 #  if scipy available.   
@@ -49,7 +61,7 @@ elif LU:
 # Obj code file changes.
 
 # Bump up max seta.
-Adjust_Max_Seta(50)
+Adjust_Max_Seta(15)
 # Make seta speed up faster.
 Adjust_Max_Speedup_Rate(4)
 
@@ -65,6 +77,10 @@ Keep_TLs_Hired_When_Empty()
 #  into what's going on or if this is useful.
 #_Prevent_Complex_Connectors()
 
+# Experimental code to try to find the complex related game slowdown.
+# Initial hour long test found no oddities with this applied.
+#Transforms.T_Obj_Code._Benchmark_Gate_Traversal_Time()
+
 # Stop scripts using 'create ship' from accidentally leaving
 #  around spacefly swarms (often accumulating in the null sector).
 Prevent_Accidental_Spacefly_Swarms()
@@ -73,7 +89,7 @@ if Vanilla or XRM:
     
     # Kill spaceflies spawned before Prevent_Accidental_Spacefly_Swarms
     #  was added, lagging the game.
-    Kill_Spaceflies()
+    #Kill_Spaceflies()
 
     # Trim the cutscenes when building factories.
     Remove_Factory_Build_Cutscene()

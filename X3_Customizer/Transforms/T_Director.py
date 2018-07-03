@@ -176,7 +176,8 @@ def Disable_Generic_Missions():
         })
 
 
-@File_Manager.Transform_Wrapper('director/3.08 Sector Management.xml', LU = False)
+@File_Manager.Transform_Wrapper('director/3.08 Sector Management.xml', 
+                                LU = False, TC = False)
 def Standardize_Tunings(
     enging_tuning_crates = 4,
     rudder_tuning_crates = 4,

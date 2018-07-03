@@ -2,34 +2,12 @@
 Transforms to missiles.
 '''
 '''
-Similar to X3_Weapons, this will open the Tmissiles file and perform systematic edits.
-Initial functions:
--Reduce damage of all missiles following a diminishing returns formula.
--Selectively edit mosquito missiles to make them better at interception.
-
-
-Damage reduction was done using a global formula, to reduce bias against
-particular missiles.
-Different formulas were tried out with spreadsheet help.
-The basic formula type was:
- dam_new = ((dam_old / pow) * ref) / ((dam_old / pow) + ref) * pow
- where pow = 10, ref = 25
-The idea was to apply a general damage scaler, use a D*X/D+X formula,
- and scale it back. This may not be the best scaling equation, but seems
- to work out.
-The old damage used a couple adjustments:
- -Translated into e3 scale before formula, eg 1k damage = 1.
- -If multi-warhead, multiply by 8 before the formula.
- -Undo adjustments at the end, and round to nearest 100 or 1000 (hand selected).
- -Optionally ignore missiles under 10k damage.
-These changes will be recalculated and applied here.
-
-TODO: consider moving to a simpler formula: x*w*(y/(x+y))^z, which can be optimized
- for a few select desired scaling points (3 points should be fine, 
- coving high/low/med).
- See X3_test module for some code to optimize this quickly.
-
-
+TODO: maybe stop missiles from being consumed on firing, and instead have
+ them take more cargo space and have a longer recharge (maybe with less
+ damage) as an overall missile mechanics transform.
+The idea would be to make missiles unlimited and a standard part of
+ player combat, no longer costing the player credits to use them (where
+ only the ai effectively gets them for free).
 '''
 from .. import File_Manager
 from ..Common import Flags
@@ -103,11 +81,13 @@ def Adjust_Missile_Damage(
         # Get the function.
         scaling_func = Scaling_Equations.Get_Scaling_Fit(x_vec, y_vec)
 
+
     # Grab the number of missiles in each swarm volley, read from Globals.
-    for this_dict in File_Manager.Load_File('types/Globals.txt'):
-        if this_dict['name'] == 'SG_MISSILE_SWARM_COUNT':
-            num_multishot_missiles = int(this_dict['value'])
-            break
+    globals_file = File_Manager.Load_File('types/Globals.txt', 
+                                          return_game_file = True)
+    num_multishot_missiles = int(globals_file.Get_Field(
+        'SG_MISSILE_SWARM_COUNT'))
+
 
     # Step through each missile.
     for this_dict in File_Manager.Load_File('types/TMissiles.txt'):
@@ -123,32 +103,7 @@ def Adjust_Missile_Damage(
         if damage < 1000:
             new_damage_round = damage
 
-        else:
-            # -Removed; use a proper scaling eq, and don't do the /1000 scaling
-            #  since it shouldn't be needed. This also didn't handle the flat
-            #  scaling factor well.
-            # if 0:
-            #     #Rescale to the 1e3
-            #     damage_e3 = damage / 1000
-            # 
-            #     #Apply the scaling factor.
-            #     damage_e3 *= scaling_factor
-            # 
-            #     #Apply the diminishing returns formula as requested.
-            #     if use_scaling_equation:
-            #         #Prebuff damage for multishot missiles.
-            #         if multishot:
-            #             damage_e3 *= num_multishot_missiles
-            # 
-            #         #Run the formula.
-            #         pow = 10
-            #         ref = 25
-            #         damage_e3 = (damage_e3 / pow * ref) / ((damage_e3 / pow) + ref) * pow
-            # 
-            #     #Remove the e3 scaling.
-            #     new_damage_old_style = damage_e3 * 1000
-
-                
+        else:                
             # Adjust the damage, using equation or flat factor.
             if use_scaling_equation:
                 # Prebuff damage for multishot missiles.

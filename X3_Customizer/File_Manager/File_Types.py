@@ -2,7 +2,8 @@
 Classes to represent game files.
 '''
 import os
-from ..Common.Settings import Settings
+from .. import Common
+Settings = Common.Settings
 from collections import OrderedDict, defaultdict
 from . import File_Fields
 from .File_Paths import *
@@ -205,11 +206,12 @@ class XML_File(Game_File):
         #xml_tree.write(file_path)
 
 
+# TODO: rename to something other than 'T', which gets confused with
+#  text files (in a t folder).
 class T_File(Game_File):
     '''
     T file contents holder, as a list of OrderedDict objects.
     Represents files found in the 'types' folder.
-    Each OrderedDict represents a separate line.
     Class exists mainly to clarify naming for now, and for any
     future attribute expansion.
 
@@ -417,6 +419,69 @@ class T_File(Game_File):
             if line_dict is s.data_dict_list[0]:
                 raise Exception()
 
+        return
+
+
+class Globals_File(T_File):
+    '''
+    Globals.txt file object. Inherits from T_File, and provides more
+    convenient wayts to access fields, including support for defaults
+    when a field is not present.
+
+    New attributes:
+    * named_lines_dict
+      - Dict, keyed by global field name, holding the OrderedDict line
+        entry.
+    '''
+    def __init__(s, *args, **kwargs):
+        # Init the standard t file.
+        super().__init__(**kwargs)
+
+        # Build a dict matching fields names to line entries.
+        s.named_lines_dict = {
+            x['name'] : x for x in s.data_dict_list
+            }
+
+        return
+
+
+    def Get_Field(s, field_name):
+        '''
+        Return the value for a given field. If the field is not found,
+        a default is returned. Values is returned as a string.
+        '''
+        if field_name in s.named_lines_dict:
+            value = s.named_lines_dict[field_name]['value']
+        else:
+            # The fields should be present in the defaults, at least.
+            assert field_name in File_Fields.Global_Defaults
+            value = File_Fields.Global_Defaults[field_name]
+            # Error if a default is not available (eg. is None).
+            assert value != None
+            # Stringify the value, to match the form of the normal lines.
+            # TODO: would it be safe to standardize values to ints?
+            #  -This would depend on if any are ever floats.
+            value = str(value)
+        return value
+
+
+    def Set_Field(s, field_name, value):
+        '''
+        Set the value for a given field. If the field is not found,
+        it will be added. If value is not a string, it will get a
+        basic string conversion; any rounding and such should be done
+        prior to this call.
+        '''
+        # Do a direct update if the line is present.
+        if field_name in s.named_lines_dict:
+            s.named_lines_dict[field_name]['value'] = str(value)
+        else:
+            # Add a new line.
+            this_line = OrderedDict()
+            this_line['name'] = field_name
+            this_line['value'] = str(value)
+            this_line[2] = '\n'
+            s.Add_Entries([this_line])
         return
 
 

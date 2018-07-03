@@ -19,12 +19,13 @@ As of customizer version 3, an executable may be generated for users
 who do not wish to run the Python source code directly.
 
 This tool is designed primarily for Albion Prelude v3.3. Most transforms
-will support prior or later versions of AP. TC is not supported currently
-due to some path assumptions.
+will support prior or later versions of AP. TC 3.4 is tentatively supported
+for many transforms, though has not been thoroughly tested.
 
-When used alongside the X3 Plugin Manager, run X3 Customizer second,
+When used alongside the X3 Plugin Manager: run X3 Customizer second,
 after the plugin manager is closed, since the plugin manager generates a
-TWareT.pck file when closed that doesn't capture changes in TWareT.txt.
+TWareT.pck file when closed that doesn't capture changes in TWareT.txt
+made by this tool.
 
 Usage:
 
@@ -80,19 +81,18 @@ Setup and behavior:
   executed by the customizer.
   
   * The key command script sections are:
-    - "from Transforms import *" to make all transform functions available.
+    - "from X3_Customizer import *" to make all transform functions available.
     - Call Set_Path to specify the X3 directory, along with some
-      other path options. See documentation below for parameters.
+      other path options. See documentation for parameters.
     - Call a series of transform functions, as desired.
   
   * The quickest way to set up a command script is to
   copy and edit the input_scripts/Example_Transforms.py file.
   Included in the repository is Authors_Transforms, the author's
-  personal set of transforms, which can be checked for futher examples
-  of how to use most transforms available.
+  personal set of transforms, which can be checked for futher examples.
 
   * Transformed output files will be generated in an unpacked form
-  in the x3 directories, or to a custom output direction set
+  in the x3 directories, or to a custom output directory set
   using Set_Path. Already existing files will be renamed,
   suffixing with '.x3c.bak', if they do not appear to have been
   created by the customizer on a prior run. A json log file will be
@@ -137,6 +137,6 @@ from . import Change_Log
 
 # Convenience items for input scripts to import.
 from .Transforms import *
-from .File_Manager import Set_Path
+from .Common.Settings import Set_Path
 from .Common.Settings import Settings
 
