@@ -77,16 +77,21 @@ Keep_TLs_Hired_When_Empty()
 #  into what's going on or if this is useful.
 #_Prevent_Complex_Connectors()
 
-# Experimental code to try to find the complex related game slowdown.
-# Initial hour long test found no oddities with this applied.
-#Transforms.T_Obj_Code._Benchmark_Gate_Traversal_Time()
-
 # Stop scripts using 'create ship' from accidentally leaving
 #  around spacefly swarms (often accumulating in the null sector).
 Prevent_Accidental_Spacefly_Swarms()
 
+# Disable combat music.
+#Disable_Combat_Music()
+# Similarly, disable the combat entrance beeping.
+# Remove_Combat_Beep()
+
 if Vanilla or XRM:
     
+    # Experimental code to address complex related game slowdown.
+    # Initial hour long test found no oddities with this applied.
+    #Remove_Complex_Related_Sector_Switch_Delay()
+
     # Kill spaceflies spawned before Prevent_Accidental_Spacefly_Swarms
     #  was added, lagging the game.
     #Kill_Spaceflies()
@@ -105,11 +110,6 @@ if Vanilla or XRM:
             on_frame_input = True,
         )
     
-    # Disable combat music.
-    # Disable_Combat_Music()
-    # Similarly, disable the combat entrance beeping.
-    # Remove_Combat_Beep()
-
     # Test code for allowing valhallas to jump to gates.
     Allow_Valhalla_To_Jump_To_Gates()
 

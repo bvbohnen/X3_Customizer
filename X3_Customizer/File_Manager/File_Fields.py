@@ -129,6 +129,7 @@ T_file_name_field_dict_dict = {
         7  : 'shield_damage',     
         8  : 'energy_used',        
         9  : 'impact_sound',      
+        # TODO: launch delay, maybe used in weapon charging.
         10 : 'lifetime',           #In milliseconds
         11 : 'speed',              #In meters per 500 seconds (divide by 500 for m/s)
         12 : 'flags',              #Special 1-hot flags.  

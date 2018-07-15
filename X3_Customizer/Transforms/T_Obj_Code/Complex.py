@@ -142,12 +142,19 @@ def _Prevent_Complex_Connectors():
 
 
 @File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
-def _Benchmark_Gate_Traversal_Time():
+def Remove_Complex_Related_Sector_Switch_Delay():
     '''
-    Experimental.
-    Disable calls to SA_CleanUpObjects or SA_FreeAllBodies when passing gates.
+    Experimental; recommend backing up save games prior to using this.
+    Disables calls to the SA_CleanUpObjects function when changing sectors.
+    This function introduces a potentially very long delay in games that
+    have built large complexes, for unknown reasons.
+    Exact purpose of the function is not known, but side effects were 
+    not observed in brief play with it disabled.
     '''
     '''
+    See https://forum.egosoft.com/viewtopic.php?t=399008 for the motivating
+    discussion.
+
     Code to edit is in CLIENT.WarpToSector.
     At 0001666B is the SA_CleanUpObjects call.
     At 00016672 is the SA_FreeAllBodies call.

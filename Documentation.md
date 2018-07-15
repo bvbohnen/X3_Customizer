@@ -1,4 +1,4 @@
-X3 Customizer 3.6
+X3 Customizer 3.7
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -634,11 +634,11 @@ Obj_Code Transforms:
       Stops any newly destroyed asteroids from being set to respawn. This can be set temporarily when wishing to clear out some unwanted asteroids. It is not recommended to leave this transform applied long term, without some other method of replacing asteroids.
       
 
- * Disable_Combat_Music (incompatible with: LU)
+ * Disable_Combat_Music
 
     Requires: L/x3story.obj
 
-      Turns off combat music, keeping the normal environment musc playing when nearing hostile objects. If applied to a saved game already in combat mode, combat music may continue to play for a moment. The beep on nearing an enemy will still be played.
+      Turns off combat music, keeping the normal environment music playing when nearing hostile objects. If applied to a saved game already in combat mode, combat music may continue to play for a moment. The beep on nearing an enemy will still be played.
       
 
  * Keep_TLs_Hired_When_Empty
@@ -662,6 +662,13 @@ Obj_Code Transforms:
     Requires: L/x3story.obj
 
       Prevents spaceflies from spawning swarms when created by a script using the 'create ship' command. Aimed at mods such as Improved Races 2.0 and SCS, which create and destroy a spacefly but accidentally leave behind a swarm with active scripts, causing spacefly accumulation and game slowdown.
+      
+
+ * Remove_Complex_Related_Sector_Switch_Delay (incompatible with: LU, TC)
+
+    Requires: L/x3story.obj
+
+      Experimental; recommend backing up save games prior to using this. Disables calls to the SA_CleanUpObjects function when changing sectors. This function introduces a potentially very long delay in games that have built large complexes, for unknown reasons. Exact purpose of the function is not known, but side effects were not observed in brief play with it disabled.
       
 
  * Remove_Factory_Build_Cutscene (incompatible with: LU)
@@ -1525,3 +1532,6 @@ Change Log:
    - Added initial support for Terran Conflict without AP installed.
    - Refined handling obj patches failures, so that all patches for a given transform are skipped if any patch has an error.
    - Increased robustness when Globals.txt does not have an expected field.
+ * 3.7
+   - Added LU support for Disable_Combat_Music.
+   - Swapped _Benchmark_Gate_Traversal_Time to Remove_Complex_Related_Sector_Switch_Delay to make it available for general use, though it is still experimental.

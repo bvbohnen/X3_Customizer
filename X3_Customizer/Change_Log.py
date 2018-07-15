@@ -179,6 +179,11 @@ Change Log:
    - Refined handling obj patches failures, so that all patches for
      a given transform are skipped if any patch has an error.
    - Increased robustness when Globals.txt does not have an expected field.
+ * 3.7
+   - Added LU support for Disable_Combat_Music.
+   - Swapped _Benchmark_Gate_Traversal_Time to 
+     Remove_Complex_Related_Sector_Switch_Delay to make it available for
+     general use, though it is still experimental.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

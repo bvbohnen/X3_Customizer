@@ -17,7 +17,7 @@ from .Misc import Remove_Factory_Build_Cutscene
 from .Misc import Keep_TLs_Hired_When_Empty
 
 from .Complex import _Prevent_Complex_Connectors
-from .Complex import _Benchmark_Gate_Traversal_Time
+from .Complex import Remove_Complex_Related_Sector_Switch_Delay
 
 # Fill in the default documentation category for the transforms.
 # Use a dict copy, since this adds new locals.

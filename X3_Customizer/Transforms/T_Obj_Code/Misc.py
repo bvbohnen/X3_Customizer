@@ -202,17 +202,17 @@ def Set_Max_Marines(
     return
 
 
-@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False)
+@File_Manager.Transform_Wrapper('L/x3story.obj')
 def Disable_Combat_Music(
     ):
     '''
-    Turns off combat music, keeping the normal environment musc playing
+    Turns off combat music, keeping the normal environment music playing
     when nearing hostile objects. If applied to a saved game already in
     combat mode, combat music may continue to play for a moment.
     The beep on nearing an enemy will still be played.
     '''
     '''
-    This will edit the CLIENT.NotifyAlert function
+    This will edit the CLIENT.NotifyAlert function.
     The arg to the function is a flag to enable or disable combat mode.
     CLIENT.cl_Alert is an existing flag indicating if already in
     combat mode or not.
@@ -264,9 +264,15 @@ def Disable_Combat_Music(
         swapped to cl_Verbose (different offset code), and near the
         start CLIENT.cl_Killed is swapped to CLIENT.cl_GameFeatures.
 
-        It is unclear at a glance what this is meant to accomplish.
-        TODO: look into this, maybe after getting LU music to work
-        so that changes can be tested.
+        It is unclear at a glance what this is meant to accomplish,
+        though it may simply be a situation where LU adds class variables,
+        changing the offsets of cl_Alert and CLIENT.cl_Killed, but the
+        disassembler is providing names based on the vanilla game.
+
+        If the underlying functionality is the same just with adjusted
+        offsets, this patch should work okay, but the reference code
+        needs to wildcard the offsets.  (In testing, this seems to
+        work fine.)
     '''
 
     patch = Obj_Patch(
@@ -276,7 +282,8 @@ def Disable_Combat_Music(
             # 'if SP[0]=0 then jump L000178A9'
             # 'push       1'
             # 'write      CLIENT.cl_Alert'
-            ref_code = '34' '........' '02' '16' '0007' '24' '01' '06' '00C8',
+            ref_code =  '34' '........' '02' '16' '....' '24' '01' 
+                        '06' '00C8' '86' '........' '24' '32',
             # Switch to 'if SP[0] != 0' and 'push 0'.
             new_code = '33' '........' '01',
             )
