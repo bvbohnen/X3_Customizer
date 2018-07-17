@@ -25,26 +25,6 @@ from ..Common.Settings import Settings
 import os
 from .File_Paths import *
 
-#class Dat_File_Entry:
-#    '''
-#    Class to represent an entry in the dat file, the contents of
-#    one packed file. This is mainly for organization currently,
-#    and may be expanded with a copy of the file contents in the future.
-#
-#    Attributes:
-#    * size
-#      - Int, the size in bytes for the entry.
-#    * start_offset
-#      - Int, the offset into the dat file where this entry begins.
-#    * end_offset
-#      - Int, the offset into the dat file where this entry ends, inclusive.
-#      - Determines automatically from size and start_offset.
-#    '''
-#    def __init__(s, size, start_offset):
-#        s.size = size
-#        s.start_offset = start_offset
-#        s.end_offset = start_offset + size - 1
-
 class Cat_Reader:
     '''
     Parsed catalog file contents.
@@ -59,7 +39,7 @@ class Cat_Reader:
     * file_size_dict
       - Dict, keyed by file cat path with name, containing the integer
         number of bytes of file data in the dat file.
-      - Essentially, a direct unpacked version of the cat contents.
+      - Essentially, a direct unpacked version of the dat contents.
       - File paths use forward slashes as separators, and start in the
         base X3 directory (above 'addon').
     * file_offset_dict

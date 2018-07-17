@@ -1,5 +1,16 @@
 '''
 Classes to represent game files.
+
+Note on newline encoding:
+    File contents written to loose system files should use the system
+    newline encoding (eg. \r\n on windows), otherwise some oddities
+    were observed (eg. ship names not loading).
+
+    However, newlines should be simple \n when file contents are written
+    to a catalog, otherwise crashing and other broken behavior observed.
+
+    Get_Binary will return simple \n encoding, while Write_File will
+    be system dependent.
 '''
 import os
 from .. import Common
@@ -57,6 +68,16 @@ class Game_File:
          depending on the file's virtual_path.
         '''
         return Virtual_Path_to_Output_Path(s.virtual_path)
+
+
+    def Is_Catalogable(s):
+        '''
+        Returns True if this file can be placed in a catalog.
+        Will for False for scripts.
+        '''
+        if s.virtual_path.startswith('scripts/'):
+            return False
+        return True
         
         
 class XML_File(Game_File):
@@ -116,19 +137,26 @@ class XML_File(Game_File):
         s._text = new_text
 
 
-    def Get_XML_Node(s):
+    def Get_XML_Tree(s):
         '''
-        Return an ElementTree node after parsing the current text
+        Return an ElementTree after parsing the current text
         as xml.
         '''        
-        return ET.fromstring(s._text)
+        node = ET.fromstring(s._text)
+        if not isinstance(node, ET.ElementTree):
+            node = ET.ElementTree(node)
+        return node
 
 
     def Update_From_XML_Node(s, element_root):
         '''
-        Update the current text from an ElementTree xml node.
+        Update the current text from an xml node, either
+         Element or ElementTree.
         First line will be left unchanged.
         '''
+        # Normalize to be the root Element.
+        if isinstance(element_root, ET.ElementTree):
+            element_root = element_root.getroot()
         s.modified = True
         s._text = (s._text.splitlines()[0] + '\n' 
                    + ET.tostring(element_root, encoding = 'unicode'))
@@ -187,10 +215,21 @@ class XML_File(Game_File):
         return None
 
 
+    def Get_Binary(s):
+        '''
+        Returns a bytearray with the file contents.
+        '''
+        binary = bytearray(s._text.encode(encoding = s.encoding))
+        # To be safe, add a newline at the end if there.
+        if not s._text.endswith('\n'):
+            binary += '\n'.encode(encoding = s.encoding)
+        return binary
+
+
     def Write_File(s, file_path):
         '''
         Write these contents to the target file_path.
-        '''        
+        '''
         # Open with the right encoding.
         with open(file_path, 'w', encoding = s.encoding) as file:   
             # Just write as raw text.
@@ -200,10 +239,11 @@ class XML_File(Game_File):
             #  be read correctly.
             if not s._text.endswith('\n'):
                 file.write('\n')
-
+    
         #-Removed; use text instead of xml.
         # Let the xml plugin pick the encoding to write out in.
-        #xml_tree.write(file_path)
+        #xml_tree.write(file_path)        
+        return
 
 
 # TODO: rename to something other than 'T', which gets confused with
@@ -231,6 +271,7 @@ class T_File(Game_File):
         s.text = None
         s.line_dict_list = []
         s.data_dict_list = []
+        assert s.virtual_path.startswith('types/')
                 
         # Field ordering could be done with named tuples, but in practice
         #  it is  probably easiest to just use ordered dicts.
@@ -333,6 +374,26 @@ class T_File(Game_File):
         #  be edited directly.
         return s.data_dict_list
     
+    
+    def Get_Binary(s):
+        '''
+        Returns a bytearray with the file contents.
+        '''
+        binary = bytearray()
+        # Loop over the lines.
+        for line_dict in s.line_dict_list:
+
+            # Convert the line fields to a list.
+            field_list = line_dict.values()
+            # Join with semicolons.
+            this_line = ';'.join(field_list)
+
+            # The last entry of each sublist is alrady a new line, so
+            #  no new line needed here.
+            # Encode and store.
+            binary += this_line.replace('\n','\r\n').encode()
+        return binary
+
 
     def Write_File(s, file_path):
         '''
@@ -342,18 +403,20 @@ class T_File(Game_File):
         with open(file_path, 'w') as file:
             # Loop over the lines.
             for line_dict in s.line_dict_list:
-
+    
                 # Convert the line fields to a list.
                 field_list = line_dict.values()
                 # Join with semicolons.
                 this_line = ';'.join(field_list)
-
+    
                 # Write to the file.
                 # The last entry of each sublist is alrady a new line, so
                 #  no new line needed here.
                 file.write(this_line)
-
-                
+            
+        return
+               
+    
     def Add_Entries(s, new_entry_list):
         '''
         Convenience function to add new lines to a t file.
@@ -503,6 +566,13 @@ class Obj_File(Game_File):
         #  binary field can be edited.
         return s
     
+    
+    def Get_Binary(s):
+        '''
+        Returns a bytearray with the file contents.
+        '''
+        return s.binary
+
 
     def Write_File(s, file_path):
         '''
@@ -536,6 +606,21 @@ class Misc_File(Game_File):
         '''
         return s.text
 
+    
+    def Get_Binary(s):
+        '''
+        Returns a bytearray with the file contents.
+        '''
+        if s.binary != None:
+            return s.binary
+        else:
+            assert s.text != None
+            binary = bytearray(s.text.encode())
+            # To be safe, add a newline at the end if there.
+            if not s.text.endswith('\n'):
+                binary += '\n'.encode()
+            return binary
+        
 
     def Write_File(s, file_path):
         '''
@@ -550,10 +635,13 @@ class Misc_File(Game_File):
                 file.write(s.text)
                 if not s.text.endswith('\n'):
                     file.write('\n')
+
         elif s.binary != None:
             # Do a binary write.
             with open(file_path, 'wb') as file:
                 file.write(s.binary)
+                
+        return
 
 
 #-Removed for now; this would need to be paired up with something

@@ -184,6 +184,15 @@ Change Log:
    - Swapped _Benchmark_Gate_Traversal_Time to 
      Remove_Complex_Related_Sector_Switch_Delay to make it available for
      general use, though it is still experimental.
+ * 3.8
+   - Added support for generating a catalog file collecting all
+     non-script changes.
+   - Add_Life_Support now edits various scripts that use special checks
+     for ships with built-in life support (normally TPs only), to support
+     the modified ship classes.
+   - Add_Ship_Variants now edits the Bounce mod's wall file, if found,
+     to include entries for the new ships which share a model with an
+     existing ship present in the bounce file.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

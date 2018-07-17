@@ -5,6 +5,8 @@ This module will include a shared Add_Script transform, and some
 convenience transforms for select scripts.
 Modified scripts will tend to be handled with patches, while original
 scripts will just be moved to the scripts folder.
+
+TODO: quiet xrm bounty messages.
 '''
 from .. import File_Manager
 from ..File_Manager.File_Patcher import *

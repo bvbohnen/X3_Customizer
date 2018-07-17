@@ -47,7 +47,7 @@ def Adjust_Max_Seta(
         ## A proper way to do this is with xml editing.
         ## Note: the top node is the language node, so searches
         ##  should start below it.
-        #root_node = lu_text_file.Get_XML_Node()
+        #root_node = lu_text_file.Get_XML_Tree().getroot()
         #
         ## Use xpath to do the node lookup.
         #seta_node = root_node.find(

@@ -766,7 +766,6 @@ def Add_Ship_Equipment(
     File_Manager.Load_File('types/WareLists.txt', return_game_file = True).Add_Entries(
         new_ware_line_dicts_list)
     
-
     # If ware list ids are still in need of updating with equipment,
     #  handle that now.
     if cap_ware_list_ids:
@@ -837,11 +836,10 @@ def Add_Ship_Life_Support(
     ):
     '''
     Adds life support as a built-in ware for select ship classes.
-    This is a convenience transform which calls Add_Ship_Equipment.
-    Warning: mission director scripts do not seem to have a way to check
-    for built in wares, and typically use a special TP check to get around
-    this. Other ship types with built-in life support will not be able
-    to pick up passengers in some cases.
+    Various mission director scripts with special TP checks will be
+    extended to check for these modified ships, since the mission director
+    does not support built-in wares and requires special code in these
+    cases.
 
     * ship_types:
       - List of ship types to add life support to, eg. ['SG_SH_M2'].
@@ -856,6 +854,221 @@ def Add_Ship_Life_Support(
             'SS_WARE_LIFESUPPORT'
             ]
         )
+
+    '''
+    Some mission directory scripts need updating to check for these ship
+    types, since they cannot detect the ware itself when built in.
+    These are cases where a ship needs to dock at a station, and then
+    passengers are loaded if the ship can support them.
+    As such, this is mostly concerned with m6 and lower sized ships, since
+    bigger ones cannot dock, but the bigger ones can be added in anyway
+    to be thorough.
+
+    2.005 Terran Plot Scene 5
+      - Line 1201
+          - Change <match_object class="tp"/> to include new classes, using
+            | separators.
+          - Eg. <match_object class="tp|m6|tm"/>
+      - Line 1184
+        - As above, but changing <match_object class="tp" negate="1"/>.
+    2.005 Terran Plot Scene 4
+      - Similar check.
+    2.007 HUB Plot
+      - Similar check.
+
+    2.014 Treasure Hunt
+      - Around line 1538 does a different style of tp check.
+      - <check_value value="{player.ship.equipment.SS_WARE_LIFESUPPORT.exists}+{player.ship.isclass.tp}" exact="0"/>
+      - Can extend the checks to + in more ship classes.
+
+    2.023 Shady Business
+      - Around line 3681, does a different variation on Treasure Hunt.
+      - <do_when value="{player.ship.isclass.tp}" exact="1" negate="1">
+      - Need to extend the value check, as with TH.
+      - Does not need to change the condition ('exact'), since only one
+        class check should return a 1, at most.
+        
+    2.024 Player Corp
+      - Uses a match_object check at line 5224.
+      - Uses a value check at line 5274.
+      - Awkward case at 7896.
+        - Checks life support but not TP since it is only for a TL class ship.
+        - <check_value value="{player.ship.cargo.SS_WARE_LIFESUPPORT.exists}" exact="1"/>
+        - This is not easy to pattern for, so will be treated more like
+          a special case of value checks (looking for lifesupport without
+          a TP rider).
+        - Could limit the special case to this file, but it is not really
+          expected to cause harm elsewhere (eg. adds some redundant code
+          in some places).
+        - This should swap 'exact' to 'min' to be safe against a ship having
+          cargo life support already when the built-in is added, causing it
+          to count twice in the modified value.
+
+    2.011 Version 2.0 Plot
+      - Uses match_object style.
+
+    2.013 New Home
+      - Different style of awkward check, this time looking at a non-player
+        ship.
+      - <do_when value="{object.equipment.SS_WARE_LIFESUPPORT.exists@CSV_Chapter2_top.CSVplayerTM}+{object.isclass.tp@CSV_Chapter2_top.CSVplayerTM}" min="1">
+      - Similar to the player ship value checks, this needs extending with
+        the extra cases.
+
+    0.3 Transport Passenger
+      - Uses match_object style.
+      - Note: this also has proper TP checks for npcs that require a TP
+        to complete the mission.
+      - Do not modify items like:
+        - <check_value value="{value@{param@Cue}.{param@ID} TPNeeded}-{player.ship.isclass.tp}" min="1"/>
+        - Can skip if TPNeeded in node value string.
+
+    2.130 Generic Group Transport
+      - Uses value check with {player.ship.isclass.tp} style.
+      - Also uses match_object style.
+
+    All cases should be covered by 3 checks:
+      - match_object, with a class list added in.
+      - Any node with a 'value' field that checks {player.ship.isclass.tp},
+        extending with other classes.
+      - Special case for New Home.
+
+    Note: in some cases the match_object update and value update will
+    be redundant (both are in a check_any block), but this should be fine.
+
+    '''
+    # Set up the class codes once for the match_object director command.
+    match_object_classes = 'tp'
+    # Also set up the check_value replacement.
+    # These will be put into parentheses to keep the additions together.
+    check_value_base_expression = '{player.ship.isclass.tp}'
+    check_value_expression = '(' + check_value_base_expression
+    # Another case for New Home.
+    check_value_base_expression_2 = '{object.isclass.tp@CSV_Chapter2_top.CSVplayerTM}'
+    check_value_expression_2 = '(' + check_value_base_expression_2
+
+    for ship_type in ship_types:
+        # Get just the last couple letters of the ship type string.
+        class_id = ship_type.split('_')[2].lower()
+
+        # Add to the match_object_classes, | as separator.
+        match_object_classes += '|' + class_id
+
+        # Add to the check_value_expression, adding the expressions.
+        check_value_expression += '+{player.ship.isclass.'+class_id+'}'
+
+        # New Home style.
+        check_value_expression_2 += '+{object.isclass.'+class_id+'@CSV_Chapter2_top.CSVplayerTM}'
+
+    check_value_expression += ')'
+    check_value_expression_2 += ')'
+
+
+    # Loop over files to share some code.
+    for xml_file_name in [
+        'director/2.004 Terran Plot Scene 4.xml',
+        'director/2.005 Terran Plot Scene 5.xml',
+        'director/2.007 HUB Plot.xml',
+        'director/2.024 Player Corp.xml',
+        'director/2.014 Treasure Hunt.xml',
+        'director/2.023 Shady Business.xml',
+        'director/2.011 Version 2.0 Plot.xml',
+        'director/2.013 New Home.xml',
+        'director/0.3 Transport Passenger.xml',
+        'director/2.130 Generic Group Transport.xml',        
+        ]:
+    
+        # Note: this file may not be present, so will not be part of the
+        #  transform requirements and will be skipped if not found.
+        xml_file = File_Manager.Load_File(xml_file_name)#, error_if_not_found = False)
+        if xml_file == None:
+            continue
+
+        # A proper way to do this is with xml editing.
+        tree = xml_file.Get_XML_Tree()
+
+        # Expect to make at least 1 change per file.
+        change_occurred = False
+
+        # Loop over all nodes.
+        for node in tree.iter():
+
+            # Handle match_object nodes.
+            if node.tag == 'match_object':
+
+                # Look up the class field, if there is one.
+                attr_class = node.get('class')
+
+                # Check if it is for a TP ship.
+                if attr_class != None and attr_class == 'tp':
+                    # Modify to also include the new classes.
+                    node.set('class', match_object_classes)
+                    change_occurred = True
+
+
+            # Handle any node with a value field.
+            # Expacting check_value, do_if.
+            attr_value = node.get('value')
+
+            # Look for the TP check string.
+            if attr_value != None:
+
+                # Skip if TPNeeded is present.
+                if 'TPNeeded' in attr_value:
+                    pass
+
+                # Normal player ship check.
+                elif check_value_base_expression in attr_value:
+
+                    # Replace it with the extended expression.
+                    node.set('value', attr_value.replace(
+                        check_value_base_expression,
+                        check_value_expression))
+                    change_occurred = True
+
+                # New Home check.
+                elif check_value_base_expression_2 in attr_value:
+                    
+                    # Replace it with the extended expression.
+                    node.set('value', attr_value.replace(
+                        check_value_base_expression_2,
+                        check_value_expression_2))
+                    change_occurred = True
+
+                # Otherwise, look for a bare player life support check.
+                # Only apply this to Player Corp, since it might mess with
+                #  some logic in the generic missions for passengers wanting
+                #  a TP.
+                elif attr_value == '{player.ship.cargo.SS_WARE_LIFESUPPORT.exists}':
+                    
+                    # Extend it with the extended expression.
+                    node.set('value', attr_value +'+'+check_value_expression)
+                    change_occurred = True
+
+                    # Check if the condition is 'exact' with a value of 1.
+                    # (Value of 0 should stay as exact 0.)
+                    attr_exact = node.get('exact')
+                    if attr_exact != None and attr_exact == '1':
+                        # Remove the 'exact' and replace with 'min'.
+                        # ET offers no good way to do this (it asks to use
+                        #  special methods to access attributes, but provides
+                        #  no deletion method), so delete straight from the
+                        #  attr dict.
+                        del node.attrib['exact']
+
+                        # Add in the min instead, with the same value.
+                        # Verify no min already exists.
+                        assert node.get('min') == None
+                        node.set('min', attr_exact)
+
+        # Verify a change happened.
+        # Removed; things look good on a reference game; modified
+        #  games might end up not requiring changes.
+        #assert change_occurred
+
+        # Update the file, since it tracks text and not xml
+        #  (for now).
+        xml_file.Update_From_XML_Node(tree)        
+
     return
 
 

@@ -281,8 +281,8 @@ def Add_More_Factory_Sizes(
     # Aim is to find the node for the template factory, and copy it over
     # with the new factory name.
     waretemplate_xml = File_Manager.Load_File('maps/WareTemplate.xml')
-    # Parse the xml.
-    element_root = waretemplate_xml.Get_XML_Node()
+    # Parse the xml.  TODO: update to use element tree instead of node.
+    element_root = waretemplate_xml.Get_XML_Tree().getroot()
 
     # Set up a dict matching factory name with its xml node.
     factory_name_node_dict = {}

@@ -56,6 +56,9 @@ if TC:
 #  to view curve fits.
 #Settings.show_scaling_plots = True
 
+# Can disable the catalog to get loose files for easier verification
+#  transforms worked (particularly director scripts).
+#Settings.output_to_catalog = False
 
 #####################################################
 # Obj code file changes.
@@ -187,7 +190,7 @@ if Vanilla or XRM:
 Convoys_made_of_race_ships()
 
 # Adjust or disable generic missions.
-if 1:
+if 0:
     # Disable generic missions.
     Disable_Generic_Missions()
 else:

@@ -211,11 +211,23 @@ def Relative_Path_to_System_Path(path):
 def Unpacked_Path_to_Packed_Path(path):
     '''
     Converts a path for an unpacked file to a packed file, for
-    any path type (sys_path, virtual_path, cat_path).
+     any path type (sys_path, virtual_path, cat_path).
+    Extension depends on that of the original path:
+     xml and txt to pck, bod to pbd, bob to pbb.
+    If the unpacked path is not expected to have an extension,
+     this returns None.
     '''
-    # All path types end with an extension, so can just split it
-    #  off and replace with .pck.
-    return path.rsplit('.',1)[0] + '.pck'
+    # All path types end with an extension, so can just split it off.
+    path_prefix, extension = path.rsplit('.',1)
+    if extension in ['txt','xml']:
+        packed_extension = '.pck'
+    elif extension == 'bod':
+        packed_extension = '.pbd'
+    elif extension == 'bob':
+        packed_extension = '.pbb'
+    else:
+        return None
+    return path.rsplit('.',1)[0] + packed_extension
 
 
 def Get_Backed_Up_Sys_Path(sys_path):

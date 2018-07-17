@@ -81,6 +81,10 @@ class Settings_class:
         instead of Albion Prelude.
       - Experimental; will generally replace the AP addon folder with
         the base X3 folder to minimize code changes.
+    * output_to_catalog
+      - Bool, if True then the modified files will be written to a single
+        cat/dat pair, incrementally numbered above existing catalogs.
+      - Scripts will be kept as loose files.
     '''
     '''
     -Removed attributes, for now.
@@ -115,6 +119,7 @@ class Settings_class:
         #s.t_folder_file_number = '9997'
         s.allow_path_error = False
         s.target_base_tc = False
+        s.output_to_catalog = True
         
 
     #def Get_Page_Text_File_Path(s):

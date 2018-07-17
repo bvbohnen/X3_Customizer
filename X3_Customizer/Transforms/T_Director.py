@@ -2,6 +2,10 @@
 Transforms to the director xml files.
 These are generally targetted at specific lines of the original input.
 
+TODO: update code to make better use of xml nodes, as convenient.
+
+TODO: any special fixes for other mods, eg. New Home gate fix for
+TC plots in AP.
 '''
 import copy
 from collections import defaultdict

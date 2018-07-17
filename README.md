@@ -1,4 +1,4 @@
-X3 Customizer 3.7
+X3 Customizer 3.8
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -356,7 +356,7 @@ Ship Transforms:
 
  * Add_Ship_Life_Support
 
-      Adds life support as a built-in ware for select ship classes. This is a convenience transform which calls Add_Ship_Equipment. Warning: mission director scripts do not seem to have a way to check for built in wares, and typically use a special TP check to get around this. Other ship types with built-in life support will not be able to pick up passengers in some cases.
+      Adds life support as a built-in ware for select ship classes. Various mission director scripts with special TP checks will be extended to check for these modified ships, since the mission director does not support built-in wares and requires special code in these cases.
 
  * Adjust_Ship_Hull
 
@@ -425,7 +425,7 @@ Ships_Variant Transforms:
 
  * Remove_Ship_Variants
 
-      Removes variants for selected ships. May be used after Add_Ship_Variants has already been applied to an existing save, to safely remove variants while leaving their tships entries intact. In this case, leave the Add_Ship_Variants call as it was previously with undesired variants, and use this tranform to prune the variants. Existing ships will remain in game, categorized as unknown race, though new ships will not spawn automatically. Variants will be removed from existing shipyards the first time a game is loaded after running this transform.
+      Removes variants for selected ships. May be used after Add_Ship_Variants has already been applied to an existing save, to safely remove variants while leaving their tships entries intact. In this case, leave the Add_Ship_Variants call as it was previously with undesired variants, and use this tranform to prune the variants. Existing ships will remain in game, categorized as unknown race, though new ships will not spawn automatically. Variants will be removed from existing shipyards the first time a game is loaded after running this transform. Note: this transform is only lightly tested.
 
 
 ***
@@ -708,3 +708,7 @@ Change Log:
  * 3.7
    - Added LU support for Disable_Combat_Music.
    - Swapped _Benchmark_Gate_Traversal_Time to Remove_Complex_Related_Sector_Switch_Delay to make it available for general use, though it is still experimental.
+ * 3.8
+   - Added support for generating a catalog file collecting all non-script changes.
+   - Add_Life_Support now edits various scripts that use special checks for ships with built-in life support (normally TPs only), to support the modified ship classes.
+   - Add_Ship_Variants now edits the Bounce mod's wall file, if found, to include entries for the new ships which share a model with an existing ship present in the bounce file.

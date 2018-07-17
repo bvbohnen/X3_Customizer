@@ -13,9 +13,13 @@ import shutil
 from .. import Common
 Settings = Common.Settings
 from .File_Fields import *
-from .Source_Reader import *
+from . import Source_Reader
+Source_Reader = Source_Reader.Source_Reader
+from . import Cat_Writer
 from .File_Types import *
-from .Logs import *
+from . import Logs
+Log_New = Logs.Log_New
+Log_Old = Logs.Log_Old
 
     
 # Make a set of all transform file names that may be used by transforms,
@@ -373,6 +377,24 @@ def Cleanup():
         if os.path.exists(path):
             os.remove(path)
 
+    # Note: if the prior file was a catalog, and other higher numbered
+    #  catalogs were added by the user since the last run, then
+    #  this will create a hiccup in the cat index order causing
+    #  confusion.
+    # This characteristic is recorded by the Source_Reader when scanning
+    #  the cats.
+    if Source_Reader.prior_customizer_cat_needs_dummy:
+        # To patch over this case, regenerate empty cat/dat files.
+        # These cannot be fully empty, since the cat needs a header,
+        # so use the Cat_Writer to help out.
+        cat_writer = Cat_Writer.Cat_Writer(
+            Source_Reader.prior_customizer_cat_path)
+        cat_writer.Write()
+        print('Dummy catalog generated at {} to replace prior Customizer'
+              ' output and maintain contiguous catalog indexing.'.format(
+                  Source_Reader.prior_customizer_cat_path))
+
+
     # Find all renamed files, and name them back to their standard
     #  form, which should normally be free after the deletions from above.
     # If the standard form is occupied, it is likely it was overwritten
@@ -422,7 +444,8 @@ def Add_Source_Folder_Copies():
 def Write_Files():
     '''
     Write output files for all source file content used or
-     created by transforms.
+     created by transforms, either to loose files or to a catalog
+     depending on settings.
     Existing files which may conflict with the new writes will be renamed,
      including files of the same name as well as their .pck versions.
     '''
@@ -436,6 +459,17 @@ def Write_Files():
     # Maybe could do it Clang style with gibberish extensions, then once
     #  all files, written, rename then properly.
 
+
+    # Pick out the path to the catalog folder and file.
+    cat_path = os.path.join(
+            Settings.Get_Addon_Folder(),
+            Source_Reader.Get_Next_Higher_Cat_Index() + '.cat')
+    # Note: this path may be the same as used in a prior run, but
+    #  the prior cat file should have been removed by cleanup.
+    assert not os.path.exists(cat_path)
+    cat_writer = Cat_Writer.Cat_Writer(cat_path)
+
+
     # Loop over the files that were loaded.
     for file_name, file_object in File_dict.items():
 
@@ -443,20 +477,34 @@ def Write_Files():
         if not file_object.modified:
             continue
 
+        # Note if this will go in a catalog or not.
+        # Scripts are always loose, otherwise this depends
+        #  on the settings.
+        if file_object.Is_Catalogable() and Settings.output_to_catalog:
+            for_catalog = True
+        else:
+            for_catalog = False
+
         # Look up the output path.
+        # Whether the file goes to a catalog or not, this is needed to
+        #  find existing loose files.
         file_path = file_object.Get_Output_Path()
         
         # In case the target directory doesn't exist, such as on a
-        #  first run, make it.
-        folder_path, _ = os.path.split(file_path)
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
+        #  first run, make it, but only when not sending to a catalog.
+        if not for_catalog:
+            folder_path, _ = os.path.split(file_path)
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
 
         # Rename any conflicting files, of same name or pck version.
         # These should never be old versions of the customize output,
         #  since the Cleanup call handled them.
         file_path_pck = Unpacked_Path_to_Packed_Path(file_path)
         for conflict_path in [file_path, file_path_pck]:
+            # Skip if None (for files with no packed version).
+            if conflict_path == None:
+                continue
 
             # Skip if no such file exists.
             if not os.path.exists(conflict_path):
@@ -481,15 +529,31 @@ def Write_Files():
             #  after every single written or renamed file for now.
             Log_New.Store()
 
-        # Write out the file, using the object's individual method.
-        file_object.Write_File(file_path)
+        if not for_catalog:
+            # Write out the file, using the object's individual method.
+            file_object.Write_File(file_path)
 
-        # Add this to the log, post-write for correct hash.
-        Log_New.Record_File_Path_Written(file_path)
+            # Add this to the log, post-write for correct hash.
+            Log_New.Record_File_Path_Written(file_path)
 
-        # As above, refresh the log file.
+            # As above, refresh the log file.
+            Log_New.Store()
+
+        else:
+            # Add to the catalog writer.
+            cat_writer.Add_File(file_object)
+
+
+    # If anything was added to the cat_writer, do its write.
+    if cat_writer.game_files:
+        cat_writer.Write()
+
+        # Log both the cat and dat files as written.
+        Log_New.Record_File_Path_Written(cat_path)
+        Log_New.Record_File_Path_Written(cat_path.replace('.cat','.dat'))
+
+        # Refresh the log file.
         Log_New.Store()
-        
 
     return
 
@@ -500,7 +564,9 @@ def Copy_File(
     ):
     '''
     Suport function to copy a file from a source folder under this project, 
-     to a dest folder. Typically used for scripts, objects, etc.
+    to a dest folder. Typically used for scripts, objects, etc.
+    Note: this simply creates a Game_File object, and the file write
+    will occur during normal output.
 
     * source_virtual_path
       - Virtual path for the source file, which matches the folder
@@ -534,62 +600,8 @@ def Version_Patch():
     #  first run or the first in 2.23+.
     # In this case, clean out some old files from prior versions which
     #  used .x3c.bak as their renamed file suffix.
+    # -Removed; .x3c.bak extension still in use.
+    # Empty code is left here as an example in case any future patches
+    #  are needed.
     if Log_Old.version == None or int(Log_Old.version.split('.')[0]) < 3:
         pass
-
-        #-Removed; x3c.bak is used again, to avoid problem of the game
-        # trying to read files with an xml extension automatically.
-        #old_backup_suffix = '.x3c.bak'
-        #
-        ## Traverse the scripts folder.
-        #for dir_path, folder_names, file_names in os.walk(
-        #    os.path.join(Settings.Get_Addon_Folder(), 'scripts')):
-        #
-        #    # Loop over the file names.
-        #    for file_name in file_names:
-        #
-        #        # Skip those without the looked for suffix.
-        #        if not file_name.endswith(old_backup_suffix):
-        #            continue
-        #
-        #        path = os.path.join(dir_path, file_name)
-        #        original_path = path.replace(old_backup_suffix, '')
-        #
-        #        # There should be no non-suffixed version of the file,
-        #        #  since it was a pck that was moved to avoid conflict.
-        #        if os.path.exists(original_path):
-        #            # Toss a warning and otherwise skip ahead.
-        #            # (Note: currently, this will only get printed on the
-        #            #  first run, so the file might linger around in later
-        #            #  runs with no notices, but it should be okay as just
-        #            #  a loose file.)
-        #            print(('Warning: could not undo renaming of "{}"'
-        #                  ' from older version due to "{}" being occupied').format(
-        #                path, original_path))
-        #            continue
-        #
-        #        # Do the rename.
-        #        os.rename(path, original_path)
-
-
-def Unpack_Pck_Scripts():
-    '''
-    Small script to unpack gzipped pck files in the current directory.
-    Outputs are placed in scripts_pck_unpacked under this dir.
-    TODO: touch up and integrate nicely; this was originally just written
-    as a standalone to aid in grepping through packed scripts.
-    '''
-    from pathlib import Path
-    import gzip
-
-    output_path = Path('scripts_pck_unpacked')
-    # Assumes the output_path exists.
-    assert output_path.exists()
-
-    for pck_file_name in Path('.').glob('*.pck'):
-        print('Unpacking: ', pck_file_name)
-    
-        with open(pck_file_name, 'rb') as file:
-            unpacked_binary = gzip.decompress(file.read())
-        with open(output_path / pck_file_name.with_suffix('.xml'), 'wb') as file:
-            file.write(unpacked_binary)

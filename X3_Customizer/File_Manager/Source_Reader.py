@@ -5,6 +5,7 @@ Import as:
     from Source_Reader import *
 '''
 import os
+from pathlib import Path # TODO: convert all from os to pathlib.
 from ..Common.Settings import Settings
 from .Logs import *
 from collections import OrderedDict
@@ -46,7 +47,7 @@ class Source_Reader_class:
 
     The general search order is:
     * Source folder defined in the settings.
-    * Scripts folder, if a script is being looked up.
+    * Loose folders, including scripts.
     * Cat files in the addon folder numbered 01 through the highest
       contiguous 2-digit number, higher number taking precedence.
     * Cat files in the base X3 directory, treated similarly to the
@@ -55,10 +56,10 @@ class Source_Reader_class:
     Note: the addon/mods folder is ignored, due to ambiguity on which
     mod located there might be in use for a given game session.
 
-    Loose source files in the game folders are ignored at this time,
-    as these are assumed to be leftovers from prior runs of the
-    customizer.
-
+    Files which were generated on a prior customizer run (identified
+    by matching a hash in the prior run's log) will be skipped.
+    Files which were backed up on a prior run will be checked.
+    
     Cat files will be parsed as they are reached in the search order,
     not before, to avoid excessive startup time when deeper cat files
     may never be needed.
@@ -83,12 +84,25 @@ class Source_Reader_class:
       - Dict, keyed by file name, with the Cat_Reader object that holds
         the file with the highest priority.
       - Used for code result reuse, and is not an exhaustive list.
+    * prior_customizer_cat_path
+      - String, path for any catalog file from a prior customizer run.
+      - The dat file has a matched path, changing extension.
+      - This path may need to get replaced with an empty cat file if the
+        user added more catalogs after the prior run, to maintain indexing
+        order.
+    * prior_customizer_cat_needs_dummy
+      - Bool, if True then a dummy catalog should be generated using the
+        prior_customizer_cat_path during file cleanup (after the prior
+        cat is deleted normally).
+      - Any new catalog file will always be at least 2 steps higher than
+        the prior cat file in this case.
     '''
     def __init__(s):
         s.source_file_path_dict = {}
         s.catalog_file_dict = OrderedDict()
         s.file_to_cat_dict = {}
-
+        s.prior_customizer_cat_path = None
+        s.prior_customizer_cat_needs_dummy = False
 
     def Init(s):
         '''
@@ -157,8 +171,29 @@ class Source_Reader_class:
                 if not os.path.exists(cat_path):
                     break
 
-                # Record the path and increment for the next cat.
-                cat_dir_list_low_to_high.append(cat_path)
+                # Record the path if the cat is not from a prior run.
+                if not Log_Old.File_Is_From_Last_Run(cat_path):
+                    cat_dir_list_low_to_high.append(cat_path)
+
+                    # If a prior cat file was found before this, then this
+                    #  was added by the user since the last customizer run.
+                    # If this cat file is not the highest priority,
+                    #  toss a warning, since this indicates the user added
+                    #  a higher numbered cat since the last customizer
+                    #  run.
+                    # Only print this warning once, by checking the dummy
+                    #  flag.
+                    if (s.prior_customizer_cat_path != None
+                    and s.prior_customizer_cat_needs_dummy == False):
+                        s.prior_customizer_cat_needs_dummy = True
+                        print('Warning: cat file {} is from a prior'
+                                ' Customizer run but is not the highest'
+                                ' numbered cat file.'.format(
+                                    s.prior_customizer_cat_path))
+                else:
+                    s.prior_customizer_cat_path = cat_path
+
+                # Increment for the next cat.
                 cat_index += 1
                
 
@@ -171,8 +206,28 @@ class Source_Reader_class:
         # Fill in dict entries with the list paths, in reverse order.
         for path in reversed(cat_dir_list_low_to_high):
             s.catalog_file_dict[path] = None
-
+            
         return
+
+
+    def Get_Next_Higher_Cat_Index(s):
+        '''
+        Returns a 2-digit string, the next catalog index, 1 higher than
+        the existing highest index when ignoring any catalogs generated
+        by prior runs. To be used if writing modified files to a catalog.
+        '''
+        # The first catalog_file_dict entry is the highest priority.
+        # This will get the file path.
+        # Convert to a Path for convenience.
+        highest_index_path = Path(next(iter(s.catalog_file_dict.keys())))
+
+        # Get the index.
+        highest_index = int(highest_index_path.stem)
+
+        # Increment and convert back to a 2-digit string.
+        next_index_str = '{:02}'.format(highest_index + 1)
+        assert len(next_index_str) == 2
+        return next_index_str
 
 
     def Record_New_Source_File(s, sys_path):
@@ -259,6 +314,7 @@ class Source_Reader_class:
         # Grab the extension.
         file_extension = virtual_path.rsplit('.',1)[1]
         # Determine the name for a possibly packed version.
+        # This is None if the file is not expected to be packed.
         virtual_path_pck = Unpacked_Path_to_Packed_Path(virtual_path)
 
         # Flag to indicate if the binary was loaded from a pck file, and
@@ -278,6 +334,9 @@ class Source_Reader_class:
         #  files found during Init.
         # Pck takes precedence over other files when X3 loads them.
         for test_virtual_path in [virtual_path_pck, virtual_path]:
+            # Skip empty packed paths.
+            if test_virtual_path == None:
+                continue
             # Skip if not found.
             if test_virtual_path not in s.source_file_path_dict:
                 continue
@@ -289,7 +348,7 @@ class Source_Reader_class:
             with open(file_source_path, 'rb') as file:
                 file_binary = file.read()
                 # If it was pck, clarify as zipped.
-                file_binary_is_zipped = test_virtual_path.endswith('.pck')
+                file_binary_is_zipped = test_virtual_path == virtual_path_pck
                 
             # Don't check the other suffix after a match is found.
             break
@@ -300,8 +359,12 @@ class Source_Reader_class:
         if file_binary == None and Settings.ignore_loose_files == False:
             sys_path = Virtual_Path_to_System_Path(virtual_path)
             sys_path_pck = Unpacked_Path_to_Packed_Path(sys_path)
+
             # Loop over pck and standard versions.
             for test_sys_path in [sys_path_pck, sys_path]:
+                # Skip empty packed paths.
+                if sys_path_pck == None:
+                    continue
 
                 # Following checks will look for a renamed file or a file with
                 #  the original name.
@@ -336,12 +399,15 @@ class Source_Reader_class:
                     # If it was pck, clarify as zipped.
                     # (Use the test_sys_path, since the actual path may
                     #  have a backup extension.)
-                    file_binary_is_zipped = test_sys_path.endswith('.pck')
+                    file_binary_is_zipped = test_sys_path == sys_path_pck
 
 
         # If still no binary found, check the cat/dat pairs.
         # Special check: if looking for a script, they are never
         #  in the cat/dats, so can skip checks early.
+        # Note: it is possible unpacked versions of files (with a packed
+        #  version) are not recognized in catalogs by the game, but this
+        #  will look for them anyway.
         if (file_binary == None
         and not virtual_path.startswith('scripts/')):
 
@@ -364,6 +430,10 @@ class Source_Reader_class:
                 #  should be fine since the cats are expected to not
                 #  mix packed and unpacked versions.)
                 for test_cat_path in [cat_path_pck, cat_path]:
+                    
+                    # Skip empty packed paths.
+                    if test_cat_path == None:
+                        continue
 
                     # Check the cat for the file.
                     file_binary = cat_reader.Read(test_cat_path)
@@ -374,7 +444,7 @@ class Source_Reader_class:
                     #  stop searching.
                     file_source_path = cat_file
                     # If it was pck, clarify as zipped.
-                    file_binary_is_zipped = test_cat_path.endswith('.pck')
+                    file_binary_is_zipped = test_cat_path == cat_path_pck
                     break
 
                 # Stop looping over cats once a match found.

@@ -6,7 +6,7 @@ probably keying off cases where [basic] is selected, and a specific ship
 is not identified.
 '''
 import math
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 import copy
 
 from .T_Director import *
@@ -80,14 +80,14 @@ there for defaults.
 
 If adding new variants programmatically, some issues to consider:
 
-    -How to parse the existing ships to find variants and the base ship
+    - How to parse the existing ships to find variants and the base ship
     they map to?
     One commonality appears to be the name index, which is always the same
     between variants, suggesting the variant name prefix is added automatically.
     Can sort all ships by name index, and check that all ships for a given
     name are disjoint variants.
 
-    -How to select adjustments for each variation, eg. shields, hull, etc.?
+    - How to select adjustments for each variation, eg. shields, hull, etc.?
     Once existings variants are found, can gather their variations in a select
     group of fields:
         laser gen, 
@@ -101,7 +101,7 @@ If adding new variants programmatically, some issues to consider:
     Other fields, eg. missile compatibility or cargo size, can be ignored,
     since it is rare for them to change (eg. a falcon hauler that can carry xl wares).
 
-    -How to add variants to an existing game?
+    - How to add variants to an existing game?
     The jobs file may select variants automatically (randomly), partially populating
     the universe.
     Making variants available for purchase would require adding them manually to
@@ -109,19 +109,51 @@ If adding new variants programmatically, some issues to consider:
     If added through x3_universe, any shipyard with a base variant can have all
     new variants added, but that may only work on a new game.
      
-    -How to ignore non-ships that are in tships, like drones and weapon platforms?
+    - How to ignore non-ships that are in tships, like drones and weapon platforms?
     These cases appear to have 0 speed extensions generally.
     Advanced space suit in xrm does have extensions, but no cargo space.
     Normal space suit has 1 cargo, some speed extensions, no rudder extensions.
     Others, like freight drones, have cargo but not speed extensions.
     Can require modified ships have both cargo and both extension types.
 
-    -How to capture built in wares, eg. ore collector for miner variants.
-    TODO: think about this.
+    - How to capture built in wares, eg. ore collector for miner variants.
+    These can be handled somewhat specially; mostly only care about copying
+    the base ship's built-ins, and adding mining equipment to miners.
 
+
+If Bounce is installed, it contains ship bounding box dimensions in the
+addon/t/8389-L044.xml file. This should be updated.
+
+    The file appears to contain a series of entries which hold the
+    subtype ids (tships line) of the ships to consider, followed by
+    6 dimension values per ship.  Comments tend to clarify the ship
+    being described, but can generally be ignored.
+
+    Eg.:
+        <t id="2000">200</t> <!--ATF Odin-->
+        <t id="2001">789</t>
+        <t id="2002">789</t>
+        <t id="2003">642</t>
+        <t id="2004">642</t>
+        <t id="2005">307</t>
+        <t id="2006">300</t>
+
+    Node id's appear to be subtype*10, giving room for the dimensions
+    between ship entries.  (Why is the ship subtype needed, then,
+    since its dims can be looked up directly?)
+
+    This information can potentially be read in, and then any variant
+    of a ship with an entry in 8389 can duplicate the node values with
+    the new tships subtype, appending to the bottom of 8389.
+
+    Since variants always reuse existing models, no effort is needed
+    in figuring out new bounding boxes.
 '''
 
-@File_Manager.Transform_Wrapper('types/TShips.txt', 'types/WareLists.txt', 'types/TWareT.txt')
+@File_Manager.Transform_Wrapper(
+    'types/TShips.txt', 
+    'types/WareLists.txt', 
+    'types/TWareT.txt')
 def Add_Ship_Combat_Variants(
         **kwargs
         ):
@@ -152,7 +184,10 @@ def Add_Ship_Combat_Variants(
         **kwargs
         )
     
-@File_Manager.Transform_Wrapper('types/TShips.txt', 'types/WareLists.txt', 'types/TWareT.txt')
+@File_Manager.Transform_Wrapper(
+    'types/TShips.txt', 
+    'types/WareLists.txt', 
+    'types/TWareT.txt')
 def Add_Ship_Trade_Variants(
         **kwargs
         ):
@@ -212,9 +247,10 @@ variant_id_field_ratios_dict_dict = None
 prior_new_variants = []
 
 
-@File_Manager.Transform_Wrapper('types/TShips.txt', 
-                    'types/WareLists.txt', 
-                    'types/TWareT.txt')
+@File_Manager.Transform_Wrapper(
+    'types/TShips.txt', 
+    'types/WareLists.txt', 
+    'types/TWareT.txt')
 def Add_Ship_Variants(
         ship_types = [
             'SG_SH_M0',
@@ -282,6 +318,9 @@ def Add_Ship_Variants(
     complete, during which time the game will be unresponsive.
     Warning: it is unsafe to remove variants once they have been added to
     an existing save.
+
+    If a Bounce mod's wall file is found, it will be updated with the new
+    variants.
 
     Special attributes, such as turret count and weapon compatibitities, are not
     considered.
@@ -494,12 +533,14 @@ def Add_Ship_Variants(
     if race_types == None:
         race_types = races_for_modifiers
 
+    tships_file = File_Manager.Load_File('types/TShips.txt', 
+                                         return_game_file = True)
 
     # Build a list of all ship names.
     # This is used later to ensure generated names have no conflicts
     #  with existing names.
     ship_names_list = []
-    for ship_dict in File_Manager.Load_File('types/TShips.txt'):
+    for ship_dict in tships_file.Read_Data():
         ship_names_list.append(ship_dict['name'])
 
     
@@ -513,7 +554,7 @@ def Add_Ship_Variants(
     #  having different internal names, so this will gather all Mercuries 
     #  together.
     name_variant_id_ship_dict_dict_dict = defaultdict(dict)
-    for ship_dict in File_Manager.Load_File('types/TShips.txt'):
+    for ship_dict in tships_file.Read_Data():
 
         # Skip those without cargo.
         if int(ship_dict['cargo_min']) == 0:
@@ -817,11 +858,22 @@ def Add_Ship_Variants(
     #  add variants for.
     # Keep a list of the new ships being created.
     new_ships_list = []
+
     # Keep a list of the new miner variants, which will have an ore collector
     #  and mineral scanner and special command software added as built-in equipment.
     # TODO: These should also have the mobile drilling system added as a compatibility
     #  if possible, though that can be kicked down the road.
     new_miners_list = []
+    
+    # For Bounce update, collect information on the base ship tships index
+    #  and variant tships index for each new ship.
+    # Note: indices start at 0, generally for the argon mammoth.
+    # Make this ordered, mostly so the updated wall file will be kept
+    #  in order as well without extra sorting needed.
+    variant_index_to_base_index_dict = OrderedDict()
+    # To know the variant index, need to know the base max index.
+    # Variant index is base + offset (number of variants).
+    base_tships_max_index = len(tships_file.Read_Data()) - 1
 
     # Loop over the ship names.
     # Each gets considered separately.
@@ -1251,6 +1303,14 @@ def Add_Ship_Variants(
             if variant_index == variant_name_index_dict['miner']:
                 new_miners_list.append(new_ship_dict)
 
+            # Pair this variant tships index (predicted) with the base
+            #  ship index.
+            # Eg. the basic_dict might be index 0 for a mammoth, and the
+            #  variant expected to be original max index + variant count.
+            base_index = tships_file.data_dict_list.index(basic_dict)
+            this_index = base_tships_max_index + len(new_ships_list)
+            variant_index_to_base_index_dict[this_index] = base_index
+
                 
     #  Get the director text for adding these new variants to
     #  shipyards.
@@ -1273,8 +1333,7 @@ def Add_Ship_Variants(
 
 
     # All new ships will be put at the bottom of the tships dict_list.
-    File_Manager.Load_File('types/TShips.txt', return_game_file = True).Add_Entries(
-        new_ships_list)
+    tships_file.Add_Entries(new_ships_list)
 
     # Note how many ships were added.
     if print_variant_count:
@@ -1290,8 +1349,73 @@ def Add_Ship_Variants(
             ship_types = [x['name'] for x in new_miners_list],
             equipment_list = mining_equipment )
 
+    # Update the bounce wall file.
+    Update_Bounce(variant_index_to_base_index_dict)
 
     return
+
+
+def Update_Bounce(variant_index_to_base_index_dict):
+    '''
+    Updates the Bounce bounding boxes wall file,
+    if the corresponding file is found.
+    '''
+    # Look up the file; return early if not found.
+    bounce_file = File_Manager.Load_File('t/8389-L044.xml', 
+                                         error_if_not_found = False)
+    if bounce_file == None:
+        return
+    bounce_xml = bounce_file.Get_XML_Tree()
+    # Get the node with the bounce information.
+    bounce_node = bounce_xml.find('./page[@id="80000"]')
+
+    # Small support function for looking up a wall node.
+    def Get_T_Node(t_id):
+        subnode = bounce_node.find('./t[@id="{}"]'.format(t_id ))
+        return subnode
+
+    # Don't edit the wall file if no changes are made.
+    # This way the comments won't get stripped, particularly if the
+    #  wall file was generated manually for the variants.
+    change_occurred = False
+
+    # Work through variants, in order.
+    for variant_index, base_index in variant_index_to_base_index_dict.items():
+
+        # Skip if the base_index (*10) wasn't in the wall file.
+        if Get_T_Node(base_index * 10) == None:
+            continue
+        # Skip if the variant index (*10) is in the wall file already for
+        #  some reason. This could happen if the wall file was generated
+        #  after variant additions, and then the customizer was rerun.
+        if Get_T_Node(variant_index * 10) != None:
+            continue
+
+        # Loop over the base nodes (should be 7 total).
+        for t_offset in range(7):
+            base_node = Get_T_Node(base_index * 10 + t_offset)
+
+            # Make a copy of this node. Could also make a new node, but this
+            #  might preserve spacing better.
+            variant_node = copy.deepcopy(base_node)
+
+            # The first node will swap the text field to the variant index.
+            if t_offset == 0:
+                assert base_node.text == str(base_index)
+                variant_node.text = str(variant_index)
+
+            # All nodes swap their ids to offset from the variant index.
+            variant_node.set('id', str(variant_index * 10 + t_offset))
+            bounce_node.append(variant_node)
+
+        # If here, a variant was added.
+        change_occurred = True
+
+    # Record the changes.
+    if change_occurred:
+        bounce_file.Update_From_XML_Node(bounce_xml)
+    return
+
 
 #  Global tracker for which variants have been removed on
 #  prior calls to Remove_Ship_Variants.
@@ -1331,6 +1455,7 @@ def Remove_Ship_Variants(
     new ships will not spawn automatically.
     Variants will be removed from existing shipyards the first time a game
     is loaded after running this transform.
+    Note: this transform is only lightly tested.
     
     * ship_types:
       - List of ship names or types to remove variants for,
@@ -1552,7 +1677,10 @@ def _Standardize_Variant_Types_List(variant_types):
         
     return
 
+
 '''
+Old thoughts on adding ships in game:
+
 Phase 2 is to generate a script which will add the new variants to the
 shipyards for an ongoing game.
 
@@ -1836,7 +1964,3 @@ Update:
     Transforms here are updated accordingly.
         
 '''
-
-# TODO: method to disable variants no longer wanted, but are present
-#  in a save game and cannot be safely removed, since ship identifiers
-#  tend to be based on line number in tships.

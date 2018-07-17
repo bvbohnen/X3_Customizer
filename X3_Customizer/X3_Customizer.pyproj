@@ -35,6 +35,9 @@
     <Compile Include="Common\Exceptions.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="File_Manager\Cat_Writer.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="File_Manager\Logs.py">
       <SubType>Code</SubType>
     </Compile>
