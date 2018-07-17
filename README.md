@@ -1,4 +1,4 @@
-X3 Customizer 3.8
+X3 Customizer 3.9
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -262,6 +262,10 @@ Obj_Code Transforms:
  * Disable_Combat_Music
 
       Turns off combat music, keeping the normal environment music playing when nearing hostile objects. If applied to a saved game already in combat mode, combat music may continue to play for a moment. The beep on nearing an enemy will still be played.
+
+ * Disable_Docking_Music
+
+      Prevents docking music from playing when the player manually requests docking.
 
  * Keep_TLs_Hired_When_Empty
 
@@ -712,3 +716,5 @@ Change Log:
    - Added support for generating a catalog file collecting all non-script changes.
    - Add_Life_Support now edits various scripts that use special checks for ships with built-in life support (normally TPs only), to support the modified ship classes.
    - Add_Ship_Variants now edits the Bounce mod's wall file, if found, to include entries for the new ships which share a model with an existing ship present in the bounce file.
+ * 3.9
+   - Added Disable_Docking_Music.

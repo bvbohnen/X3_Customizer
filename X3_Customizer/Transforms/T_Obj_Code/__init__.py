@@ -15,6 +15,7 @@ from .Misc import Disable_Asteroid_Respawn
 from .Misc import Allow_Valhalla_To_Jump_To_Gates
 from .Misc import Remove_Factory_Build_Cutscene
 from .Misc import Keep_TLs_Hired_When_Empty
+from .Misc import Disable_Docking_Music
 
 from .Complex import _Prevent_Complex_Connectors
 from .Complex import Remove_Complex_Related_Sector_Switch_Delay

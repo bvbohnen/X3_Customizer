@@ -193,6 +193,8 @@ Change Log:
    - Add_Ship_Variants now edits the Bounce mod's wall file, if found,
      to include entries for the new ships which share a model with an
      existing ship present in the bounce file.
+ * 3.9
+   - Added Disable_Docking_Music.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

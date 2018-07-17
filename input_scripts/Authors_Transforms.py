@@ -85,9 +85,14 @@ Keep_TLs_Hired_When_Empty()
 Prevent_Accidental_Spacefly_Swarms()
 
 # Disable combat music.
-#Disable_Combat_Music()
+# This is actually kinda stressful to turn off, making it harder to
+#  know when in danger, so maybe leave combat music in place.
+# Disable_Combat_Music()
 # Similarly, disable the combat entrance beeping.
 # Remove_Combat_Beep()
+
+# Disable docking music.
+Disable_Docking_Music()
 
 if Vanilla or XRM:
     
@@ -203,14 +208,14 @@ else:
         'L2M183': 0.5,
         # Disable sector info, as it is generally useless.
         'L2M147': 0,
-        # Disable return ship missions, as they are generally impossible
+        # Reduce return ship missions, as they are often impossible
         #  when playing without jump drives, and the temptation to keep
         #  ships is too great. (A shame, since these are fun.)
-        'L2M105': 0,
-        # Disable factory defense, since the AI doesn't defend itself
+        'L2M105': 0.3,
+        # Reduce factory defense, since the AI doesn't defend itself
         #  properly for these missions (just focuses on the factory
         #  while getting picked off).
-        'L2M135': 0,
+        'L2M135': 0.1,
         })
 
 

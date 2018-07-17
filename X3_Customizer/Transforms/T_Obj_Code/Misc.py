@@ -724,3 +724,44 @@ def Keep_TLs_Hired_When_Empty():
 
     return
 
+
+@File_Manager.Transform_Wrapper('L/x3story.obj')
+def Disable_Docking_Music():
+    '''
+    Prevents docking music from playing when the player manually requests
+    docking.
+    '''
+    '''
+    Code to edit is in CLIENT.DockingAllowed, where music track 14 is
+    called.
+    
+    Can convert the code section to nops:
+           pushb      14d ; 0Eh
+           push       1
+           pushw      200d ; 0C8h
+           call86     X_AUDIO.ChangeTrackMusic
+           pop
+    '''
+    patch = Obj_Patch(
+            file = 'L/x3story.obj',
+            #offsets = [0x000172AE],
+            ref_code =  '05' '0E'
+                        '02'
+                        '06' '00C8'
+                        '86' '........'
+                        '24'
+                        '6F'
+                        '33' '........'
+                        '02'
+                        '06' '0503'
+                        '05' '0D'
+                        '28' '0002'
+                        '03'
+                        '06' '00C8',
+            # Swap to 12 nops.
+            new_code = NOP * 12,
+            )
+    Apply_Obj_Patch(patch)
+
+    return
+
