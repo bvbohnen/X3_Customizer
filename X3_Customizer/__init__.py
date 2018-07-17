@@ -22,10 +22,12 @@ This tool is designed primarily for Albion Prelude v3.3. Most transforms
 will support prior or later versions of AP. TC 3.4 is tentatively supported
 for many transforms, though has not been thoroughly tested.
 
-When used alongside the X3 Plugin Manager: run X3 Customizer second,
-after the plugin manager is closed, since the plugin manager generates a
-TWareT.pck file when closed that doesn't capture changes in TWareT.txt
-made by this tool.
+When used alongside the X3 Plugin Manager: if the customizer outputs to
+a catalog (the default), these tools can run in either order; if the
+customizer outputs to loose files (command line option), the customizer
+should be run second, after the plugin manager is closed, since the
+plugin manager generates a TWareT.pck file when closed that doesn't
+capture changes in TWareT.txt made by this tool.
 
 Usage:
 
@@ -60,8 +62,8 @@ Setup and behavior:
   are either provided as loose files, or extracted automatically from the
   game's cat/dat files.
 
-  * Source files are searched for in this priority order, where .pck
-    versions of files take precedence:
+  * Source files are searched for in this priority order, where packed
+    versions (pck, pbb, pbd) of files take precedence:
     - From an optional user specified source folder, with a folder
       structure matching the X3 directory structure (without 'addon' path).
       Eg. [source_folder]/types/TShips.txt
@@ -91,11 +93,12 @@ Setup and behavior:
   Included in the repository is Authors_Transforms, the author's
   personal set of transforms, which can be checked for futher examples.
 
-  * Transformed output files will be generated in an unpacked form
-  in the x3 directories, or to a custom output directory set
-  using Set_Path. Already existing files will be renamed,
-  suffixing with '.x3c.bak', if they do not appear to have been
-  created by the customizer on a prior run. A json log file will be
+  * Transformed output files will be generated to a catalog file in
+  the addon folder by default, or as loose files in the x3 directories
+  if requested. Scripts are always placed in the scripts folder.
+  Already existing loose files will be renamed, suffixing
+  with '.x3c.bak', if they do not appear to have been created
+  by the customizer on a prior run. A json log file will be
   written with information on which files were created or renamed.
 
   * Warning: this tool will attempt to avoid unsafe behavior, but
@@ -104,7 +107,6 @@ Setup and behavior:
   transformed files.
   
 '''
-# TODO: maybe remove version tag from title, just leave in change log.
 # Note: the above comment gets printed to the markdown file, so avoid
 #  having a 4-space indent because text will get code blocked.
 # -Need to also avoid this 4-space group across newlines, annoyingly.
@@ -119,6 +121,7 @@ TODO transforms:
 -Add option for salvage command software mod to disable the extra 
  content (invincible repair stations and such).
 -Add option for xrm bounties to not spam the player log with messages.
+-Some other todos spread across transform modules.
 '''
 
 # Note:

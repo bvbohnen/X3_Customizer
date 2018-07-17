@@ -9,7 +9,7 @@ This tool is written in Python, and tested on version 3.6. As of customizer vers
 
 This tool is designed primarily for Albion Prelude v3.3. Most transforms will support prior or later versions of AP. TC 3.4 is tentatively supported for many transforms, though has not been thoroughly tested.
 
-When used alongside the X3 Plugin Manager: run X3 Customizer second, after the plugin manager is closed, since the plugin manager generates a TWareT.pck file when closed that doesn't capture changes in TWareT.txt made by this tool.
+When used alongside the X3 Plugin Manager: if the customizer outputs to a catalog (the default), these tools can run in either order; if the customizer outputs to loose files (command line option), the customizer should be run second, after the plugin manager is closed, since the plugin manager generates a TWareT.pck file when closed that doesn't capture changes in TWareT.txt made by this tool.
 
 Usage:
 
@@ -34,7 +34,7 @@ Setup and behavior:
 
   * Transforms will operate on source files (eg. tships.txt) which are either provided as loose files, or extracted automatically from the game's cat/dat files.
 
-  * Source files are searched for in this priority order, where .pck versions of files take precedence:
+  * Source files are searched for in this priority order, where packed versions (pck, pbb, pbd) of files take precedence:
     - From an optional user specified source folder, with a folder structure matching the X3 directory structure (without 'addon' path). Eg. [source_folder]/types/TShips.txt
     - From the normal x3 folders.
     - From the incrementally indexed cat/dat files in the 'addon' folder.
@@ -50,7 +50,7 @@ Setup and behavior:
   
   * The quickest way to set up a command script is to copy and edit the input_scripts/Example_Transforms.py file. Included in the repository is Authors_Transforms, the author's personal set of transforms, which can be checked for futher examples.
 
-  * Transformed output files will be generated in an unpacked form in the x3 directories, or to a custom output directory set using Set_Path. Already existing files will be renamed, suffixing with '.x3c.bak', if they do not appear to have been created by the customizer on a prior run. A json log file will be written with information on which files were created or renamed.
+  * Transformed output files will be generated to a catalog file in the addon folder by default, or as loose files in the x3 directories if requested. Scripts are always placed in the scripts folder. Already existing loose files will be renamed, suffixing with '.x3c.bak', if they do not appear to have been created by the customizer on a prior run. A json log file will be written with information on which files were created or renamed.
 
   * Warning: this tool will attempt to avoid unsafe behavior, but the user should back up irreplaceable files to be safe against bugs such as accidental overwrites of source files with transformed files.
   
