@@ -195,6 +195,8 @@ Change Log:
      existing ship present in the bounce file.
  * 3.9
    - Added Disable_Docking_Music.
+ * 3.10
+   - Added Preserve_Captured_Ship_Equipment.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

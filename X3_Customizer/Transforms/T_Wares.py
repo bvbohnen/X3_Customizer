@@ -1,5 +1,19 @@
 '''
 Edits to the ware lists.
+
+Note: The X3 Plugin Manager autogenerates a TWareT file, extending it
+with a few hundred entries.
+If edits here are done relative to existing values, this could cause
+a recursive loop to form between the X3C and X3PM, where X3C runs its
+edits, X3PM is opened and makes a copy of the edits to its file, then
+X3C next time will read the X3PM file and use it to make further edits,
+etc.
+Eg. doubling the price of a ware would happen for every cycle of these
+two tools.
+
+For now, no relative modifations are made (instead setting specific prices
+or ware sizes), but a solution will be needed if transforms are extended
+to be relative.
 '''
 from .. import File_Manager
 
@@ -94,6 +108,7 @@ def Set_Ware_Pricing(
 
     return
 
+
 # Transform to set relative value the same for player and npcs, essentially
 #  to remove the player factory advantage.
 # Can either set player to npc (player factories less efficient, and throws
@@ -182,6 +197,8 @@ def Change_Ware_Size(
     # Get the ware files to search.
     if ware_file == None:
         # Try everything, but in rough order of expected need to search.
+        # TODO: maybe preparse these to build a ware dict, matching name
+        #  to file. This could be reused above for price changes as well.
         ware_file_list = [
             'types/TWareT.txt', 'types/TLaser.txt', 'types/TShields.txt',
             'types/TMissiles.txt', 'types/TFactories.txt', 'types/TDocks.txt',

@@ -91,10 +91,17 @@ Prevent_Accidental_Spacefly_Swarms()
 # Similarly, disable the combat entrance beeping.
 # Remove_Combat_Beep()
 
-# Disable docking music.
+# Disable docking music transition when manually requesting to dock.
 Disable_Docking_Music()
 
+# Keep equipment intacts for captured ships.
+Preserve_Captured_Ship_Equipment()
+
 if Vanilla or XRM:
+
+    # Experimental attempt to turn off friendly fire between ships.
+    # -Not working in practice.
+    #Transforms.T_Obj_Code._Disable_Friendly_Fire()
     
     # Experimental code to address complex related game slowdown.
     # Initial hour long test found no oddities with this applied.
@@ -441,6 +448,10 @@ if XRM:
 
 #####################################################
 # Weapons
+
+# Charging weapons is inconsistent with npc or turret use, so
+#  remove that behavior.
+Remove_Weapon_Charge_Up()
 
 if Vanilla:
     # Give a mild weapon range increase.

@@ -259,9 +259,9 @@ def Clear_Weapon_Flag(flag_name):
 @File_Manager.Transform_Wrapper('types/TBullets.txt')
 def Remove_Weapon_Charge_Up():
     '''
-    Remove charge up from all weapons, to make PPCs and similar easier to use in
-    a manner consistent with the npcs (eg. hold trigger to just keep firing), as
-    charging is a player-only option.
+    Remove charge up from all weapons, to make PPCs and similar easier to use
+    in a manner consistent with the npcs (eg. hold trigger to just keep
+    firing), as charging is a player-only option.
     '''
     Clear_Weapon_Flag('charged')
 

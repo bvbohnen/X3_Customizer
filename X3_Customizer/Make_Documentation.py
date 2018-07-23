@@ -298,6 +298,17 @@ def Make(*args):
     # Get a set of lines suitable for the egosoft forum thread,
     #  using BB code.
     doc_bb_lines = Get_BB_Text(doc_short_lines)
+    # Prefix with some extra lines for the forum.
+    doc_bb_lines = [
+        'Download source from github:',
+        '[url]https://github.com/bvbohnen/X3_Customizer[/url]',
+        'Compiled release (Windows):',
+        '[url]https://github.com/bvbohnen/X3_Customizer/releases[/url]',
+        'Full documentation:',
+        '[url]https://github.com/bvbohnen/X3_Customizer/blob/master/Documentation.md[/url]',
+        '',
+        '',
+        ] + doc_bb_lines
     
     # Write out the full doc.
     # Put these 1 directory up to separate from the code.

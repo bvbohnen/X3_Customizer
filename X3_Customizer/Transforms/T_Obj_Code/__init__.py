@@ -16,6 +16,8 @@ from .Misc import Allow_Valhalla_To_Jump_To_Gates
 from .Misc import Remove_Factory_Build_Cutscene
 from .Misc import Keep_TLs_Hired_When_Empty
 from .Misc import Disable_Docking_Music
+from .Misc import _Disable_Friendly_Fire
+from .Misc import Preserve_Captured_Ship_Equipment
 
 from .Complex import _Prevent_Complex_Connectors
 from .Complex import Remove_Complex_Related_Sector_Switch_Delay

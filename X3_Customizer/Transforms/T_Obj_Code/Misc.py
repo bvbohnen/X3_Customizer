@@ -765,3 +765,93 @@ def Disable_Docking_Music():
 
     return
 
+
+@File_Manager.Transform_Wrapper('L/x3story.obj')
+def _Disable_Friendly_Fire():
+    '''
+    Disables friendly fire between ships with the same owner.
+    Experimental; not working in testing.
+    '''
+    '''
+    Code to edit is in SHIP.Hit.
+
+    Relatively early on, a check is made for if the attacker is the same
+    owner as the victim.  Normally this skips over some notoriety hit
+    code, but could be changed to return instead, skipping the damage
+    update.
+
+    The jump can be redirected to the end of the function, which has
+    the same stack depth (3).
+
+    Test result: no change in damage application when shooting another
+    owned ship.  Suggests this bit of code isn't actually used normally.
+    '''
+    patch = Obj_Patch(
+            file = 'L/x3story.obj',
+            #offsets = [0x000C01C0],
+            # Code section starting with the jump address to the ship
+            #  damage code.
+            ref_code =  '000C02E5'
+                        '0D' '0001'    
+                        '0E' '0008'    
+                        '5B'         
+                        '34' '000C0211'
+                        '01'         
+                        '0E' '0008'    
+                        '85' '0000298C',
+            # Address of a pre-return stack pop.
+            new_code = '000C04D0',
+            )
+    Apply_Obj_Patch(patch)
+
+    return
+
+
+@File_Manager.Transform_Wrapper('L/x3story.obj')
+def Preserve_Captured_Ship_Equipment():
+    '''
+    Preserves equipment of captured ships.  This is expected to affect
+    bailed ships, marine captured ships, the "pilot eject from ship" script
+    command, and the "force pilot to leave ship" director command.
+    '''
+    '''
+    Code to edit is in SHIP.DowngradeTakeOver.
+
+    This is called from several places, so the edit will be in the function
+    to return early (as opposed to filling all call points with Nops).
+
+    The script command calls SHIP.LeaveShip, which calls this function.
+    Small ship bailing also calls SHIP.LeaveShip.
+    Marines boarding calls this function directly.
+    Unclear on where the mission director command is handled, though in
+    game test suggests it is affected as well.
+    '''
+    patch = Obj_Patch(
+            file = 'L/x3story.obj',
+            #offsets = [0x000C86B2],
+            # Code section following function entry.
+            # This starts with 0 items on the stack.
+            ref_code =  '06' '03E8'
+                        '02'
+                        '82' '........'
+                        '24'
+                        '01'
+                        '01'
+                        '14' '0002'
+                        '24'
+                        '0D' '0001'
+                        '05' '08'
+                        '02'
+                        '82' '........'
+                        '5C'
+                        '34' '........'
+                        '32' '........',
+            # Replace with returning a 0.
+            # For good form, this will also replace the whole initial delay
+            #  call (up through the '24' popping the return value) so that
+            #  the stack looks okay when disassembled.
+            new_code = PUSH_0 + RETURN + NOP * 8,
+            )
+    Apply_Obj_Patch(patch)
+
+    return
