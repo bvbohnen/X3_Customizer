@@ -197,6 +197,10 @@ Change Log:
    - Added Disable_Docking_Music.
  * 3.10
    - Added Preserve_Captured_Ship_Equipment.
+ * 3.11
+   - Added Hide_Lasertowers_Outside_Radar per request.
+   - Changed default args for Adjust_Gate_Rings to plain ring for normal
+     gates, reversed hub ring for hub gates.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

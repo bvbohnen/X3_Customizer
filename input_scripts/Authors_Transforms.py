@@ -97,6 +97,10 @@ Disable_Docking_Music()
 # Keep equipment intacts for captured ships.
 Preserve_Captured_Ship_Equipment()
 
+# Testing requested option for hiding lasertowers/orbital platforms not on radar.
+# Test succesful, though disabling for personal use.
+Hide_Lasertowers_Outside_Radar()
+
 if Vanilla or XRM:
 
     # Experimental attempt to turn off friendly fire between ships.
@@ -234,10 +238,12 @@ else:
 # Disable for now; maybe turn on if losing too many ships to standard
 #  gates to try it out.
 if Vanilla:
-    pass
     # Swap_Standard_Gates_To_Terran_Gates()
+    Adjust_Gate_Rings(
+        standard_ring_option = 'use_plain_ring',
+        hub_ring_option = 'use_reversed_hub',
+        )
 elif XRM:
-    pass
     # Swap_Standard_Gates_To_Terran_Gates()
     Adjust_Gate_Rings(
         standard_ring_option = 'use_plain_ring',
@@ -254,8 +260,14 @@ elif XRM:
         )
 
 # LU uses orbs to replace gate fields, and removes rings.
-# Rings could be added back in using the transform, but can leave
-#  them alone for now.
+# Rings could be added back in using the transform, though orbs are
+#  still in place (where the actual collision field will match the
+#  plane inside the ring, not the full orb).
+elif LU:
+    Adjust_Gate_Rings(
+        standard_ring_option = 'use_plain_ring',
+        hub_ring_option = 'use_reversed_hub',
+        )
     
 #####################################################
 # Universe
@@ -914,8 +926,10 @@ if Vanilla:
 
 
 if XRM:
-    # Can remove engine trails if they cause slowdown.
-    # Simplify_Engine_Trails()
+    # Can remove engine trails if they cause slowdown or just look ugly.
+    # Trails have a horrible effect during Seta, displaying ahead of the
+    #  ship quite often, so best to disable if Setaing a lot.
+    Simplify_Engine_Trails(remove_trails = True)
 
     # Add life support to cap ships. This includes TLs by default.
     Add_Ship_Life_Support()

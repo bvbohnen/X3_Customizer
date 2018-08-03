@@ -855,3 +855,45 @@ def Preserve_Captured_Ship_Equipment():
     Apply_Obj_Patch(patch)
 
     return
+
+
+@File_Manager.Transform_Wrapper('L/x3story.obj')
+def Hide_Lasertowers_Outside_Radar():
+    '''
+    Prevents lasertowers from showing up on sector maps when outside
+    the radar ranges of player ships, similar to normal ships.
+    A side effect is that mines will be similarly hidden.
+    '''
+    '''
+    Code to edit is in MENU_SECTOR.FindMapObjects.
+
+    Lasertowers, Mines, and Satellites (and beacons) are sublcasses
+    of class 2135.  The code for determining if an object is visible
+    will normally do a radar range check on player owned assets, but for
+    class 2135 will only check the result of a GetUnknown call.
+
+    To preserve this behavior for jump beacons while hiding laser towers,
+    the class code can be swapped to 2079, the class code for satellites
+    and beacons.
+    '''
+    patch = Obj_Patch(
+            file = 'L/x3story.obj',
+            #offsets = [0x00132C15],
+            # Code starts off with the 2135 class code check.
+            ref_code =  '06' '0857'
+                        '0D' '0002'
+                        '03'
+                        '82' '........'
+                        '64'
+                        '0D' '0002'
+                        '03'
+                        '88' '........'
+                        '33' '........'
+                        '01'
+                        '32' '........',
+            # Replace start with 2011 check.
+            new_code = '06' '081F',
+            )
+    Apply_Obj_Patch(patch)
+
+    return

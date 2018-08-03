@@ -25,8 +25,9 @@ Files of interest:
         terran_gate_scene.bod
 
     The terraformer gates appear to be the ones in the Hub.
-    On one side, these are the same as standard argon gates, but the 
-    backside has shortened stubs.
+    On one side these are the same as standard argon gates, but the 
+    backside has shortened stubs, plus some minor details are
+    changed (eg. orange instead of blue ring glow).
 
     The patch20 terran gate appears to be the one used for the Aldrin
     expansion plot.
@@ -34,8 +35,7 @@ Files of interest:
     Note: bod files are text, and somewhat suitable for direct editing.
     The scene file puts together bod files, with some placement
     information.
-    The pbd files are unknown, not openable by x3_editor, and may be
-    generally offlimits for editing.
+    The pbd files are just gzipped bod files.
 
 
 Some possible options:
@@ -59,6 +59,8 @@ Some possible options:
     5) Swap terran gates (from the Aldrin expansion plot) in for the normal
        gates, as they don't have pylons that project as far, though they do
        have more mass in general for ships to collide with.
+
+    6) See update further below on a pylonless gate model.
 
 Any of these options could work.
 A generalized transform may seek to apply any of them.
@@ -236,8 +238,8 @@ import copy
 
 @File_Manager.Transform_Wrapper('types/TGates.txt', 'types/TSpecial.txt')
 def Adjust_Gate_Rings(
-    standard_ring_option = None,
-    hub_ring_option = 'use_standard_ring',
+    standard_ring_option = 'use_plain_ring',
+    hub_ring_option = 'use_reversed_hub',
     ):
     '''
     Various options to modify gate rings, with the aim of reducing

@@ -462,8 +462,8 @@ def Simplify_Engine_Trails(
     ):
     '''
     Change engine trail particle effects to basic or none.
-    This will switch to effect 1 for medium and light ships 
-    and 0 for heavy ships, as in vanilla AP.
+    This will switch to effect 1 for medium and light ships and 0 for
+    heavy ships, as in vanilla AP.  Intended for use primarily with XRM.
 
     * remove_trails:
       - If True, this will remove trails from all ships.
@@ -491,6 +491,7 @@ def Simplify_Engine_Trails(
             this_dict['particle_effect'] = '1'
         else:
             this_dict['particle_effect'] = '0'
+    return
                 
 
 @File_Manager.Transform_Wrapper('types/TShips.txt')

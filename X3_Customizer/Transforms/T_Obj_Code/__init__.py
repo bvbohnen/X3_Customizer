@@ -1,6 +1,26 @@
 '''
 Obj file edits, broken out due to length.
 '''
+'''
+Some general notes on obj editing:
+
+A group of Russian modders wrote a disassembler for the obj files.
+See this thread for a link (maybe with browser security settings turned up): 
+https://forum.egosoft.com/viewtopic.php?t=92374.
+
+The obj files contain KC psuedo-assembly code, which is fed to a lower 
+level interpreter in the exe. Egosoft has some details on the X2 KC 
+available at https://www.egosoft.com/X/questsdk/info/doxygen/index.html, 
+which can give a general idea of what is in there.
+
+The assembly is stack oriented, where operations generally pull some number
+of items off the stack and put a result back on the stack.
+
+Notepad++ does a reasonable job as a text viewer.
+The .asm file can be used for general perusal, though the .out is handy 
+for checking stack depth changes to help understand different operations.
+
+'''
 from .Seta import Adjust_Max_Seta
 from .Seta import Adjust_Max_Speedup_Rate
 from .Seta import Stop_Events_From_Disabling_Seta
@@ -18,6 +38,7 @@ from .Misc import Keep_TLs_Hired_When_Empty
 from .Misc import Disable_Docking_Music
 from .Misc import _Disable_Friendly_Fire
 from .Misc import Preserve_Captured_Ship_Equipment
+from .Misc import Hide_Lasertowers_Outside_Radar
 
 from .Complex import _Prevent_Complex_Connectors
 from .Complex import Remove_Complex_Related_Sector_Switch_Delay
