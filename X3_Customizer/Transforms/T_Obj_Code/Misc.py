@@ -51,10 +51,16 @@ Note on verification:
 '''
 '''
 TODO:
-    Asteroid/station respawn time.
-    Station tolerance to friendly fire.
+    - Asteroid/station respawn time.
+    - Station tolerance to friendly fire.
       - Can reduce shield threshold before response from ~99% down to
         something lower, like 10% or 0% (require hull damage).
+    - Look into possible bug with 'get true amount of ware [] in cargo bay'
+    which was seemingly not working in Mayhem for jumpdrives sometimes, 
+    and was replaced with 'get amount of ware' as a workaround.
+    - Maybe stop missile count from decrementing on missile fire, for an
+    infinite missiles option. (May also need script tweaks for OOS missile
+    fire which manually applies damage and removes missiles.)
 
 '''
 from ... import File_Manager
@@ -860,11 +866,12 @@ def Preserve_Captured_Ship_Equipment():
 @File_Manager.Transform_Wrapper('L/x3story.obj')
 def Hide_Lasertowers_Outside_Radar():
     '''
-    Prevents lasertowers from showing up on sector maps when outside
-    the radar ranges of player ships, similar to normal ships.
-    A side effect is that mines will be similarly hidden.
+    Prevents lasertowers and mines from showing up on sector maps
+    when outside the radar ranges of player ships.
     '''
     '''
+    Added by request.
+
     Code to edit is in MENU_SECTOR.FindMapObjects.
 
     Lasertowers, Mines, and Satellites (and beacons) are sublcasses
@@ -895,5 +902,153 @@ def Hide_Lasertowers_Outside_Radar():
             new_code = '06' '081F',
             )
     Apply_Obj_Patch(patch)
+
+    return
+
+
+@File_Manager.Transform_Wrapper('L/x3story.obj')
+def Force_Infinite_Loop_Detection():
+    '''
+    Use with caution.
+    Turns on infinite loop detection in the script engine for all scripts.
+    Once turned on, loop detection will stay on for running scripts
+    even if this transform is removed.
+    This is intended for limited debug usage, and should preferably 
+    not be applied to a main save file to avoid bugs when scripts
+    are ended due to false positives.
+
+    An infinite loop is normally defined as at least 10k-20k operations
+    occurring on the same time step (exact amount depending on alignment).
+    False positives will occur when a script intentionally runs this
+    many operations at once. This limit will be raised to 32k-64k by this
+    transform to reduce false positives. In brief testing, false postivies
+    were observed at game loading for OK Traders, SCS, and one XRM script.
+    '''
+
+    '''
+    Added by request.
+
+    Code to edit is in SCRIPT.__runScript.
+
+    Stack location 13 holds an operation counter, that counts down.
+    If this variable is set to 0, loop detection is disabled. In normal
+    operation, the count starts from 10k and decrements down to 0,
+    at which point a time check is performed (seeing if the time is the
+    same as the last time 0 was reached).
+
+    The initial code of this section checks the counter for being 0, and
+    skips the section if so. To force detection on, this check can
+    be removed, such that the count will decrement to -1. This should be
+    okay, since the condition checks for the count being <1, and ints
+    in the KC are treated as signed.
+
+
+    Note: doing just this change (entering check code with a count of 0)
+    will cause an immediate false positive for new scripts.
+
+        When a script is initialized, the time of the last loop check is
+        initialized to the script start time. The first check of the counter
+        will see it is <1, which will pull the time again and compare to the
+        stored script start time, causing a false positive since they match.
+
+        To cover for this, the initialization code on new scripts should
+        also be modified, eg. putting in some safer value for the initial
+        time.
+        
+        If initial time is set to 0, this will cause false positives
+        when a new game is created, but should be fine for debugging a
+        given save.
+
+        If initial time is set to 1, should be slightly safer against
+        false positives on a new game as well.
+
+
+    To further reduce false positives on mods, the 10k limit can be
+    changed.
+        
+        When 10k is set, it is using pushw, a 16-bit value.
+        Since KC ints are signed, this count can only be increased to 32k.
+
+        The 10k setting in the 'infinite loop detection enabled' script
+        command can be left as-is; scripts that use that command were
+        presumably tested against the 10k limit and okay.
+
+
+    Note: a similar edit could be inserted to force disable infinite
+    loop detection, always skipping the section as if the count is 0,
+    eg. by changing the 'push SP[3]' to 'push 0'.
+
+
+    Test 1:
+        Set to skip the 0 check, without changing initial time value.
+        Result: every script failed.
+    Test 2:
+        Skip 0 check, set initial time value to 1.
+        XRM with mods had 6 scripts fail on startup, mods at a glance.
+    Test 3:
+        Skip 0 check, initial time of 1, 10k raised to 32k.
+        Now only 3 scripts fail (xrm ship chooser, ok trader, SCS).
+        This will be considered satisfactory for initial release.
+    '''
+    patch_list = [
+        # Force entry when count is 0.
+        # Change the max count to a higher number; 32k is what can fit.
+        Obj_Patch(
+            file = 'L/x3story.obj',
+            #offsets = [0x00038429],
+            # Code starts off with pushing the count and comparing
+            #  to 0, jumping if so.
+            ref_code =  '0D' '0004'
+                        '34' '........'
+                        # Enters the decrement code here.
+                        '0D' '0004'
+                        '02'
+                        '4B'
+                        '14' '0005'
+                        '02'
+                        '5E'
+                        '34' '........'
+                        # This is the original 10k limit.
+                        '06' '2710'
+                        '14' '0005'
+                        '24',
+            # Replace start check with nops.
+            new_code =  NOP * 8 +
+                        '..' '....'
+                        '..'
+                        '..'
+                        '..' '....'
+                        '..'
+                        '..'
+                        '..' '........'
+                        # Swap count to 7FFF, max positive.
+                        '06' '7FFF',
+            ),
+        # Change initial time on new scripts to 0.
+        Obj_Patch(
+            file = 'L/x3story.obj',
+            #offsets = [0x000382B0],
+            # This starts by pushing 0, then calling TI_GetAbsTime, with
+            #  the value being left on the stack as the initial time.
+            ref_code =  '01'
+                        '82' '........'
+                        '01'
+                        '01'
+                        '02'
+                        '34' '........'
+                        '0D' '0007'
+                        '02'
+                        '46'
+                        '14' '0008'
+                        '02'
+                        '4B'
+                        '0D' '000F'
+                        '10'
+                        '14' '0002',
+            # Replace with 'Push 1' and nops, leaving the 1 on the stack.
+            new_code = PUSH_1 + NOP * 5,
+            ),
+    ]
+    Apply_Obj_Patch_Group(patch_list)
 
     return

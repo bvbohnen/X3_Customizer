@@ -99,7 +99,12 @@ Preserve_Captured_Ship_Equipment()
 
 # Testing requested option for hiding lasertowers/orbital platforms not on radar.
 # Test succesful, though disabling for personal use.
-Hide_Lasertowers_Outside_Radar()
+#Hide_Lasertowers_Outside_Radar()
+
+# Testing forcing of infinite loop detection.
+# Only turn this on when debugging, and never continue a save that had this
+#  enabled on it, since detection cannot be forced off again (currently).
+#Force_Infinite_Loop_Detection()
 
 if Vanilla or XRM:
 

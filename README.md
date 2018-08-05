@@ -1,4 +1,4 @@
-X3 Customizer 3.11
+X3 Customizer 3.12
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -267,9 +267,13 @@ Obj_Code Transforms:
 
       Prevents docking music from playing when the player manually requests docking.
 
+ * Force_Infinite_Loop_Detection
+
+      Use with caution. Turns on infinite loop detection in the script engine for all scripts. Once turned on, loop detection will stay on for running scripts even if this transform is removed. This is intended for limited debug usage, and should preferably not be applied to a main save file to avoid bugs when scripts are ended due to false positives.
+
  * Hide_Lasertowers_Outside_Radar
 
-      Prevents lasertowers from showing up on sector maps when outside the radar ranges of player ships, similar to normal ships. A side effect is that mines will be similarly hidden.
+      Prevents lasertowers and mines from showing up on sector maps when outside the radar ranges of player ships.
 
  * Keep_TLs_Hired_When_Empty
 
@@ -729,5 +733,7 @@ Change Log:
  * 3.10
    - Added Preserve_Captured_Ship_Equipment.
  * 3.11
-   - Added Hide_Lasertowers_Outside_Radar per request.
+   - Added Hide_Lasertowers_Outside_Radar.
    - Changed default args for Adjust_Gate_Rings to plain ring for normal gates, reversed hub ring for hub gates.
+ * 3.12
+   - Added Force_Infinite_Loop_Detection.

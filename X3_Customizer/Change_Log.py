@@ -198,9 +198,11 @@ Change Log:
  * 3.10
    - Added Preserve_Captured_Ship_Equipment.
  * 3.11
-   - Added Hide_Lasertowers_Outside_Radar per request.
+   - Added Hide_Lasertowers_Outside_Radar.
    - Changed default args for Adjust_Gate_Rings to plain ring for normal
      gates, reversed hub ring for hub gates.
+ * 3.12
+   - Added Force_Infinite_Loop_Detection.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

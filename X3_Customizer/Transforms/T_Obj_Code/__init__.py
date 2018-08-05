@@ -39,6 +39,7 @@ from .Misc import Disable_Docking_Music
 from .Misc import _Disable_Friendly_Fire
 from .Misc import Preserve_Captured_Ship_Equipment
 from .Misc import Hide_Lasertowers_Outside_Radar
+from .Misc import Force_Infinite_Loop_Detection
 
 from .Complex import _Prevent_Complex_Connectors
 from .Complex import Remove_Complex_Related_Sector_Switch_Delay
