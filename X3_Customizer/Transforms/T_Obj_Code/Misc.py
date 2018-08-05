@@ -907,7 +907,9 @@ def Hide_Lasertowers_Outside_Radar():
 
 
 @File_Manager.Transform_Wrapper('L/x3story.obj')
-def Force_Infinite_Loop_Detection():
+def Force_Infinite_Loop_Detection(
+        operation_limit = 1000000
+    ):
     '''
     Use with caution.
     Turns on infinite loop detection in the script engine for all scripts.
@@ -920,9 +922,17 @@ def Force_Infinite_Loop_Detection():
     An infinite loop is normally defined as at least 10k-20k operations
     occurring on the same time step (exact amount depending on alignment).
     False positives will occur when a script intentionally runs this
-    many operations at once. This limit will be raised to 32k-64k by this
-    transform to reduce false positives. In brief testing, false postivies
-    were observed at game loading for OK Traders, SCS, and one XRM script.
+    many operations at once. This limit will be raised to reduce
+    false positives while this transform is in effect.
+
+    * operation_limit
+      - Int, the number of operations between two infinite loop checks,
+        between 10000 (normal script engine value) and 2 billion.
+      - Default is 1 million. This corresponds to less than 1 second
+        in a test infinite looping script, and was sufficient to avoid
+        false positives in brief tests.
+      - Currently this only works on the vanilla x3story; LU will use
+        a 32k limit.
     '''
 
     '''
@@ -973,10 +983,20 @@ def Force_Infinite_Loop_Detection():
         command can be left as-is; scripts that use that command were
         presumably tested against the 10k limit and okay.
 
+        To go beyond 32k, code would need to be moved to make room for
+        an extra 2 bytes for a wider int.
+        Conveniently, some earlier bytes were freed up when bypassing
+        the 0 check, so the intervening code can be moved up to make
+        this room.
 
-    Note: a similar edit could be inserted to force disable infinite
-    loop detection, always skipping the section as if the count is 0,
-    eg. by changing the 'push SP[3]' to 'push 0'.
+        This adjustment allows up to 2 billion ops as the limit.
+        A good value to use would need some playing around, and the
+        value could be put into the transform args.
+
+        Note: support for byte deletions/insertions added to the
+        patcher, so that the code can be shifted up without requiring
+        copying the original code (and jump address) in a way that
+        ties it to vanilla AP 3.3.
 
 
     Test 1:
@@ -987,45 +1007,76 @@ def Force_Infinite_Loop_Detection():
         XRM with mods had 6 scripts fail on startup, mods at a glance.
     Test 3:
         Skip 0 check, initial time of 1, 10k raised to 32k.
-        Now only 3 scripts fail (xrm ship chooser, ok trader, SCS).
+        Now only 4 scripts fail (xrm ship chooser and keymap, ok trader, SCS).
         This will be considered satisfactory for initial release.
+    Test 4:
+        As above, but with a 100k op limit.
+        This has 2 xrm scripts fail.
+    Test 5:
+        Bumping to 1 million op limit.
+        No script failures in this case.
+        
+
+    Note: a similar edit could be inserted to force disable infinite
+    loop detection, always skipping the section as if the count is 0,
+    eg. by changing the 'push SP[3]' to 'push 0'.
+
     '''
-    patch_list = [
-        # Force entry when count is 0.
-        # Change the max count to a higher number; 32k is what can fit.
-        Obj_Patch(
-            file = 'L/x3story.obj',
-            #offsets = [0x00038429],
-            # Code starts off with pushing the count and comparing
-            #  to 0, jumping if so.
-            ref_code =  '0D' '0004'
-                        '34' '........'
-                        # Enters the decrement code here.
-                        '0D' '0004'
-                        '02'
-                        '4B'
-                        '14' '0005'
-                        '02'
-                        '5E'
-                        '34' '........'
-                        # This is the original 10k limit.
-                        '06' '2710'
-                        '14' '0005'
-                        '24',
-            # Replace start check with nops.
-            new_code =  NOP * 8 +
-                        '..' '....'
-                        '..'
-                        '..'
-                        '..' '....'
-                        '..'
-                        '..'
-                        '..' '........'
-                        # Swap count to 7FFF, max positive.
-                        '06' '7FFF',
-            ),
-        # Change initial time on new scripts to 0.
-        Obj_Patch(
+    # Convert the input arg into a useable hex string.
+    # This will cap at max unsigned int, and will floor at 10k.
+    # Just estimate max as 2 billion for now; should be good enough.
+    operation_limit = max(10000, min( 2000000000, int(operation_limit) ))
+    
+    # Convert to hex string, 4 bytes.
+    operation_limit_hex = Int_To_Hex_String(operation_limit, 4)
+    
+    # Force entry even when count is 0.
+    # Change the max count to a higher number.
+    entry_dynamic_patch = Obj_Patch(
+        file = 'L/x3story.obj',
+        #offsets = [0x00038429],
+        # Code starts off with pushing the count and comparing
+        #  to 0, jumping if so.
+        ref_code =  '0D' '0004'
+                    '34' '........'
+                    # Enters the decrement code here.
+                    '0D' '0004'
+                    '02'
+                    '4B'
+                    '14' '0005'
+                    '02'
+                    '5E'
+                    '34' '........'
+                    # This is the original 10k limit.
+                    '06' '2710'
+                    '14' '0005'
+                    '24',
+        # Replace the start with 6 nops (not 8), leaving 2 bytes
+        #  unnaccounted for.
+        # This will end up moving the code jump address up, so needs to keep
+        #  it intact (no wildcard replacements).
+        new_code =  NOP * 6 +
+                    # Remove two bytes.
+                    '--'
+                    '..' '....'
+                    '..'
+                    '..'
+                    '..' '....'
+                    '..'
+                    '..'
+                    '..' '........'
+                    # This is the original 10k limit.
+                    # Swap to PUSHD (int instead of short), and use
+                    #  the input arg value.
+                    # Add two bytes to make room.
+                    '++'
+                    + PUSHD + operation_limit_hex +
+                    '14' '0005'
+                    '24',
+        )
+    
+    # Change initial time on new scripts to 0.
+    init_time_patch = Obj_Patch(
             file = 'L/x3story.obj',
             #offsets = [0x000382B0],
             # This starts by pushing 0, then calling TI_GetAbsTime, with
@@ -1047,8 +1098,8 @@ def Force_Infinite_Loop_Detection():
                         '14' '0002',
             # Replace with 'Push 1' and nops, leaving the 1 on the stack.
             new_code = PUSH_1 + NOP * 5,
-            ),
-    ]
-    Apply_Obj_Patch_Group(patch_list)
+            )
+
+    Apply_Obj_Patch_Group([init_time_patch, entry_dynamic_patch])
 
     return

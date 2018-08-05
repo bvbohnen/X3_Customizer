@@ -1,4 +1,4 @@
-X3 Customizer 3.12
+X3 Customizer 3.12.1
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -737,3 +737,6 @@ Change Log:
    - Changed default args for Adjust_Gate_Rings to plain ring for normal gates, reversed hub ring for hub gates.
  * 3.12
    - Added Force_Infinite_Loop_Detection.
+ * 3.12.1
+   - Added operation_limit argument to Force_Infinite_Loop_Detection and defaulting to 1 million (up from 32k) to reduce false positives.
+   - Obj patches now support balanced insertions and deletions.

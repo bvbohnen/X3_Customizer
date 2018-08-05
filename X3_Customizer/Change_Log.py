@@ -203,6 +203,11 @@ Change Log:
      gates, reversed hub ring for hub gates.
  * 3.12
    - Added Force_Infinite_Loop_Detection.
+ * 3.12.1
+   - Added operation_limit argument to Force_Infinite_Loop_Detection
+     and defaulting to 1 million (up from 32k) to reduce false
+     positives.
+   - Obj patches now support balanced insertions and deletions.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

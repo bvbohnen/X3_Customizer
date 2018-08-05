@@ -1,17 +1,12 @@
 '''
 General support for obj patching.
-
-TODO: update patch application to be able to handle all patches for
-a transform in one call, in a way that will fail out safely with no
-patches applied if any patch has an error (as opposed to applying patches
-until one fails, leaving prior edits in place for a partially implemented
-transform).
 '''
 import inspect
 # This function will convert hex strings to bytes objects.
 from binascii import unhexlify as hex2bin
 from binascii import hexlify as bin2hex
 import re
+import copy
 
 from ... import Common
 from ... import File_Manager
@@ -24,8 +19,9 @@ from ... import File_Manager
 PUSH_0         = '01'
 PUSH_1         = '02'
 PUSH_2         = '03'
-PUSHB          = '05'
-PUSHW          = '06'
+PUSHB          = '05' # 1 byte int push
+PUSHW          = '06' # 2 byte int push
+PUSHD          = '07' # 4 byte int push
 NOP            = '0C'
 PUSH           = '0D'
 POP            = '24'
@@ -70,6 +66,12 @@ class Obj_Patch:
       - Replacements will be on a 1:1 basis with existing bytes, starting
         at a matched offset and continuing until the end of the new_code.
       - Overall obj code will remain the same length.
+      - Also supports byte deletions and insertions, to aid in moving
+        code sections.  A '-' removes 1 byte, a '+' inserts one byte
+        with a default 0 value.  Replacements continue after deletions
+        points, and overwrite insertion points, eg. '++0607' will insert
+        two bytes of values '0607'. The number of '-' and '+' must
+        always match.
     * expected_matches
       - Int, number of places in code a match should be found.
       - Normally 1, but may be more in some cases of repeated code that
@@ -87,13 +89,18 @@ def _String_To_Bytes(string, add_escapes = False):
     Converts the given string into bytes.
     Strings should either be hex representations (2 characters at a time)
     or wildcards given as '.' (also in pairs, where .. matches a single
-    wildcard byte).
+    wildcard byte). Byte values that match special regex control
+    chars will be escaped.
 
     * add_escapes
       - Bool, if True then re.escape will be called on the non-wildcard
         entries.
       - This should be applied if the bytes will be used as a regex pattern.
     '''
+    # To make striding more convenient, double all + and - so that take
+    #  up 2 chars each.
+    string = string.replace('-','--').replace('+','++')
+
     # Make sure the input is even length, since hex conversions
     #  require 2 chars at a time (to make up a full byte).
     assert len(string) % 2 == 0
@@ -104,7 +111,7 @@ def _String_To_Bytes(string, add_escapes = False):
     for even_index in range(0, len(string), 2):
         char_pair = string[even_index : even_index + 2]
         
-        # Wildcards will be handled directly.
+        # Special chars will be handled directly.
         if char_pair == '..':
             # Encode as a single '.' so this matches one byte.
             new_bytes += str.encode('.')
@@ -284,17 +291,69 @@ def Apply_Obj_Patch_Group(patch_list):
             # Grab the offset of the match.
             offset = match.start()
 
-            # Get the wildcard char, as an int (since the loop below unpacks
-            #  the byte string into ints automatically, and also pulls ints
-            #  from the original binary).
-            wildcard = str.encode('.')[0]
-            
-            # Apply the patch, leaving wildcard entries unchanged.
-            # This will edit in place on the bytearray.
-            new_bytes = _String_To_Bytes(patch.new_code)
-            for index, new_byte in enumerate(new_bytes):
-                if new_byte == wildcard:
-                    continue
-                file_contents.binary[offset + index] = new_byte
+            # Verify there are a matched number of insertions and
+            #  deletions in the new_code.
+            if patch.new_code.count('+') != patch.new_code.count('-'):
+                raise Exception('Error: Obj patch changes code size.')
+                        
+            #-Removed; old style before insert/delete characters were
+            #  added in. Was this unsafe on the wildcards anyway, which
+            #  could take the same value as normal bytes? May have just
+            #  gotten lucky that this case didn't come up.
+            ## Get the wildcard char, as an int (since the loop below unpacks
+            ##  the byte string into ints automatically, and also pulls ints
+            ##  from the original binary).
+            #wildcard = str.encode('.')[0]
+            ## Apply the patch, leaving wildcard entries unchanged.
+            ## This will edit in place on the bytearray.
+            #new_bytes = _String_To_Bytes(patch.new_code)
+            #for index, new_byte in enumerate(new_bytes):
+            #    if new_byte == wildcard:
+            #        continue
+            #    file_contents.binary[offset + index] = new_byte
 
+            # Stride through the new code.
+            # For convenience, this will work on char pairs (for byte
+            #  conversion when needed), and so a pre-pass will duplicate
+            #  all control characters (+-) accordingly. '.' is not
+            #  duplicated since it is already doubled in the original
+            #  string.
+            new_code = patch.new_code
+            for control_char in ['+','-']:
+                new_code = new_code.replace(control_char, control_char*2)
+
+            # Note the code length before starting, for error check later.
+            start_length = len(file_contents.binary)
+
+            # Loop over the pairs, using even indices.
+            for even_index in range(0, len(new_code), 2):
+                char_pair = new_code[even_index : even_index + 2]
+                
+                # If this is a wildcard, advance the offset with no change.
+                if char_pair == '..':
+                    offset += 1
+
+                # If this is a deletion, remove the byte from the 
+                #  file_contents and do not advance the offset (which will
+                #  then be pointing at the post-deletion byte automatically).
+                elif char_pair == '--':
+                    file_contents.binary.pop(offset)
+                    
+                # If this is an addition, insert a 0.
+                elif char_pair == '++':
+                    file_contents.binary.insert(offset, 0)
+
+                else:
+                    # This is a replacement byte.
+                    # Convert it, insert, and inc the offset.
+                    # Note: bytearray requires an int version of this value,
+                    #  and hex2bin returns a byte string version.
+                    #  Indexing into a bytearray of byte strings
+                    #  returns an int, not a string.
+                    new_byte = hex2bin(char_pair)[0]
+                    file_contents.binary[offset] = new_byte
+                    offset += 1
+
+            # Error check.
+            assert len(file_contents.binary) == start_length
     return
