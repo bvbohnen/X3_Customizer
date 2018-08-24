@@ -34,12 +34,24 @@ def Run(*args):
         #formatter_class = argparse.ArgumentDefaultsHelpFormatter,
         )
 
+    # Set this to default to None, which will be caught manually.
     argparser.add_argument(
         'user_module',
+        default = None,
+        # Consume 0 or more arguments.
+        # This prevents an error message when an arg not given.
+        nargs = '?',
         help = 'Python module setting up paths and specifying'
                ' transforms to be run.'
                ' Example in input_scripts/Example_Transforms.py.'
                )
+    
+    # Flag to use the user_transforms as a default.
+    argparser.add_argument(
+        '-default_script', 
+        action='store_true',
+        help = 'Runs input_scripts/User_Transforms.py if no user_module'
+                ' provided.')
 
     # Flag to clean out old files.
     argparser.add_argument(
@@ -107,15 +119,31 @@ def Run(*args):
         action='store_true',
         help =  'Performs a test run of the transforms, behaving like'
                 ' a normal run but not writing out results.')
-        
+    
     
     # Run the parser on the sys args.
     args = argparser.parse_args(args)
 
     
     # The arg should be a python module.
-    # This may include pathing, though is generally not expected to.
+    # This may include pathing.
+    # May be None if no module was specified.
     user_module_name = args.user_module
+
+
+    # Catch the None case.
+    # TODO: maybe standardize user_module_name to a Path object.
+    if user_module_name == None:
+        if args.default_script:
+            # Default will be to use 'input_scripts/User_Transforms.py'.
+            # To find it more robustly, no matter what working directory
+            #  this tool is called from, set the path up relative to
+            #  the parent_dir.
+            user_module_name = str(parent_dir / 'input_scripts' / 'User_Transforms.py')
+        else:
+            # Print out the argparse help text, and return.
+            argparser.print_help()
+            return
 
     if not user_module_name.endswith('.py'):
         print('Error: expecting the name of a python module, ending in .py.')
@@ -124,6 +152,14 @@ def Run(*args):
     # Check for file existence.
     if not os.path.exists(user_module_name):
         print('Error: {} not found.'.format(user_module_name))
+        # Print some extra help text if the user tried to run the default
+        #  script from the bat file.
+        if user_module_name.endswith('User_Transforms.py'):
+            # Avoid word wrap in the middle of a word by using an explicit
+            #  newline.
+            print('For new users, please open input_scripts/'
+                  'User_Transforms_template.py\n'
+                  'for first time setup instructions.')
         return
     
     # Check for the clean option.
@@ -204,6 +240,7 @@ def Run(*args):
             raise ex
         #else:
         #    print('Enable developer mode for exception stack trace.')
+        
 
     # If cleanup/writeback not disabled, run them.
     # These are mainly disabled by the patch builder.
@@ -217,7 +254,7 @@ def Run(*args):
     else:
         print('Skipping file writes.')
 
-    #print('Run complete')
+    print('Run complete')
     
 
 if __name__ == '__main__':

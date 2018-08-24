@@ -25,6 +25,9 @@ from ..Common.Flags import *
 
 # TODO:
 # May add SETA as a built-in ware for all ships.
+# Similarly, can add anti-boarding equipment to all capital ships, so
+#  they cannot be trivialized by shooting the ship until they are
+#  destroyed.
 
 # TODO:
 # Cut hull on the 'unknown object' M6 in XRM, which is around 25x higher
@@ -492,7 +495,18 @@ def Simplify_Engine_Trails(
         else:
             this_dict['particle_effect'] = '0'
     return
-                
+           
+
+@File_Manager.Transform_Wrapper('types/TShips.txt')
+def Remove_Engine_Trails():
+    '''
+    Remove engine trail particle effects.
+
+    This is a convenience transform which redirects to
+    Simplify_Engine_Trails(remove_trails = True).
+    '''
+    Simplify_Engine_Trails(remove_trails = True)
+
 
 @File_Manager.Transform_Wrapper('types/TShips.txt')
 def Standardize_Ship_Tunings(

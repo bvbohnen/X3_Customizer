@@ -3,4 +3,7 @@
 from .Settings import Settings
 from .Settings import Set_Path
 from . import Flags
-from .Exceptions import File_Missing_Exception, Obj_Patch_Exception, Text_Patch_Exception
+from .Exceptions import File_Missing_Exception
+from .Exceptions import Obj_Patch_Exception
+from .Exceptions import Text_Patch_Exception
+from .Exceptions import Gzip_Exception

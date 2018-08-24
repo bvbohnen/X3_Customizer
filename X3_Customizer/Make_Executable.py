@@ -354,7 +354,23 @@ def Make(*args):
             # Disable the echo of the command.
             '@echo off',
             # Use '%*' to pass all command line args.
-            os.path.join('bin', program_name + '.exe') + ' %*',
+            # Add the '-default_script' arg, in case this is launched without
+            #  a specified user script.
+            os.path.join('bin', program_name + '.exe') + ' %* -default_script',
+            # Wait for user input, so they can read messages.
+            'pause',
+            ]))
+
+    # Create an alternate version for cleaning out changes by
+    #  setting the -clean flag.
+    with open(os.path.join(This_dir, '..', 'Clean_X3_Customizer.bat'), 'w') as file:
+        file.write('\n'.join([
+            # Disable the echo of the command.
+            '@echo off',
+            # Use '%*' to pass all command line args.
+            os.path.join('bin', program_name + '.exe') + ' %* -default_script -clean',
+            # Wait for user input, so they can read messages.
+            'pause',
             ]))
 
     # Restory any original workind directory, in case this function

@@ -154,7 +154,8 @@ TMissiles_flag_bits = {
 # Note: the encoded flags are 32-bit signed, so the Kyon weapons
 #  created a negative number. This is true in vanilla tships as well
 #  as those out of x3_editor.
-# Note: 27, 30 unused.  Only 30 of 32 categories.
+# Note: flags can be verified somewhat by checking the game exe,
+#  which contains a table of these names ordered high to low.
 Tships_laser_subtype_flag_bits = {
      0  : 'SG_LASER_IRE'          ,
      1  : 'SG_LASER_PAC'          ,
@@ -183,10 +184,10 @@ Tships_laser_subtype_flag_bits = {
     24  : 'SG_LASER_TERRAN_HEAVY' ,
     25  : 'SG_LASER_ARGON_BEAM'   ,
     26  : 'SG_LASER_PARANID_BEAM' ,
-    # 27 unused.
+    27  : 'SG_LASER_TERRAN_BEAM'  ,
     28  : 'SG_LASER_SPECIAL'      ,
     29  : 'SG_LASER_UNKNOWN1'     ,
-    # 30 unused.
+    30  : 'SG_LASER_UNKNOWN2'     ,
     31  : 'SG_LASER_KYON'         ,
     }
 # Missiles work the same way with category names in tmissiles.

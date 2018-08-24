@@ -931,8 +931,6 @@ def Force_Infinite_Loop_Detection(
       - Default is 1 million. This corresponds to less than 1 second
         in a test infinite looping script, and was sufficient to avoid
         false positives in brief tests.
-      - Currently this only works on the vanilla x3story; LU will use
-        a 32k limit.
     '''
 
     '''

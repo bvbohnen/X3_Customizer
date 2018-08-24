@@ -5,13 +5,13 @@
     <ProjectGuid>f321f45f-39ee-4cc8-91e7-bfec28462c97</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>Main.py</StartupFile>
-    <SearchPath>..\..\X3_Customizer;..\input_scripts</SearchPath>
+    <SearchPath>..\..\X3_Customizer;..\input_scripts;..\input_scripts;..\input_scripts</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>X3_Customizer</Name>
     <RootNamespace>X3_Customizer</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>..\input_scripts\Authors_Transforms.py -dev</CommandLineArguments>
+    <CommandLineArguments>..\input_scripts\Authors_Transforms.py  -dev</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -31,6 +31,9 @@
     </Compile>
     <Compile Include="..\input_scripts\Test.py">
       <Link>Test.py</Link>
+    </Compile>
+    <Compile Include="..\input_scripts\User_Transforms_template.py">
+      <Link>User_Transforms_template.py</Link>
     </Compile>
     <Compile Include="Common\Exceptions.py">
       <SubType>Code</SubType>

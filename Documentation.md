@@ -1,4 +1,4 @@
-X3 Customizer 3.12.1
+X3 Customizer 3.12.2
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -659,7 +659,6 @@ Obj_Code Transforms:
       * operation_limit
         - Int, the number of operations between two infinite loop checks, between 10000 (normal script engine value) and 2 billion.
         - Default is 1 million. This corresponds to less than 1 second in a test infinite looping script, and was sufficient to avoid false positives in brief tests.
-        - Currently this only works on the vanilla x3story; LU will use a 32k limit.
       
 
  * Hide_Lasertowers_Outside_Radar
@@ -968,6 +967,15 @@ Ship Transforms:
   
       * include_xrm_fixes
         - Bool, if True then the Medusa Vanguard is patched if found and in the form set by XRM. Default True.
+      
+
+ * Remove_Engine_Trails
+
+    Requires: types/TShips.txt
+
+      Remove engine trail particle effects.
+  
+      This is a convenience transform which redirects to Simplify_Engine_Trails(remove_trails = True).
       
 
  * Remove_Khaak_Corvette_Spin
@@ -1588,3 +1596,6 @@ Change Log:
  * 3.12.1
    - Added operation_limit argument to Force_Infinite_Loop_Detection and defaulting to 1 million (up from 32k) to reduce false positives.
    - Obj patches now support balanced insertions and deletions.
+ * 3.12.2
+   - Added better support for launching by double clicking the bat file, along with a little more guidance for new users.
+   - Added convenience transform Remove_Engine_Trails.

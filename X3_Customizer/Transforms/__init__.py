@@ -60,6 +60,7 @@ from .T_Ships import Fix_Pericles_Pricing
 from .T_Ships import Patch_Ship_Variant_Inconsistencies
 from .T_Ships import Boost_Truelight_Seeker_Shield_Reactor
 from .T_Ships import Simplify_Engine_Trails
+from .T_Ships import Remove_Engine_Trails
 from .T_Ships import Standardize_Ship_Tunings
 from .T_Ships import Add_Ship_Equipment
 from .T_Ships import Add_Ship_Life_Support

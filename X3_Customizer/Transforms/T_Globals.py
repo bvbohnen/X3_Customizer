@@ -8,11 +8,14 @@ from collections import OrderedDict
 from .. import File_Manager
 from ..Common import Flags
 
-#Transporter distance adjustment.
+# Transporter distance adjustment.
 #TODO, SG_MAX_DISTANCE_BEAMING
 
-#Docking computer distance adjustment.
+# Docking computer distance adjustment.
 #TODO, SG_MAX_VERTEXDIST_DOCKCOMPUTER
+
+# Tracked object adjustment (eg. UI brackets).
+# TODO, SG_TRACKER_NUM_ items.
 
         
 @File_Manager.Transform_Wrapper('types/TMissiles.txt', 'types/Globals.txt', category = 'Missile')

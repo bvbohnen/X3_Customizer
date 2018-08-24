@@ -370,6 +370,11 @@ def Cleanup():
     Preferably do this late in a run, so that files from a prior run
      are not removed if the new run had an error during a transform.
     '''
+    # It is possible Init was never run if no transforms were provided.
+    # Ensure it gets run here in such cases.
+    if First_call:
+        Init()
+
     # Find all files generated on a prior run, that still appear to be
     #  from that run (eg. were not changed externally), and remove
     #  them.

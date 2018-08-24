@@ -9,37 +9,43 @@ from X3_Customizer import *
 #version = 'Vanilla'
 version = 'XRM'
 #version = 'LU'
+#version = 'Mayhem'
 # Test flag to applying to base TC.
 #version = 'TC'
 
 
-# Some convenience translation, to make easier if/else statements.
-Vanilla = version == 'Vanilla'
-XRM = version == 'XRM'
-LU = version == 'LU'
-TC = version == 'TC'
-
-if Vanilla:
+if version == 'Vanilla':
     Set_Path(
         path_to_x3_folder = r'D:\Steam\SteamApps\common\x3 terran conflict vanilla',
         #path_to_source_folder = 'vanilla_source'
     )
-elif XRM:
+elif version == 'XRM':
     Set_Path(
         path_to_x3_folder = r'C:\Base\x3 terran conflict xrm',
         #path_to_addon_folder = r'C:\Base\x3 terran conflict xrm\addon',
         #path_to_source_folder = 'xrm_source'
         #path_to_output_folder = 'custom_output'
     )
-elif LU:
+elif version == 'LU':
     Set_Path(
         path_to_x3_folder = r'D:\Steam\SteamApps\common\x3 terran conflict LU',
     )
-elif TC:
+elif version == 'Mayhem':
+    Set_Path(
+        path_to_x3_folder = r'D:\Steam\SteamApps\common\x3 terran conflict LU Mayhem',
+    )
+elif version == 'TC':
     Set_Path(
         path_to_x3_folder = r'D:\Steam\SteamApps\common\x3 terran conflict without AP',
         enable_TC_mode = True
     )
+
+# Some convenience translation, to make easier if/else statements.
+# LU and Mayhem will share settings (just the paths differ).
+Vanilla = version == 'Vanilla'
+XRM = version == 'XRM'
+LU = version == 'LU' or version == 'Mayhem'
+TC = version == 'TC'
 
 # Temp enable xrm transforms for lu to see what happens.
 #XRM = LU if LU else XRM
@@ -130,7 +136,6 @@ if Vanilla or XRM:
             #  to scan.
             on_receiving_priority_message = True,
             # on_collision_warning = True,
-            # Side note: this one is not fully understood.
             on_frame_input = True,
         )
     
@@ -239,9 +244,8 @@ else:
 #####################################################
 # Gates
 
-# If the standard gate model should swap to the terran gate model.
-# Disable for now; maybe turn on if losing too many ships to standard
-#  gates to try it out.
+# Swap to safer gate models that don't have protrusions in front that
+#  capital ships run into.
 if Vanilla:
     # Swap_Standard_Gates_To_Terran_Gates()
     Adjust_Gate_Rings(
@@ -911,6 +915,10 @@ if Vanilla or XRM:
 if Vanilla:
     Fix_Pericles_Pricing()
     Boost_Truelight_Seeker_Shield_Reactor()
+
+    # Maybe remove engine trail dust.
+    #Remove_Engine_Trails()
+    
     Adjust_Ship_Speed(
         adjustment_factors_dict = {
             # Bump up interceptors about 30%, to better distinguish their role from
@@ -933,7 +941,7 @@ if Vanilla:
 if XRM:
     # Can remove engine trails if they cause slowdown or just look ugly.
     # Trails have a horrible effect during Seta, displaying ahead of the
-    #  ship quite often, so best to disable if Setaing a lot.
+    #  ship quite often, so best to disable if Seta-ing a lot.
     Simplify_Engine_Trails(remove_trails = True)
 
     # Add life support to cap ships. This includes TLs by default.
@@ -948,7 +956,6 @@ if XRM:
         engine_tunings = 10,
         rudder_tunings = 10
         )
-    
 
     Adjust_Ship_Pricing(
         # The XRM costs include eg. a 2-4x upscale on scouts, which combined with

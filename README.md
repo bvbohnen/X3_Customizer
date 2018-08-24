@@ -1,4 +1,4 @@
-X3 Customizer 3.12.1
+X3 Customizer 3.12.2
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -410,6 +410,10 @@ Ship Transforms:
 
       Applies some patches to some select inconsistencies in ship variants. Modified ships include the Baldric Miner and XRM Medusa Vanguard, both manually named instead of using the variant system. This is meant to be run prior to Add_Ship_Variants, to avoid the non-standard ships creating their own sub-variants. There may be side effects if the variant inconsistencies were intentional.
 
+ * Remove_Engine_Trails
+
+      Remove engine trail particle effects.
+
  * Remove_Khaak_Corvette_Spin
 
       Remove the spin on the secondary hull of the Khaak corvette. The replacement file used is expected to work for vanilla, xrm, and other mods that don't change the model scene file.
@@ -740,3 +744,6 @@ Change Log:
  * 3.12.1
    - Added operation_limit argument to Force_Infinite_Loop_Detection and defaulting to 1 million (up from 32k) to reduce false positives.
    - Obj patches now support balanced insertions and deletions.
+ * 3.12.2
+   - Added better support for launching by double clicking the bat file, along with a little more guidance for new users.
+   - Added convenience transform Remove_Engine_Trails.

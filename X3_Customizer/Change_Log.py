@@ -208,6 +208,10 @@ Change Log:
      and defaulting to 1 million (up from 32k) to reduce false
      positives.
    - Obj patches now support balanced insertions and deletions.
+ * 3.12.2
+   - Added better support for launching by double clicking the bat file,
+     along with a little more guidance for new users.
+   - Added convenience transform Remove_Engine_Trails.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

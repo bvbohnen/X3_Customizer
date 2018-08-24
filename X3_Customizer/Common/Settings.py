@@ -509,5 +509,11 @@ def Set_Path(
     # Note: verification is done at the first transform, not here,
     #  so that any settings overwrites can be done after (or without)
     #  the Set_Path call.
+    # Note: skipping Init until later isn't entirely safe if no
+    #  transforms were run (eg. if a new user runs the template file,
+    #  where all transforms are commented out).  Ensure Init gets run
+    #  at some late point if needed to complete path checks, since
+    #  old transform files may still need to be cleaned out using these
+    #  paths.
 
     return
