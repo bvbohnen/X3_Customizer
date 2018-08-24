@@ -10,7 +10,7 @@ will also do analysis of game files, to intelligently select appropriate
 edits to perform.  Some transforms carry out binary code edits, allowing
 for options not found elsewhere.
 
-Source files will generally support any prior modding. Nearly all transforms 
+Source files will generally support any prior modding. Most transforms 
 support input arguments to set parameters and adjust behavior, according 
 to user preferences. Most transforms will work on an existing save.
 
@@ -24,7 +24,7 @@ for many transforms, though has not been thoroughly tested.
 
 When used alongside the X3 Plugin Manager: if the customizer outputs to
 a catalog (the default), these tools can run in either order; if the
-customizer outputs to loose files (command line option), the customizer
+customizer outputs to loose files (a command line option), the customizer
 should be run second, after the plugin manager is closed, since the
 plugin manager generates a TWareT.pck file when closed that doesn't
 capture changes in TWareT.txt made by this tool.
@@ -32,16 +32,24 @@ capture changes in TWareT.txt made by this tool.
 Usage:
 
  * "Launch_X3_Customizer.bat [path to user_transform_module.py]"
-   - Call from the command line.
-   - Runs the customizer, using the provided python control module
-     which will declare the path to the X3 directory and the
+   - Call from the command line for full options, or run directly
+     for default options.
+   - Runs the customizer, using the provided python user_transform_module
+     which will specify the path to the X3 directory and the
      transforms to be run.
+   - By default, attempts to run User_Transforms.py in the input_scripts
+     folder.
    - Call with '-h' to see any additional arguments.
+ * "Clean_X3_Customizer.bat [path to user_transform_module.py]"
+   - Similar to Launch_X3_Customizer, except appends the "-clean" flag,
+     which will undo any transforms from a prior run.
  * "source\X3_Customizer.py [path to user_transform_module.py]"
    - As above, running the python source code directly.
-   - Supports general python imports in the control module.
-   - If the scipy package is available, this has additional
-     features omitted from the executable due to file size.
+   - May need to be prefixed with "python" or similar, depending on
+     system setup.
+   - Supports general python imports in the user_transform_module.
+   - If the scipy package is available, this supports smoother curve fits
+     for some transforms, omitted from the executable due to file size.
  * "source\Make_Documentation.py"
    - Generates updated documentation for this project, as markdown
      formatted files README.md and Documentation.md.
@@ -88,8 +96,9 @@ Setup and behavior:
       other path options. See documentation for parameters.
     - Call a series of transform functions, as desired.
   
-  * The quickest way to set up a command script is to
-  copy and edit the input_scripts/Example_Transforms.py file.
+  * The quickest way to set up the command script is to copy and edit
+  the "input_scripts/User_Transforms_template.py" file, renaming
+  it to "User_Transforms.py" for recognition by Launch_X3_Customizer.bat.
   Included in the repository is Authors_Transforms, the author's
   personal set of transforms, which can be checked for futher examples.
 
