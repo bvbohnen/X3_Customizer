@@ -212,6 +212,10 @@ Change Log:
    - Added better support for launching by double clicking the bat file,
      along with a little more guidance for new users.
    - Added convenience transform Remove_Engine_Trails.
+ * 3.12.3
+   - Bug fixes in Adjust_Weapon_Fire_Rate: the fire_rate_floor will no longer
+     be mistakenly applied when increasing fire rate, and setting
+     skip_ammo_weapons to False will now be recognized.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

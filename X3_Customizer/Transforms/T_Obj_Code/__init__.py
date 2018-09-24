@@ -40,6 +40,8 @@ from .Misc import _Disable_Friendly_Fire
 from .Misc import Preserve_Captured_Ship_Equipment
 from .Misc import Hide_Lasertowers_Outside_Radar
 from .Misc import Force_Infinite_Loop_Detection
+# This doesn't work sufficiently, so hide it; titles aren't available.
+#from .Misc import _Show_Pirate_Yaki_Nororiety
 
 from .Complex import _Prevent_Complex_Connectors
 from .Complex import Remove_Complex_Related_Sector_Switch_Delay

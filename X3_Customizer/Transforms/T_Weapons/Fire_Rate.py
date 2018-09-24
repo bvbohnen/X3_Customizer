@@ -99,8 +99,9 @@ def Adjust_Weapon_Fire_Rate(
     Adjust weapon fire rates. DPS and energy efficiency will remain constant.
     This may be used to reduce fire rates for performance improvements.
     Secondary weapon effects are not modified.
-    If a bullet is used by multiple lasers, the first laser will
-    be used for fire rate damage and energy adjustment.
+    If a bullet is used by multiple lasers, the first adjusted laser
+    (by TLaser order) will be used to set the bullet's damage and energy
+    adjustment.
 
     * scaling_factor:
       - The base multiplier to apply to fire rate.
@@ -151,26 +152,39 @@ def Adjust_Weapon_Fire_Rate(
         this_fire_rate = Flags.Game_Ticks_Per_Minute / this_fire_delay
 
         # Skip lasers that use ammo.
-        if int(this_dict['bullet']) in ammo_based_bullet_list:
+        if skip_ammo_weapons and int(this_dict['bullet']) in ammo_based_bullet_list:
             continue
 
         # Determine the fire rate adjustment.        
         if this_dict['name'] in laser_name_adjustment_dict:
             this_scaling_factor = laser_name_adjustment_dict[this_dict['name']]
         elif scaling_factor != 1:
-            # No changes if fire rate already below the floor.
-            if this_fire_rate < fire_rate_floor:
-                continue
             this_scaling_factor = scaling_factor
+            # No changes if fire rate already below the floor, when scaling
+            #  is <1.  Do not do this check when speeding up weapons, eg.
+            #  for LU where nearly all weapons are already slower than the
+            #  default floor of 60.
+            if this_scaling_factor <= 1 and this_fire_rate < fire_rate_floor:
+                continue
         else:
             continue
+        # TODO: consider changing the above to skip when the factor is 1,
+        #  which will also catch if a specific laser was given with 1x
+        #  adjustment.  This may impact bullet adjustments where multiple
+        #  lasers share a bullet.  In general, impact of such an edit would
+        #  be low, though.
 
         # Apply change factor.  TODO: diminishing returns.
         this_fire_rate *= this_scaling_factor
 
-        # Apply the floor, eg. if the fire rate fell below 60 and the floor is 60, 
-        #  use the floor.
-        this_fire_rate = max(this_fire_rate, fire_rate_floor)
+        # Apply the floor, eg. if the fire rate fell below 60 and the floor
+        #  is 60, use the floor.
+        # Only apply this when reducing fire rates, as above, since this
+        #  makes mistakes if increasing fire rates.
+        # Cases where the weapon was originally above the floor were
+        #  already skipped above.
+        if this_scaling_factor <= 1:
+            this_fire_rate = max(this_fire_rate, fire_rate_floor)
 
         # Get the new delay, and round it.
         new_fire_delay = round(Flags.Game_Ticks_Per_Minute / this_fire_rate)
@@ -222,3 +236,4 @@ def Adjust_Weapon_Fire_Rate(
     #  Since bullet energies were changed, update the max laser energies.
     Floor_Laser_Energy_To_Bullet_Energy()
                 
+    

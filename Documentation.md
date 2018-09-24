@@ -1,4 +1,4 @@
-X3 Customizer 3.12.2
+X3 Customizer 3.12.3
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -1285,7 +1285,7 @@ Weapons Transforms:
 
     Requires: types/TBullets.txt, types/TLaser.txt
 
-      Adjust weapon fire rates. DPS and energy efficiency will remain constant. This may be used to reduce fire rates for performance improvements. Secondary weapon effects are not modified. If a bullet is used by multiple lasers, the first laser will be used for fire rate damage and energy adjustment.
+      Adjust weapon fire rates. DPS and energy efficiency will remain constant. This may be used to reduce fire rates for performance improvements. Secondary weapon effects are not modified. If a bullet is used by multiple lasers, the first adjusted laser (by TLaser order) will be used to set the bullet's damage and energy adjustment.
   
       * scaling_factor:
         - The base multiplier to apply to fire rate.
@@ -1603,3 +1603,5 @@ Change Log:
  * 3.12.2
    - Added better support for launching by double clicking the bat file, along with a little more guidance for new users.
    - Added convenience transform Remove_Engine_Trails.
+ * 3.12.3
+   - Bug fixes in Adjust_Weapon_Fire_Rate: the fire_rate_floor will no longer be mistakenly applied when increasing fire rate, and setting skip_ammo_weapons to False will now be recognized.

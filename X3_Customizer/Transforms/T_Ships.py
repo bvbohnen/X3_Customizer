@@ -950,6 +950,22 @@ def Add_Ship_Life_Support(
     Note: in some cases the match_object update and value update will
     be redundant (both are in a check_any block), but this should be fine.
 
+    Update:
+        On review of the MD code in the KC, object_has_equipment will call
+        to GetWareTypeCountWithPredefined, which will recognize built-in wares.
+        However, object_has_ware will not recognized build-ins (if ever used),
+        and expressions using "cargo" and "equipment" alias to the same code
+        which also does not recognized built-ins.
+
+        TODO: recognize if the SS_WARE_LIFESUPPORT check is part of an
+        object_has_equipment check (in which case no ship class checks need
+        to be added), or part of an expression (in which case either class
+        checks are needed, or the ware check can be replaced with the
+        object_has_equipment command).
+
+        This would probably be more effort than the above, but should be a
+        better solution if ever manually editing the scripts to get cleaner
+        code.    
     '''
     # Set up the class codes once for the match_object director command.
     match_object_classes = 'tp'
