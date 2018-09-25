@@ -155,34 +155,32 @@ def Adjust_Weapon_Fire_Rate(
         if skip_ammo_weapons and int(this_dict['bullet']) in ammo_based_bullet_list:
             continue
 
-        # Determine the fire rate adjustment.        
+        # Determine the fire rate adjustment, from dict or generic scaling.
         if this_dict['name'] in laser_name_adjustment_dict:
             this_scaling_factor = laser_name_adjustment_dict[this_dict['name']]
-        elif scaling_factor != 1:
-            this_scaling_factor = scaling_factor
-            # No changes if fire rate already below the floor, when scaling
-            #  is <1.  Do not do this check when speeding up weapons, eg.
-            #  for LU where nearly all weapons are already slower than the
-            #  default floor of 60.
-            if this_scaling_factor <= 1 and this_fire_rate < fire_rate_floor:
-                continue
         else:
-            continue
-        # TODO: consider changing the above to skip when the factor is 1,
-        #  which will also catch if a specific laser was given with 1x
-        #  adjustment.  This may impact bullet adjustments where multiple
-        #  lasers share a bullet.  In general, impact of such an edit would
-        #  be low, though.
+            this_scaling_factor = scaling_factor
 
-        # Apply change factor.  TODO: diminishing returns.
+        # If the scaling is just 1x, don't need to continue.
+        if scaling_factor == 1:
+            continue
+        
+        # No changes if fire rate already below the floor, when scaling
+        #  is <1.  Do not do this check when speeding up weapons, eg.
+        #  for LU where nearly all weapons are already slower than the
+        #  default floor of 60.
+        if this_scaling_factor <= 1 and this_fire_rate < fire_rate_floor:
+            continue
+
+        # Apply change factor.  TODO: maybe support diminishing returns.
         this_fire_rate *= this_scaling_factor
 
-        # Apply the floor, eg. if the fire rate fell below 60 and the floor
+        # Apply the floor. Eg. if the fire rate fell below 60 and the floor
         #  is 60, use the floor.
-        # Only apply this when reducing fire rates, as above, since this
-        #  makes mistakes if increasing fire rates.
+        # Only apply this when reducing fire rates, as above.
         # Cases where the weapon was originally above the floor were
-        #  already skipped above.
+        #  already skipped (to avoid already slow weapons from getting
+        #  sped up accidentally).
         if this_scaling_factor <= 1:
             this_fire_rate = max(this_fire_rate, fire_rate_floor)
 

@@ -216,6 +216,10 @@ Change Log:
    - Bug fixes in Adjust_Weapon_Fire_Rate: the fire_rate_floor will no longer
      be mistakenly applied when increasing fire rate, and setting
      skip_ammo_weapons to False will now be recognized.
+ * 3.12.4
+   - Bug fix in Adjust_Weapon_Fire_Rate: fire_rate_floor will no longer speed
+     up named lasers that started below the floor while attempting to reduce
+     their fire rate.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.
