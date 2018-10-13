@@ -67,7 +67,75 @@ from ... import File_Manager
 from ... import Common
 Settings = Common.Settings
 from .Obj_Shared import *
-    
+
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
+def Max_Marines_Video_Id_Overwrite(
+    ):
+    '''
+    Remove the sirokos overwrite and put in its place a check for ships video ID
+    Which if larger than the default value will overwrite
+    '''
+	
+    # Construct the patches.
+    patch = Obj_Patch(
+            file = 'L/x3story.obj',
+            #offsets = [0x00017895],
+            # Existing code is 
+            # 'if SP[0]=0 then jump L000178A9'
+            # 'push       1'
+            # 'write      CLIENT.cl_Alert'
+            ref_code =  '0F000E' '060106' '5B' '34000A8771' '05..' '83' '01' '83',
+            # Switch to 'if SP[0] != 0' and 'push 0'.
+            new_code = NOP NOP NOP NOP NOP '0F000E' '0507' '03' '82000148E9' '83',
+            )
+   
+
+    # Apply the patches.
+    Apply_Obj_Patch_Group(patch_list)
+
+    return
+
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
+def Set_Max_Marines_Sirokos(
+	sirokos_count = 30,
+    ):
+    '''
+    * sirokos_count
+      - Int, marines carried by the Sirokos, or whichever ship is located
+        at entry 263 in Tships (when starting count at 1).
+      - Note: XRM does not use this slot in Tships.
+    '''
+    max_count = 127
+    sirokos_count = max(1, min(int(sirokos_count), max_count))
+    sirokos_count = Int_To_Hex_String(sirokos_count, 1)
+	
+    # Lay out the replacement region, capturing both values (otherwise
+    #  ambiguity problems crop up).
+    patch_fields = [
+        # Sirokos. Special case of SHIP.
+        # Only one value to patch.
+        # Note: removing this for TC is not enough to get the transform
+        #  working.
+        ['05'  '1E'  '83''01''83''01''83''6E''0005''0F''0062', 
+         '..'+sirokos_count],
+        ]
+	
+     # Construct the patches.
+    patch_list = []
+    for ref_code, replacement in patch_fields:
+        patch_list.append( Obj_Patch(
+            file = 'L/x3story.obj',
+            #offsets = [offset],
+            ref_code = ref_code,
+            new_code = replacement,
+        ))
+   
+
+    # Apply the patches.
+    Apply_Obj_Patch_Group(patch_list)
+
+    return
+
 
 @File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
 def Set_Max_Marines(
@@ -75,7 +143,6 @@ def Set_Max_Marines(
         tp_count = 40,
         m6_count = 8,
         capital_count = 20,
-        sirokos_count = 30,
     ):
     '''
     Sets the maximum number of marines that each ship type can carry.
@@ -89,10 +156,6 @@ def Set_Max_Marines(
       - Int, marines carried by M6s.
     * capital_count
       - Int, marines carried by capital ships: M1, M2, M7, TL.
-    * sirokos_count
-      - Int, marines carried by the Sirokos, or whichever ship is located
-        at entry 263 in Tships (when starting count at 1).
-      - Note: XRM does not use this slot in Tships.
     '''
     # Make input args ints, limit to 1 to max_count.
     max_count = 127
@@ -100,14 +163,12 @@ def Set_Max_Marines(
     tp_count = max(1, min(int(tp_count), max_count))
     m6_count = max(1, min(int(m6_count), max_count))
     capital_count = max(1, min(int(capital_count), max_count))
-    sirokos_count = max(1, min(int(sirokos_count), max_count))
 
     # Convert to hex strings, 1 byte each.
     tm_count      = Int_To_Hex_String(tm_count, 1)
     tp_count      = Int_To_Hex_String(tp_count, 1)
     m6_count      = Int_To_Hex_String(m6_count, 1)
     capital_count = Int_To_Hex_String(capital_count, 1)
-    sirokos_count = Int_To_Hex_String(sirokos_count, 1)
 
     '''
     These are generally just going to be integer value edits of
@@ -116,9 +177,6 @@ def Set_Max_Marines(
     Entries generally are doubled, one const is used in a comparison,
     second copy is used on one comparison path, so 2 patches per
     marine count changed.
-
-    Sirokos is a special case, with an ship subtype id comparison and
-    early return of 30.
 
     For now, all locations are edited, but arg defaults
     should leave things unchanged.
@@ -135,10 +193,6 @@ def Set_Max_Marines(
     # Note: for cleaner matching, keep a prefix 05 in the ref, but leave
     #  it off the new_code here and add it below.
     #patch_fields = [
-    #    # Sirokos. Special case of SHIP.
-    #    # Only one value to patch.
-    #    [0x000A876E, '051E8301', sirokos_count],
-    #
     #    # TM. Inherits from SHIP_BIG.
     #    [0x000CFA1C, '05085D34', tm_count],
     #    [0x000CFA2C, '05081400', tm_count],
