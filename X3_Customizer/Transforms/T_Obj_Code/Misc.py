@@ -236,13 +236,6 @@ def Set_Max_Marines(
          '05'  '28'    '14''0002''24''83''24''01''83''6E''0007''0D', 
          '..'+tp_count+'..''..''........''..''....''..''........'
          '..'+tp_count],
-
-        # Sirokos. Special case of SHIP.
-        # Only one value to patch.
-        # Note: removing this for TC is not enough to get the transform
-        #  working.
-        ['05'  '1E'  '83''01''83''01''83''6E''0005''0F''0062', 
-         '..'+sirokos_count],
         ]
     
     # Construct the patches.
