@@ -1153,7 +1153,7 @@ def _Show_Pirate_Yaki_Nororiety():
 
     return
 
-@File_Manager.Transform_Wrapper('L/x3story.obj')
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
 def Make_Terran_Stations_Make_Terran_Marines(
     ):
     '''
