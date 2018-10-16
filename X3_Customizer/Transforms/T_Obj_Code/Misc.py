@@ -79,19 +79,13 @@ def Max_Marines_Video_Id_Overwrite(
     # Construct the patches.
     patch = Obj_Patch(
             file = 'L/x3story.obj',
-            #offsets = [0x00017895],
-            # Existing code is 
-            # 'if SP[0]=0 then jump L000178A9'
-            # 'push       1'
-            # 'write      CLIENT.cl_Alert'
-            ref_code =  '0F000E' '060106' '5B' '34000A8771' '05..' '83' '01' '83',
-            # Switch to 'if SP[0] != 0' and 'push 0'.
+            ref_code = '0F000E' '060106' '5B' '34000A8771' '05..' '83' '01' '83',
             new_code = NOP NOP NOP NOP NOP '0F000E' '0507' '03' '82000148E9' '83',
             )
    
 
     # Apply the patches.
-    Apply_Obj_Patch_Group(patch_list)
+    Apply_Obj_Patch(patch)
 
     return
 
@@ -108,31 +102,22 @@ def Set_Max_Marines_Sirokos(
     max_count = 127
     sirokos_count = max(1, min(int(sirokos_count), max_count))
     sirokos_count = Int_To_Hex_String(sirokos_count, 1)
+
+    # Sirokos. Special case of SHIP.
+    # Only one value to patch.
+    # Note: removing this for TC is not enough to get the transform
+    #  working.
 	
-    # Lay out the replacement region, capturing both values (otherwise
-    #  ambiguity problems crop up).
-    patch_fields = [
-        # Sirokos. Special case of SHIP.
-        # Only one value to patch.
-        # Note: removing this for TC is not enough to get the transform
-        #  working.
-        ['05'  '1E'  '83''01''83''01''83''6E''0005''0F''0062', 
-         '..'+sirokos_count],
-        ]
-	
-     # Construct the patches.
-    patch_list = []
-    for ref_code, replacement in patch_fields:
-        patch_list.append( Obj_Patch(
+    # Construct the patches.
+    patch = Obj_Patch(
             file = 'L/x3story.obj',
-            #offsets = [offset],
-            ref_code = ref_code,
-            new_code = replacement,
-        ))
+            ref_code = '05'  '1E'  '83''01''83''01''83''6E''0005''0F''0062',
+            new_code = '..'+sirokos_count,
+            )
    
 
     # Apply the patches.
-    Apply_Obj_Patch_Group(patch_list)
+    Apply_Obj_Patch(patch)
 
     return
 
