@@ -1204,9 +1204,7 @@ def Set_LaserTower_Equipment(
     orbital_laser_laser_count  = Int_To_Hex_String(orbital_laser_laser_count, 1)
     orbital_laser_shield_type  = Int_To_Hex_String(orbital_laser_shield_type, 1)
     orbital_laser_shield_count = Int_To_Hex_String(orbital_laser_shield_count, 1)
-    
-    # Lay out the replacement region, capturing both values (otherwise
-    #  ambiguity problems crop up).
+
     patch_fields = [
         # TM. Inherits from SHIP_BIG.
         [
