@@ -7,8 +7,8 @@ from X3_Customizer import *
 
 # Select if this is modifying vanilla or XRM or LU.
 #version = 'Vanilla'
-version = 'XRM'
-#version = 'LU'
+#version = 'XRM'
+version = 'LU'
 #version = 'Mayhem'
 # Test flag to applying to base TC.
 #version = 'TC'
@@ -225,8 +225,12 @@ else:
         # 'Trade': 0.3,
         # 'Build': 0.3,
         # 'Think': 0.3,
-        # Reduce dual convoy.
-        'L2M183': 0.5,
+        # Remove dual convoy.
+        # This mission appears to have a bug where it sets selected
+        #  stations invulnerable upon mission creation, but does not
+        #  remove the invulnerability if the mission is never taken
+        #  (and only times out).
+        'L2M183': 0,
         # Disable sector info, as it is generally useless.
         'L2M147': 0,
         # Reduce return ship missions, as they are often impossible

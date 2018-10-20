@@ -97,7 +97,7 @@ def _String_To_Bytes(string, add_escapes = False):
         entries.
       - This should be applied if the bytes will be used as a regex pattern.
     '''
-    # To make striding more convenient, double all + and - so that take
+    # To make striding more convenient, double all + and - so that they take
     #  up 2 chars each.
     string = string.replace('-','--').replace('+','++')
 
