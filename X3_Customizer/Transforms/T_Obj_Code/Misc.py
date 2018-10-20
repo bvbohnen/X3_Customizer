@@ -1274,3 +1274,32 @@ def Set_LaserTower_Equipment(
     Apply_Obj_Patch_Group(patch_list)
 
     return
+
+
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
+def Make_Terran_Stations_Make_Terran_Marines(
+    ):
+    '''
+    Refactors STATION.CreateAddMarine first by making the failures for the
+    Pirate check and then the general race mask check use the same block
+    for selecting a random race.
+    
+    Then use the newly freed bytes for changing the race mask from a small int
+    to a large int. This allows the mask to include all possible races.
+    
+    Next we just flip the bit in the mask for terran to true and we have are end \
+    result of terran stations creating terran marines.
+    '''
+
+    patch = Obj_Patch(
+            file = 'L/x3story.obj',
+            ref_code = '01' '0F000F' '8500000D71' '0D0001' '0508' '5B' '34000950F0' '053E' '02'
+	    	       '8400007450' '140002' '24' '320009510E' '01' '0F000F' '8500004C66' '053E' 
+	               '53' '64' '340009510E' '053E' '02' '8400007450' '140002' '24' '01',
+            new_code = '01' '0F000F' '8500000D71' '0D0001' '0508' '5A' '3400095102' '0C0C' '0C'
+	               '0C0C0C0C0C' '0C0C0C' '0C' '0C0C' '01' '0F000F' '8500004C66' '070004003E' 
+	               '53' '64' '340009510E' '053E' '02' '8400007450' '140002' '24' '01',
+            )
+    Apply_Obj_Patch(patch)
+
+    return
