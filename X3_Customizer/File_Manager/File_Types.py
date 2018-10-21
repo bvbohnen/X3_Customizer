@@ -416,6 +416,20 @@ class T_File(Game_File):
             
         return
                
+
+    def Find(s, key, value):
+        '''
+        Finds and returns the line dict that matches the given key:value
+        pair.  Eg. Find('name','SS_SH_P_M4_ENH') when used on the
+        Tships file will return the Pericles entry.
+        Raises an exception is the key is not valid for this file
+        type; otherwise returns None if a value match is not found.
+        '''
+        for line_dict in s.data_dict_list:
+            if line_dict[key] == value:
+                return line_dict
+        return None
+
     
     def Add_Entries(s, new_entry_list):
         '''

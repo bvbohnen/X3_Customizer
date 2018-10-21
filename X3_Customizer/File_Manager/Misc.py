@@ -37,8 +37,16 @@ Transform_list = []
 # Record a set of transforms that were called.
 # Transforms not on this list at the end of a run may need to do
 #  cleanup of older files generated on prior runs.
+#  (Note: cleanup code has largely been removed now, not being needed
+#   thanks to delayed file writes.)
 # This is filled in by the decorator.
 Transforms_names_run = set()
+
+def Transform_Was_Run_Before(transform_name):
+    '''
+    Returns True if the named transform has been run.
+    '''
+    return transform_name in Transforms_names_run
 
 
 # On the first call to Load_File from any transform, do some extra

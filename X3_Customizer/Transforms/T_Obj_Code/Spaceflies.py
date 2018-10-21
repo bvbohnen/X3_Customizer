@@ -229,7 +229,6 @@ def Kill_Spaceflies():
     #
     #if option in [1,2]:
     #    patch = Obj_Patch(
-    #        file = 'L/x3story.obj',
     #        #offsets = [0x000777B5],
     #        # Give the original IsDisabled handler, and a few following ones.
     #        ref_code =  '0004EFF2'
@@ -340,7 +339,6 @@ def Kill_Spaceflies():
     #    new_code = ''.join(new_code)
     #
     #    patch = Obj_Patch(
-    #            file = 'L/x3story.obj',
     #            #offsets = [0x0004F072],
     #            ref_code = ref_code,
     #            new_code = new_code,
@@ -397,7 +395,6 @@ def Kill_Spaceflies():
     #    new_code += NOP * nop_count
     #
     #    patch = Obj_Patch(
-    #        file = 'L/x3story.obj',
     #        #offsets = [0x000AE85F],
     #        ref_code =  ref_code,
     #        new_code =  new_code,         
@@ -492,7 +489,6 @@ def Kill_Spaceflies():
     #    new_code += NOP * nop_count
     #
     #    patch = Obj_Patch(
-    #            file = 'L/x3story.obj',
     #            #offsets = [0x0004F06D],
     #            ref_code = ref_code,
     #            new_code = new_code,
@@ -604,7 +600,6 @@ def Kill_Spaceflies():
     new_code += NOP * nop_count
 
     patch = Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0004F06D],
             ref_code = ref_code,
             new_code = new_code,
@@ -649,7 +644,6 @@ def Prevent_Accidental_Spacefly_Swarms(
     '''
 
     patch = Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0004AE92],
             # TODO: extend this to not need exact addresses, maybe.
             ref_code =  '85' '........'

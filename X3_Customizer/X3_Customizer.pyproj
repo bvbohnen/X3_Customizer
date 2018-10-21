@@ -87,6 +87,18 @@
     <Compile Include="Transforms\T_Obj_Code\Complex.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Transforms\T_Obj_Code\Experimental.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transforms\T_Obj_Code\Lasertowers.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transforms\T_Obj_Code\Marines.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transforms\T_Obj_Code\Music.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Transforms\T_Obj_Code\Obj_Shared.py">
       <SubType>Code</SubType>
     </Compile>

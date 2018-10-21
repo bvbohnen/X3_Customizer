@@ -7,8 +7,8 @@ from X3_Customizer import *
 
 # Select if this is modifying vanilla or XRM or LU.
 #version = 'Vanilla'
-#version = 'XRM'
-version = 'LU'
+version = 'XRM'
+#version = 'LU'
 #version = 'Mayhem'
 # Test flag to applying to base TC.
 #version = 'TC'
@@ -154,6 +154,16 @@ if Vanilla or XRM:
             capital_count = 60,
             sirokos_count = 80,
         )
+
+    # Testing transforms from pull requests.
+    # Lasertower change doesn't seem to work well.
+    #Set_LaserTower_Equipment(lasertower_shield_type = 3)
+    # Video_id for marine count does work.
+    #Max_Marines_Video_Id_Overwrite()
+    # Terran station marines may need other tweaks to get those
+    #  stations actually carrying marines as wares, but otherwise
+    #  might work fine.
+    #Make_Terran_Stations_Make_Terran_Marines()
     
 #####################################################
 # Background

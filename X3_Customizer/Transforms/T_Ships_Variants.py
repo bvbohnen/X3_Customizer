@@ -1592,7 +1592,7 @@ def Remove_Ship_Variants(
         )
 
     # Stick the cue_index on the end of the cue name, to help ensure the
-    #  cue will be unique and will fire (eg. wasn't fire previously in a
+    #  cue will be unique and will fire (eg. wasn't fired previously in a
     #  given save).
     # Make the file.
     director_loader_base_name = 'X3_Customizer_Remove_Variants'

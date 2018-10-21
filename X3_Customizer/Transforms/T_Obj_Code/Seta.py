@@ -85,7 +85,6 @@ def Adjust_Max_Seta(
             # Change the menu cap. Unclear on when this is called exactly.
             # Edits Obj_2259.Input.
             Obj_Patch(
-                file = 'L/x3story.obj',
                 #offsets = [0x001152BF],
                 # Existing code is 'pushb 10d', or b'050A'.
                 ref_code = '05' '0A' '16' '0054' '24' '0F' '0054' '02' '06' '0096',
@@ -96,7 +95,6 @@ def Adjust_Max_Seta(
             # Change the max check when clicking the buttons.
             # Edits Obj_2259.ChangeValue.
             Obj_Patch(
-                file = 'L/x3story.obj',
                 #offsets = [0x001157C1],
                 # Existing code is 'pushb 10d', or b'050A'.
                 # Check an extra couple bytes.
@@ -107,7 +105,6 @@ def Adjust_Max_Seta(
 
             # Edits Obj_2259.ChangeValue (a little below the above spot).
             Obj_Patch(
-                file = 'L/x3story.obj',
                 #offsets = [0x00115812],
                 ref_code = '05' '0A' '16' '0055' '24' '0F' '0055' '16' '0054',
                 new_code = '05' + seta_hex,
@@ -148,7 +145,6 @@ def Adjust_Max_Speedup_Rate(
     # This edits CLIENT.Vbi, which internally has a timer that it compares
     #  to 250 (ms), the value to replace.
     patch = Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x00013994, 0x00014304],
             # Existing code is 'pushw 250d', or b'0600FA'.
             ref_code = '06' '00FA' '5D' '34' '........' '02' '32' '........' '01',
@@ -230,7 +226,6 @@ def Stop_Events_From_Disabling_Seta(
         # Edit in CLIENT.NotifyMissileAlert.
         # Note: this code isn't in LU.
         patch_list.append( Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x00017BEE],
             ref_code = original_call + '6F' '33' '........' '05' '14',
             new_code = replacement,
@@ -239,7 +234,6 @@ def Stop_Events_From_Disabling_Seta(
     if on_receiving_priority_message:
         # Edit in CLIENT.ReceiveMessageWithPriority.
         patch_list.append( Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x00015DCA],
             ref_code = original_call + '0D' '0004' '0D' '0006' '03',
             new_code = replacement,
@@ -248,7 +242,6 @@ def Stop_Events_From_Disabling_Seta(
     if on_collision_warning:
         # Edit in CLIENT.NotifyCollisionWarn.
         patch_list.append( Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x00017F22],
             ref_code = original_call + '24' '01' '83' '6E' '0009' '0F' '0006',
             new_code = replacement,
@@ -257,7 +250,6 @@ def Stop_Events_From_Disabling_Seta(
     if on_frame_input:
         # Edit in Obj_501.PerFrameInput.
         patch_list.append( Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0001C40C],
             ref_code = original_call + '32' '........' '79' '0006' '0000',
             new_code = replacement,
