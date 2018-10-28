@@ -296,3 +296,8 @@ def Set_Marine_Training_Cost_And_Time_Divisors(
             ref_code = ref_code,
             new_code = replacement,
         ))
+	
+    # Apply the patches.
+    Apply_Obj_Patch_Group(patch_list)
+
+    return
