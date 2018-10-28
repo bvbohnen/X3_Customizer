@@ -261,3 +261,38 @@ def Make_Terran_Stations_Make_Terran_Marines(
     Apply_Obj_Patch(patch)
 
     return
+
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
+def Set_Marine_Training_Cost_And_Time_Divisors(
+	cost_divisor = 5,
+        time_divisor = 5,
+    ):
+    '''
+    The higher the divisor the cheaper/faster training will be
+    The lower the divisor the more expensive/slower training will be
+    '''
+
+    # Each skill has a max value of 100, so any value over 100 will always result in 0
+    max_count = 100
+
+    cost_divisor = max(1, min(int(cost_divisor), max_count))
+    time_divisor = max(1, min(int(time_divisor), max_count))
+
+    # Convert to hex strings, 1 byte each.
+    cost_divisor = Int_To_Hex_String(cost_divisor, 1)
+    time_divisor = Int_To_Hex_String(time_divisor, 1)
+
+    patch_fields = [
+	['32' '000D3C7F' '0D' '0002' '05' '..'         '51' '02' '46' '0D' '0004' '06' '1388',
+	 '32' '000D3C7F' '0D' '0002' '05'+cost_divisor+'51' '02' '46' '0D' '0004' '06' '1388'],
+        ['32' '000D3D3F' '0D' '0002' '05' '..'         '51' '02' '46' '0D' '0004' '06' '012C',
+	 '32' '000D3D3F' '0D' '0002' '05'+time_divisor+'51' '02' '46' '0D' '0004' '06' '012C'],
+        ]
+
+    patch_list = []
+    for ref_code, replacement in patch_fields:
+        patch_list.append( Obj_Patch(
+            #offsets = [offset],
+            ref_code = ref_code,
+            new_code = replacement,
+        ))
