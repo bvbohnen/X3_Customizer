@@ -1,4 +1,4 @@
-X3 Customizer 3.12.4
+X3 Customizer 3.13
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -192,7 +192,7 @@ Director Transforms:
       * adjustment_dict:
         - Dict keyed by mission identifiers or preset categories, holding the chance multiplier.
         - Keys may be cue names, eg. 'L2M104A', or categories, eg. 'Fight'. Specific cue names will override categories.
-        - Categories and cue names for the vanilla AP are as follows, where the term after the category is the base mission chance shared by all missions in that category, as used in the game files.
+        - Categories and cue names for vanilla AP are as follows, where the term after the category is the base mission chance shared by all missions in that category, as used in the game files.
         - Trade (TXXX)
           - L2M104A : Deliver Wares to Station in need
           - L2M104B : Deliver Illegal Wares to Pirate Station
@@ -688,6 +688,20 @@ Obj_Code Transforms:
       Deaths are delayed by 10 seconds so that mods generating and killing the spaceflies have time to record their information. It may take a minute for accumulated spaceflies to die. Progress can be checked in the script editor by watching the active spacefly script counts.
       
 
+ * Make_Terran_Stations_Make_Terran_Marines (incompatible with: LU, TC)
+
+    Requires: L/x3story.obj
+
+      Allow Terran stations (eg. orbital patrol bases) to generate Terran marines instead of random commonwealth marines. Additional modding may be needed to add marines as products of some Terran stations (not included here) before an effect is seen.
+      
+
+ * Max_Marines_Video_Id_Overwrite (incompatible with: LU, TC)
+
+    Requires: L/x3story.obj
+
+      Remove the sirokos overwrite and put in its place a check for ships video ID Which if larger than the default value will overwrite
+      
+
  * Preserve_Captured_Ship_Equipment
 
     Requires: L/x3story.obj
@@ -716,11 +730,35 @@ Obj_Code Transforms:
       Removes the cutscene that plays when placing factories by shortening the duration to 0.  Also prevents the player ship from being stopped. May still have some visible camera shifts for an instant.
       
 
+ * Set_LaserTower_Equipment (incompatible with: LU, TC)
+
+    Requires: L/x3story.obj
+
+      Sets laser and shield type and count that are auto equipped for lasertowers and Terran orbital lasers. May need corresponding changes in Tships to enable equipment compatibility (not included here).
+      
+      * lasertower_laser_type
+        - Int, argon lasertower laser type.
+      * lasertower_laser_count
+        - Int, argon lasertower laser count.
+      * lasertower_shield_type
+        - Int, argon lasertower shield type.
+      * lasertower_shield_count
+        - Int, argon lasertower shield count.
+      * orbital_laser_laser_type
+        - Int, terran orbital laser laser type.
+      * orbital_laser_laser_count
+        - Int, terran orbital laser laser count.
+      * orbital_laser_shield_type
+        - Int, terran orbital laser shield type.
+      * orbital_laser_shield_count
+        - Int, terran orbital laser shield count.
+      
+
  * Set_Max_Marines (incompatible with: LU, TC)
 
     Requires: L/x3story.obj
 
-      Sets the maximum number of marines that each ship type can carry. These are byte values, signed, so max is 127.
+      Sets the maximum number of marines that each ship type can carry. These are byte values, signed, so max is 127. Note: in some cases, a larger ship type may use the marine count of a smaller ship if it is greater.
       
       * tm_count
         - Int, marines carried by TMs.
@@ -728,10 +766,13 @@ Obj_Code Transforms:
         - Int, marines carried by TPs.
       * m6_count
         - Int, marines carried by M6s.
+        - Overridden by tm_count if it is larger.
       * capital_count
         - Int, marines carried by capital ships: M1, M2, M7, TL.
+        - Overridden by tm_count if it is larger.
       * sirokos_count
         - Int, marines carried by the Sirokos, or whichever ship is located at entry 263 in Tships (when starting count at 1).
+        - Overridden by capital_count if it is larger.
         - Note: XRM does not use this slot in Tships.
       
 
@@ -1607,3 +1648,6 @@ Change Log:
    - Bug fixes in Adjust_Weapon_Fire_Rate: the fire_rate_floor will no longer be mistakenly applied when increasing fire rate, and setting skip_ammo_weapons to False will now be recognized.
  * 3.12.4
    - Bug fix in Adjust_Weapon_Fire_Rate: fire_rate_floor will no longer speed up named lasers that started below the floor while attempting to reduce their fire rate.
+ * 3.13
+   - Added Max_Marines_Video_Id_Overwrite.
+   - Tentatively added Set_LaserTower_Equipment and Make_Terran_Stations_Make_Terran_Marines.

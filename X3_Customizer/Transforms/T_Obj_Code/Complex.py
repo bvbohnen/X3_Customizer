@@ -118,7 +118,6 @@ def _Prevent_Complex_Connectors():
         to gate traversal time.
     '''
     patch = Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x000A2323],
             ref_code =  '0D' '0002' '02' '82' '........'
                         '34' '........' '0D' '0002' '0F' '0003' '03'
@@ -225,7 +224,6 @@ def Remove_Complex_Related_Sector_Switch_Delay():
             ]
 
     patch = Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0001666C],
             ref_code = ''.join(ref_code),
             new_code = ''.join(new_code),

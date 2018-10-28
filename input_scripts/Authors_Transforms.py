@@ -154,6 +154,16 @@ if Vanilla or XRM:
             capital_count = 60,
             sirokos_count = 80,
         )
+
+    # Testing transforms from pull requests.
+    # Lasertower change doesn't seem to work well.
+    #Set_LaserTower_Equipment(lasertower_shield_type = 3)
+    # Video_id for marine count does work.
+    #Max_Marines_Video_Id_Overwrite()
+    # Terran station marines may need other tweaks to get those
+    #  stations actually carrying marines as wares, but otherwise
+    #  might work fine.
+    #Make_Terran_Stations_Make_Terran_Marines()
     
 #####################################################
 # Background
@@ -225,8 +235,12 @@ else:
         # 'Trade': 0.3,
         # 'Build': 0.3,
         # 'Think': 0.3,
-        # Reduce dual convoy.
-        'L2M183': 0.5,
+        # Remove dual convoy.
+        # This mission appears to have a bug where it sets selected
+        #  stations invulnerable upon mission creation, but does not
+        #  remove the invulnerability if the mission is never taken
+        #  (and only times out).
+        'L2M183': 0,
         # Disable sector info, as it is generally useless.
         'L2M147': 0,
         # Reduce return ship missions, as they are often impossible

@@ -67,237 +67,6 @@ from ... import File_Manager
 from ... import Common
 Settings = Common.Settings
 from .Obj_Shared import *
-    
-
-@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
-def Set_Max_Marines(
-        tm_count = 8,
-        tp_count = 40,
-        m6_count = 8,
-        capital_count = 20,
-        sirokos_count = 30,
-    ):
-    '''
-    Sets the maximum number of marines that each ship type can carry.
-    These are byte values, signed, so max is 127.
-    
-    * tm_count
-      - Int, marines carried by TMs.
-    * tp_count
-      - Int, marines carried by TPs.
-    * m6_count
-      - Int, marines carried by M6s.
-    * capital_count
-      - Int, marines carried by capital ships: M1, M2, M7, TL.
-    * sirokos_count
-      - Int, marines carried by the Sirokos, or whichever ship is located
-        at entry 263 in Tships (when starting count at 1).
-      - Note: XRM does not use this slot in Tships.
-    '''
-    # Make input args ints, limit to 1 to max_count.
-    max_count = 127
-    tm_count = max(1, min(int(tm_count), max_count))
-    tp_count = max(1, min(int(tp_count), max_count))
-    m6_count = max(1, min(int(m6_count), max_count))
-    capital_count = max(1, min(int(capital_count), max_count))
-    sirokos_count = max(1, min(int(sirokos_count), max_count))
-
-    # Convert to hex strings, 1 byte each.
-    tm_count      = Int_To_Hex_String(tm_count, 1)
-    tp_count      = Int_To_Hex_String(tp_count, 1)
-    m6_count      = Int_To_Hex_String(m6_count, 1)
-    capital_count = Int_To_Hex_String(capital_count, 1)
-    sirokos_count = Int_To_Hex_String(sirokos_count, 1)
-
-    '''
-    These are generally just going to be integer value edits of
-    the GetMaxMarines functions (base and overloads).
-
-    Entries generally are doubled, one const is used in a comparison,
-    second copy is used on one comparison path, so 2 patches per
-    marine count changed.
-
-    Sirokos is a special case, with an ship subtype id comparison and
-    early return of 30.
-
-    For now, all locations are edited, but arg defaults
-    should leave things unchanged.
-
-    Note on LU:
-        This removes most of the overloads and just has the base function
-        look up the ware volume of the ship, and hence the marine count
-        is set through tships instead.
-        TODO: add support for this alternate style of marine changes.
-    '''
-
-    # Create a short version of the key patch fields.
-    # These are groups of [offset, ref_code, new_count].
-    # Note: for cleaner matching, keep a prefix 05 in the ref, but leave
-    #  it off the new_code here and add it below.
-    #patch_fields = [
-    #    # Sirokos. Special case of SHIP.
-    #    # Only one value to patch.
-    #    [0x000A876E, '051E8301', sirokos_count],
-    #
-    #    # TM. Inherits from SHIP_BIG.
-    #    [0x000CFA1C, '05085D34', tm_count],
-    #    [0x000CFA2C, '05081400', tm_count],
-    #    
-    #    # Capitals, inherit from Obj_2019.
-    #    [0x000D58EE, '05145D34', capital_count],
-    #    [0x000D58FE, '05141400', capital_count],
-    #    
-    #    # M6. Uses SHIP_M6.
-    #    [0x000D68DB, '05085D34', m6_count],
-    #    [0x000D68EB, '05081400', m6_count],
-    #    
-    #    # TP. Uses SHIP_TP.
-    #    [0x000D9537, '05285D34', tp_count],
-    #    [0x000D9547, '05281400', tp_count],
-    #    ]
-    
-    # Lay out the replacement region, capturing both values (otherwise
-    #  ambiguity problems crop up).
-    patch_fields = [
-        # TM. Inherits from SHIP_BIG.
-        ['05'  '08'    '5D''34''........''0D''0001''32''........'
-         '05'  '08'    '14''0002''24''83''24''01''83''6E''0006''01', 
-         '..'+tm_count+'..''..''........''..''....''..''........'
-         '..'+tm_count],
-        
-        # Capitals, inherit from Obj_2019.
-        ['05'  '14'         '5D''34''........''0D''0001''32''........'
-         '05'  '14'         '14''0002''24''83''24''01''83''6E''0007''0D', 
-         '..'+capital_count+'..''..''........''..''....''..''........'
-         '..'+capital_count],
-        
-        # M6. Uses SHIP_M6.
-        ['05'  '08'    '5D''34''........''0D''0001''32''........'
-         '05'  '08'    '14''0002''24''83''24''01''83''6E''0007''05', 
-         '..'+m6_count+'..''..''........''..''....''..''........'
-         '..'+m6_count],
-        
-        # TP. Uses SHIP_TP.
-        ['05'  '28'    '5D''34''........''0D''0001''32''........'
-         '05'  '28'    '14''0002''24''83''24''01''83''6E''0007''0D', 
-         '..'+tp_count+'..''..''........''..''....''..''........'
-         '..'+tp_count],
-
-        # Sirokos. Special case of SHIP.
-        # Only one value to patch.
-        # Note: removing this for TC is not enough to get the transform
-        #  working.
-        ['05'  '1E'  '83''01''83''01''83''6E''0005''0F''0062', 
-         '..'+sirokos_count],
-        ]
-    
-    # Construct the patches.
-    patch_list = []
-    for ref_code, replacement in patch_fields:
-        patch_list.append( Obj_Patch(
-            file = 'L/x3story.obj',
-            #offsets = [offset],
-            ref_code = ref_code,
-            new_code = replacement,
-        ))
-   
-
-    # Apply the patches.
-    Apply_Obj_Patch_Group(patch_list)
-
-    return
-
-
-@File_Manager.Transform_Wrapper('L/x3story.obj')
-def Disable_Combat_Music(
-    ):
-    '''
-    Turns off combat music, keeping the normal environment music playing
-    when nearing hostile objects. If applied to a saved game already in
-    combat mode, combat music may continue to play for a moment.
-    The beep on nearing an enemy will still be played.
-    '''
-    '''
-    This will edit the CLIENT.NotifyAlert function.
-    The arg to the function is a flag to enable or disable combat mode.
-    CLIENT.cl_Alert is an existing flag indicating if already in
-    combat mode or not.
-
-    Near entry, the code can be edited so that when
-    called to turn on combat mode, and checking to see if already
-    in combat mode and return early, it will instead return early
-    if not in combat mode (skipping the combat mode enable code).
-
-    To deal with cases where this transform is applied and combat
-    mode is already on, the turn-on code will be edited to turn
-    off combat mode instead.
-
-    Both of these changes are next to each other, and can be done
-    with one patch.
-
-    Example:
-    L00017889: push       SP[3] ; arg1
-            ; Jumps to turning off combat
-            if SP[0]=0 then jump L000178AE     
-            read       CLIENT.cl_Alert ; [7]
-            if SP[0]=0 then push 1 else push 0
-            ; Jumps to return if already in combat
-            if SP[0]=0 then jump L000178A9
-            ; Turns on combat and music
-            push       1
-            write      CLIENT.cl_Alert ; [7]
-            ...
-
-    Replacement will look like:
-    L00017889: push       SP[3] ; arg1
-            ; Jumps to turning off combat
-            if SP[0]=0 then jump L000178AE     
-            read       CLIENT.cl_Alert ; [7]
-            if SP[0]=0 then push 1 else push 0
-            ; Jumps to return if not in combat
-            if SP[0]!=0 then jump L000178A9    <-edit
-            ; If here, then arg1 requested combat, and combat flag
-            ;  is set, so turn off the flag.
-            ; Turns off combat
-            push       0                       <-edit
-            write      CLIENT.cl_Alert ; [7]
-            ; Continue to turning on combat music for now;
-            ;  next check should switch the path that clears combat fully.
-            ...
-
-    Note on LU:
-        The code is mostly the same, but for some reason cl_Alert is
-        swapped to cl_Verbose (different offset code), and near the
-        start CLIENT.cl_Killed is swapped to CLIENT.cl_GameFeatures.
-
-        It is unclear at a glance what this is meant to accomplish,
-        though it may simply be a situation where LU adds class variables,
-        changing the offsets of cl_Alert and CLIENT.cl_Killed, but the
-        disassembler is providing names based on the vanilla game.
-
-        If the underlying functionality is the same just with adjusted
-        offsets, this patch should work okay, but the reference code
-        needs to wildcard the offsets.  (In testing, this seems to
-        work fine.)
-    '''
-
-    patch = Obj_Patch(
-            file = 'L/x3story.obj',
-            #offsets = [0x00017895],
-            # Existing code is 
-            # 'if SP[0]=0 then jump L000178A9'
-            # 'push       1'
-            # 'write      CLIENT.cl_Alert'
-            ref_code =  '34' '........' '02' '16' '....' '24' '01' 
-                        '06' '00C8' '86' '........' '24' '32',
-            # Switch to 'if SP[0] != 0' and 'push 0'.
-            new_code = '33' '........' '01',
-            )
-    Apply_Obj_Patch(patch)
-
-    return
-
-
 
 # Notes on the god engine station removal behavior:
 '''
@@ -385,7 +154,6 @@ def Stop_GoD_From_Removing_Stations(
     #    # a given factory doesn't count as full/starved, whatever path
     #    # its analysis took, since both paths will now write a 0.
     #    patch = Obj_Patch(
-    #            file = 'L/x3story.obj',
     #            offsets = [0x0017F560],
     #            # Change the 'push 1' to 'push 0'.
     #            # Verify the following instruction.
@@ -400,7 +168,6 @@ def Stop_GoD_From_Removing_Stations(
     #    # pop and some nops, so that all list items get removed. The later
     #    # check for an empty list will then skip to the next sector.
     #    patch = Obj_Patch(
-    #            file = 'L/x3story.obj',
     #            offsets = [0x0017FC59],
     #            ref_code = hex2bin('340017FC6B'),
     #            new_code = hex2bin(POP + NOP * 4),
@@ -411,7 +178,6 @@ def Stop_GoD_From_Removing_Stations(
     # When the sector is checking for its 'SetNoEvents' flag to be skipped,
     # ensure both result paths will skip the sector.
     patch = Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0017EEEB],
             # Swap 'push 0' to 'push 1'.
             ref_code = '01' '32' '........' '02' '34' '........' 
@@ -455,7 +221,6 @@ def Disable_Asteroid_Respawn(
     Note: does not apply to LU, which already has the respawn code removed.
     '''
     patch = Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0008F9EB],
             # Replace with nops.
             ref_code = '2E' '02' '06' '012F' '86' '........' '24' '0F' '0001' '34',
@@ -497,7 +262,6 @@ def Allow_Valhalla_To_Jump_To_Gates(
     Note: LU trims away all of this extra code already.
     '''
     patch = Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x000CED11],
             # This pushes 0, returns, and checks a few later commands
             #  for verification.
@@ -573,7 +337,6 @@ def Remove_Factory_Build_Cutscene(
     patch_list = [
         # Factory and complex intro, shared code template.
         Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0001B019, 0x0001BB91],
             # 06 01F4 is first fade time (500 ms)
             # 06 07D0 is the first delay (2000 ms)
@@ -595,7 +358,6 @@ def Remove_Factory_Build_Cutscene(
         
         # Complex outro.
         Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0001BDEB, 0x0001BE5F],
             # 06 03E8 is first fade time (1000 ms)
             # 06 0FA0 is the first delay (4000 ms)
@@ -617,7 +379,6 @@ def Remove_Factory_Build_Cutscene(
 
         # Outros also have a followup 500 ms fade.
         Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0001B26A],
             # 06 03E8 is fade time (1000 ms)
             ref_code =  '06' '03E8' '01' '03' '06' '0096' '86' '........'
@@ -632,7 +393,6 @@ def Remove_Factory_Build_Cutscene(
         # Ship stop logic.
         # Replace these with nops.
         Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0001AE52],
             # The ........ fields will call, in order:
             #  SA_SetDesiredSpeed
@@ -666,7 +426,6 @@ def Remove_Factory_Build_Cutscene(
         #  code diverges too much for simple wildcards to match the
         #  desired locations and nowhere else, so use two patches.
         Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0001AF74],
             # This does an SE_ObjectExists check and then a StopCommand.
             # Replace the StopCommand with nops, as above.
@@ -678,7 +437,6 @@ def Remove_Factory_Build_Cutscene(
                         + NOP * 10 ),
             ),
         Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x0001BAF8],
             # Slightly different version of above.
             ref_code =  '0D' '0011' '02' '82' '........' '34' '........'
@@ -717,7 +475,6 @@ def Keep_TLs_Hired_When_Empty():
     side effects to setting a hired ship to hired again.
     '''
     patch = Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x000DAA8C],
             # Only this first bit is the SetHired call, with args and
             #  return pop.
@@ -731,86 +488,6 @@ def Keep_TLs_Hired_When_Empty():
     return
 
 
-@File_Manager.Transform_Wrapper('L/x3story.obj')
-def Disable_Docking_Music():
-    '''
-    Prevents docking music from playing when the player manually requests
-    docking.
-    '''
-    '''
-    Code to edit is in CLIENT.DockingAllowed, where music track 14 is
-    called.
-    
-    Can convert the code section to nops:
-           pushb      14d ; 0Eh
-           push       1
-           pushw      200d ; 0C8h
-           call86     X_AUDIO.ChangeTrackMusic
-           pop
-    '''
-    patch = Obj_Patch(
-            file = 'L/x3story.obj',
-            #offsets = [0x000172AE],
-            ref_code =  '05' '0E'
-                        '02'
-                        '06' '00C8'
-                        '86' '........'
-                        '24'
-                        '6F'
-                        '33' '........'
-                        '02'
-                        '06' '0503'
-                        '05' '0D'
-                        '28' '0002'
-                        '03'
-                        '06' '00C8',
-            # Swap to 12 nops.
-            new_code = NOP * 12,
-            )
-    Apply_Obj_Patch(patch)
-
-    return
-
-
-@File_Manager.Transform_Wrapper('L/x3story.obj')
-def _Disable_Friendly_Fire():
-    '''
-    Disables friendly fire between ships with the same owner.
-    Experimental; not working in testing.
-    '''
-    '''
-    Code to edit is in SHIP.Hit.
-
-    Relatively early on, a check is made for if the attacker is the same
-    owner as the victim.  Normally this skips over some notoriety hit
-    code, but could be changed to return instead, skipping the damage
-    update.
-
-    The jump can be redirected to the end of the function, which has
-    the same stack depth (3).
-
-    Test result: no change in damage application when shooting another
-    owned ship.  Suggests this bit of code isn't actually used normally.
-    '''
-    patch = Obj_Patch(
-            file = 'L/x3story.obj',
-            #offsets = [0x000C01C0],
-            # Code section starting with the jump address to the ship
-            #  damage code.
-            ref_code =  '000C02E5'
-                        '0D' '0001'    
-                        '0E' '0008'    
-                        '5B'         
-                        '34' '000C0211'
-                        '01'         
-                        '0E' '0008'    
-                        '85' '0000298C',
-            # Address of a pre-return stack pop.
-            new_code = '000C04D0',
-            )
-    Apply_Obj_Patch(patch)
-
-    return
 
 
 @File_Manager.Transform_Wrapper('L/x3story.obj')
@@ -833,7 +510,6 @@ def Preserve_Captured_Ship_Equipment():
     game test suggests it is affected as well.
     '''
     patch = Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x000C86B2],
             # Code section following function entry.
             # This starts with 0 items on the stack.
@@ -862,48 +538,6 @@ def Preserve_Captured_Ship_Equipment():
 
     return
 
-
-@File_Manager.Transform_Wrapper('L/x3story.obj')
-def Hide_Lasertowers_Outside_Radar():
-    '''
-    Prevents lasertowers and mines from showing up on sector maps
-    when outside the radar ranges of player ships.
-    '''
-    '''
-    Added by request.
-
-    Code to edit is in MENU_SECTOR.FindMapObjects.
-
-    Lasertowers, Mines, and Satellites (and beacons) are sublcasses
-    of class 2135.  The code for determining if an object is visible
-    will normally do a radar range check on player owned assets, but for
-    class 2135 will only check the result of a GetUnknown call.
-
-    To preserve this behavior for jump beacons while hiding laser towers,
-    the class code can be swapped to 2079, the class code for satellites
-    and beacons.
-    '''
-    patch = Obj_Patch(
-            file = 'L/x3story.obj',
-            #offsets = [0x00132C15],
-            # Code starts off with the 2135 class code check.
-            ref_code =  '06' '0857'
-                        '0D' '0002'
-                        '03'
-                        '82' '........'
-                        '64'
-                        '0D' '0002'
-                        '03'
-                        '88' '........'
-                        '33' '........'
-                        '01'
-                        '32' '........',
-            # Replace start with 2011 check.
-            new_code = '06' '081F',
-            )
-    Apply_Obj_Patch(patch)
-
-    return
 
 
 @File_Manager.Transform_Wrapper('L/x3story.obj')
@@ -1031,7 +665,6 @@ def Force_Infinite_Loop_Detection(
     # Force entry even when count is 0.
     # Change the max count to a higher number.
     entry_dynamic_patch = Obj_Patch(
-        file = 'L/x3story.obj',
         #offsets = [0x00038429],
         # Code starts off with pushing the count and comparing
         #  to 0, jumping if so.
@@ -1075,7 +708,6 @@ def Force_Infinite_Loop_Detection(
     
     # Change initial time on new scripts to 0.
     init_time_patch = Obj_Patch(
-            file = 'L/x3story.obj',
             #offsets = [0x000382B0],
             # This starts by pushing 0, then calling TI_GetAbsTime, with
             #  the value being left on the stack as the initial time.
@@ -1102,53 +734,4 @@ def Force_Infinite_Loop_Detection(
 
     return
 
-# Underscore this name; it isn't really for general use due to
-#   missing titles.
-@File_Manager.Transform_Wrapper('L/x3story.obj')
-def _Show_Pirate_Yaki_Nororiety():
-    '''
-    Adds pirates and yaki to the displayed list of faction notorieties.
-    Due to missing text linkages, titles are not currently available and
-    only progress to the next rank is shown.
-    '''
-    '''
-    Code to edit is in MENU_PLAYER.SpecialUpdate.
 
-    When races are looped over, they are checked against a 0006023Eh mask.
-    This includes the main races, terrans, atf, and goners.
-    To add pirates and yaki, switch to 000E033Eh.
-
-    Result:
-        Works as far as it goes, but the lack of text titles prevents this
-        from being very useful.
-        At a glance, there appears to be no way to add in titles, since they
-        are seemingly hard coded to certain text pages through a global
-        function (not in the KC), where page numbers do not follow any
-        exploitable pattern.
-
-        The mod at https://forum.egosoft.com/viewtopic.php?t=307436
-        works around this by adding pirates/yaki to the generic mission
-        based rankings using the MD, setting up cues that constantly
-        copy over pirate/yaki rep to the mission side title for display.
-        Such titles are set through an MD command that specifies the
-        page text (with a bit of implicit offset based on rank).
-
-        For now, sideline this but leave it here in case any ideas strike.
-    '''
-    patch = Obj_Patch(
-            file = 'L/x3story.obj',
-            #offsets = [0x0013DAC6],
-            # Code starts off with the pushing the mask.
-            ref_code =  '07' '0006023E'
-                        '53'
-                        '01'
-                        '5B'
-                        '34' '........'
-                        '24'
-                        '32' '........',
-            # Replace the pushed value.
-            new_code = '07' '000E033E',
-            )
-    Apply_Obj_Patch(patch)
-
-    return

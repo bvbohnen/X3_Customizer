@@ -54,6 +54,8 @@ class Obj_Patch:
     Attributes:
     * file
       - String, name of the obj file being edited.
+      - Defaults to 'L/x3story.obj', which is expected to hold all
+        runtime obj code of interest.
     * ref_code
       - String, the code starting at the offset which is being replaced.
       - Used for verification and for offset searching.
@@ -77,7 +79,7 @@ class Obj_Patch:
       - Normally 1, but may be more in some cases of repeated code that
         should all be patched the same way.
     '''
-    def __init__(s, file, ref_code, new_code, expected_matches = 1):
+    def __init__(s, ref_code, new_code, expected_matches = 1, file = 'L/x3story.obj'):
         s.file = file
         s.ref_code = ref_code
         s.new_code = new_code
@@ -97,7 +99,7 @@ def _String_To_Bytes(string, add_escapes = False):
         entries.
       - This should be applied if the bytes will be used as a regex pattern.
     '''
-    # To make striding more convenient, double all + and - so that take
+    # To make striding more convenient, double all + and - so that they take
     #  up 2 chars each.
     string = string.replace('-','--').replace('+','++')
 

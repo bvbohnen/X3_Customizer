@@ -7,6 +7,7 @@ from .Misc import Write_Files
 from .Misc import Copy_File
 from .Misc import Add_File
 from .Logs import Write_Summary_Line
+from .Misc import Transform_Was_Run_Before
 from .File_Types import *
 
 # Allow access indirectly of some modules.

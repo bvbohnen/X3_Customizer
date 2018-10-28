@@ -220,6 +220,10 @@ Change Log:
    - Bug fix in Adjust_Weapon_Fire_Rate: fire_rate_floor will no longer speed
      up named lasers that started below the floor while attempting to reduce
      their fire rate.
+ * 3.13
+   - Added Max_Marines_Video_Id_Overwrite.
+   - Tentatively added Set_LaserTower_Equipment and
+     Make_Terran_Stations_Make_Terran_Marines.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

@@ -30,7 +30,7 @@ def Adjust_Generic_Missions(
         the chance multiplier.
       - Keys may be cue names, eg. 'L2M104A', or categories, eg. 'Fight'.
         Specific cue names will override categories.
-      - Categories and cue names for the vanilla AP are as follows, where
+      - Categories and cue names for vanilla AP are as follows, where
         the term after the category is the base mission chance shared by
         all missions in that category, as used in the game files.
       - Trade (TXXX)
