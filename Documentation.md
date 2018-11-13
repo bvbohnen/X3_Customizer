@@ -1,4 +1,4 @@
-X3 Customizer 3.13
+X3 Customizer 3.14
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -181,93 +181,42 @@ Background Transforms:
 
 ***
 
-Director Transforms:
+Bug_Fixe Transforms:
 
- * Adjust_Generic_Missions
+ * Fix_Corporation_Troubles_Balance_Rollover
 
-    Requires: director/3.01 Generic Missions.xml
+    Requires: director/2.024 Player Corp.xml
 
-      Adjust the spawn chance of various generic mission types, relative to each other. Note: decreasing chance on unwanted missions seems to work better than increasing chance on wanted missions.
-  
-      * adjustment_dict:
-        - Dict keyed by mission identifiers or preset categories, holding the chance multiplier.
-        - Keys may be cue names, eg. 'L2M104A', or categories, eg. 'Fight'. Specific cue names will override categories.
-        - Categories and cue names for vanilla AP are as follows, where the term after the category is the base mission chance shared by all missions in that category, as used in the game files.
-        - Trade (TXXX)
-          - L2M104A : Deliver Wares to Station in need
-          - L2M104B : Deliver Illegal Wares to Pirate Station
-          - L2M104C : Deliver Illegal Wares to Trading Station
-          - L2M116  : Transport Cargo
-          - L2M130  : Passenger Transport
-          - L2M150a : Buy Used Ship
-        - Fight (XFXX)
-          - L2M101  : Assassination
-          - L2M108  : Xenon Invasion
-          - L2M119  : Escort Convoy
-          - L2M127  : Destroy Convoy
-          - L2M134  : Generic Patrol
-          - L2M135  : Defend Object
-          - L2M183  : Dual Convoy
-        - Build (XXBX)
-          - L2M122  : Build Station    
-        - Think (XXXT)
-          - L2M103  : Transport Passenger
-          - L2M105  : Return Ship
-          - L2M113  : Follow Ship
-          - L2M129  : Deliver Matching Ship
-          - L2M133  : Freight Scan
-          - L2M145  : Scan Asteroids
-          - L2M180  : Repair Station
-          - L2M181  : Multiple Transport
-          - L2M182  : Tour Of A Lifetime
-          - L2M136  : Notoriety Hack
-          - L2M144  : Buy Asteroid Survey
-          - L2M147  : Buy Sector Data
-          - L2M161  : Buy Blueprints
-          - DPL2M186: Sell Blueprints
-      * cap_at_100:
-        - Bool, if True then mission chance adjustment will cap at 100, the typical highest in vanilla AP. Default False.
+      In the Corporation Troubles plot, prevents the bank balance from reaching >2 billion and rolling over due to the 32-bit signed integer limit.
       
 
- * Convoys_made_of_race_ships
+ * Fix_Dual_Convoy_Invincible_Stations
 
-    Requires: director/2.119 Trade Convoy.xml
+    Requires: director/0.83 Dual Convoy.xml, director/2.183 Dual Convoy.xml
 
-      If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
+      Fixes Dual Convoy generic missions to no longer leave stations permenently invincible, and to no longer risk clearing invincibility from plot stations, as well as fixes a minor bug in the parameter list.
+  
+      Stations used by these missions will no longer be set invincible, and a mission is cancelled if an end point station is destroyed.
+  
+      Does not affect any invinciblity flags already set in an existing save. Consider also using Fix_Reset_Invincible_Stations to clear leftover flags in an existing save.
       
 
- * Disable_Generic_Missions
+ * Fix_Reset_Invincible_Stations
 
-    Requires: director/3.01 Generic Missions.xml
+    Requires: None
 
-      Disable generic missions from spawning. Existing generic missions will be left untouched.
+      Resets the invinciblity flag on stations in an existing save. Works by re-triggering the matching script contained in an AP patch, which will preserve invincibilty for AP plot related stations. Warnings: invincibility flags from other sources (eg. TC plots for AP) may be lost. Pending test and verification.
+  
+      * cue_index
+        - Int, index for the director cue which will retrigger the reset call. Increment this if wanting to run the reset script again for an existing save, as each cue name will fire only once.
+        - Default is 0.
       
 
- * Standardize_Start_Plot_Overtunings (incompatible with: LU)
+ * Fix_Terran_Plot_Aimless_TPs
 
-    Requires: director/3.05 Gamestart Missions.xml
+    Requires: director/2.004 Terran Plot Scene 4.xml
 
-      Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
-  
-      * fraction_of_max:
-        - Float, typically between 0 and 1, the fraction of the max overtuning to use. A value of 0 will remove overtunings, and 1 will give max overtuning that is available in vanilla. Default of 0.7 is set to mimic moderate game reloading results.
-      
-
- * Standardize_Tunings (incompatible with: LU, TC)
-
-    Requires: director/3.08 Sector Management.xml
-
-      Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
-  
-      * enging_tuning_crates:
-        - Int, the number of engine tuning crates to spawn. Default 4.
-      * rudder_tuning_crates:
-        - Int, the number of rudder tuning crates to spawn. Default 4.
-      * engine_tunings_per_crate:
-        - Int, the number of tunings in each engine crate. Default 4.
-      * rudder_tunings_per_crate:
-        - Int, the number of tunings in each rudder crate. Default 3.
-  
+      In the Terran Conflict plot when allied TPs move to capture an Elephant, fix replacement TPs to move toward the Elephant instead of wandering aimlessly.
       
 
 
@@ -468,6 +417,71 @@ Job Transforms:
           - 'create_outside_sector'
       * docked_chance:
         - Int, 0 to 100, the percentage chance the ship is docked when spawned.
+      
+
+
+***
+
+Misc Transforms:
+
+ * Adjust_Generic_Missions
+
+    Requires: director/3.01 Generic Missions.xml
+
+      Adjust the spawn chance of various generic mission types, relative to each other. Note: decreasing chance on unwanted missions seems to work better than increasing chance on wanted missions.
+  
+      * adjustment_dict:
+        - Dict keyed by mission identifiers or preset categories, holding the chance multiplier.
+        - Keys may be cue names, eg. 'L2M104A', or categories, eg. 'Fight'. Specific cue names will override categories.
+        - Categories and cue names for vanilla AP are as follows, where the term after the category is the base mission chance shared by all missions in that category, as used in the game files.
+        - Trade (TXXX)
+          - L2M104A : Deliver Wares to Station in need
+          - L2M104B : Deliver Illegal Wares to Pirate Station
+          - L2M104C : Deliver Illegal Wares to Trading Station
+          - L2M116  : Transport Cargo
+          - L2M130  : Passenger Transport
+          - L2M150a : Buy Used Ship
+        - Fight (XFXX)
+          - L2M101  : Assassination
+          - L2M108  : Xenon Invasion
+          - L2M119  : Escort Convoy
+          - L2M127  : Destroy Convoy
+          - L2M134  : Generic Patrol
+          - L2M135  : Defend Object
+          - L2M183  : Dual Convoy
+        - Build (XXBX)
+          - L2M122  : Build Station    
+        - Think (XXXT)
+          - L2M103  : Transport Passenger
+          - L2M105  : Return Ship
+          - L2M113  : Follow Ship
+          - L2M129  : Deliver Matching Ship
+          - L2M133  : Freight Scan
+          - L2M145  : Scan Asteroids
+          - L2M180  : Repair Station
+          - L2M181  : Multiple Transport
+          - L2M182  : Tour Of A Lifetime
+          - L2M136  : Notoriety Hack
+          - L2M144  : Buy Asteroid Survey
+          - L2M147  : Buy Sector Data
+          - L2M161  : Buy Blueprints
+          - DPL2M186: Sell Blueprints
+      * cap_at_100:
+        - Bool, if True then mission chance adjustment will cap at 100, the typical highest in vanilla AP. Default False.
+      
+
+ * Convoys_made_of_race_ships
+
+    Requires: director/2.119 Trade Convoy.xml
+
+      If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
+      
+
+ * Disable_Generic_Missions
+
+    Requires: director/3.01 Generic Missions.xml
+
+      Disable generic missions from spawning. Existing generic missions will be left untouched.
       
 
 
@@ -1001,7 +1015,7 @@ Ship Transforms:
 
     Requires: types/TShips.txt
 
-      Applies a bug fix to the enhanced pericles in vanilla AP, which has its npc value set to 1/10 of player value, causing it price to be 1/10 what it should be. Does nothing if the existing npc and player prices are matched.
+      Applies a bug fix to the enhanced pericles in vanilla AP, which has its npc value set to 1/10 of player value, causing its price to be 1/10 what it should be. Does nothing if the existing npc and player prices are matched.
       
 
  * Patch_Ship_Variant_Inconsistencies
@@ -1153,6 +1167,38 @@ Sound Transforms:
   
       * sound_id
        - Int, the id of the sound file to be overwritten.
+      
+
+
+***
+
+Tuning Transforms:
+
+ * Standardize_Start_Plot_Overtunings (incompatible with: LU)
+
+    Requires: director/3.05 Gamestart Missions.xml
+
+      Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
+  
+      * fraction_of_max:
+        - Float, typically between 0 and 1, the fraction of the max overtuning to use. A value of 0 will remove overtunings, and 1 will give max overtuning that is available in vanilla. Default of 0.7 is set to mimic moderate game reloading results.
+      
+
+ * Standardize_Tunings (incompatible with: LU, TC)
+
+    Requires: director/3.08 Sector Management.xml
+
+      Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
+  
+      * enging_tuning_crates:
+        - Int, the number of engine tuning crates to spawn. Default 4.
+      * rudder_tuning_crates:
+        - Int, the number of rudder tuning crates to spawn. Default 4.
+      * engine_tunings_per_crate:
+        - Int, the number of tunings in each engine crate. Default 4.
+      * rudder_tunings_per_crate:
+        - Int, the number of tunings in each rudder crate. Default 3.
+  
       
 
 
@@ -1651,3 +1697,8 @@ Change Log:
  * 3.13
    - Added Max_Marines_Video_Id_Overwrite.
    - Tentatively added Set_LaserTower_Equipment and Make_Terran_Stations_Make_Terran_Marines.
+ * 3.14
+   - Added Fix_Corporation_Troubles_Balance_Rollover.
+   - Added Fix_Terran_Plot_Aimless_TPs.
+   - Added Fix_Dual_Convoy_Invincible_Stations; pending testing.
+   - Added Fix_Reset_Invincible_Stations.

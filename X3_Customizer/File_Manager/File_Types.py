@@ -80,15 +80,25 @@ class Game_File:
         return True
         
         
+# TODO: maybe set xml file output to automatically normalize layout,
+#  so transforms don't need to worry about pretty indentation.
+# TODO: maybe just fully convert this to holding an ET tree normally,
+#  and update text based transforms accordingly. This may be a bit of
+#  work for the updates, though.
 class XML_File(Game_File):
     '''
     Simple XML file contents holder with encoding and text.
 
     Attributes:
-    * text
-      - Raw text for this file.
     * encoding
       - String indicating the encoding type of the xml.
+    * _text
+      - Raw text for this file. Do not access directly, as this may be
+        changed in the future to store only xml nodes.
+    * xml_header_lines
+      - List of strings, original header lines from the xml text,
+        including the encoding declaration and the stylesheet
+        declaration.
     '''
     def __init__(s, file_binary, **kwargs):
         super().__init__(**kwargs)
@@ -112,6 +122,18 @@ class XML_File(Game_File):
         # Set as unmodified, and rely on transforms to call the appropriate
         #  methods when doing updates (instead of modifying text).
         s.modified = False
+
+        # Isolate the header lines, those with a "<?" prefix at the start
+        #  of the file.
+        s.xml_header_lines = []
+        for line in s._text.splitlines():
+            if line.startswith('<?'):
+                s.xml_header_lines.append(line)
+            else:
+                # Stop when running out of header lines.
+                break
+
+        return
 
             
     def Read_Data(s):
@@ -139,28 +161,64 @@ class XML_File(Game_File):
 
     def Get_XML_Tree(s):
         '''
-        Return an ElementTree after parsing the current text
-        as xml.
+        Return an ElementTree after parsing the current text as xml.
         '''        
         node = ET.fromstring(s._text)
+        # Normalize to an ElementTree type.
         if not isinstance(node, ET.ElementTree):
             node = ET.ElementTree(node)
         return node
 
 
-    def Update_From_XML_Node(s, element_root):
+    def Update_From_XML_Node(s, element_root, reformat = False):
         '''
         Update the current text from an xml node, either
          Element or ElementTree.
         First line will be left unchanged.
+
+        * reformat
+          - Bool, if True then the xml will have its formatting redone
+            for indentations and newlines.
         '''
-        # Normalize to be the root Element.
+        s.modified = True
+        # Normalize to be the root Element (TODO: is this needed?).
         if isinstance(element_root, ET.ElementTree):
             element_root = element_root.getroot()
-        s.modified = True
-        s._text = (s._text.splitlines()[0] + '\n' 
-                   + ET.tostring(element_root, encoding = 'unicode'))
-        assert s._text.count('<?xml') == 1
+
+        if not reformat:
+            # Combine the ET.tostring output with the original header
+            #  lines, since tostring doesn't include any header.
+            s._text = ('\n'.join(s.xml_header_lines) + '\n' 
+                       + ET.tostring(element_root, encoding = 'unicode'))
+
+        else:
+            # Strip all whitespace from the text/tail fields of the nodes,
+            #  to get rid of old formatting.
+            for element in element_root.iter():
+                element.text = None if not element.text else element.text.strip()
+                element.tail = None if not element.tail else element.tail.strip()
+
+            # Want to use the minidome.toprettyxml function, so need to
+            #  convert from ET to minidom.
+            xml_text = ET.tostring(element_root)
+            minidom_root = minidom.parseString(xml_text)
+
+            # Note: toprettyxml inserts indents and newlines, appending to any
+            #  existing ones blindly, but old formatting was removed
+            #  already so this should work fine.
+            # Use a 2-space indent, as is typical in the x3 xml.
+            xml_text = minidom_root.toprettyxml(indent = '  ')
+
+            # Unlike ET, minidom put a simple header "<?xml ...>" line.
+            # Since the original header has the intended encoding that
+            #  will be used for final text writeout, along with the
+            #  stylesheet, throw away the minidom header and keep the
+            #  original.
+            s._text = '\n'.join(s.xml_header_lines + xml_text.splitlines()[1:])
+            
+        # Just a quick verification only one header is present.
+        assert s._text.count('<?xml ') == 1
+        return
 
 
     @staticmethod

@@ -224,6 +224,11 @@ Change Log:
    - Added Max_Marines_Video_Id_Overwrite.
    - Tentatively added Set_LaserTower_Equipment and
      Make_Terran_Stations_Make_Terran_Marines.
+ * 3.14
+   - Added Fix_Corporation_Troubles_Balance_Rollover.
+   - Added Fix_Terran_Plot_Aimless_TPs.
+   - Added Fix_Dual_Convoy_Invincible_Stations; pending testing.
+   - Added Fix_Reset_Invincible_Stations.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

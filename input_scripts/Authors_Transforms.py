@@ -112,7 +112,16 @@ Preserve_Captured_Ship_Equipment()
 #  enabled on it, since detection cannot be forced off again (currently).
 #Force_Infinite_Loop_Detection()
 
+# Bug fixes; common to all installs.
+Fix_Dual_Convoy_Invincible_Stations()
+# If ever needed, can do a station invincibility flag reset.
+#Fix_Reset_Invincible_Stations(cue_index = 0)
+
 if Vanilla or XRM:
+    
+    # Bug fixes, for missions not supported by LU.
+    Fix_Corporation_Troubles_Balance_Rollover()
+    Fix_Terran_Plot_Aimless_TPs()
 
     # Experimental attempt to turn off friendly fire between ships.
     # -Not working in practice.

@@ -1,4 +1,4 @@
-X3 Customizer 3.13
+X3 Customizer 3.14
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -111,27 +111,23 @@ Background Transforms:
 
 ***
 
-Director Transforms:
+Bug_Fixe Transforms:
 
- * Adjust_Generic_Missions
+ * Fix_Corporation_Troubles_Balance_Rollover
 
-      Adjust the spawn chance of various generic mission types, relative to each other. Note: decreasing chance on unwanted missions seems to work better than increasing chance on wanted missions.
+      In the Corporation Troubles plot, prevents the bank balance from reaching >2 billion and rolling over due to the 32-bit signed integer limit.
 
- * Convoys_made_of_race_ships
+ * Fix_Dual_Convoy_Invincible_Stations
 
-      If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
+      Fixes Dual Convoy generic missions to no longer leave stations permenently invincible, and to no longer risk clearing invincibility from plot stations, as well as fixes a minor bug in the parameter list.
 
- * Disable_Generic_Missions
+ * Fix_Reset_Invincible_Stations
 
-      Disable generic missions from spawning. Existing generic missions will be left untouched.
+      Resets the invinciblity flag on stations in an existing save. Works by re-triggering the matching script contained in an AP patch, which will preserve invincibilty for AP plot related stations. Warnings: invincibility flags from other sources (eg. TC plots for AP) may be lost. Pending test and verification.
 
- * Standardize_Start_Plot_Overtunings (incompatible with: LU)
+ * Fix_Terran_Plot_Aimless_TPs
 
-      Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
-
- * Standardize_Tunings (incompatible with: LU, TC)
-
-      Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
+      In the Terran Conflict plot when allied TPs move to capture an Elephant, fix replacement TPs to move toward the Elephant instead of wandering aimlessly.
 
 
 ***
@@ -200,6 +196,23 @@ Job Transforms:
  * Set_Job_Spawn_Locations
 
       Sets the spawn location of ships created for jobs, eg. at a shipyard, at a gate, docked at a station, etc.
+
+
+***
+
+Misc Transforms:
+
+ * Adjust_Generic_Missions
+
+      Adjust the spawn chance of various generic mission types, relative to each other. Note: decreasing chance on unwanted missions seems to work better than increasing chance on wanted missions.
+
+ * Convoys_made_of_race_ships
+
+      If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
+
+ * Disable_Generic_Missions
+
+      Disable generic missions from spawning. Existing generic missions will be left untouched.
 
 
 ***
@@ -420,7 +433,7 @@ Ship Transforms:
 
  * Fix_Pericles_Pricing (incompatible with: XRM, LU)
 
-      Applies a bug fix to the enhanced pericles in vanilla AP, which has its npc value set to 1/10 of player value, causing it price to be 1/10 what it should be. Does nothing if the existing npc and player prices are matched.
+      Applies a bug fix to the enhanced pericles in vanilla AP, which has its npc value set to 1/10 of player value, causing its price to be 1/10 what it should be. Does nothing if the existing npc and player prices are matched.
 
  * Patch_Ship_Variant_Inconsistencies
 
@@ -475,6 +488,19 @@ Sound Transforms:
  * Remove_Sound
 
       Removes a sound by writing an empty file in its place, based on the sound's id.
+
+
+***
+
+Tuning Transforms:
+
+ * Standardize_Start_Plot_Overtunings (incompatible with: LU)
+
+      Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
+
+ * Standardize_Tunings (incompatible with: LU, TC)
+
+      Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
 
 
 ***
@@ -770,3 +796,8 @@ Change Log:
  * 3.13
    - Added Max_Marines_Video_Id_Overwrite.
    - Tentatively added Set_LaserTower_Equipment and Make_Terran_Stations_Make_Terran_Marines.
+ * 3.14
+   - Added Fix_Corporation_Troubles_Balance_Rollover.
+   - Added Fix_Terran_Plot_Aimless_TPs.
+   - Added Fix_Dual_Convoy_Invincible_Stations; pending testing.
+   - Added Fix_Reset_Invincible_Stations.

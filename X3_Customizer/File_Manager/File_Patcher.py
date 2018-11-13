@@ -7,6 +7,10 @@ contents.
 Initial version is not expected to support multiple patches to
 the same file through this method.
 
+TODO: maybe reorganize to clarify this as being meant for scripts.
+Other patching tools exist for obj files (binary) or mission director
+xml (using ElementTree).
+
 This will operate on files in the patches folder.
 This folder should generally have three versions of any given file:
     file_name
@@ -375,6 +379,7 @@ def Standardize_XML_Format(xml_text, encoding):
     # eg. when it is a newline followed by spaces that prefix the next
     # element when printed, or a newline in a text field preceeding a
     # subelement.
+    # TODO: may be simpler to just strip() the text/tail fields.
     for element in element_root.iter():
         # If nothing is left after splitting on the whitespace, can
         # replace with an empty string.

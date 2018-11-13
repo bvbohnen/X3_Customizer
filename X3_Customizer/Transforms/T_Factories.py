@@ -3,9 +3,11 @@ Transforms to factories.
 '''
 from collections import defaultdict
 import copy
+import xml.etree.ElementTree as ET
 
 from .. import File_Manager
-from .T_Director import *
+from .T_Director import Make_Director_Shell
+from .T_Director import Generate_Director_Text_To_Update_Shipyards
 from ..Common import Flags
 
 # Global tracker for factory field adjustments based on size.

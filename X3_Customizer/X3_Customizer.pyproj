@@ -84,6 +84,18 @@
     <Compile Include="Common\Settings.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Transforms\T_Director\Bug_Fixes.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transforms\T_Director\Support.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transforms\T_Director\Tunings.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transforms\T_Director\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Transforms\T_Obj_Code\Complex.py">
       <SubType>Code</SubType>
     </Compile>
@@ -128,7 +140,7 @@
     <Compile Include="Transforms\T_Weapons\__init__.py" />
     <Compile Include="Transforms\__init__.py" />
     <Compile Include="Transforms\T_Backgrounds.py" />
-    <Compile Include="Transforms\T_Director.py" />
+    <Compile Include="Transforms\T_Director\Misc.py" />
     <Compile Include="Transforms\T_Factories.py">
       <SubType>Code</SubType>
     </Compile>
@@ -164,6 +176,7 @@
     <Folder Include="Common\" />
     <Folder Include="File_Manager\" />
     <Folder Include="Transforms\" />
+    <Folder Include="Transforms\T_Director\" />
     <Folder Include="Transforms\T_Obj_Code\" />
     <Folder Include="Transforms\T_Weapons\" />
   </ItemGroup>

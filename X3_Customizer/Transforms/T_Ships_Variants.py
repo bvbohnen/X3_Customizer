@@ -1696,7 +1696,7 @@ Through a callable script:
         <RetVar> = get station array: of race <Var/Race> class/type =<Value>
         <RetVar> = get station array: product =<Var/Ware> include empty =<Var/Boolean>
 
-    The thread has a simple example of using a couple of the above, once the
+    This thread has a simple example of using a couple of the above, once the
     ship and station are selected:
         https://forum.egosoft.com/viewtopic.php?p=3671990
 

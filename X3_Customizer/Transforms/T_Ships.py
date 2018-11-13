@@ -344,7 +344,7 @@ def Adjust_Ship_Shield_Slots(
 def Fix_Pericles_Pricing():
     '''
     Applies a bug fix to the enhanced pericles in vanilla AP, which has its
-    npc value set to 1/10 of player value, causing it price to be 1/10
+    npc value set to 1/10 of player value, causing its price to be 1/10
     what it should be.
     Does nothing if the existing npc and player prices are matched.
     '''

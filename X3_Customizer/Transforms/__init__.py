@@ -9,12 +9,6 @@ from .T_Backgrounds import Adjust_Fade_Start_End_Gap
 from .T_Backgrounds import Adjust_Particle_Count
 from .T_Backgrounds import Remove_Stars_From_Foggy_Sectors
 
-from .T_Director import Adjust_Generic_Missions
-from .T_Director import Disable_Generic_Missions
-from .T_Director import Standardize_Tunings
-from .T_Director import Convoys_made_of_race_ships
-from .T_Director import Standardize_Start_Plot_Overtunings
-
 from .T_Factories import Add_More_Factory_Sizes
 
 from .T_Gates import Adjust_Gate_Rings
@@ -91,3 +85,4 @@ from .T_Wares import Change_Ware_Size
 #  the individual transforms.
 from .T_Obj_Code import *
 from .T_Weapons import *
+from .T_Director import *
