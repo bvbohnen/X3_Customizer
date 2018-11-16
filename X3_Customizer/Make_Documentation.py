@@ -511,11 +511,12 @@ def Get_BB_Text(line_list):
     def Small(string):
         'Apply small font tags to a string. Should go inside other tags.'
         # Use BB default small/large sizes.
-        return '[size=10]{}[/size]'.format(string)
+        # Update: the latest BB software treats this as a %.
+        return '[size=75]{}[/size]'.format(string)
 
     def Large(string):
         'Apply large font tags to a string. Should go inside other tags.'
-        return '[size=24]{}[/size]'.format(string)
+        return '[size=200]{}[/size]'.format(string)
 
     def Record(line):
         'Record a line for the BB lines.'
