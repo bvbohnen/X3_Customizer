@@ -115,6 +115,9 @@ Setup and behavior:
   bugs such as accidental overwrites of source files with
   transformed files.
   
+
+Contributors:
+  RoverTX
 '''
 # Note: the above comment gets printed to the markdown file, so avoid
 #  having a 4-space indent because text will get code blocked.

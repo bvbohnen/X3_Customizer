@@ -229,6 +229,8 @@ Change Log:
    - Added Fix_Terran_Plot_Aimless_TPs.
    - Added Fix_Dual_Convoy_Invincible_Stations; pending testing.
    - Added Fix_Reset_Invincible_Stations.
+ * 3.14.1
+   - Fix to Force_Infinite_Loop_Detection to prevent a false positive case.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

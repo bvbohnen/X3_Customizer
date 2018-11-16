@@ -60,6 +60,7 @@ class Obj_Patch:
       - String, the code starting at the offset which is being replaced.
       - Used for verification and for offset searching.
       - Use '.' for any wildcard match.
+      - Spaces allowed for visual alignment; ignored during parsing.
       - Will be converted to a regex pattern, though the string should
         not be formatted as a regex pattern.
     * new_code
@@ -68,6 +69,7 @@ class Obj_Patch:
       - Replacements will be on a 1:1 basis with existing bytes, starting
         at a matched offset and continuing until the end of the new_code.
       - Overall obj code will remain the same length.
+      - Spaces allowed, as with ref_code.
       - Also supports byte deletions and insertions, to aid in moving
         code sections.  A '-' removes 1 byte, a '+' inserts one byte
         with a default 0 value.  Replacements continue after deletions
@@ -81,8 +83,9 @@ class Obj_Patch:
     '''
     def __init__(s, ref_code, new_code, expected_matches = 1, file = 'L/x3story.obj'):
         s.file = file
-        s.ref_code = ref_code
-        s.new_code = new_code
+        # Prune off spacing.
+        s.ref_code = ref_code.replace(' ','')
+        s.new_code = new_code.replace(' ','')
         s.expected_matches = expected_matches
 
 
@@ -99,6 +102,7 @@ def _String_To_Bytes(string, add_escapes = False):
         entries.
       - This should be applied if the bytes will be used as a regex pattern.
     '''
+    # Replace the spaces.
     # To make striding more convenient, double all + and - so that they take
     #  up 2 chars each.
     string = string.replace('-','--').replace('+','++')

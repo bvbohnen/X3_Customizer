@@ -247,6 +247,12 @@ def Allow_Valhalla_To_Jump_To_Gates(
     and 1 otherwise.  This uses a jump table with an xjump with an
     offset of 211, relying on all non-211 ships to be out of the
     table range and use the default jump target.
+    
+    Note: this function, and all calls to it, exists purely to prevent
+    valhalla jumping. However, there may be side effects from the
+    various places this function is called. One report was of not being
+    able to give jump commands while piloting the valhalla, though that
+    may be from an older patch or from TC.
 
     Possible edits include:
         - Changing the xjump from "xjump 1, 211" to "xjump 1, -1", so that
@@ -265,8 +271,8 @@ def Allow_Valhalla_To_Jump_To_Gates(
             #offsets = [0x000CED11],
             # This pushes 0, returns, and checks a few later commands
             #  for verification.
-            ref_code = '01' '83' '32' '........' '78' '0001' '000000D3'
-                        '........' '........' '02' '83',
+            ref_code = '01 83 32 ........ 78 0001 000000D3'
+                        '........ ........ 02 83',
             # Swap push 0 to push 1
             new_code = '02',
             )
@@ -653,6 +659,13 @@ def Force_Infinite_Loop_Detection(
     loop detection, always skipping the section as if the count is 0,
     eg. by changing the 'push SP[3]' to 'push 0'.
 
+    Update: a user pointed out that if a script disables infinite loop
+    detection, a 0 will be written to loc13, but due to this transform's
+    chance this will lead to an immediate (eg. on next instruction) time
+    check and possibly a false positive.  A simple fix is to edit
+    the "infinite loop detection enabled" script command to never overwrite
+    loc13 while this transform is in effect.
+
     '''
     # Convert the input arg into a useable hex string.
     # This will cap at max unsigned int, and will floor at 10k.
@@ -668,19 +681,19 @@ def Force_Infinite_Loop_Detection(
         #offsets = [0x00038429],
         # Code starts off with pushing the count and comparing
         #  to 0, jumping if so.
-        ref_code =  '0D' '0004'
-                    '34' '........'
+        ref_code =  '0D 0004'
+                    '34 ........'
                     # Enters the decrement code here.
-                    '0D' '0004'
+                    '0D 0004'
                     '02'
                     '4B'
-                    '14' '0005'
+                    '14 0005'
                     '02'
                     '5E'
-                    '34' '........'
+                    '34 ........'
                     # This is the original 10k limit.
-                    '06' '2710'
-                    '14' '0005'
+                    '06 2710'
+                    '14 0005'
                     '24',
         # Replace the start with 6 nops (not 8), leaving 2 bytes
         #  unnaccounted for.
@@ -689,20 +702,20 @@ def Force_Infinite_Loop_Detection(
         new_code =  NOP * 6 +
                     # Remove two bytes.
                     '--'
-                    '..' '....'
+                    '.. ....'
                     '..'
                     '..'
-                    '..' '....'
+                    '.. ....'
                     '..'
                     '..'
-                    '..' '........'
+                    '.. ........'
                     # This is the original 10k limit.
                     # Swap to PUSHD (int instead of short), and use
                     #  the input arg value.
                     # Add two bytes to make room.
                     '++'
                     + PUSHD + operation_limit_hex +
-                    '14' '0005'
+                    '14 0005'
                     '24',
         )
     
@@ -712,25 +725,63 @@ def Force_Infinite_Loop_Detection(
             # This starts by pushing 0, then calling TI_GetAbsTime, with
             #  the value being left on the stack as the initial time.
             ref_code =  '01'
-                        '82' '........'
+                        '82 ........'
                         '01'
                         '01'
                         '02'
-                        '34' '........'
-                        '0D' '0007'
+                        '34 ........'
+                        '0D 0007'
                         '02'
                         '46'
-                        '14' '0008'
+                        '14 0008'
                         '02'
                         '4B'
-                        '0D' '000F'
+                        '0D 000F'
                         '10'
-                        '14' '0002',
+                        '14 0002',
             # Replace with 'Push 1' and nops, leaving the 1 on the stack.
             new_code = PUSH_1 + NOP * 5,
             )
 
-    Apply_Obj_Patch_Group([init_time_patch, entry_dynamic_patch])
+    script_command_patch = Obj_Patch(
+            #offsets = [0x00052072],
+            # This code bit simply pushes a 0 into SP[9] (loc13).
+            # Replace with nops.
+            # Note: since most of the code after the replaced bit is common
+            #  header to all scripts, reduce the chance of a match mistake
+            #  by grabbing code from before the replaced bit.
+            ref_code =  '0D 0001    '
+                        '34 ........'
+                        '0D 0009    '
+                        '64         '
+                        '34 ........'
+                        '06 2710    '
+                        '14 000A    '
+                        '24         '
+                        '32 ........'
+                        # Bit to replace is here.
+                        '01         '
+                        '14 000A    '
+                        '24         '
+                        # End replacement.
+                        '23 0002    '
+                        '32 ........',
+
+            new_code =  '.. ....    '
+                        '.. ........'
+                        '.. ....    '
+                        '..         '
+                        '.. ........'
+                        '.. ....    '
+                        '.. ....    '
+                        '..         '
+                        '.. ........'
+                        + NOP * 5,
+            )
+
+    Apply_Obj_Patch_Group([init_time_patch, 
+                           entry_dynamic_patch,
+                           script_command_patch])
 
     return
 

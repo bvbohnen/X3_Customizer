@@ -1,4 +1,4 @@
-X3 Customizer 3.14
+X3 Customizer 3.14.1
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -58,6 +58,8 @@ Setup and behavior:
 
   * Warning: this tool will attempt to avoid unsafe behavior, but the user should back up irreplaceable files to be safe against bugs such as accidental overwrites of source files with transformed files.
   
+
+Contributors: RoverTX
 
 Full documentation found in Documentation.md.
 
@@ -801,3 +803,5 @@ Change Log:
    - Added Fix_Terran_Plot_Aimless_TPs.
    - Added Fix_Dual_Convoy_Invincible_Stations; pending testing.
    - Added Fix_Reset_Invincible_Stations.
+ * 3.14.1
+   - Fix to Force_Infinite_Loop_Detection to prevent a false positive case.
