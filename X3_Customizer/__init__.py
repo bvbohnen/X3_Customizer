@@ -14,9 +14,12 @@ Source files will generally support any prior modding. Most transforms
 support input arguments to set parameters and adjust behavior, according 
 to user preferences. Most transforms will work on an existing save.
 
-This tool is written in Python, and tested on version 3.6.
-As of customizer version 3, an executable may be generated for users
-who do not wish to run the Python source code directly.
+This tool is written in Python, and tested on version 3.7.
+As of customizer version 3, an executable will be generated for users
+who do not wish to run the Python source code directly, and is available
+on the github Releases page.  These will be provided as convenient,
+generally for 64-bit Windows.  For Linux or 32-bit Windows users, the
+source code can be run directly using an appopriate version of Python.
 
 This tool is designed primarily for Albion Prelude v3.3. Most transforms
 will support prior or later versions of AP. TC 3.4 is tentatively supported
@@ -29,7 +32,7 @@ should be run second, after the plugin manager is closed, since the
 plugin manager generates a TWareT.pck file when closed that doesn't
 capture changes in TWareT.txt made by this tool.
 
-Usage:
+Usage for Releases:
 
  * "Launch_X3_Customizer.bat [path to user_transform_module.py]"
    - Call from the command line for full options, or run directly
@@ -43,24 +46,29 @@ Usage:
  * "Clean_X3_Customizer.bat [path to user_transform_module.py]"
    - Similar to Launch_X3_Customizer, except appends the "-clean" flag,
      which will undo any transforms from a prior run.
- * "source\X3_Customizer.py [path to user_transform_module.py]"
-   - As above, running the python source code directly.
-   - May need to be prefixed with "python" or similar, depending on
-     system setup.
+
+Usage for the Python source code:
+
+ * "X3_Customizer\Main.py [path to user_transform_module.py]"
+   - This is the primary entry function for the python source code.
+   - Does not fill in a default transform file unless the -default_script
+     option is used.
    - Supports general python imports in the user_transform_module.
    - If the scipy package is available, this supports smoother curve fits
-     for some transforms, omitted from the executable due to file size.
- * "source\Make_Documentation.py"
+     for some transforms, which were omitted from the Release due to
+     file size.
+ * "X3_Customizer\Make_Documentation.py"
    - Generates updated documentation for this project, as markdown
      formatted files README.md and Documentation.md.
- * "source\Make_Executable.py"
+ * "X3_Customizer\Make_Executable.py"
    - Generates a standalone executable and support files, placed
      in the bin folder. Requires the PyInstaller package be available.
- * "source\Make_Patches.py"
+     The executable will be created for the system it was generated on.
+ * "X3_Customizer\Make_Patches.py"
    - Generates patch files for this project from some select modified
      game scripts. Requires the modified scripts be present in the
      patches folder; these scripts are not included in the repository.
- * "source\Make_Release.py"
+ * "X3_Customizer\Make_Release.py"
    - Generates a zip file with all necessary binaries and source files
      for general release.
 
