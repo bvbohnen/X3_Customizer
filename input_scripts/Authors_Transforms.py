@@ -117,6 +117,10 @@ Fix_Dual_Convoy_Invincible_Stations()
 # If ever needed, can do a station invincibility flag reset.
 #Fix_Reset_Invincible_Stations(cue_index = 0)
 
+# Experimenting with achievement unlocks.
+#from X3_Customizer.Transforms.T_Obj_Code import Experimental
+#Experimental._Disable_Modified_Tag()
+
 if Vanilla or XRM:
     
     # Bug fixes, for missions not supported by LU.

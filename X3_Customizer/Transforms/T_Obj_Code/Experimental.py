@@ -98,3 +98,135 @@ def _Show_Pirate_Yaki_Nororiety():
 
     return
 
+
+@File_Manager.Transform_Wrapper('L/x3story.obj')
+def _Disable_Modified_Tag():
+    '''
+    Disables the modified tag on a save, allowing for achievements
+    to be gained.
+    '''
+    '''
+    Obj_205.IsAuthorized is generally checked as part of the achievement
+    unlock progress.  It in turn calls CLIENT.GetModified, preventing
+    unlocks on modified games.  CLIENT.GetModified can be edited to
+    always return a 0.
+
+    Result:
+        Appears to have unwanted side effects.  The SCS mod kept
+        opening a glitchy menu (within half second of closing it).
+        May have something to do with the script editor unlock,
+        which normally sets the modified tag, and may rely on that
+        tag to work properly.
+
+    Attempt 2: Selective edits of GetModified call locations.
+        Obj_205.IsAuthorized
+        - Edit to unlock achievements.
+        MENU_PLAYER.SpecialUpdate
+        - Edit to remove the modified tag.
+        
+        The other places it is called are when exporting statistics,
+        and when filling out the artificial life plugins menu.
+        It is unclear on why either of those would cause a problem
+        observed above.
+        GetModified may also get called in the executable.
+
+    Result:
+        Removal of the "modified" tag was succesful.
+        Achievement unlocks didn't appear to work.  The achievement
+        menu lists them, and Xenon kills were counting up, though
+        attempts to unlock the 2 billion credits one, or destroy
+        a solar power plant, did not go through.
+
+        TODO: look into other possible reasons for failure.
+        The success with the achievements menu indicates that the
+        edited code is being used, at least.
+    '''
+    #-Failed version that modified CLIENT.GetModified.
+    #patch = Obj_Patch(
+    #        #offsets = [00014D00],
+    #        # Original code enters the function, looks up a modified
+    #        #  flag, and returns it.  Following ops then return a 0,
+    #        #  though are unreachable normally.
+    #        ref_code =  '6E 0001'
+    #                    '0F 000E'
+    #                    '83     '
+    #                    '       '
+    #                    '01     '
+    #                    '83     '
+    #                    # Some extra for matching.
+    #                    '6E 0007'
+    #                    '02     '
+    #                    '16 000E'
+    #                    '24     '
+    #                    '0F 000E',
+    #        # Can just insert nops so that the following return-0 is
+    #        #  used instead.
+    #        new_code = '.. ....' + NOP*4,
+    #        )
+    
+    patch_list = [
+        # Change Obj_205.IsAuthorized.
+        Obj_Patch(
+            #offsets = [00021F62],
+            ref_code =  (
+                # This code performs the call, and returns early on a 1.
+                # Note: stack is depth 0 here.
+                '01         '
+                '06 0096    '
+                '86 ........'
+                '64         '
+                '83         '
+                # This is the default return-0.
+                # Don't want this; want to return 1.
+                '01         '
+                '83         '
+                # Extra for matching.
+                '6E 0002    '
+                '0D 0004    '
+                '02         '
+                '82 ........'
+                '83         '
+                '           '
+                '01         '
+                '83         '),                        
+                        
+            # Replace with returning 1, plus nops (optional, since
+            #  unreachable).
+            new_code = PUSH_1 + RETURN + NOP * 9
+            ),
+
+        # Change MENU_PLAYER.SpecialUpdate.
+        Obj_Patch(
+            #offsets = [0013E1ED],
+            ref_code =  (
+                # This calls SpecialUpdate and jumps if 0.
+                '01         '
+                '06 0096    '
+                '86 ........'
+                '34 ........'
+                # Extra match code.
+                # This deals with the modified tag, and could potentially
+                #  be nop'd (would need some more, though).
+                '01         '
+                '88 ........'
+                '24         '
+                '01         '
+                '88 ........'
+                '34 ........'
+                '03         '
+                '0F 003E    '
+                '06 0081    '
+                '0E 0000    '
+                '0B ........'),               
+                        
+            # Swap the call to just pushing a 0 (not modified).
+            new_code = (
+                PUSH_0
+                + NOP * 8
+                )
+            ),
+       ]
+
+    Apply_Obj_Patch_Group(patch_list)
+
+    return

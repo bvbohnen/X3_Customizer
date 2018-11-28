@@ -411,6 +411,8 @@ T_file_name_field_dict_dict = {
     'Jobs.txt.ap' : {
         'min_data_entries': 5,
         },
+    # TODO: maybe track down "job jump range", possibly a field in
+    #  this file.
     'Jobs.txt' : {
         'min_data_entries': 5,
         'lines_tc': 130,
@@ -424,6 +426,7 @@ T_file_name_field_dict_dict = {
         4 : 'script',               #String
         5 : 'script_config',        #String
         6 : 'name_id',              #Integer; the in-game displayed name.
+        # 7 is unknown, but observed to generally be 0.
         # Int; if not 0, the override name to use.
         #  Unclear on relation to name_id.
         8 : 'override_name',       

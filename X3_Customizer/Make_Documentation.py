@@ -302,7 +302,7 @@ def Make(*args):
     doc_bb_lines = [
         'Download source from github:',
         '[url]https://github.com/bvbohnen/X3_Customizer[/url]',
-        'Compiled release (Windows):',
+        'Compiled release (64-bit Windows):',
         '[url]https://github.com/bvbohnen/X3_Customizer/releases[/url]',
         'Full documentation:',
         '[url]https://github.com/bvbohnen/X3_Customizer/blob/master/Documentation.md[/url]',
