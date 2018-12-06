@@ -186,7 +186,67 @@ Background Transforms:
 
 ***
 
-Bug_Fixe Transforms:
+Director Transforms:
+
+ * Adjust_Generic_Missions
+
+    Requires: director/3.01 Generic Missions.xml
+
+      Adjust the spawn chance of various generic mission types, relative to each other. Note: decreasing chance on unwanted missions seems to work better than increasing chance on wanted missions.
+  
+      * adjustment_dict:
+        - Dict keyed by mission identifiers or preset categories, holding the chance multiplier.
+        - Keys may be cue names, eg. 'L2M104A', or categories, eg. 'Fight'. Specific cue names will override categories.
+        - Categories and cue names for vanilla AP are as follows, where the term after the category is the base mission chance shared by all missions in that category, as used in the game files.
+        - Trade (TXXX)
+          - L2M104A : Deliver Wares to Station in need
+          - L2M104B : Deliver Illegal Wares to Pirate Station
+          - L2M104C : Deliver Illegal Wares to Trading Station
+          - L2M116  : Transport Cargo
+          - L2M130  : Passenger Transport
+          - L2M150a : Buy Used Ship
+        - Fight (XFXX)
+          - L2M101  : Assassination
+          - L2M108  : Xenon Invasion
+          - L2M119  : Escort Convoy
+          - L2M127  : Destroy Convoy
+          - L2M134  : Generic Patrol
+          - L2M135  : Defend Object
+          - L2M183  : Dual Convoy
+        - Build (XXBX)
+          - L2M122  : Build Station    
+        - Think (XXXT)
+          - L2M103  : Transport Passenger
+          - L2M105  : Return Ship
+          - L2M113  : Follow Ship
+          - L2M129  : Deliver Matching Ship
+          - L2M133  : Freight Scan
+          - L2M145  : Scan Asteroids
+          - L2M180  : Repair Station
+          - L2M181  : Multiple Transport
+          - L2M182  : Tour Of A Lifetime
+          - L2M136  : Notoriety Hack
+          - L2M144  : Buy Asteroid Survey
+          - L2M147  : Buy Sector Data
+          - L2M161  : Buy Blueprints
+          - DPL2M186: Sell Blueprints
+      * cap_at_100:
+        - Bool, if True then mission chance adjustment will cap at 100, the typical highest in vanilla AP. Default False.
+      
+
+ * Convoys_made_of_race_ships
+
+    Requires: director/2.119 Trade Convoy.xml
+
+      If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
+      
+
+ * Disable_Generic_Missions
+
+    Requires: director/3.01 Generic Missions.xml
+
+      Disable generic missions from spawning. Existing generic missions will be left untouched.
+      
 
  * Fix_Corporation_Troubles_Balance_Rollover
 
@@ -222,6 +282,33 @@ Bug_Fixe Transforms:
     Requires: director/2.004 Terran Plot Scene 4.xml
 
       In the Terran Conflict plot when allied TPs move to capture an Elephant, fix replacement TPs to move toward the Elephant instead of wandering aimlessly.
+      
+
+ * Standardize_Start_Plot_Overtunings (incompatible with: LU)
+
+    Requires: director/3.05 Gamestart Missions.xml
+
+      Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
+  
+      * fraction_of_max:
+        - Float, typically between 0 and 1, the fraction of the max overtuning to use. A value of 0 will remove overtunings, and 1 will give max overtuning that is available in vanilla. Default of 0.7 is set to mimic moderate game reloading results.
+      
+
+ * Standardize_Tunings (incompatible with: LU, TC)
+
+    Requires: director/3.08 Sector Management.xml
+
+      Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
+  
+      * enging_tuning_crates:
+        - Int, the number of engine tuning crates to spawn. Default 4.
+      * rudder_tuning_crates:
+        - Int, the number of rudder tuning crates to spawn. Default 4.
+      * engine_tunings_per_crate:
+        - Int, the number of tunings in each engine crate. Default 4.
+      * rudder_tunings_per_crate:
+        - Int, the number of tunings in each rudder crate. Default 3.
+  
       
 
 
@@ -422,71 +509,6 @@ Job Transforms:
           - 'create_outside_sector'
       * docked_chance:
         - Int, 0 to 100, the percentage chance the ship is docked when spawned.
-      
-
-
-***
-
-Misc Transforms:
-
- * Adjust_Generic_Missions
-
-    Requires: director/3.01 Generic Missions.xml
-
-      Adjust the spawn chance of various generic mission types, relative to each other. Note: decreasing chance on unwanted missions seems to work better than increasing chance on wanted missions.
-  
-      * adjustment_dict:
-        - Dict keyed by mission identifiers or preset categories, holding the chance multiplier.
-        - Keys may be cue names, eg. 'L2M104A', or categories, eg. 'Fight'. Specific cue names will override categories.
-        - Categories and cue names for vanilla AP are as follows, where the term after the category is the base mission chance shared by all missions in that category, as used in the game files.
-        - Trade (TXXX)
-          - L2M104A : Deliver Wares to Station in need
-          - L2M104B : Deliver Illegal Wares to Pirate Station
-          - L2M104C : Deliver Illegal Wares to Trading Station
-          - L2M116  : Transport Cargo
-          - L2M130  : Passenger Transport
-          - L2M150a : Buy Used Ship
-        - Fight (XFXX)
-          - L2M101  : Assassination
-          - L2M108  : Xenon Invasion
-          - L2M119  : Escort Convoy
-          - L2M127  : Destroy Convoy
-          - L2M134  : Generic Patrol
-          - L2M135  : Defend Object
-          - L2M183  : Dual Convoy
-        - Build (XXBX)
-          - L2M122  : Build Station    
-        - Think (XXXT)
-          - L2M103  : Transport Passenger
-          - L2M105  : Return Ship
-          - L2M113  : Follow Ship
-          - L2M129  : Deliver Matching Ship
-          - L2M133  : Freight Scan
-          - L2M145  : Scan Asteroids
-          - L2M180  : Repair Station
-          - L2M181  : Multiple Transport
-          - L2M182  : Tour Of A Lifetime
-          - L2M136  : Notoriety Hack
-          - L2M144  : Buy Asteroid Survey
-          - L2M147  : Buy Sector Data
-          - L2M161  : Buy Blueprints
-          - DPL2M186: Sell Blueprints
-      * cap_at_100:
-        - Bool, if True then mission chance adjustment will cap at 100, the typical highest in vanilla AP. Default False.
-      
-
- * Convoys_made_of_race_ships
-
-    Requires: director/2.119 Trade Convoy.xml
-
-      If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
-      
-
- * Disable_Generic_Missions
-
-    Requires: director/3.01 Generic Missions.xml
-
-      Disable generic missions from spawning. Existing generic missions will be left untouched.
       
 
 
@@ -1172,38 +1194,6 @@ Sound Transforms:
   
       * sound_id
        - Int, the id of the sound file to be overwritten.
-      
-
-
-***
-
-Tuning Transforms:
-
- * Standardize_Start_Plot_Overtunings (incompatible with: LU)
-
-    Requires: director/3.05 Gamestart Missions.xml
-
-      Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
-  
-      * fraction_of_max:
-        - Float, typically between 0 and 1, the fraction of the max overtuning to use. A value of 0 will remove overtunings, and 1 will give max overtuning that is available in vanilla. Default of 0.7 is set to mimic moderate game reloading results.
-      
-
- * Standardize_Tunings (incompatible with: LU, TC)
-
-    Requires: director/3.08 Sector Management.xml
-
-      Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
-  
-      * enging_tuning_crates:
-        - Int, the number of engine tuning crates to spawn. Default 4.
-      * rudder_tuning_crates:
-        - Int, the number of rudder tuning crates to spawn. Default 4.
-      * engine_tunings_per_crate:
-        - Int, the number of tunings in each engine crate. Default 4.
-      * rudder_tunings_per_crate:
-        - Int, the number of tunings in each rudder crate. Default 3.
-  
       
 
 

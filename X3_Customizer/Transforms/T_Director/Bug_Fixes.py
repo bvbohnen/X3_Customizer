@@ -232,12 +232,18 @@ def Fix_Dual_Convoy_Invincible_Stations():
     Go with option (2), since (1) still leaves bugs in place.
 
     How to clean up missions when stations are destroyed?
-    - Existing conditions for ending the mission aren't really set up to
-    capture station destruction.
-    - So, set up a new cue just for this case, triggering if either end
-    station gets destroyed (start stations can be ignored).
-    - Action logic can borrow from the other cues to trigger cleanup,
-    set a return code, etc.
+        - Existing conditions for ending the mission aren't really set up to
+        capture station destruction.
+        - So, set up a new cue just for this case, triggering if either end
+        station gets destroyed (start stations can be ignored).
+        - Action logic can borrow from the other cues to trigger cleanup,
+        set a return code, etc.
+
+    Test results:
+        Quick test destroying an end point station did cancel out the
+        mission, albeit with a message saying the convoy was destroyed.
+
+        Any further robustness tests are pending.
     '''
     # Get the input files of interest.
     # For lack of a better name prefix, these are 'low' and 'high' for

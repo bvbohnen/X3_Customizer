@@ -116,7 +116,19 @@ Background Transforms:
 
 ***
 
-Bug_Fixe Transforms:
+Director Transforms:
+
+ * Adjust_Generic_Missions
+
+      Adjust the spawn chance of various generic mission types, relative to each other. Note: decreasing chance on unwanted missions seems to work better than increasing chance on wanted missions.
+
+ * Convoys_made_of_race_ships
+
+      If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
+
+ * Disable_Generic_Missions
+
+      Disable generic missions from spawning. Existing generic missions will be left untouched.
 
  * Fix_Corporation_Troubles_Balance_Rollover
 
@@ -133,6 +145,14 @@ Bug_Fixe Transforms:
  * Fix_Terran_Plot_Aimless_TPs
 
       In the Terran Conflict plot when allied TPs move to capture an Elephant, fix replacement TPs to move toward the Elephant instead of wandering aimlessly.
+
+ * Standardize_Start_Plot_Overtunings (incompatible with: LU)
+
+      Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
+
+ * Standardize_Tunings (incompatible with: LU, TC)
+
+      Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
 
 
 ***
@@ -201,23 +221,6 @@ Job Transforms:
  * Set_Job_Spawn_Locations
 
       Sets the spawn location of ships created for jobs, eg. at a shipyard, at a gate, docked at a station, etc.
-
-
-***
-
-Misc Transforms:
-
- * Adjust_Generic_Missions
-
-      Adjust the spawn chance of various generic mission types, relative to each other. Note: decreasing chance on unwanted missions seems to work better than increasing chance on wanted missions.
-
- * Convoys_made_of_race_ships
-
-      If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
-
- * Disable_Generic_Missions
-
-      Disable generic missions from spawning. Existing generic missions will be left untouched.
 
 
 ***
@@ -493,19 +496,6 @@ Sound Transforms:
  * Remove_Sound
 
       Removes a sound by writing an empty file in its place, based on the sound's id.
-
-
-***
-
-Tuning Transforms:
-
- * Standardize_Start_Plot_Overtunings (incompatible with: LU)
-
-      Set the starting plots with overtuned ships to have their tunings standardized instead of being random.
-
- * Standardize_Tunings (incompatible with: LU, TC)
-
-      Set the number of randomized tuning creates at gamestart to be de-randomized into a standard number of tunings. Note: vanilla has 2-5 average tunings per crate, 8 crates total. Default args here reach this average, biasing toward engine tunings.
 
 
 ***

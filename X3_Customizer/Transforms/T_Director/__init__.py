@@ -15,3 +15,10 @@ from .Support import Generate_Director_Text_To_Update_Shipyards
 
 from .Tunings import Standardize_Tunings
 from .Tunings import Standardize_Start_Plot_Overtunings
+
+
+# Fill in the default documentation category for the transforms.
+# Use a dict copy, since this adds new locals.
+for _attr_name, _attr in dict(locals()).items():
+    if hasattr(_attr, '_category'):
+        _attr._category = 'Director'
