@@ -94,8 +94,8 @@ def Make(*args):
                 
                 # Only include select input scripts.
                 if folder == 'input_scripts':
-                    if file_name not in ['User_Transforms_template',
-                                         'Authors_Transforms']:
+                    if file_name not in ['User_Transforms_template.py',
+                                         'Authors_Transforms.py']:
                         continue
 
                 file_paths.append(os.path.join(folder, dir_path, file_name))
