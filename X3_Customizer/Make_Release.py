@@ -91,6 +91,12 @@ def Make(*args):
                 #  the script editor.
                 if folder == 'game_files' and file_name.endswith('.bak'):
                     continue
+                
+                # Only include select input scripts.
+                if folder == 'input_scripts':
+                    if file_name not in ['User_Transforms_template',
+                                         'Authors_Transforms']:
+                        continue
 
                 file_paths.append(os.path.join(folder, dir_path, file_name))
                 

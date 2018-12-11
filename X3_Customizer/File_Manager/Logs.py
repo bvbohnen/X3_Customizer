@@ -9,16 +9,22 @@ from .File_Paths import *
 
 # General messages printout by transforms or during runtime.
 Message_file = None
-def Write_Summary_Line(line, no_newline = False):
+def Write_Summary_Line(line, newline = True):
     '''
     Write a line to the summary file.
-    A newline is inserted automatically if no_newline == False.
+    A newline is inserted automatically unless newline == False.
     '''
     global Message_file
     # Open the file if needed.
     if Message_file == None:
         Message_file = open(Settings.Get_Message_File_Path(), 'w')
-    Message_file.write(line + '\n' if not no_newline else '')
+    # This code was poorly written, and skipped the line when no
+    #  newline was used.
+    #Message_file.write(line + '\n' if not no_newline else '')
+    Message_file.write(line)
+    if newline:
+        Message_file.write('\n')
+    return
     
 
 class Log:
