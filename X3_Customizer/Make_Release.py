@@ -69,6 +69,9 @@ def Make(*args):
         # Loop over extensions to include.
         # This will be somewhat blind for the moment.
         for extension in ['.md','.txt','.bat']:
+            # Ignore the 'for egosoft forums' file.
+            if 'for_egosoft_forum.txt' in file_name:
+                continue
             if file_name.endswith(extension):
                 file_paths.append(os.path.join(Top_dir, file_name))
 
