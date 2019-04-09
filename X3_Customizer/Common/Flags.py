@@ -173,7 +173,7 @@ Tships_laser_subtype_flag_bits = {
     13  : 'SG_LASER_SPLIT_MEDIUM' ,
     14  : 'SG_LASER_TERRAN_MEDIUM',
     15  : 'SG_LASER_TELADI_AF'    ,
-	16  : 'SG_LASER_ARGON_AF'     ,
+    16  : 'SG_LASER_ARGON_AF'     ,
     17  : 'SG_LASER_SPLIT_AF'     ,
     18  : 'SG_LASER_PARANID_AF'   ,
     19  : 'SG_LASER_TERRAN_AF'    ,
@@ -191,6 +191,12 @@ Tships_laser_subtype_flag_bits = {
     31  : 'SG_LASER_KYON'         ,
     }
 # Missiles work the same way with category names in tmissiles.
+# Note: this might be a 16-bit signed number; the mosquito missile is
+#  hardcoded as enabled on all ships, so SG_MISSILE_COUNTER is not set
+#  in the vanilla tships to check; x3 editor will save it as a positive
+#  number.
+# Can treat unpacking as supporting signed numbers, for safety, but
+#  repacking as unsigned to match x3 editor.
 Tships_missile_subtype_flag_bits = {
      0 : 'SG_MISSILE_LIGHT'          ,
      1 : 'SG_MISSILE_MEDIUM'         ,
@@ -233,7 +239,8 @@ def Unpack_Tships_Laser_Flags(ship_dict):
 
 def Unpack_Tships_Missile_Flags(ship_dict):
     return Unpack_Flags(Tships_missile_subtype_flag_bits, 
-                        ship_dict['missile_compatibility_flags'])
+                        ship_dict['missile_compatibility_flags'],
+                        negative_bit = 15)
     
 # Similar functions for calling Pack_Flags with the right options.
 # Most of these use unsigned numbers, so are handled the same way.
@@ -251,6 +258,7 @@ def Pack_Tships_Laser_Flags(ship_dict, flags_dict):
     packed_flags = Pack_Flags(flags_dict, negative_bit = 31)
     ship_dict['laser_compatibility_flags'] = packed_flags
 
+# Do not repack missiles as signed, to match x3 editor.
 def Pack_Tships_Missile_Flags(ship_dict, flags_dict):
     packed_flags = Pack_Flags(flags_dict)
     ship_dict['missile_compatibility_flags'] = packed_flags
@@ -274,21 +282,35 @@ def Unpack_Flags(flag_bit_to_name_dict,
     # Convert input to an int if a string was given.
     if isinstance(packed_flags_value, str):
         packed_flags_value = int(packed_flags_value)
+
     # If there is a negative bit, make an adjustment.
     if negative_bit != None:
-        # The value of the sign bit can be obtained with a shift.
-        # Eg. if the sign bit is 3 (4-bit signed number), this is -8.
-        sign_value = (1 << negative_bit) * -1
-        # If the input value is negative, can subtract the sign value
-        #  twice to flip the value positive.
+
+        # If the input value is negative, convert it.
+        # Eg. for 4-bit signed; if input is -1 (all bits set), can convert
+        #  to 15 by adding (1 << (negative_bit+1)).
         # The first sign_value negates the existing one, the second puts
         #  the bit back in as positive.
         if packed_flags_value < 0:
-            packed_flags_value += sign_value *2
+            packed_flags_value += 1 << (negative_bit +1)
+            # If the input is still negative, something went wrong,
+            # and the input value is of a greater bit width than expected
+            # for this field.
+            if packed_flags_value < 0:
+                raise Exception('Packed flags use more bits than expected')
+
+    assert isinstance(packed_flags_value, int)
+    assert packed_flags_value >= 0
+
+    # Safety limit, just in case of unbounded loop.
+    limit = 1024
 
     # Start from bit 0 and go upward.
     bit_index = 0
     while 1:
+        limit -= 1
+        if limit <= 0:
+            raise Exception('Unbounded loop when unpacking flags.')
 
         # Approach will be to use AND mask operations to determine if any given bit
         #  is set in packed_flags_value.

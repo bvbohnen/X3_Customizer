@@ -400,6 +400,8 @@ T_file_name_field_dict_dict = {
         #  Indices appear to always be in order, starting from 0.
         -1: 'slash_index_comment',  
         },
+
+
     # Note: it appears the jobs file has two formats, one (maybe for ap)
     #  which has 4 more fields inserted somewhere and throwing off later flags.
     # The AP new fields are at: [70,105,123,128], and will shift down
@@ -408,11 +410,10 @@ T_file_name_field_dict_dict = {
     #  to work okay), and the fluff entries will be noted and used when
     #  parsing if needed to shift entry names.
     # Set an initial empty dict for the ap fields; build it further below.
+    # TODO: fill in the AP field names.
     'Jobs.txt.ap' : {
         'min_data_entries': 5,
         },
-    # TODO: maybe track down "job jump range", possibly a field in
-    #  this file.
     'Jobs.txt' : {
         'min_data_entries': 5,
         'lines_tc': 130,
@@ -438,9 +439,10 @@ T_file_name_field_dict_dict = {
         12: 'show_variant',        #0 or 1; for display name in game.
         13: 'job_wing_index',      #Int; entry in JobWings.txt with subjobs to act as wingmen.
         14: 'ware_list_index',     #Int; wares associated with this job (eg to trade)
-        15: 'job_jump_range',      #Int. Note: not 100% verified. Missing in x3 editor.
+        15: 'job_jump_range',      #? Int. Note: not 100% verified. Missing in x3 editor.
         16: 'idle_rate',           #Int, generally 0-10 or so.
         17: 'respawn_time',        #Integer, appears to be in seconds.
+
         18: 'ship_type_name',  #String, optional name of ship to spawn. -1 if unused.
         # Ship types to allow, given as standard type name for coding convenience.
         19: 'SG_SH_M1', #0 or 1
@@ -455,6 +457,7 @@ T_file_name_field_dict_dict = {
         28: 'SG_SH_TS', #0 or 1
         29: 'SG_SH_TL', #0 or 1
         30: 'special_tl_ts_flag', #0 or 1, unknown use.
+
         31: 'manufacturer_argon',  #0 or 1; probably used in ship selection.
         32: 'manufacturer_boron', 
         33: 'manufacturer_split', 
@@ -467,6 +470,7 @@ T_file_name_field_dict_dict = {
         40: 'manufacturer_atf', 
         41: 'manufacturer_terran', 
         42: 'manufacturer_yaki', 
+
         43: 'variant_basic',       #0 or 1
         44: 'variant_vanguard',
         45: 'variant_sentinel',
@@ -484,6 +488,7 @@ T_file_name_field_dict_dict = {
         57: 'variant_tanker_xl',
         58: 'variant_super_freighter_xl',
         59: 'variant_advanced',
+
         # Hue/saturation are generally -1, sometimes 0, and may be unused.
         # The spray shop supports 0-360 hue, -256 to 256 saturation.
         # Could consider playing with this at some point, maybe randomizing,
@@ -491,13 +496,15 @@ T_file_name_field_dict_dict = {
         #  would only be across jobs.
         60: 'hue',
         61: 'saturation',
+
         63: 'select_owners_sector',     #0 or 1
-        67: 'select_not_enemy_sector',
         64: 'select_core_sector',
-        68: 'select_border_sector',
         65: 'select_shipyard_sector',
         66: 'select_owner_station_sector',
+        67: 'select_not_enemy_sector',
+        68: 'select_border_sector',
         69: 'limit_to_x_universe_races',
+        # Note: AP inserts an entry here.
         70: 'invert_sector_flags', #Never seen used; unclear on effect.
         71: 'sector_x', #Int, sector coordinates. -1,-1 used for dont case seemingly.
         72: 'sector_y',
@@ -507,10 +514,13 @@ T_file_name_field_dict_dict = {
         76: 'create_outside_sector',
         77: 'create_null',         #Never seen used.
         78: 'docked_chance',       #Int, 0-100, percentage.
+
+        #79 ? 0 in the few samples checked.
         80: 'freight_extensions',  #Int, 0 to 100.
         81: 'engine_tunings',      #Int, 0 to 100.
         82: 'rudder_tunings',      #Int, 0 to 100.
         83: 'rotation_acceleration_limit', #Int, 0 or -20 seen (on idle TLs)
+
         84: 'owner_argon',         #0 or 1
         85: 'owner_boron', 
         86: 'owner_split', 
@@ -525,14 +535,39 @@ T_file_name_field_dict_dict = {
         95: 'owner_pirates',  #Oddly, different ordering from manufacturer
         96: 'shield_level',  #Int, 0 to 100.
         97: 'laser_level',   #Int, 0 to 100.
+
+        98: 'allow_fighter_drone', #0 or 1; oddly not with other flags
+        # Note: forbidden weapon fields not seen to be used in AP.
+        99:  'forbid_impulse_ray_emitter',
+        100: 'forbid_high_energy_plasma_thrower',
+        101: 'forbid_alpha_kyon_emitter',
+        102: 'forbid_particle_accelerator_cannon',
+        103: 'forbid_photon_pulse_cannon',
+        # Note: AP inserts an entry at 104 (105 for it).
+        104: 'allow_phased_shockwave_generator',
+        105: 'allow_mass_driver',
+        106: 'allow_ion_disruptor',
+        107: 'allow_unknown_1',
+        108: 'allow_unknown_2',
+        109: 'allow_flak_artillery_array',
+        110: 'allow_pulsed_beam_emitter',
+        111: 'allow_mobile_drilling_sy stem',
+        112: 'allow_tractor_beam',
+        113: 'allow_repair_laser',
+        114: 'select_weapons', #Flag, 0 or 1
+
+        #115 ? 5 or 30 in the few samples checked; maybe job jump range?
         116: 'aggression',   #Int, 0 to 100.
         117: 'moral',        #Int, 0 to 100.
         118: 'fight_skill',  #Int, 0 to 100. May affect missile loadout.
+        #119?
         120: 'set_invincible',
+        # Note: AP inserts an entry at 121 (123 for it).
         121: 'set_as_hidden_pirate',
         122: 'destroy_out_of_sector',
         123: 'rebuild_in_new_sector',
         124: 'fly_average_speed',
+        # Note: AP inserts an entry at 125 (128 for it).
         125: 'classification_military',  #0 or 1
         126: 'classification_trader',
         127: 'classification_civilian',

@@ -382,7 +382,7 @@ def Add_Ship_Variants(
         Possible entries include: ['yaw','pitch','roll','speed','acceleration',
         'shield_power','weapon_energy','weapon_recharge_factor','cargo',
         'hull_strength','angular_acceleration','price']. Price should generally
-        have a negative multiplier.
+        have a <1 multiplier.
     * add_mining_equipment:
       - Bool, if True mining equipment will be added to Miner variants. 
         Default True.

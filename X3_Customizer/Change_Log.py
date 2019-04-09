@@ -231,6 +231,8 @@ Change Log:
    - Added Fix_Reset_Invincible_Stations.
  * 3.14.1
    - Fix to Force_Infinite_Loop_Detection to prevent a false positive case.
+ * 3.14.2
+   - Fix to handle negative numbers for missile flag masks in tships.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.

@@ -1,4 +1,4 @@
-X3 Customizer 3.14.1
+X3 Customizer 3.14.2
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -1141,7 +1141,7 @@ Ships_Variant Transforms:
       * variant_indices_to_reset_on_base_ships:
         - List of integers, any variant types which will be set to 0 when that variant is used as a base ship. Eg. a Hyperion Vanguard (variation 16) may be switched to a base Hyperion, from which vanguard and other variants are made. Default list includes 16 (redundant vanguard) and 19 (redundant hauler).
       * shield_conversion_ratios:
-        - Dict of floats, keyed by ship attribute strings. When shielding cannot be adjusted accurately due to the X3 shielding system, this gives the rate at which shield adjustment error is converted to other ship attributes. Eg. if a ship is supposed to receive a 5% shield boost that cannot be given, and this dict has en entry with {'shield_power':1}, then an extra 5% boost will be given to the shield power generator instead. By default, shield error will convert using {'shield_power': 1, 'weapon_energy': 1, 'weapon_recharge_factor': 1}. Possible entries include: ['yaw','pitch','roll','speed','acceleration', 'shield_power','weapon_energy','weapon_recharge_factor','cargo', 'hull_strength','angular_acceleration','price']. Price should generally have a negative multiplier.
+        - Dict of floats, keyed by ship attribute strings. When shielding cannot be adjusted accurately due to the X3 shielding system, this gives the rate at which shield adjustment error is converted to other ship attributes. Eg. if a ship is supposed to receive a 5% shield boost that cannot be given, and this dict has en entry with {'shield_power':1}, then an extra 5% boost will be given to the shield power generator instead. By default, shield error will convert using {'shield_power': 1, 'weapon_energy': 1, 'weapon_recharge_factor': 1}. Possible entries include: ['yaw','pitch','roll','speed','acceleration', 'shield_power','weapon_energy','weapon_recharge_factor','cargo', 'hull_strength','angular_acceleration','price']. Price should generally have a <1 multiplier.
       * add_mining_equipment:
         - Bool, if True mining equipment will be added to Miner variants. Default True.
       * prepatch_ship_variant_inconsistencies:
@@ -1699,3 +1699,5 @@ Change Log:
    - Added Fix_Reset_Invincible_Stations.
  * 3.14.1
    - Fix to Force_Infinite_Loop_Detection to prevent a false positive case.
+ * 3.14.2
+   - Fix to handle negative numbers for missile flag masks in tships.
