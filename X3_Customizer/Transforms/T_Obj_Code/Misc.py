@@ -75,14 +75,14 @@ Characteristics of this task:
 
     Infinite loop.
     Each loop randomly selects a sector, within 0-23 x, 0-19 y.
-	    -Skips xenon/khaak/unclaimed sectors.
-	    -Skips sectors flagged as 
-	    -Skips sectors checked in the prior 10 hours.
+        -Skips xenon/khaak/unclaimed sectors.
+        -Skips sectors flagged as 
+        -Skips sectors checked in the prior 10 hours.
     Analyzes one sector per 35 seconds or so (some random variation, with a 
         lot of scattered small waits).
-	    -This is fast enough to traverse all sectors ~5 times in 10 hours.
-	    -Probably spend most time doing ~15 second waits between skipped sectors.
-	    -A sector with its 10 hours up will probably get visited within ~2 hours.
+        -This is fast enough to traverse all sectors ~5 times in 10 hours.
+        -Probably spend most time doing ~15 second waits between skipped sectors.
+        -A sector with its 10 hours up will probably get visited within ~2 hours.
     In the sector, will loop over all factories.
     Loops over all resources, and records their overall fullness.
     Aims to capture factories that are lightly filled, and factories that are 
@@ -92,12 +92,12 @@ Characteristics of this task:
 
     If any such starved or stuffed factories found, an event will be spawned 
     for the sectors with those factories in a list, presumably to handle deletion.
-	    -Some effort was spent on following the logic for how events work, but 
+        -Some effort was spent on following the logic for how events work, but 
         the script calling was extremely obtuse.
 
     If the above deletion event not started, more logic is present to do further
     analysis, leading to a secondary event type.
-	    -This was not explored in detail, and is not described here.
+        -This was not explored in detail, and is not described here.
         -In testing, this logic chain appears to also perform station deletion.
 
     To stop station deletion, the code leading to the corresponding events need 
@@ -110,13 +110,13 @@ Characteristics of this task:
     In either case, the code for deleting wrecks should be left intact, so
     any edits should occur after there.
     
-	Test results:
-		1) Game started with god enabled, modded to skip first event type. Fail.
-		2) Game started with all sectors skipped from start. Success.
-		3) Game started with only the first event type skipped from start. Fail.
-			-Suggest second event type also removes stations.
-		4) Game started with both event types skipped from start. Success.
-		4) Game started with god enabled, then modded to skip all sectors. Success.
+    Test results:
+        1) Game started with god enabled, modded to skip first event type. Fail.
+        2) Game started with all sectors skipped from start. Success.
+        3) Game started with only the first event type skipped from start. Fail.
+            -Suggest second event type also removes stations.
+        4) Game started with both event types skipped from start. Success.
+        4) Game started with god enabled, then modded to skip all sectors. Success.
 '''
 
 @File_Manager.Transform_Wrapper('L/x3story.obj')
@@ -544,6 +544,50 @@ def Preserve_Captured_Ship_Equipment():
 
     return
 
+
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False)
+def Prevent_Ship_Equipment_Damage():
+    '''
+    Damage to a ship's hull will no longer randomly destroy equipment.
+    '''
+    '''
+    Code to edit is in SHIP.MakeDamage, which contains equipment selection,
+    removal, and player notification.
+
+    This is called a couple places, so the edit will be in the function
+    to return early (as opposed to filling all call points with Nops).
+
+    The function begins by checking if the ship is invincible, continuing
+    only if not. This check can be replaced with nops, such that the
+    fallthrough path returns early always.
+    (This approach will keep the stack clean when disassembling, as compared
+    to just a blind early return.)
+    '''
+    patch = Obj_Patch(
+            #offsets = [0x000C86B2],
+            # Code section following function entry.
+            # This begins with pushing 0, calling IsInvincible, and
+            # jumping ahead in the function if not, or falling through
+            # to pushing 0 and returning if so.
+            ref_code =  '01         '
+                        '87 0000B759'
+                        '34 000C77BD'
+                        '01         '
+                        '83         '
+                        '01         '
+                        '88 000B07AB'
+                        '01         '
+                        '88 000B07F9'
+                        '01         '
+                        '88 000B083F'
+                        '01         '
+                        '88 000B088D',
+            # Replace the first part with nops
+            new_code = NOP * 11,
+            )
+    Apply_Obj_Patch(patch)
+
+    return
 
 
 @File_Manager.Transform_Wrapper('L/x3story.obj')

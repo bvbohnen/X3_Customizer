@@ -37,6 +37,7 @@ from .Misc import Allow_Valhalla_To_Jump_To_Gates
 from .Misc import Remove_Factory_Build_Cutscene
 from .Misc import Keep_TLs_Hired_When_Empty
 from .Misc import Preserve_Captured_Ship_Equipment
+from .Misc import Prevent_Ship_Equipment_Damage
 from .Misc import Force_Infinite_Loop_Detection
 
 from .Music import Disable_Combat_Music

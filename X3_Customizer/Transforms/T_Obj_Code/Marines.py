@@ -195,6 +195,9 @@ def Set_Max_Marines(
     return
 
 
+##############################################################################
+# Following code originally written by rovermicrover.
+
 @File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
 def Max_Marines_Video_Id_Overwrite(
     ):
@@ -202,7 +205,7 @@ def Max_Marines_Video_Id_Overwrite(
     Remove the sirokos overwrite and put in its place a check for ships video ID
     Which if larger than the default value will overwrite
     '''
-	
+    
     # Construct the patches.
     patch = Obj_Patch(
             ref_code = '0F000E' '060106' '5B' '34000A8771' '05..' '83' '01' '83',
@@ -252,11 +255,11 @@ def Make_Terran_Stations_Make_Terran_Marines(
 
     patch = Obj_Patch(
             ref_code = '01' '0F000F' '8500000D71' '0D0001' '0508' '5B' '34000950F0' '053E' '02'
-	    	       '8400007450' '140002' '24' '320009510E' '01' '0F000F' '8500004C66' '053E' 
-	               '53' '64' '340009510E' '053E' '02' '8400007450' '140002' '24' '01',
+                   '8400007450' '140002' '24' '320009510E' '01' '0F000F' '8500004C66' '053E' 
+                   '53' '64' '340009510E' '053E' '02' '8400007450' '140002' '24' '01',
             new_code = '01' '0F000F' '8500000D71' '0D0001' '0508' '5A' '3400095102' '0C0C' '0C'
-	               '0C0C0C0C0C' '0C0C0C' '0C' '0C0C' '01' '0F000F' '8500004C66' '070004003E' 
-	               '53' '64' '340009510E' '053E' '02' '8400007450' '140002' '24' '01',
+                   '0C0C0C0C0C' '0C0C0C' '0C' '0C0C' '01' '0F000F' '8500004C66' '070004003E' 
+                   '53' '64' '340009510E' '053E' '02' '8400007450' '140002' '24' '01',
             )
     Apply_Obj_Patch(patch)
 

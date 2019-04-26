@@ -46,6 +46,10 @@ def Hide_Lasertowers_Outside_Radar():
     return
 
 
+
+##############################################################################
+# Following code originally written by rovermicrover.
+
 @File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
 def Set_LaserTower_Equipment(
         lasertower_laser_type = 25,

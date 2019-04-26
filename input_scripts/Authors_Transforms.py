@@ -103,6 +103,9 @@ Disable_Docking_Music()
 # Keep equipment intacts for captured ships.
 Preserve_Captured_Ship_Equipment()
 
+# Disable equipment damage when a hull is hit.
+Prevent_Ship_Equipment_Damage()
+
 # Testing requested option for hiding lasertowers/orbital platforms not on radar.
 # Test succesful, though disabling for personal use.
 #Hide_Lasertowers_Outside_Radar()

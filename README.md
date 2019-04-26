@@ -1,4 +1,4 @@
-X3 Customizer 3.14.2
+X3 Customizer 3.15
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -323,6 +323,10 @@ Obj_Code Transforms:
  * Prevent_Accidental_Spacefly_Swarms
 
       Prevents spaceflies from spawning swarms when created by a script using the 'create ship' command. Aimed at mods such as Improved Races 2.0 and SCS, which create and destroy a spacefly but accidentally leave behind a swarm with active scripts, causing spacefly accumulation and game slowdown.
+
+ * Prevent_Ship_Equipment_Damage (incompatible with: LU)
+
+      Damage to a ship's hull will no longer randomly destroy equipment.
 
  * Remove_Complex_Related_Sector_Switch_Delay (incompatible with: LU, TC)
 
@@ -800,3 +804,5 @@ Change Log:
    - Fix to Force_Infinite_Loop_Detection to prevent a false positive case.
  * 3.14.2
    - Fix to handle negative numbers for missile flag masks in tships.
+ * 3.15
+   - Added Prevent_Ship_Equipment_Damage.
