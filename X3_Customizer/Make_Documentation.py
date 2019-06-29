@@ -439,6 +439,8 @@ def Get_BB_Text(line_list):
 
     # Tag for if a list is in use.
     list_active = False
+    # Indent of the list.
+    list_indent = None
     # Tag for if a code section is in use.
     code_active = False
     # Tag for if the change log section is active.
@@ -457,11 +459,12 @@ def Get_BB_Text(line_list):
         nonlocal index
         # Can psuedo-join with the next line by just advancing the
         #  index to skip it when blank.
-        if index + 1 < len(line_list) and not line_list[index + 1]:
-            index += 1
-            bb_lines.append(tag)
+        # -Removed; doesn't make too much sense.
+        #if index + 1 < len(line_list) and not line_list[index + 1]:
+        #    index += 1
+        #    bb_lines.append(tag)
         # Check if the prior line was blank and overwrite it.
-        elif bb_lines and not bb_lines[-1]:
+        if bb_lines and not bb_lines[-1]:
             bb_lines[-1] = tag
         # Otherwise just add another line as normal.
         else:
@@ -533,8 +536,16 @@ def Get_BB_Text(line_list):
         strip_line = line.strip()
 
         # Empty lines get handled first.
+        # Skip newlines while lists are active; the egosoft
+        #  forums always hide the later newlines in a list entry,
+        #  which just makes earlier ones awkward.
+        # This assumes there are no newlines in the middle of
+        #  transform description text, which there shouldn't be
+        #  for simple documentation.
         if not strip_line:
-            Record('')
+            if not list_active:
+                Record('')
+
         
         # At every '***', any active list or code is closed.
         elif strip_line == '***':
@@ -590,13 +601,18 @@ def Get_BB_Text(line_list):
             if strip_line == 'Change Log:':
                 changelog_active = True
 
-            # Note when in a transform section, to add formatting.
-            if 'Transforms' in strip_line:
+            # Note when in a transform or other plugin section,
+            #  to add formatting.
+            if any(x in strip_line for x in ['Transforms','Analyses','Utilities']):
                 transform_active = True
 
 
         # If the line starts with '*', it is a major list entry.
         elif strip_line[0] == '*':
+            
+            # Record the indent of the list, so it can be closed
+            #  whenever indent is reduced by a line.
+            list_indent = len(line) - len(line.lstrip())
 
             # Note: any format tags need to be applied after the *,
             #  so prune the * first, handle formatting, then add
@@ -621,6 +637,9 @@ def Get_BB_Text(line_list):
 
         # Other lines can record as-is.
         else:
+            # Close a list if this line has a smaller indent.
+            if list_active and (len(line) - len(line.lstrip()) < list_indent):
+                Close_List()
             # Make the change log items small.
             if changelog_active:
                 line = Small(line)
@@ -633,7 +652,6 @@ def Get_BB_Text(line_list):
     Close_List()
 
     return bb_lines
-
 
 if __name__ == '__main__':
     Make(sys.argv)

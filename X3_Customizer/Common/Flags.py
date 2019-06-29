@@ -89,17 +89,18 @@ Director_race_code_name_dict = {
 #  it is constructed from (ecells to bio, ecells+bio to food/minerals, etc.).
 #  Some special handling is done for lasers/shields, however.
 Value_to_credits_ratio_dict = {
-    'TWareE'    : 4,      #Ecells.
-    'TWareB'    : 5.33,   #Bio.
-    'TWareM'    : 5.33,   #Minerals.
-    'TWareF'    : 12,     #Food
-    'TWareT'    : 28,     #Various tech (microchips, warheads, etc.)
+    'TWareE'    : 4,      # Ecells.
+    'TWareB'    : 5.33,   # Bio.
+    'TWareM'    : 5.33,   # Minerals.
+    'TWareF'    : 12,     # Food
+    'TWareT'    : 28,     # Various tech (microchips, warheads, etc.)
     'TMissiles' : 28,
     'TLaser'    : 64.9,
     'TShields'  : 64.9,
-    'TShips'    : 66, #An old comment elsewhere said 81 here; needs retest maybe.
-    'TWareN'    : 4,      #Misc items (artefacts, etc.), all base value.
+    'TWareN'    : 4,      # Misc items (artefacts, etc.), all base value.
+    'TShips'    : 50,     # Before any built-in wares.
     }
+
 # Side notes for profit expectation:
 #  Player shields produce at 80/130 efficiency 
 #   (eg. as if 39.9 credits/value, or 39.9/(12+5.33+4) = +87% profit).

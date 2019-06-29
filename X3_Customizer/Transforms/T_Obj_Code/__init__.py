@@ -5,8 +5,13 @@ Obj file edits, broken out due to length.
 Some general notes on obj editing:
 
 A group of Russian modders wrote a disassembler for the obj files.
-See this thread for a link (maybe with browser security settings turned up): 
-https://forum.egosoft.com/viewtopic.php?t=92374.
+An older egosoft thread (92374) references it, but it links to a site
+with a virus, so don't use that.
+
+Try this link, which provides some description of the output files,
+and appears to be safe (as of the time of this comment); translate from
+russian as needed.
+https://www.elite-games.ru/conference/viewtopic.php?t=47140
 
 The obj files contain KC psuedo-assembly code, which is fed to a lower 
 level interpreter in the exe. Egosoft has some details on the X2 KC 
@@ -15,6 +20,9 @@ which can give a general idea of what is in there.
 
 The assembly is stack oriented, where operations generally pull some number
 of items off the stack and put a result back on the stack.
+
+All edits done here are byte-size neutral, to avoid any changes in
+function pointers that are hardcoded in the assembly.
 
 Notepad++ does a reasonable job as a text viewer.
 The .asm file can be used for general perusal, though the .out is handy 

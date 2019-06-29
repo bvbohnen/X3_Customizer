@@ -564,24 +564,26 @@ def Prevent_Ship_Equipment_Damage():
     to just a blind early return.)
     '''
     patch = Obj_Patch(
-            #offsets = [0x000C86B2],
             # Code section following function entry.
             # This begins with pushing 0, calling IsInvincible, and
             # jumping ahead in the function if not, or falling through
             # to pushing 0 and returning if so.
             ref_code =  '01         '
-                        '87 0000B759'
-                        '34 000C77BD'
+                        '87 ........'
+                        '34 ........'
                         '01         '
                         '83         '
                         '01         '
-                        '88 000B07AB'
+                        '88 ........'
                         '01         '
-                        '88 000B07F9'
+                        '88 ........'
                         '01         '
-                        '88 000B083F'
+                        '88 ........'
                         '01         '
-                        '88 000B088D',
+                        '88 ........'
+                        '0D 0008    '
+                        '07 00989680'
+                        '5D         ',
             # Replace the first part with nops
             new_code = NOP * 11,
             )

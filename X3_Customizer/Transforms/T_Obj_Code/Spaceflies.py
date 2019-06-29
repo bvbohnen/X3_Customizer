@@ -6,13 +6,13 @@ Motivating example:
     10 day old XRM game, 134 factories, 200 ships.
     15k scripts active, 3.7k of them spaceflies (241 idle, rest followers).
     Testing seta speedup in Harmony of Perpetuity:
-		With spacefly scripts running:
-			1 real minute : 5 game minutes
-			2 real minutes: 9 game minutes
-		With spacefly scripts killed off (5000% seta limit):
-			1 real minute : 28 game minutes
-			2 real minutes: 59 game minutes
-		6.5x speedup with dead spaceflies.
+        With spacefly scripts running:
+            1 real minute : 5 game minutes
+            2 real minutes: 9 game minutes
+        With spacefly scripts killed off (5000% seta limit):
+            1 real minute : 28 game minutes
+            2 real minutes: 59 game minutes
+        6.5x speedup with dead spaceflies.
 
 Note: problem eventually tracked down to:
     A) "create ship" command spawning a spacefly swarm instead of just 1,
