@@ -1,7 +1,6 @@
 '''
 These transforms fix known bugs in the egosoft MD scripts.
 
-Note: transforms planned; not yet implemented.
 '''
 import xml.etree.ElementTree as ET
 from .Support import XML_Find_Match, XML_Find_All_Matches, Make_Director_Shell
@@ -15,6 +14,12 @@ New Home (tc plots for ap)
     - The final gate connection is not completed; only affects the base
     version of this mod; rereleases tend to fix the bug.
     - Low priority, since fixes exist and this is just a mod.
+
+Defend station mission capping
+    - Ships capped as part of Defend Station still are considered attackers,
+      so the mission doesn't end.
+    - If cancelling the mission, the capped ship is deleted.
+    - https://forum.egosoft.com/viewtopic.php?f=94&t=381503&start=6375
 
 '''
 

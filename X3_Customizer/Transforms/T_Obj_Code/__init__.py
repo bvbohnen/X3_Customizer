@@ -47,6 +47,7 @@ from .Misc import Keep_TLs_Hired_When_Empty
 from .Misc import Preserve_Captured_Ship_Equipment
 from .Misc import Prevent_Ship_Equipment_Damage
 from .Misc import Force_Infinite_Loop_Detection
+from .Misc import Remove_Modified
 
 from .Music import Disable_Combat_Music
 from .Music import Disable_Docking_Music
@@ -57,6 +58,7 @@ from .Seta import Stop_Events_From_Disabling_Seta
 
 from .Spaceflies import Kill_Spaceflies
 from .Spaceflies import Prevent_Accidental_Spacefly_Swarms
+
 
 # Fill in the default documentation category for the transforms.
 # Use a dict copy, since this adds new locals.

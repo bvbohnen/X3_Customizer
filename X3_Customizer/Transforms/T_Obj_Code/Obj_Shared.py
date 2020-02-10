@@ -83,9 +83,9 @@ class Obj_Patch:
     '''
     def __init__(s, ref_code, new_code, expected_matches = 1, file = 'L/x3story.obj'):
         s.file = file
-        # Prune off spacing.
-        s.ref_code = ref_code.replace(' ','')
-        s.new_code = new_code.replace(' ','')
+        # Prune off spacing, newlines.
+        s.ref_code = ref_code.replace(' ','').replace('\n','')
+        s.new_code = new_code.replace(' ','').replace('\n','')
         s.expected_matches = expected_matches
 
 

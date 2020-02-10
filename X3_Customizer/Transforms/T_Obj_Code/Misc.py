@@ -832,3 +832,42 @@ def Force_Infinite_Loop_Detection(
     return
 
 
+
+@File_Manager.Transform_Wrapper('L/x3story.obj')
+def Remove_Modified():
+    '''
+    Removes the modified file check for achievements and maybe menus.
+    '''
+    '''
+    Code to edit is in CLIENT.GetModified, swapping a global flag lookup
+    to instead return 0:
+
+        read       CLIENT.cl_Modified
+    to
+        push 0
+        nop 
+        nop
+
+    Note: LU appears to use a different flag, cl_TargetMode, and different
+    address.  TODO: look into this.
+    '''
+    patch = Obj_Patch(
+            ref_code =  '''
+                6E 0001
+                0F 000E
+                83     
+            
+                01     
+                83     
+
+                6E 0007
+                02     
+                16 000E
+                24     
+                0F 000E
+            ''',
+            new_code = '.. ....' + PUSH_0 + NOP * 2,
+            )
+    Apply_Obj_Patch(patch)
+
+    return

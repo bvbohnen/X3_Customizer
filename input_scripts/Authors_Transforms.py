@@ -69,6 +69,9 @@ if TC:
 #####################################################
 # Obj code file changes.
 
+# Experimental code to remove the modified flag.
+Remove_Modified()
+
 # Bump up max seta.
 Adjust_Max_Seta(15)
 # Make seta speed up faster.
