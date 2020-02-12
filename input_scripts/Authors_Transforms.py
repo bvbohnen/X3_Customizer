@@ -70,7 +70,7 @@ if TC:
 # Obj code file changes.
 
 # Experimental code to remove the modified flag.
-Remove_Modified()
+Remove_Modified_Check()
 
 # Bump up max seta.
 Adjust_Max_Seta(15)

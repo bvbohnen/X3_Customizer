@@ -834,24 +834,39 @@ def Force_Infinite_Loop_Detection(
 
 
 @File_Manager.Transform_Wrapper('L/x3story.obj')
-def Remove_Modified():
+def Remove_Modified_Check():
     '''
-    Removes the modified file check for achievements and maybe menus.
+    Partially removes the modified flag check for achievements.
+    This will allow achievements to display and increment, but is not
+    sufficient on its own for unlocks.  (May need to be paired with
+    a modified executable.)
     '''
-    '''
-    Code to edit is in CLIENT.GetModified, swapping a global flag lookup
-    to instead return 0:
 
+    # Note: the below code has two approaches:
+    # - Change GetModified to always return 0, and fix places that need 1.
+    # - Edit IsAuthorized to ignore GetModified, and fix places that need
+    #   to act as unmodified.
+    # Patches for both are laid out, and selected at the end.
+    
+    '''
+    Edit to CLIENT.GetModified, swapping a global flag lookup
+    to instead return 0.  This might be more useful than just
+    changing IsAuthorized.
+    
         read       CLIENT.cl_Modified
     to
         push 0
         nop 
         nop
-
+    
     Note: LU appears to use a different flag, cl_TargetMode, and different
     address.  TODO: look into this.
+    
+    Note: just applying this alone messes up scripts and menus somewhat,
+    apparently due to AL plugins not loading?
+    
     '''
-    patch = Obj_Patch(
+    GetModified_patch = Obj_Patch(
             ref_code =  '''
                 6E 0001
                 0F 000E
@@ -859,7 +874,7 @@ def Remove_Modified():
             
                 01     
                 83     
-
+    
                 6E 0007
                 02     
                 16 000E
@@ -868,6 +883,234 @@ def Remove_Modified():
             ''',
             new_code = '.. ....' + PUSH_0 + NOP * 2,
             )
-    Apply_Obj_Patch(patch)
+
+
+    # This code patches IsAuthorized.
+    '''
+    All achievement tracking (eg. spacefly counters and such) check with
+    the IsAuthorized function, which checks for modified games as well
+    as a couple other things (eg. player being alive).
+
+    Can swap the GetModified call to a simple push_1.
+            push       0
+            pushw      150d ; 96h
+            call86     CLIENT.GetModified
+            if SP[0]=0 then push 1 else push 0
+        to
+            push 0
+            (nops as needed)
+            if SP[0]=0 then push 1 else push 0
+
+        (Can also overwrite the last SP[0]=0 stuff, but just doing the
+        prior part can be consistent across such changes in the code
+        elsewhere.)
+
+    '''
+    IsAuthorized_patch = Obj_Patch(
+        # First 3 lines are the setup and GetModified call.
+        ref_code =  '''
+            01         
+            06 0096    
+            86 ........
+            64         
+            83         
+            
+            01         
+            83         
+
+            6E 0002    
+            0D 0004    
+            02         
+            82 ........
+            83         
+                
+            01         
+            83         
+        ''',
+        # Replace 9 bytes total; push can be anywhere among the nops.
+        new_code = PUSH_0 + NOP * 8,
+        )
+
+
+    '''
+    
+    In Menus, AL plugins only show up when modified. Edit this
+    in Obj_2259.SpecialUpdate:
+    
+           push       0
+           pushw      150d ; 96h
+           call86     CLIENT.GetModified
+           if SP[0]=0 then jump L00114B95
+           push       0
+           pushw      301d ; 012Dh
+           call86     AL_PLUGINS.GetPlugins
+
+    Only needed if GetModified was changed.
+    '''
+    Obj_2259_SpecialUpdate_patch = Obj_Patch(
+            ref_code =  '''
+                01         
+                06 0096    
+                86 ........
+                34 ........
+                01         
+                06 012D    
+                86 ........
+                02         
+                82 ........
+                01         
+                5D         
+                34 ........
+                06 2402    
+                05 2A      
+                06 07E4    
+                03         
+            ''',
+            # Force 1, act as modified.
+            new_code = PUSH_1 + NOP * 8,
+            )
+
+    '''
+    In MENU_PLAYER.SpecialUpdate, the **modified** text is added to
+    the player info screen.  Can potentially force this check to 0.
+    
+           push       0
+           pushw      150d ; 96h
+           call86     CLIENT.GetModified
+           if SP[0]=0 then jump L0013E231
+           push       0
+           call88     MENU.NewSection
+
+    Only needed if GetModified was not changed.    
+    '''    
+    MENU_PLAYER_SpecialUpdate_patch = Obj_Patch(
+            ref_code =  '''
+                01         
+                06 0096    
+                86 ........
+                34 ........
+                01         
+                88 ........
+                24         
+                01         
+                88 ........
+                34 ........
+                03         
+                0F 003E    
+                06 0081    
+                0E 0000    
+            ''',
+            # Force 0, act as not modified.
+            new_code = PUSH_0 + NOP * 8,
+            )
+    
+    '''
+    The above changes (whether GetModified or IsAuthorized) do not appear
+    sufficient to unlock achieves, though they will show up on the menu,
+    including any already unlocked.
+
+    In a variety of places, a call is made to the external function
+    X2_SetModified, which may be what prevents final unlocks.
+    Can edit those locations to omit the call.
+
+    Want to replace this code chunk with sending a 0 (to flip to not
+    being modified).  Eg. the read replaces with push_0.
+        read       CLIENT.cl_Modified ; [14d ; 0Eh]
+        push       1
+        callasm    X2_SetModified
+        pop
+    Where the cl_Modified and X2_SetModified addresses may vary with
+    vanilla/LU.
+
+    Test result: achieves still not unlocking.  Additional modification
+    checks may be in the executable that need editing, not reachable
+    by these obj edits.
+    '''
+    X2_SetModified_patches = [
+        # CLIENT.Init patch.
+        # LU remove some xbox controller code after the X2_SetModified call,
+        # so use leading code to help with the match.
+        Obj_Patch(
+            ref_code =  ('''
+                6E 0003    
+                0D 0004    
+                02         
+                06 012C    
+                86 ........
+                24         
+                '''
+                # Code to edit is below.
+                '''
+                0F ....    
+                02         
+                82 ........
+                24         
+            '''),
+            # 16 bytes left alone, 10 bytes nopped.
+            new_code = '..' * 16 + PUSH_0 + NOP * 2,
+            ),
+        
+        # CLIENT.Restart
+        Obj_Patch(
+            # Call code is at the top.
+            ref_code =  ('''
+                0F ....    
+                02         
+                82 ........
+                24         
+                01         
+                83   
+                6E 0004    
+                01         
+                06 01F7    
+                86 ........
+                0D 0001    
+                34 ........
+                06 08B4    
+                0D 0002    
+            '''),
+            new_code = PUSH_0 + NOP * 2,
+            ),   
+        
+        # CLIENT.__SetModified
+        Obj_Patch(
+            # Call code is at the top.
+            ref_code =  ('''
+                0F ....    
+                02         
+                82 ........
+                24         
+                02         
+                0B ........
+                03         
+                82 ........
+                01         
+                5F         
+                34 ........
+                02         
+                0B ........
+                0B ........
+                04         
+            '''),
+            new_code = PUSH_0 + NOP * 2,
+            ),      
+        ]
+
+    if 0:
+        # Editing GetModified.
+        Apply_Obj_Patch(GetModified_patch)
+        # Fix AL plugins.
+        Apply_Obj_Patch(Obj_2259_SpecialUpdate_patch)
+    else:
+        # Editing IsAuthorized.
+        Apply_Obj_Patch(IsAuthorized_patch)
+        # Remove modified tag.
+        Apply_Obj_Patch(MENU_PLAYER_SpecialUpdate_patch)
+    
+    # Both cases need the X2_Modified calls removed.
+    # (Maybe; may be skippable with a modified exe, and doesn't fully
+    #  allow achieves anyway.)
+    Apply_Obj_Patch_Group(X2_SetModified_patches)
+
 
     return
