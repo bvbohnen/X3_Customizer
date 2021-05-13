@@ -363,7 +363,7 @@ class Source_Reader_class:
             # Loop over pck and standard versions.
             for test_sys_path in [sys_path_pck, sys_path]:
                 # Skip empty packed paths.
-                if sys_path_pck == None:
+                if test_sys_path == None:
                     continue
 
                 # Following checks will look for a renamed file or a file with
@@ -371,7 +371,7 @@ class Source_Reader_class:
                 # TODO: consider doing a more generic renamed file check.
                 file_path_to_source = None
 
-                # If the file was not created by the customize on a previous
+                # If the file was not created by the customizer on a previous
                 #  run, and exists, use it.
                 # This allows a user to overwrite a customizer file with a new
                 #  version, and have it get used over any prior backup.

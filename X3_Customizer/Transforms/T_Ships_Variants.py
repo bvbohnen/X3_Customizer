@@ -148,6 +148,22 @@ addon/t/8389-L044.xml file. This should be updated.
 
     Since variants always reuse existing models, no effort is needed
     in figuring out new bounding boxes.
+
+FL pirate note:
+    The pirate versions of ships in AP have the pirate race, but in FL
+    they instead have the base race. This creates ambiguity in the
+    analysis, eg. Teladi Falcon variant 0 shows up twice for the Teladi
+    race, where the second one is the pirate version (but with no robust
+    way to know this; checked by comparing stats to online wikis).
+
+    For now, a workaround is to just ignore duplicate name/variant/race
+    entries after the first, with a note that FL may skip some ship
+    variants.
+
+TODO: support new FL variants.
+    This can potentially act similar to the "advanced" versions before,
+    where eg. a "heavy transporter" is a new ship type distinct from
+    the basic transporters and variants.
 '''
 
 @File_Manager.Transform_Wrapper(
@@ -250,7 +266,8 @@ prior_new_variants = []
 @File_Manager.Transform_Wrapper(
     'types/TShips.txt', 
     'types/WareLists.txt', 
-    'types/TWareT.txt')
+    'types/TWareT.txt',
+    )
 def Add_Ship_Variants(
         ship_types = [
             'SG_SH_M0',
@@ -321,6 +338,10 @@ def Add_Ship_Variants(
 
     If a Bounce mod's wall file is found, it will be updated with the new
     variants.
+
+    Note: in FL some ships, notably pirates, have ambiguous tships entries
+    are wont be well supported by this transform. Some new ship variants,
+    eg. "armored transporter", are not yet fully supported.
 
     Special attributes, such as turret count and weapon compatibitities, are not
     considered.
@@ -571,6 +592,9 @@ def Add_Ship_Variants(
         # Skip those blacklisted.
         if ship_dict['name'] in blacklist:
             continue
+        # Skip FL placeholders.
+        if 'SS_SH_PLACEHOLDER_' in ship_dict['name']:
+            continue
         
         # Grab the variant index.
         variation_index = int(ship_dict['variation_index'])
@@ -593,8 +617,16 @@ def Add_Ship_Variants(
 
         # Error if a ship with this key already found somehow, eg. the
         #  same race has another ship of the same name and variant.
-        assert variation_index not in name_variant_id_ship_dict_dict_dict[key]
-        
+        # Note: FL has a big problem with this, since pirate ships use
+        #  their base maker race and not the "pirate" race.
+        # As a workaround, skip if there was a matching entry already
+        #  found, to ignore pirates. (Also an issue with some mammoth
+        #  variant 19 "bigciv" ships).
+        if variation_index in name_variant_id_ship_dict_dict_dict[key]:
+            #print(f"dupe of {key}({variation_index}): {ship_dict['name']}")
+            continue
+            #raise Exception()
+
         # Everything else should be fairly safe to add in.
         name_variant_id_ship_dict_dict_dict[key][variation_index] = ship_dict
 

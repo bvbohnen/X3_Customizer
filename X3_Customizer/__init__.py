@@ -23,7 +23,8 @@ source code can be run directly using an appopriate version of Python.
 
 This tool is designed primarily for Albion Prelude v3.3. Most transforms
 will support prior or later versions of AP. TC 3.4 is tentatively supported
-for many transforms, though has not been thoroughly tested.
+for many transforms, though has not been thoroughly tested. Farnham's Legacy 
+support has been added as well.
 
 When used alongside the X3 Plugin Manager: if the customizer outputs to
 a catalog (the default), these tools can run in either order; if the
@@ -85,7 +86,7 @@ Setup and behavior:
       Eg. [source_folder]/types/TShips.txt
     - From the normal x3 folders.
     - From the incrementally indexed cat/dat files in the 
-      'addon' folder.
+      'addon' or 'addon2' folder.
     - From the incrementally indexed cat/dat files in the base
       x3 folder.
     - Note: any cat/dat files in the 'addon/mods' folder will be
@@ -124,7 +125,7 @@ Setup and behavior:
   transformed files.
   
 
-Contributors:
+Other contributors:
   RoverTX
 '''
 # Note: the above comment gets printed to the markdown file, so avoid

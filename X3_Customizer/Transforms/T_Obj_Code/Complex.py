@@ -139,16 +139,17 @@ def _Prevent_Complex_Connectors():
 
 
 
-
-@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
+# Fails on FL, though comments by dev suggest the function is still called.
+# TODO: maybe update for FL (would need a generic wildcard match instead of
+# hardcoded addresses).
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False, FL = False)
 def Remove_Complex_Related_Sector_Switch_Delay():
     '''
-    Experimental; recommend backing up save games prior to using this.
     Disables calls to the SA_CleanUpObjects function when changing sectors.
     This function introduces a potentially very long delay in games that
     have built large complexes, for unknown reasons.
-    Exact purpose of the function is not known, but side effects were 
-    not observed in brief play with it disabled.
+    Exact purpose of the function is not known, but unwanted side effects have 
+    not been observed or reported by users.
     '''
     '''
     See https://forum.egosoft.com/viewtopic.php?t=399008 for the motivating
@@ -181,8 +182,8 @@ def Remove_Complex_Related_Sector_Switch_Delay():
     this edit (eg. starts at a base of 1.8 GB, climbs up to ~3.5 GB and then
     does some sort of flush back down to ~1.8).
 
-    TODO: get more playtime in with this transform to establish higher
-    confidence of stability, and release for general use.
+    Note: multiple users have tried this succesfully, with no reported
+    oddities.
 
     '''
     remove_SA_CleanUpObjects = True

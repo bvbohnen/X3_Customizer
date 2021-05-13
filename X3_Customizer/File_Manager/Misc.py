@@ -121,8 +121,9 @@ def Add_File(game_file):
 from functools import wraps
 def Transform_Wrapper(
         *file_names, 
-        category = None, 
-        Vanilla = True,
+        category = None,
+        AP = True,
+        FL = True,
         XRM = True,
         LU = True,
         TC = True,
@@ -138,18 +139,21 @@ def Transform_Wrapper(
         is set to the name of the containing module without the 'T_'
         prefix and set to singular instead of plural.
       - Subpackages of transforms should set this explicitly for now.
-    * Vanilla
+    * AP
       - Bool, if True then the transform should be compatable with
-        vanilla x3.
+        vanilla x3 AP.
     * XRM
       - Bool, if True then the transform should be compatable with
-        XRM modded x3.
+        XRM modded x3 AP.
     * LU
       - Bool, if True then the transform should be compatable with
-        LU modded x3.
+        LU modded x3 AP.
     * TC
       - Bool, if True then the transform should be compatable with
-        basic vanilla TC (without AP).
+        basic vanilla TC (without AP/FL).
+    * FL
+      - Bool, if True then the transform should be compatable with
+        Farnham's Legacy.
     '''
 
     # Record the required file names to a set for use elsewhere.
@@ -191,10 +195,11 @@ def Transform_Wrapper(
         # Record the version compatability flags.
         # Keep this ordered for easy documentation generation.
         func._compatabilities = OrderedDict([
-            ('Vanilla', Vanilla),
+            ('AP'     , AP),
             ('XRM'    ,  XRM),
             ('LU'     ,  LU),
             ('TC'     ,  TC),
+            ('FL'     ,  FL),
             ])
 
         # Record the transform function.
@@ -339,7 +344,12 @@ def Load_File(file_name,
 
     # If the file is not loaded, handle loading.
     if file_name not in File_dict:
-
+        
+        # Make sure init was called, in case Load_File used from outside
+        # a transform.
+        if First_call:
+            Init()
+        
         # Get the file using the source_reader, maybe pulling from
         #  a cat/dat pair.
         # Returns a Game_File object, of some subclass, or None

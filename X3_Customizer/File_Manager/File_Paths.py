@@ -115,7 +115,7 @@ def Cat_Path_to_Virtual_Path(cat_path):
     #  source folder setup (which doesn't distinguish 'addon').
     # ('addon' should always be followed by something, so don't
     #  worry about that being the only item in the list.)
-    if path_split[0] == 'addon':
+    if path_split[0] == Settings.Get_Addon_Folder_Name():
         path_split = path_split[1:]
 
     # Rejoin and return.
@@ -137,22 +137,22 @@ def Virtual_Path_to_Cat_Path(virtual_path):
     # Skip the 'addon' prefix for a base TC target.
     if not Settings.target_base_tc:
         # Get the folders that should be in the addon directory.
-        # These are just the first folders, in case of nesting, though
-        #  no nesting expected for any files expected to be transformed,
-        #  it can happen (eg. directory/images).
+        # These are just the first folders, in case of nesting (though
+        #  no nesting expected for any files expected to be transformed).
         # Note: comparison should be case insensitive.
-        for test_folder in [
+        # Note: in AP the L folder is taken from the TC path, no addon, but
+        # in FL it is addon2/L, so do a separate check for that.
+        start_folder = path_start_folder.lower()
+        if (start_folder in [
                 'cutscenes',
                 'director',
                 'maps',
                 't',
                 'types',
-                'scripts',
-            ]:
-            # On a match, prefix with the addon folder.
-            if path_start_folder.lower() == test_folder:
-                cat_path = 'addon/' + virtual_path
-                break
+                'scripts',] 
+        or (Settings.Target_Is_FL() and start_folder == 'l')):
+            # On a match, prefix with the addon (or addon2) folder.
+            cat_path = Settings.Get_Addon_Folder_Name() + '/' + virtual_path
         
     return cat_path
 

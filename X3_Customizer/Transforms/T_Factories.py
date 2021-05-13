@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from .. import File_Manager
 from .T_Director import Make_Director_Shell
 from .T_Director import Generate_Director_Text_To_Update_Shipyards
-from ..Common import Flags
+from ..Common import Flags, Settings
 
 # Global tracker for factory field adjustments based on size.
 # Initialized on first call, reused on later calls to avoid any
@@ -24,7 +24,9 @@ size_field_ratios_dict_dict = None
 prior_new_factories = []
 
 
-@File_Manager.Transform_Wrapper('types/TFactories.txt', 'maps/WareTemplate.xml')
+@File_Manager.Transform_Wrapper(
+    'types/TFactories.txt', 
+    'maps/WareTemplate.xml')
 def Add_More_Factory_Sizes(
         factory_types = [
             # Skip mines to avoid affecting mineral output of asteroids.
@@ -94,6 +96,9 @@ def Add_More_Factory_Sizes(
         and is only intended to indicate potential problems in source files.
     '''
     global prior_new_factories
+
+    # Note is this is FL, which needs extra work to update TFacSizes.
+    FL = Settings.Target_Is_FL()
     
     # To add the factories to shipyards in game, a script has been set
     # up for running from the game script editor.
@@ -138,6 +143,13 @@ def Add_More_Factory_Sizes(
                     # Name_id is an integer id.
                     int(factory_dict['name_id'])][
                         size] = factory_dict
+
+
+    # For FL, also get organized entries from tfacsizes, keyed by name.
+    if FL:
+        name_tfacsize_dict = {}
+        for facsize_dict in File_Manager.Load_File('types/TFacSizes.txt'):
+            name_tfacsize_dict[facsize_dict['name']] = facsize_dict
         
 
     #Build a list of all factory names.
@@ -204,6 +216,9 @@ def Add_More_Factory_Sizes(
     # etc.
     # Keep a dict of new factories to add.
     new_factories_list = []
+    # Also a dict of sizes for tfacsizes if this is FL.
+    if FL:
+        new_fac_sizes_list = []
 
     # Loop over each layer of the organized factory dicts.
     # Start with the races.
@@ -250,7 +265,7 @@ def Add_More_Factory_Sizes(
                     # This will just suffix with the size, and an x3c tag to help
                     # uniquify the name. Keep in caps to be consistent with names
                     # generally being capitalized.
-                    new_name = new_factory_dict['name'] + '_X3C_{}'.format(wanted_size)
+                    new_name = template_factory_dict['name'] + '_X3C_{}'.format(wanted_size)
                     if new_name in factory_names_list:
                         raise Exception('Factory name {} already taken.'.format(new_name))
                     new_factory_dict['name'] = new_name
@@ -276,6 +291,13 @@ def Add_More_Factory_Sizes(
                     # Annotate the new factory with the name of its template, for
                     # use later.
                     new_factory_dict.template_name = template_factory_dict['name']
+
+                    if FL:
+                        # Duplicate the facsize entry, based on names.
+                        template_facsize_dict = name_tfacsize_dict[template_factory_dict['name']]
+                        new_facsize_dict = copy.copy(template_facsize_dict)
+                        new_facsize_dict['name'] = new_name
+                        new_fac_sizes_list.append(new_facsize_dict)
 
 
     # Now the ware templates need to be added for these factories.
@@ -320,7 +342,7 @@ def Add_More_Factory_Sizes(
 
     # Now build a list of new nodes for the new factories.
     new_xml_nodes = []
-    # Loop over a copy of the factory list, do the list can be pruned
+    # Loop over a copy of the factory list, so the list can be pruned
     # if select factories are skipped.
     for factory_dict in list(new_factories_list):
 
@@ -406,6 +428,12 @@ def Add_More_Factory_Sizes(
     # Add all of the new factories to tfactories.
     File_Manager.Load_File('types/TFactories.txt', return_game_file = True).Add_Entries(
         new_factories_list)
+
+    if FL:
+        # Add new entries to TFacSizes
+        File_Manager.Load_File('types/TFacSizes.txt', return_game_file = True).Add_Entries(
+            new_fac_sizes_list)
+        
     
     # Add these factories to the prior new factories, to be seen
     # by any later transforms.

@@ -16,6 +16,7 @@ import copy
 
 from .. import File_Manager
 from ..Common.Flags import *
+from ..Common import Settings
 
 # TODO:
 # Consider if corvette turn rates should be reduced, and perhaps those of
@@ -994,19 +995,39 @@ def Add_Ship_Life_Support(
     check_value_expression_2 += ')'
 
 
-    # Loop over files to share some code.
-    for xml_file_name in [
-        'director/2.004 Terran Plot Scene 4.xml',
-        'director/2.005 Terran Plot Scene 5.xml',
-        'director/2.007 HUB Plot.xml',
-        'director/2.024 Player Corp.xml',
-        'director/2.014 Treasure Hunt.xml',
-        'director/2.023 Shady Business.xml',
-        'director/2.011 Version 2.0 Plot.xml',
-        'director/2.013 New Home.xml',
-        'director/0.3 Transport Passenger.xml',
-        'director/2.130 Generic Group Transport.xml',        
-        ]:
+    # Pick which md files to update.
+    md_file_names = []
+    if Settings.Target_Is_AP():
+        md_file_names = [
+            'director/2.004 Terran Plot Scene 4.xml',
+            'director/2.005 Terran Plot Scene 5.xml',
+            'director/2.007 HUB Plot.xml',
+            'director/2.024 Player Corp.xml',
+            'director/2.014 Treasure Hunt.xml',
+            'director/2.023 Shady Business.xml',
+            'director/2.011 Version 2.0 Plot.xml',
+            'director/2.013 New Home.xml',
+            'director/0.3 Transport Passenger.xml',
+            'director/2.130 Generic Group Transport.xml',        
+        ]
+    elif Settings.Target_Is_FL():
+        # TODO
+        pass
+    elif Settings.Target_Is_TC():
+        # Note: a guess; untested.
+        md_file_names = [
+            'director/2.004 Terran Plot Scene 4.xml',
+            'director/2.005 Terran Plot Scene 5.xml',
+            'director/2.007 HUB Plot.xml',
+            'director/2.024 Player Corp.xml',
+            'director/2.014 Treasure Hunt.xml',
+            'director/2.011 Version 2.0 Plot.xml',
+            'director/2.013 New Home.xml',
+            'director/0.3 Transport Passenger.xml',
+            'director/2.130 Generic Group Transport.xml',        
+        ]
+
+    for xml_file_name in md_file_names:
     
         # Note: this file may not be present, so will not be part of the
         #  transform requirements and will be skipped if not found.

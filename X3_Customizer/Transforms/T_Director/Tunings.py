@@ -4,7 +4,7 @@ Modifications to ship tuning crates.
 from ... import File_Manager
 
 @File_Manager.Transform_Wrapper('director/3.08 Sector Management.xml', 
-                                LU = False, TC = False)
+                                LU = False, TC = False, FL = False)
 def Standardize_Tunings(
     enging_tuning_crates = 4,
     rudder_tuning_crates = 4,
@@ -129,7 +129,8 @@ def Standardize_Tunings(
     return
 
     
-@File_Manager.Transform_Wrapper('director/3.05 Gamestart Missions.xml', LU = False)
+@File_Manager.Transform_Wrapper('director/3.05 Gamestart Missions.xml', 
+                                LU = False, FL = False)
 def Standardize_Start_Plot_Overtunings(
     # Pick what fraction of the maximum overtunings to give.
     # Overtuning will be set to some % of the maximum, which should roughly

@@ -47,7 +47,7 @@ Increase_Tuning_Prices = True
 Tuning_cost_multiplier = 5
 '''
 
-@File_Manager.Transform_Wrapper('types/TWareT.txt', Vanilla = False, LU = False)
+@File_Manager.Transform_Wrapper('types/TWareT.txt', AP = False, FL = False, LU = False)
 def Restore_Vanilla_Tuning_Pricing():
     '''
     Sets the price for ship tunings (engine, rudder, cargo) to those

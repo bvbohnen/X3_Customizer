@@ -174,7 +174,9 @@ from .T_Director import Make_Director_Shell
     't/7360-L044.xml',
     # Currently doesn't support LU due to a different text file with the
     #  sector names; could probably add support with a little effort.
-    LU = False
+    LU = False,
+	# FL changes x3_universe (breaks qtrade check) and doesnt have other t files.
+	FL = False,
     )
 def Color_Sector_Names(
     # Specify the color to use for each race/affiliation.
@@ -345,7 +347,8 @@ def Color_Sector_Names(
     return
 
 
-@File_Manager.Transform_Wrapper('maps/x3_universe.xml', Vanilla = False, LU = False)
+@File_Manager.Transform_Wrapper('maps/x3_universe.xml', 
+								AP = False, FL = False, LU = False)
 def Restore_Aldrin_rock():
     '''
     Restors the big rock in Aldrin for XRM, reverting to the vanilla
@@ -366,7 +369,8 @@ def Restore_Aldrin_rock():
         file_contents.Get_Text().replace(original_text, replacement_text))
         
     
-@File_Manager.Transform_Wrapper('maps/x3_universe.xml', Vanilla = False, LU = False)
+@File_Manager.Transform_Wrapper('maps/x3_universe.xml', 
+								AP = False, FL = False, LU = False)
 def Restore_Hub_Music(
     apply_to_existing_save = False
     ):
@@ -410,7 +414,8 @@ def Restore_Hub_Music(
         pass
 
     
-@File_Manager.Transform_Wrapper('maps/x3_universe.xml', Vanilla = False, LU = False)
+@File_Manager.Transform_Wrapper('maps/x3_universe.xml', 
+								AP = False, FL = False, LU = False)
 def Restore_M148_Music(
     apply_to_existing_save = False
     ):

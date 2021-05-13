@@ -141,7 +141,7 @@ Update:
     equation for now, since at least it does not have humps.
 
 '''
-from Common.Settings import Settings
+from ..Common.Settings import Settings
 
 # Conditional import of scipy.
 try:

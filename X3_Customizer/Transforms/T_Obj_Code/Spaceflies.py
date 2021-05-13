@@ -200,7 +200,7 @@ from ... import Common
 Settings = Common.Settings
 from .Obj_Shared import *
 
-@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False)
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, FL = False)
 def Kill_Spaceflies():
     '''
     Kills active spaceflies by changing their "is disabled" script
@@ -218,6 +218,9 @@ def Kill_Spaceflies():
     It may take a minute for accumulated spaceflies to die.
     Progress can be checked in the script editor by watching the
     active spacefly script counts.
+
+    Note: FL has an alternative scripting method to find and kill spaceflies,
+    and shouldn't need this obj approach.
     '''
 
     #-Removed; prior attempts were partially functional, but only the
@@ -501,6 +504,7 @@ def Kill_Spaceflies():
     # To have some limited support, addresses will be specified in a table
     #  here, and can be swapped around as needed.
     # Per request, a version will be made for TC.
+    # Note: FL said to have a script option to kill flies, so ignore that.
     if Settings.target_base_tc:
         # TC 3.4 addresses.
         # Function addresses.

@@ -1,8 +1,10 @@
 
 from ... import File_Manager
 from ... import Common
+Settings = Common.Settings
 from .Obj_Shared import *
 
+# TODO: update for FL
 @File_Manager.Transform_Wrapper('L/x3story.obj', TC = False)
 def Adjust_Max_Seta(
         speed_factor = 10,
@@ -16,6 +18,97 @@ def Adjust_Max_Seta(
         up to 50. This transform will soft cap at 127, the max positive
         single byte value.
     '''
+    '''
+    Notes made when looking into seta speed:
+    
+	TI_SetTimeWarpFactor and TI_GetTimeWarpFactor appear to deal with Seta.
+		
+		TI_SetTimeWarpFactor is defaulted in some places to 65536, 0x10000, 
+        such as in dialogue handling or when playing cutscenes, indicating 
+        this sets the timescale back to 1x.
+			
+		DEBUG.IncreaseTimeWarp checks the current value against 0x10000 and 
+        does nothing if >= to that, else doubles the current value.
+			This implies the TimeWarpFactor is a 32-bit integer where the 
+            lower 16-bits are fractional scaling.
+			Capping at 0x10000 is a 10x speed multiplier.
+		DEBUG.DecreaseTimeWarp checks against 0x1000 and does not drop below 
+        that, else halves the current value.
+			
+		X_AUDIO.SpeakArrayWithPriorityAndFaceAndDurationWithSubtitle and 
+        SpeakArrayWithPriorityAndFaceAndDuration change the timewarp, 
+        though it is unclear on the value changed to 
+        (lots of stack manipulation).
+			
+		CAMERA.CutEvent and CLIENT.StopFastForward and 
+        MENU_DIALOG.SpeakQuestionWithDuration set the timewarp to 0x10000.
+		CLIENT.Vbi sets it in an  unclear way, but after calls to cl_FastForward.
+			
+		There is no clear indicator this deals with Seta, though; 
+        may be a more generic time factor.
+			
+	FastForward is another name to look at.
+		Var: CLIENT.cl_FastForwardTime
+			-Initialized to 6.
+			-Appears to be the menu selection for seta speed.
+		Var: CLIENT.cl_FastForward
+			-Appears to be the current seta speed.
+		Var: CLIENT.cl_FastForwardStep
+			-Appears to be a temp var to track the time since the last seta increment.
+			-Used to time out 250ms updates.
+		CLIENT.StartFastForward
+			-Plays a sound.
+			-Does some sort of key check to exit early.
+			-Does not call TI_SetTimeWarpFactor, only sets vars.
+			-Edits cl_TargetNextKey, cl_FastForward, cl_FastForwardStep, cl_LastNotifyPlanet.
+		CLIENT.StopFastForward
+			-Plays a sound
+			-Calls TI_SetTimeWarpFactor set back to 0x10000.
+			-This is commonly called by other methods to disable Seta.
+			-Can potentially track down those other methods and muck with their
+             call to stop a ship being dropped out of seta automatically.
+			-Returns 0 on the stack; consumes no inputs. To disable, need to 
+             replace with some harmless function which will return a single 
+             item on the stack, while taking no input args.
+			-IsFastForward might work as a replacement; nearby (easier to 
+             remember), and just a quick value lookup, though it doesn't 
+             return 0 (shouldn't matter).
+		CLIENT.ToggleFastForward
+			-Calls StartFastForward or StopFastForward.
+			-Has a NotifyNoEquipment call, maybe after checking for Seta software.
+		CLIENT.Vbi
+			-Does some time variable stuff, unclear on details.
+			-Does compare cl_FastForward to 10, which could be the max seta check.
+			-Appears to have a 250ms timer, and increments cl_FastForward by 1, 
+             suggesting this is the mechanic that slowly increases seta.
+			-Succesfully changed to speed up seta turn-on rate.
+		CLIENT.SetWarpFactor
+			-Updates cl_FastForwardTime.
+			-Called in Obj_2259.Input.
+		Var: Obj_2259.var_2259_1
+			-Gets initialized with CLIENT.GetWarpFactor.
+			-If above returned 0, this defaults to 6.
+			-This appears to be the temp var for the menu item, converted to a 
+             string elsewhere.
+		Obj_2259.Input
+			-Appears to deal with menu items.
+			-Label L00114EF2 sets the minimum seta value to 2.
+			-Label L001152BF sets the maximum to 10?
+					-Unclear on why this would force it to 10.
+					-Code block is only called from a switch statement, 
+                     apparently based on button press, but there is no 
+                     expected comparison to 10 here.
+			-Label L001157C1 checks against 10 and calls L001157D9, 
+             which rolls it over to 2?
+			-Label L00115812 also has a 10 value.
+			-When cheat mode is active, it appears the max may be 50 instead of 10.
+				
+		Conclusion: Editing the above 3 locations in Obj_2259.Input succesfully increased SETA speed.
+		Editing the CLIENT.Vbi delay (250 ms) down succesfully speeds up SETA turn-on rate.
+
+    '''
+
+
     # Make sure the input is an int, not float.
     try:
         speed_factor = int(speed_factor)
@@ -69,12 +162,19 @@ def Adjust_Max_Seta(
                      '<t id="200">{}</t>'.format(speed_factor))
         lu_text_file.Update_From_Text(text)
 
-
     else:
         # Convert the input into a byte string, hex.
         # Always big endian (required by function, doesn't matter
         #  for 1 byte though).
         seta_hex = Int_To_Hex_String(speed_factor, 1)
+
+        # The addresses of vars differ between AP and FL.
+        if Settings.Target_Is_AP():
+            var1 = '0054'
+            var2 = '0055'
+        else: # FL
+            var1 = '0065'
+            var2 = '0066'
 
         # Construct the patch.
         # Unfortunately, this is mostly the result of hand analysis of the
@@ -84,10 +184,11 @@ def Adjust_Max_Seta(
 
             # Change the menu cap. Unclear on when this is called exactly.
             # Edits Obj_2259.Input.
+            # Just prior to CLIENT.SetWarpFactor.
             Obj_Patch(
                 #offsets = [0x001152BF],
                 # Existing code is 'pushb 10d', or b'050A'.
-                ref_code = '05' '0A' '16' '0054' '24' '0F' '0054' '02' '06' '0096',
+                ref_code = '05' '0A' '16' +var1+ '24' '0F' +var1+ '02' '06' '0096',
                 # Swap to something larger.
                 new_code = '05' + seta_hex,
                 ),
@@ -98,15 +199,16 @@ def Adjust_Max_Seta(
                 #offsets = [0x001157C1],
                 # Existing code is 'pushb 10d', or b'050A'.
                 # Check an extra couple bytes.
-                ref_code = '05' '0A' '5C' '34' '........' '0F' '0055' '02',
+                ref_code = '05' '0A' '5C' '34' '........' '0F' +var2+ '02',
                 # Swap to something larger.
                 new_code = '05' + seta_hex,
                 ),
 
             # Edits Obj_2259.ChangeValue (a little below the above spot).
+            # This is also prior to CLIENT.SetWarpFactor.
             Obj_Patch(
                 #offsets = [0x00115812],
-                ref_code = '05' '0A' '16' '0055' '24' '0F' '0055' '16' '0054',
+                ref_code = '05' '0A' '16' +var2+ '24' '0F' +var2+ '16' +var1,
                 new_code = '05' + seta_hex,
                 ),
         ]

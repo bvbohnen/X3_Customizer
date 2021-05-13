@@ -230,8 +230,8 @@ def Disable_Asteroid_Respawn(
 
     return
 
-
-@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
+# TODO: look into FL changes to this.
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False, FL = False)
 def Allow_Valhalla_To_Jump_To_Gates(
     ):
     '''
@@ -281,6 +281,8 @@ def Allow_Valhalla_To_Jump_To_Gates(
     return
 
 
+# TODO: check/note if this is useful for FL, which has a new menu option
+# which may change the cutscene speed already. (Patch still worked though.)
 @File_Manager.Transform_Wrapper('L/x3story.obj', LU = False)
 def Remove_Factory_Build_Cutscene(
     ):
@@ -496,7 +498,7 @@ def Keep_TLs_Hired_When_Empty():
 
 
 
-@File_Manager.Transform_Wrapper('L/x3story.obj')
+@File_Manager.Transform_Wrapper('L/x3story.obj', FL = False)
 def Preserve_Captured_Ship_Equipment():
     '''
     Preserves equipment of captured ships.  This is expected to affect
@@ -514,6 +516,10 @@ def Preserve_Captured_Ship_Equipment():
     Marines boarding calls this function directly.
     Unclear on where the mission director command is handled, though in
     game test suggests it is affected as well.
+
+    Note: FL makes some changes to the post-entry code that causes the
+    match to fail. TODO: set up alternate match code and pick how many
+    nops to insert for nice disassembly.
     '''
     patch = Obj_Patch(
             #offsets = [0x000C86B2],
@@ -834,12 +840,16 @@ def Force_Infinite_Loop_Detection(
 
 
 @File_Manager.Transform_Wrapper('L/x3story.obj')
-def Remove_Modified_Check():
+def Remove_Modified_Check(hide_modified_flag = False):
     '''
     Partially removes the modified flag check for achievements.
     This will allow achievements to display and increment, but is not
     sufficient on its own for unlocks.  (May need to be paired with
     a modified executable.)
+
+    * hide_modified_flag
+      - Bool, set to True to hide the **modified** flag on the player
+        info tab.
     '''
 
     # Note: the below code has two approaches:
@@ -1012,9 +1022,8 @@ def Remove_Modified_Check():
     In a variety of places, a call is made to the external function
     X2_SetModified, which may be what prevents final unlocks.
     Can edit those locations to omit the call.
-
-    Want to replace this code chunk with sending a 0 (to flip to not
-    being modified).  Eg. the read replaces with push_0.
+    
+    Want to replace this code chunk:
         read       CLIENT.cl_Modified ; [14d ; 0Eh]
         push       1
         callasm    X2_SetModified
@@ -1022,10 +1031,21 @@ def Remove_Modified_Check():
     Where the cl_Modified and X2_SetModified addresses may vary with
     vanilla/LU.
 
-    Test result: achieves still not unlocking.  Additional modification
+    Test: edit to always send 0.
+    Result: achieves still not unlocking.  Additional modification
     checks may be in the executable that need editing, not reachable
     by these obj edits.
+
+    Test: edit to remove the call entirely.
+    Result: Same outcome, no unlocks.
     '''
+    if 1:
+        # Asm bytes to send a 0.
+        replacement_asm = PUSH_0 + NOP * 2
+    else:
+        # Asm bytes to prevent the call entirely.
+        replacement_asm = NOP * 10
+
     X2_SetModified_patches = [
         # CLIENT.Init patch.
         # LU remove some xbox controller code after the X2_SetModified call,
@@ -1046,8 +1066,8 @@ def Remove_Modified_Check():
                 82 ........
                 24         
             '''),
-            # 16 bytes left alone, 10 bytes nopped.
-            new_code = '..' * 16 + PUSH_0 + NOP * 2,
+            # 16 bytes left alone.
+            new_code = '..' * 16 + replacement_asm,
             ),
         
         # CLIENT.Restart
@@ -1069,7 +1089,7 @@ def Remove_Modified_Check():
                 06 08B4    
                 0D 0002    
             '''),
-            new_code = PUSH_0 + NOP * 2,
+            new_code = replacement_asm,
             ),   
         
         # CLIENT.__SetModified
@@ -1092,7 +1112,7 @@ def Remove_Modified_Check():
                 0B ........
                 04         
             '''),
-            new_code = PUSH_0 + NOP * 2,
+            new_code = replacement_asm,
             ),      
         ]
 
@@ -1101,11 +1121,13 @@ def Remove_Modified_Check():
         Apply_Obj_Patch(GetModified_patch)
         # Fix AL plugins.
         Apply_Obj_Patch(Obj_2259_SpecialUpdate_patch)
+        # TODO: also set uploads to the ego server to still be modified.
     else:
         # Editing IsAuthorized.
         Apply_Obj_Patch(IsAuthorized_patch)
         # Remove modified tag.
-        Apply_Obj_Patch(MENU_PLAYER_SpecialUpdate_patch)
+        if hide_modified_flag:
+            Apply_Obj_Patch(MENU_PLAYER_SpecialUpdate_patch)
     
     # Both cases need the X2_Modified calls removed.
     # (Maybe; may be skippable with a modified exe, and doesn't fully

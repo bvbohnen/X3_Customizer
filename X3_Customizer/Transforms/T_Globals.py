@@ -17,6 +17,9 @@ from ..Common import Flags
 # Tracked object adjustment (eg. UI brackets).
 # TODO, SG_TRACKER_NUM_ items.
 
+# TODO: new FL globals.
+# https://www.egosoft.com:8444/confluence/display/X3WIKI/6D+-+Mod+Files+Changes
+
         
 @File_Manager.Transform_Wrapper('types/TMissiles.txt', 'types/Globals.txt', category = 'Missile')
 def Set_Missile_Swarm_Count(
@@ -194,8 +197,8 @@ def Set_Dock_Storage_Capacity(
             
 @File_Manager.Transform_Wrapper('types/Globals.txt')
 def Adjust_Strafe(
-        #Try out halving these, to make strafe less tempting, and less jumpy when in
-        # a spacesuit.
+        # Try out halving these, to make strafe less tempting, and less jumpy
+        # when in a spacesuit.
         small_ship_factor = 1,
         big_ship_factor   = 1
     ):
@@ -208,9 +211,9 @@ def Adjust_Strafe(
     * big_ship_factor:
       - Multiplier on big ship strafe.
     '''
-    #Appears to use an integer value which may be in the standard
-    # 2 meters / ms metric.
-    #Original for fighters is ~50k, or maybe 25 m/s.
+    # Appears to use an integer value which may be in the standard
+    #  2 meters / ms metric.
+    # Original for fighters is ~50k, or maybe 25 m/s.
     Adjust_Global('SG_MAXSTRAFEFACTOR_SMALLSHIP', small_ship_factor)
     Adjust_Global('SG_MAXSTRAFEFACTOR_BIGSHIP', big_ship_factor)
                 
@@ -237,7 +240,7 @@ def Set_Global(field_name, value):
 @File_Manager.Transform_Wrapper('types/Globals.txt')
 def Adjust_Global(field_name, scaling_factor):
     '''
-    Adjust a global flag by the given multiplier.
+    Adjust a global flag by the given scaling_factor.
     Generic transform works on any named global field.
 
     * field_name:
@@ -245,12 +248,12 @@ def Adjust_Global(field_name, scaling_factor):
     * scaling_factor:
       - Multiplier to apply to the existing value.
     '''
-    #Can return early if just multiplying by 1.
-    if multiplier == 1:
+    # Can return early if just multiplying by 1.
+    if scaling_factor == 1:
         return
     for this_dict in File_Manager.Load_File('types/Globals.txt'):
         if this_dict['name'] == field_name:
             new_value = int(this_dict['value']) * scaling_factor
-            #Note: all globals are integers.
+            # Note: all globals are integers.
             this_dict['value'] = str(int(new_value))
             break

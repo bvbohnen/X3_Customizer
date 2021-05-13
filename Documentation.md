@@ -1,4 +1,4 @@
-X3 Customizer 3.15
+X3 Customizer 3.16
 -----------------
 
 This tool will read in source files from X3, modify on them based on user selected transforms, and write the results back to the game directory. Transforms will often perform complex or repetitive tasks succinctly, avoiding the need for hand editing of source files. Many transforms will also do analysis of game files, to intelligently select appropriate edits to perform.  Some transforms carry out binary code edits, allowing for options not found elsewhere.
@@ -7,7 +7,7 @@ Source files will generally support any prior modding. Most transforms support i
 
 This tool is written in Python, and tested on version 3.7. As of customizer version 3, an executable will be generated for users who do not wish to run the Python source code directly, and is available on the github Releases page.  These will be provided as convenient, generally for 64-bit Windows.  For Linux or 32-bit Windows users, the source code can be run directly using an appopriate version of Python.
 
-This tool is designed primarily for Albion Prelude v3.3. Most transforms will support prior or later versions of AP. TC 3.4 is tentatively supported for many transforms, though has not been thoroughly tested.
+This tool is designed primarily for Albion Prelude v3.3. Most transforms will support prior or later versions of AP. TC 3.4 is tentatively supported for many transforms, though has not been thoroughly tested. Farnham's Legacy support has been added as well.
 
 When used alongside the X3 Plugin Manager: if the customizer outputs to a catalog (the default), these tools can run in either order; if the customizer outputs to loose files (a command line option), the customizer should be run second, after the plugin manager is closed, since the plugin manager generates a TWareT.pck file when closed that doesn't capture changes in TWareT.txt made by this tool.
 
@@ -44,7 +44,7 @@ Setup and behavior:
   * Source files are searched for in this priority order, where packed versions (pck, pbb, pbd) of files take precedence:
     - From an optional user specified source folder, with a folder structure matching the X3 directory structure (without 'addon' path). Eg. [source_folder]/types/TShips.txt
     - From the normal x3 folders.
-    - From the incrementally indexed cat/dat files in the 'addon' folder.
+    - From the incrementally indexed cat/dat files in the 'addon' or 'addon2' folder.
     - From the incrementally indexed cat/dat files in the base x3 folder.
     - Note: any cat/dat files in the 'addon/mods' folder will be ignored, due to ambiguity on which if any might be selected in the game launcher.
 
@@ -62,7 +62,7 @@ Setup and behavior:
   * Warning: this tool will attempt to avoid unsafe behavior, but the user should back up irreplaceable files to be safe against bugs such as accidental overwrites of source files with transformed files.
   
 
-Contributors: RoverTX
+Other contributors: RoverTX
 
 ***
 
@@ -102,8 +102,8 @@ Setup methods:
          - Path to the X3 base folder, where the executable is located.
          - Can be skipped if path_to_addon_folder provided.
        * path_to_addon_folder
-         - Path to the X3 AP addon folder.
-         - Can be skipped if path_to_x3_folder provided.
+         - Path to the X3 AP "addon" folder or FL "addon2" folder.
+         - Can be skipped if path_to_x3_folder provided, though in that case AP will be targeted by default.
        * path_to_output_folder
          - Optional, path to a folder to place output files in.
          - Defaults to match path_to_x3_folder, so that outputs are directly readable by the game.
@@ -124,7 +124,7 @@ Setup methods:
          - This is also the file which will be read for any log from a prior run.
          - Defaults to 'X3_Customizer_log.json'.      
        * enable_TC_mode
-         - Bool, if True then the target X3 version will be Terran Conflict instead of Albion Prelude.
+         - Bool, if True then the target X3 version will be Terran Conflict instead of AP/FL.
          - All files which would have been placed in the addon folder will now be placed in the base x3 folder.
          - Note: not all transforms have been tested for TC compatability.
        
@@ -188,7 +188,7 @@ Background Transforms:
 
 Director Transforms:
 
- * Adjust_Generic_Missions
+ * Adjust_Generic_Missions (incompatible with: FL)
 
     Requires: director/3.01 Generic Missions.xml
 
@@ -234,28 +234,28 @@ Director Transforms:
         - Bool, if True then mission chance adjustment will cap at 100, the typical highest in vanilla AP. Default False.
       
 
- * Convoys_made_of_race_ships
+ * Convoys_made_of_race_ships (incompatible with: FL)
 
     Requires: director/2.119 Trade Convoy.xml
 
       If convoy defense missions should use the convoy's race to select their ship type. The vanilla script uses randomized ship types (eg. a terran convoy flying teladi ships).
       
 
- * Disable_Generic_Missions
+ * Disable_Generic_Missions (incompatible with: FL)
 
     Requires: director/3.01 Generic Missions.xml
 
       Disable generic missions from spawning. Existing generic missions will be left untouched.
       
 
- * Fix_Corporation_Troubles_Balance_Rollover
+ * Fix_Corporation_Troubles_Balance_Rollover (incompatible with: FL)
 
     Requires: director/2.024 Player Corp.xml
 
       In the Corporation Troubles plot, prevents the bank balance from reaching >2 billion and rolling over due to the 32-bit signed integer limit.
       
 
- * Fix_Dual_Convoy_Invincible_Stations
+ * Fix_Dual_Convoy_Invincible_Stations (incompatible with: FL)
 
     Requires: director/0.83 Dual Convoy.xml, director/2.183 Dual Convoy.xml
 
@@ -266,7 +266,7 @@ Director Transforms:
       Does not affect any invinciblity flags already set in an existing save. Consider also using Fix_Reset_Invincible_Stations to clear leftover flags in an existing save.
       
 
- * Fix_Reset_Invincible_Stations
+ * Fix_Reset_Invincible_Stations (incompatible with: FL)
 
     Requires: None
 
@@ -277,14 +277,14 @@ Director Transforms:
         - Default is 0.
       
 
- * Fix_Terran_Plot_Aimless_TPs
+ * Fix_Terran_Plot_Aimless_TPs (incompatible with: FL)
 
     Requires: director/2.004 Terran Plot Scene 4.xml
 
       In the Terran Conflict plot when allied TPs move to capture an Elephant, fix replacement TPs to move toward the Elephant instead of wandering aimlessly.
       
 
- * Standardize_Start_Plot_Overtunings (incompatible with: LU)
+ * Standardize_Start_Plot_Overtunings (incompatible with: LU, FL)
 
     Requires: director/3.05 Gamestart Missions.xml
 
@@ -294,7 +294,7 @@ Director Transforms:
         - Float, typically between 0 and 1, the fraction of the max overtuning to use. A value of 0 will remove overtunings, and 1 will give max overtuning that is available in vanilla. Default of 0.7 is set to mimic moderate game reloading results.
       
 
- * Standardize_Tunings (incompatible with: LU, TC)
+ * Standardize_Tunings (incompatible with: LU, TC, FL)
 
     Requires: director/3.08 Sector Management.xml
 
@@ -372,7 +372,7 @@ Global Transforms:
 
     Requires: types/Globals.txt
 
-      Adjust a global flag by the given multiplier. Generic transform works on any named global field.
+      Adjust a global flag by the given scaling_factor. Generic transform works on any named global field.
   
       * field_name:
         - String, name of the field in Globals.txt
@@ -665,7 +665,7 @@ Obj_Code Transforms:
         - Float, the amount to boost the speedup rate by. Eg. 2 will reduce the delay between ticks to 125 ms. Practical limit may be set by game frame rate, eg. approximately 15x at 60 fps.
       
 
- * Allow_Valhalla_To_Jump_To_Gates (incompatible with: LU, TC)
+ * Allow_Valhalla_To_Jump_To_Gates (incompatible with: LU, TC, FL)
 
     Requires: L/x3story.obj
 
@@ -720,13 +720,15 @@ Obj_Code Transforms:
       When a hired TL places its last station, it will remain hired until the player explicitly releases it instead of being automatically dehired.
       
 
- * Kill_Spaceflies (incompatible with: LU)
+ * Kill_Spaceflies (incompatible with: LU, FL)
 
     Requires: L/x3story.obj
 
       Kills active spaceflies by changing their "is disabled" script command to make them self destruct. Intended for use with games that have accumulated many stale spacefly swarms generated by Improved Races 2.0 or Salvage Command Software or other mods which accidentally add excess spaceflies through the "create ship" command, causing accumulating slowdown (eg. 85% SETA slowdown after 10 game days). Use Prevent_Accidental_Spacefly_Swarms to stop future spacefly accumulation, and this transform to clean out existing spaceflies.
   
       Deaths are delayed by 10 seconds so that mods generating and killing the spaceflies have time to record their information. It may take a minute for accumulated spaceflies to die. Progress can be checked in the script editor by watching the active spacefly script counts.
+  
+      Note: FL has an alternative scripting method to find and kill spaceflies, and shouldn't need this obj approach.
       
 
  * Make_Terran_Stations_Make_Terran_Marines (incompatible with: LU, TC)
@@ -743,7 +745,7 @@ Obj_Code Transforms:
       Remove the sirokos overwrite and put in its place a check for ships video ID Which if larger than the default value will overwrite
       
 
- * Preserve_Captured_Ship_Equipment
+ * Preserve_Captured_Ship_Equipment (incompatible with: FL)
 
     Requires: L/x3story.obj
 
@@ -764,11 +766,11 @@ Obj_Code Transforms:
       Damage to a ship's hull will no longer randomly destroy equipment.
       
 
- * Remove_Complex_Related_Sector_Switch_Delay (incompatible with: LU, TC)
+ * Remove_Complex_Related_Sector_Switch_Delay (incompatible with: LU, TC, FL)
 
     Requires: L/x3story.obj
 
-      Experimental; recommend backing up save games prior to using this. Disables calls to the SA_CleanUpObjects function when changing sectors. This function introduces a potentially very long delay in games that have built large complexes, for unknown reasons. Exact purpose of the function is not known, but side effects were not observed in brief play with it disabled.
+      Disables calls to the SA_CleanUpObjects function when changing sectors. This function introduces a potentially very long delay in games that have built large complexes, for unknown reasons. Exact purpose of the function is not known, but unwanted side effects have not been observed or reported by users.
       
 
  * Remove_Factory_Build_Cutscene (incompatible with: LU)
@@ -776,6 +778,16 @@ Obj_Code Transforms:
     Requires: L/x3story.obj
 
       Removes the cutscene that plays when placing factories by shortening the duration to 0.  Also prevents the player ship from being stopped. May still have some visible camera shifts for an instant.
+      
+
+ * Remove_Modified_Check
+
+    Requires: L/x3story.obj
+
+      Partially removes the modified flag check for achievements. This will allow achievements to display and increment, but is not sufficient on its own for unlocks.  (May need to be paired with a modified executable.)
+  
+      * hide_modified_flag
+        - Bool, set to True to hide the **modified** flag on the player info tab.
       
 
  * Set_LaserTower_Equipment (incompatible with: LU, TC)
@@ -802,11 +814,11 @@ Obj_Code Transforms:
         - Int, terran orbital laser shield count.
       
 
- * Set_Max_Marines (incompatible with: LU, TC)
+ * Set_Max_Marines (incompatible with: LU, TC, FL)
 
     Requires: L/x3story.obj
 
-      Sets the maximum number of marines that each ship type can carry. These are byte values, signed, so max is 127. Note: in some cases, a larger ship type may use the marine count of a smaller ship if it is greater.
+      Sets the maximum number of marines that each ship type can carry. These are byte values, signed, so max is 127. Note: in some cases, a larger ship type may use the marine count of a smaller ship if it is greater. Note: FL sets per-ship limits through tboarding.txt instead.
       
       * tm_count
         - Int, marines carried by TMs.
@@ -852,28 +864,28 @@ Obj_Code Transforms:
 
 Script Transforms:
 
- * Add_CLS_Software_To_More_Docks
+ * Add_CLS_Software_To_More_Docks (incompatible with: FL)
 
     Requires: None
 
       Adds Commodity Logistics Software, internal and external, to all equipment docks which stock Trade Command Software Mk2. This is implemented as a setup script which runs on the game loading. Once applied, this transform may be disabled to remove the script run time. This change is not easily reversable.
       
 
- * Allow_CAG_Apprentices_To_Sell (incompatible with: LU, TC)
+ * Allow_CAG_Apprentices_To_Sell (incompatible with: LU, TC, FL)
 
     Requires: scripts/plugin.com.agent.main.xml
 
       Allows Commercial Agents to sell factory products at pilot rank 0. May require CAG restart to take effect.
       
 
- * Complex_Cleaner_Bug_Fix (incompatible with: LU)
+ * Complex_Cleaner_Bug_Fix (incompatible with: LU, FL)
 
     Requires: scripts/plugin.gz.CmpClean.Main.xml
 
       Apply bug fixes to the Complex Cleaner mod. Designed for version 4.09 of that mod. Includes a fix for mistargetted a wrong hub in systems with multiple hubs, and a fix for some factories getting ignored when crunching. Patches plugin.gz.CmpClean.Main.xml.
       
 
- * Complex_Cleaner_Use_Small_Cube (incompatible with: LU)
+ * Complex_Cleaner_Use_Small_Cube (incompatible with: LU, FL)
 
     Requires: scripts/plugin.gz.CmpClean.crunch.xml
 
@@ -887,28 +899,28 @@ Script Transforms:
       Modifies the Attack command when used on an owned asset to instead enact Attack Nearest. In vanilla AP, such attack commands are quietly ignored. Intended for use when commanding groups, where Attack is available but Attack Nearest is not. This replaces '!ship.cmd.attack.std'.
       
 
- * Disable_OOS_War_Sector_Spawns (incompatible with: LU, TC)
+ * Disable_OOS_War_Sector_Spawns (incompatible with: LU, TC, FL)
 
     Requires: scripts/!fight.war.protectsector.xml
 
       Disables spawning of dedicated ships in the AP war sectors which attack player assets when the player is out-of-sector. By default, these ships scale up with player assets, and immediately respawn upon being killed. This patches '!fight.war.protectsector'.
       
 
- * Fix_OOS_Laser_Missile_Conflict (incompatible with: LU, TC)
+ * Fix_OOS_Laser_Missile_Conflict (incompatible with: LU, TC, FL)
 
     Requires: scripts/!plugin.acp.fight.attack.object.xml
 
       Allows OOS combat to include both missile and laser fire in the same attack round. In vanilla AP, a ship firing a missile will not fire its lasers for a full round, generally causing a large drop in damage output. With the change, adding missiles to OOS ships should not hurt their performance.
       
 
- * Fleet_Interceptor_Bug_Fix (incompatible with: LU, TC)
+ * Fleet_Interceptor_Bug_Fix (incompatible with: LU, TC, FL)
 
     Requires: scripts/!lib.fleet.shipsfortarget.xml
 
       Apply bug fixes to the Fleet logic for selecting ships to launch at enemies. A mispelling of 'interecept' causes M6 ships to be launched against enemy M8s instead of interceptors. Patches !lib.fleet.shipsfortarget.xml.
       
 
- * Increase_Escort_Engagement_Range (incompatible with: LU, TC)
+ * Increase_Escort_Engagement_Range (incompatible with: LU, TC, FL)
 
     Requires: scripts/!move.follow.template.xml
 
@@ -1129,6 +1141,8 @@ Ships_Variant Transforms:
   
       If a Bounce mod's wall file is found, it will be updated with the new variants.
   
+      Note: in FL some ships, notably pirates, have ambiguous tships entries are wont be well supported by this transform. Some new ship variants, eg. "armored transporter", are not yet fully supported.
+  
       Special attributes, such as turret count and weapon compatibitities, are not considered. Variants are added base on ship name and race; pirate variants are handled separately from standard variants. Ships without extensions or cargo are ignored (eg. drones, weapon platforms).
       
       * ship_types:
@@ -1222,7 +1236,7 @@ Universe Transforms:
         - String, name to use for the director cue and the generated file. This should be different than any used earlier in a given saved game.
       
 
- * Color_Sector_Names (incompatible with: LU)
+ * Color_Sector_Names (incompatible with: LU, FL)
 
     Requires: maps/x3_universe.xml, t/0001-L044.xml, t/7027-L044.xml, t/7360-L044.xml
 
@@ -1232,14 +1246,14 @@ Universe Transforms:
         - Dict matching race id string to the color code string to be used. Default is filled out similar to the standalone colored sectors mod.
       
 
- * Restore_Aldrin_rock (incompatible with: Vanilla, LU)
+ * Restore_Aldrin_rock (incompatible with: AP, LU, FL)
 
     Requires: maps/x3_universe.xml
 
       Restors the big rock in Aldrin for XRM, reverting to the vanilla sector layout. Note: only works on a new game.
       
 
- * Restore_Hub_Music (incompatible with: Vanilla, LU)
+ * Restore_Hub_Music (incompatible with: AP, LU, FL)
 
     Requires: maps/x3_universe.xml
 
@@ -1249,7 +1263,7 @@ Universe Transforms:
         - If True, makes a drop-in director script that will fire once and change the music for an existing save game. This is not reversable at this time.
       
 
- * Restore_M148_Music (incompatible with: Vanilla, LU)
+ * Restore_M148_Music (incompatible with: AP, LU, FL)
 
     Requires: maps/x3_universe.xml
 
@@ -1278,7 +1292,7 @@ Ware Transforms:
         - Optional string to help identify the ware file to look in, eg. 'TWareT' or 'TLaser'. If not given, ware files will be searched in order, skipping those not found in the source folder.
       
 
- * Restore_Vanilla_Tuning_Pricing (incompatible with: Vanilla, LU)
+ * Restore_Vanilla_Tuning_Pricing (incompatible with: AP, LU, FL)
 
     Requires: types/TWareT.txt
 
@@ -1379,7 +1393,7 @@ Weapons Transforms:
       * scaling_factor:
         - The base multiplier to apply to fire rate.
       * laser_name_adjustment_dict:
-        - Dict, keyed by laser name (eg. 'SS_LASER_HEPT'), with the multiplier to apply instead of using the scaling_factor.     
+        - Dict, keyed by laser name (eg. 'SS_LASER_HEPT'), with the multiplier to apply instead of using the scaling_factor.
       * fire_rate_floor:
         - Int, the floor below which fire rate will not be reduced, in shots per minute. Eg. 60 for 1/second.
       * skip_ammo_weapons:
@@ -1710,3 +1724,5 @@ Change Log:
    - Fix to handle negative numbers for missile flag masks in tships.
  * 3.15
    - Added Prevent_Ship_Equipment_Damage.
+ * 3.16
+   - Added support for Farnham's Legacy.

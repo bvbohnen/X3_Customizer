@@ -108,6 +108,12 @@ Note on scene files:
     (implicitly path from objects/v folder, presumably).
 
 '''
+from ..Common import Settings
+
+__all__ = [
+    'T_file_name_field_dict_dict',
+    'Global_Defaults',
+    ]
 
 # T file names, and named fields of interest.
 # The original files contain semicolon delimited lines; the index to each field
@@ -176,7 +182,17 @@ T_file_name_field_dict_dict = {
         26 : 'video_id',
         27 : 'skin_index',
         -2 : 'name',               #Name is 'SS_FAC_'+suffix
-
+        },
+    # New FL file specifying size of each factory, for auto-placement spacing.
+    'TFacSizes.txt' : {
+        'min_data_entries': 5,
+        0  : 'name',    #String, eg. 'SG_FAC_A_SHIP'
+        1  : '+x', # Size in given direction away from center point.
+        2  : '-x', 
+        3  : '+y', 
+        4  : '-y', 
+        5  : '+z', 
+        6  : '-z',
         },
     'TLaser.txt' : {
         'min_data_entries': 5,
@@ -402,35 +418,40 @@ T_file_name_field_dict_dict = {
         },
 
 
-    # Note: it appears the jobs file has two formats, one (maybe for ap)
-    #  which has 4 more fields inserted somewhere and throwing off later flags.
+    # Note: it appears the jobs file has multiple formats, one (maybe for ap)
+    #  which has 4 more fields inserted somewhere and throwing off later flags,
+    #  and an even longer form for FL.
     # The AP new fields are at: [70,105,123,128], and will shift down
     #  the TC values correspondingly.
-    # These offsets will be for the short/TC form (which xrm uses and seems
-    #  to work okay), and the fluff entries will be noted and used when
-    #  parsing if needed to shift entry names.
-    # Set an initial empty dict for the ap fields; build it further below.
-    # TODO: fill in the AP field names.
+    # XRM seems to use the shorter form, even in AP, indicating the game can
+    #  dynamically handle multiple formats.
+    # To do similar dynamicness here, entries will be made for each form,
+    #  and selected elsewhere when parsing the txt file to pick fields
+    #  based on which has a column number match.
     'Jobs.txt.ap' : {
+        'min_data_entries': 5,
+        },
+    'Jobs.txt.fl' : {
         'min_data_entries': 5,
         },
     'Jobs.txt' : {
         'min_data_entries': 5,
-        'lines_tc': 130,
-        'lines_ap': 134,
-        # Provide the replacement dict to use in the ap case.
-        'ap_name' : 'Jobs.txt.ap',
+        # 130 columns in TC (129 plus newline).
+        # For elsewhere, match field number to alt format name.
+        # This is checked when jobs is parsed to pick the field field dict.
+        'alt_fields_cols_names': {
+            134 : 'Jobs.txt.ap',
+            181 : 'Jobs.txt.fl', # 47 more than ap.
+            },
         0 : 'id',                   #Integer
         1 : 'name',                 #String, name of the job entry
         2 : 'max_jobs',             #Integer
         3 : 'max_jobs_in_sector',   #Integer
-        4 : 'script',               #String
-        5 : 'script_config',        #String
+        4 : 'script',               #String, script to run during play
+        5 : 'script_config',        #String, script to run once during setup
         6 : 'name_id',              #Integer; the in-game displayed name.
-        # 7 is unknown, but observed to generally be 0.
-        # Int; if not 0, the override name to use.
-        #  Unclear on relation to name_id.
-        8 : 'override_name',       
+        7 : 'unique_name',          #Int, 0 in samples; uncertain (taken from another parser).
+        8 : 'override_name',        # Int; if not 0, the override name to use (for voice).
         # These fields affect display and announcement name, being
         #  prefixed or suffixed to the name_id text/voice.
         9 : 'show_race',           #0 or 1; for display name in game.
@@ -439,7 +460,7 @@ T_file_name_field_dict_dict = {
         12: 'show_variant',        #0 or 1; for display name in game.
         13: 'job_wing_index',      #Int; entry in JobWings.txt with subjobs to act as wingmen.
         14: 'ware_list_index',     #Int; wares associated with this job (eg to trade)
-        15: 'job_jump_range',      #? Int. Note: not 100% verified. Missing in x3 editor.
+        15: 'job_jump_range',      #Int. Note: not 100% verified, but matches another parser.
         16: 'idle_rate',           #Int, generally 0-10 or so.
         17: 'respawn_time',        #Integer, appears to be in seconds.
 
@@ -455,8 +476,8 @@ T_file_name_field_dict_dict = {
         26: 'SG_SH_M8', #0 or 1
         27: 'SG_SH_TP', #0 or 1
         28: 'SG_SH_TS', #0 or 1
-        29: 'SG_SH_TL', #0 or 1
-        30: 'special_tl_ts_flag', #0 or 1, unknown use.
+        29: 'SG_SH_TM', #0 or 1
+        30: 'SG_SH_TL', #0 or 1
 
         31: 'manufacturer_argon',  #0 or 1; probably used in ship selection.
         32: 'manufacturer_boron', 
@@ -479,15 +500,15 @@ T_file_name_field_dict_dict = {
         48: 'variant_miner',
         49: 'variant_super_freighter',
         50: 'variant_tanker',
-        51: 'variant_mk1',
-        52: 'variant_9',
-        53: 'variant_10',
-        54: 'variant_11',
-        55: 'variant_12',
-        56: 'variant_13',
+        51: 'variant_tug', # Used for "mk1" in xrm.
+        52: 'variant_luxury_cruiser',
+        53: 'variant_slave_transport',
+        54: 'variant_military_transport',
+        55: 'variant_xl',
+        56: 'variant_extended',
         57: 'variant_tanker_xl',
         58: 'variant_super_freighter_xl',
-        59: 'variant_advanced',
+        59: 'variant_plus', # Sometimes used for "advanced"/"heavy" ships.
 
         # Hue/saturation are generally -1, sometimes 0, and may be unused.
         # The spray shop supports 0-360 hue, -256 to 256 saturation.
@@ -496,6 +517,9 @@ T_file_name_field_dict_dict = {
         #  would only be across jobs.
         60: 'hue',
         61: 'saturation',
+        # Chance to randomize race; picks subtype selection based on
+        # race, otherwise matches pilot race to subtype.
+        62: 'chance_random_race',
 
         63: 'select_owners_sector',     #0 or 1
         64: 'select_core_sector',
@@ -504,7 +528,7 @@ T_file_name_field_dict_dict = {
         67: 'select_not_enemy_sector',
         68: 'select_border_sector',
         69: 'limit_to_x_universe_races',
-        # Note: AP inserts an entry here.
+        # Note: AP inserts an entry here
         70: 'invert_sector_flags', #Never seen used; unclear on effect.
         71: 'sector_x', #Int, sector coordinates. -1,-1 used for dont case seemingly.
         72: 'sector_y',
@@ -515,10 +539,10 @@ T_file_name_field_dict_dict = {
         77: 'create_null',         #Never seen used.
         78: 'docked_chance',       #Int, 0-100, percentage.
 
-        #79 ? 0 in the few samples checked.
-        80: 'freight_extensions',  #Int, 0 to 100.
-        81: 'engine_tunings',      #Int, 0 to 100.
-        82: 'rudder_tunings',      #Int, 0 to 100.
+        79: 'freight_extensions',  #Int, 0 to 100.
+        80: 'engine_tunings',      #Int, 0 to 100.
+        81: 'rudder_tunings',      #Int, 0 to 100.
+        82: 'other_expansions',
         83: 'rotation_acceleration_limit', #Int, 0 or -20 seen (on idle TLs)
 
         84: 'owner_argon',         #0 or 1
@@ -533,36 +557,41 @@ T_file_name_field_dict_dict = {
         93: 'owner_terran', 
         94: 'owner_yaki', 
         95: 'owner_pirates',  #Oddly, different ordering from manufacturer
+
         96: 'shield_level',  #Int, 0 to 100.
         97: 'laser_level',   #Int, 0 to 100.
 
         98: 'allow_fighter_drone', #0 or 1; oddly not with other flags
-        # Note: forbidden weapon fields not seen to be used in AP.
+
+        # Using Crycrows order on these, which disagrees with x3 editor.
+        # TODO: does it vary by game?
         99:  'forbid_impulse_ray_emitter',
-        100: 'forbid_high_energy_plasma_thrower',
-        101: 'forbid_alpha_kyon_emitter',
-        102: 'forbid_particle_accelerator_cannon',
-        103: 'forbid_photon_pulse_cannon',
+        100: 'forbid_particle_accelerator_cannon',
+        101: 'forbid_high_energy_plasma_thrower',
+        102: 'forbid_photon_pulse_cannon',
+        103: 'forbid_alpha_kyon_emitter',
         # Note: AP inserts an entry at 104 (105 for it).
-        104: 'allow_phased_shockwave_generator',
-        105: 'allow_mass_driver',
+        104: 'allow_mass_driver',
+        105: 'allow_phased_shockwave_generator',
         106: 'allow_ion_disruptor',
-        107: 'allow_unknown_1',
-        108: 'allow_unknown_2',
-        109: 'allow_flak_artillery_array',
-        110: 'allow_pulsed_beam_emitter',
-        111: 'allow_mobile_drilling_sy stem',
-        112: 'allow_tractor_beam',
-        113: 'allow_repair_laser',
+        107: 'allow_flak_artillery_array',
+        108: 'allow_pulsed_beam_emitter',
+        109: 'allow_mobile_drilling_system',
+        110: 'allow_tractor_beam',
+        111: 'allow_repair_laser',
+        112: 'forbid_dumbfire',
+        113: 'allow_missile_boat_missiles',
+
         114: 'select_weapons', #Flag, 0 or 1
 
-        #115 ? 5 or 30 in the few samples checked; maybe job jump range?
+        115: 'trade_skill',  #Int, 5 or 30 is checked samples.
         116: 'aggression',   #Int, 0 to 100.
         117: 'moral',        #Int, 0 to 100.
         118: 'fight_skill',  #Int, 0 to 100. May affect missile loadout.
-        #119?
+        119: 'npc_id',
+        # Note: AP inserts an entry at 120 (122 for it).
+        # Note: x3editor has the ap field and invincible reversed.
         120: 'set_invincible',
-        # Note: AP inserts an entry at 121 (123 for it).
         121: 'set_as_hidden_pirate',
         122: 'destroy_out_of_sector',
         123: 'rebuild_in_new_sector',
@@ -574,7 +603,124 @@ T_file_name_field_dict_dict = {
         128: 'classification_fighter',
         # 129 is the last entry, seen to be a 0 with newline generally.
         },
+    # TODO: FL TBoarding
 }
+
+# Supplemental jobs fields for AP, defining which entry they follow in TC.
+# Key is the name of an existing field that preceeds the new field(s).
+# Entry is a list of new fields.
+AP_job_preceeder_and_name_dict = {
+    'limit_to_x_universe_races' : ['select_not_war_sector'],
+    'forbid_alpha_kyon_emitter' : ['forbid_plasma_burst_generator'],
+    'npc_id'                    : ['job_is_dormant'],
+    'fly_average_speed'         : ['no_race_logic'],
+    }
+
+# Supplemental jobs fields for FL.
+# https://www.egosoft.com:8444/confluence/display/X3WIKI/6D+-+Mod+Files+Changes
+FL_job_preceeder_and_name_dict = {
+    'script_config' : [
+        'check_script'
+        ],
+    'idle_rate' : [
+        'plot_flags'
+        ],
+    'SG_SH_M7' : [
+        'SG_SH_M7M', 
+        'SG_SH_M7D',
+        ],
+    'manufacturer_yaki' : [
+        'manufacturer_otas',
+        'manufacturer_terracorp',
+        'manufacturer_atreus',
+        'manufacturer_nmmc',
+        'manufacturer_strong arms',
+        'manufacturer_beryll',
+        'manufacturer_dukes',
+        'manufacturer_darkspace',
+        'manufacturer_industritech',
+        'manufacturer_race1',
+        'manufacturer_race2',
+        'manufacturer_corporation1',
+        'manufacturer_corporation2',
+        ],
+    'variant_plus' : [
+        'variant_advanced',
+        'variant_prototype',
+        'variant_experimental',
+        'variant_enhanced',
+        'variant_heavy_freight',
+        'variant_armoured_transporter',
+        'variant_heavy_miner',
+        'variant_extra1',
+        'variant_extra2',
+        'variant_extra3',
+        'variant_extra4',
+        ],
+    'select_owners_sector' : [
+        'select_not_owners_sector', # Undocumented change
+        'select_connected_owners_sector' # Used for corps to allow main race sectors.
+        ],
+    # This picks a sector based on being connected to x/y.
+    'sector_y' : [
+        'connected_sector_x',
+        'connected_sector_y',
+        ],
+    'select_shipyard_sector' : [
+        'select_trade_dock_sector',
+        'select_pirate_dock_sector',
+        ],
+    'owner_pirates' : [
+        'owner_otas',
+        'owner_terracorp',
+        'owner_atreus',
+        'owner_nmmc',
+        'owner_strong arms',
+        'owner_beryll',
+        'owner_dukes',
+        'owner_darkspace',
+        'owner_industritech',
+        'owner_race1',
+        'owner_race2',
+        'owner_corporation1',
+        'owner_corporation2'
+        ],
+    }
+
+# Create jobs.txt variants for ap/fl.
+if 1:
+    # Flatten the dict into a list, with None entries for unnamed.
+    # First, size the list (+1 since indices start at 0).
+    col_count = 1 + max([x for x in T_file_name_field_dict_dict['Jobs.txt'].keys() if isinstance(x, int)])
+    job_fields = [None]*col_count
+    # Fill it.
+    for tc_line_number, field in T_file_name_field_dict_dict['Jobs.txt'].items():
+        # Skip special entries.
+        if isinstance(tc_line_number, str):
+            continue
+        job_fields[tc_line_number] = field
+        
+    # Share code between ap/fl extensions.
+    # Note: ap applies to fl case as well, so the job_fields will update
+    # for ap, save the jobs entries, then update for fl.
+    for new_t_name, new_fields_dict in [
+        ('Jobs.txt.ap', AP_job_preceeder_and_name_dict),
+        ('Jobs.txt.fl', FL_job_preceeder_and_name_dict)]:
+
+        # Insert the new fields, extending the list.
+        for prior_field, new_fields in new_fields_dict.items():
+            prior_index = job_fields.index(prior_field)
+            # Insert the fields, at progressize offsets.
+            for i, new_field in enumerate(new_fields):
+                job_fields.insert(prior_index + 1 + i, new_field)
+
+        # Extend the existing jobs dict.
+        for i, field in enumerate(job_fields):
+            if field != None:
+                T_file_name_field_dict_dict[new_t_name][i] = field
+
+
+
 
 # Fill in the TWare file entries.
 for tware_name in [
@@ -587,18 +733,19 @@ for tware_name in [
     ]:
     T_file_name_field_dict_dict[tware_name] = T_file_name_field_dict_dict['TWare_.txt']
     
-# Build an ap-specific dict for the jobs file, with inserted lines.
-for tc_line_number, field in T_file_name_field_dict_dict['Jobs.txt'].items():
-    # Skip special entries.
-    if isinstance(tc_line_number, str):
-        continue
-    # Get the line number offset adjustment for ap.
-    ap_line_number = tc_line_number + sum(
-        # This will sum up all of the AP lines that the tc_line_number
-        #  has reached. Eg. on tc reaching 70, an offset of 1 is applied;
-        #  on tc reaching 105, an offset of 2 is applied.
-        [1 for x in [70,105,123,128] if tc_line_number >= x])
-    T_file_name_field_dict_dict['Jobs.txt.ap'][ap_line_number] = field
+
+## Build an ap-specific dict for the jobs file, with inserted lines.
+#for tc_line_number, field in T_file_name_field_dict_dict['Jobs.txt'].items():
+#    # Skip special entries.
+#    if isinstance(tc_line_number, str):
+#        continue
+#    # Get the line number offset adjustment for ap.
+#    ap_line_number = tc_line_number + sum(
+#        # This will sum up all of the AP lines that the tc_line_number
+#        #  has reached. Eg. on tc reaching 70, an offset of 1 is applied;
+#        #  on tc reaching 105, an offset of 2 is applied.
+#        [1 for x in [70,105,123,128] if tc_line_number >= x])
+#    T_file_name_field_dict_dict['Jobs.txt.ap'][ap_line_number] = field
     
 
     
@@ -849,4 +996,193 @@ Global_Defaults = {
     'SG_WAR_SCORE_MD_MULTIPLIER'            : 1,
     'SG_WAR_SCORE_PLAYER_MULTIPLIER'        : 20,
     'SG_WAR_SCORE_RELVAL_DIVISOR'           : 1000,
+
+    # TODO: FL https://www.egosoft.com:8444/confluence/display/X3WIKI/6D+-+Mod+Files+Changes
     }
+
+
+
+'''
+Jobs headers shared by Crycrow, for FL:
+
+JobID
+Comment
+Quota
+Max. Quota per Sector
+Function
+Configscript
+check script
+Job Text ID
+Unique Shipname
+Overriden NameID (Voice)
+Show Race Name
+Show Corpsname
+Show Shiptypename
+Show Variationname
+GroupID (Sheet)
+Shopping Basket (sheet)
+Jump Range
+Idle Rate
+Plot Flags
+Spawn Time
+Ship subtype
+M1
+M2
+M3
+M4
+M5
+M6
+M7
+M7M
+M7D
+M8
+TP
+TS
+TM
+TL
+Argon (1)
+Boron (2)
+Split (3)
+Paranid (4)
+Teladi (5)
+Xenon (6)
+Pirate (8)
+Khaak (7)
+Goner (9)
+ATF (17)
+Terran (18)
+Yaki (19)
+OTAS (20)
+TerraCorp (21)
+Atreus (22)
+NMMC (23)
+Strong Arms (24)
+Beryll (25)
+Dukes (26)
+DarkSpace (27)
+Industritech(28)
+Race 1 (15)
+Race 2 (16)
+Corporation 1 (29)
+Corporation 2 (30)
+VAR 0 Basic
+VAR 1 Vanguard
+VAR 2 Sentinel
+VAR 3 Raider
+VAR 4 Hauler
+VAR 5 Miner
+VAR 6 Super Freighter
+VAR 7 Tanker
+VAR 8 Tug
+VAR 9 Luxury Cruiser
+VAR 10 Slave Transport
+VAR 11 Military Transport
+VAR 12 XL
+VAR 13 Extended
+VAR 14 Tanker2
+VAR 15 Superfreighter2
+VAR 20 Plus & M
+VAR 21 Advanced
+VAR 22 Prototype
+VAR 23 Experimental
+VAR 24 Enhanced
+VAR 25 Heavy Freighter
+VAR 26 Armoured Transport
+VAR 27 Heavy Miner
+VAR 28 Extra 1
+VAR 29 Extra 2
+VAR 30 Extra 3
+VAR 31 Extra 4
+Hue Modifier
+Saturation Modifier
+Chance RACE is random and depending on this select the ship subtype (from those I selected) otherwise fit the race pilot to the subtype
+Is Owner sector
+Is Not Owner
+Include Connected Owner
+Is Core
+Has Yard
+Has Trade Dock
+Has Pirate Base
+Has owner stations
+Is not enemy sector
+Is Border
+Is X Universe
+Is not War sector
+invers
+Sector X
+Sector Y
+Connected X
+Connected Y
+Create in Shipyard
+Create in Gate
+Create Inside Sector
+Create outside Sector
+Create NULL
+Chance Ship is Docked
+Freight ext.
+Speed ext.
+Steering ext.
+Other expansions
+Rot Accel Limit
+Argon
+Boron
+Split
+Paranid
+Teladi
+Xenon
+Khaak
+Goner
+ATF
+Terran
+Yaki
+Is Pirate
+Otas
+TerraCorp
+Atreus
+NMMC
+Strong Arms
+Beryll
+Dukes
+DarkSpace
+Industritech
+Race 1
+Race 2
+Corporation 1
+Corporation 2
+Shield
+Laser
+Use Drones
+Not Use IRE
+Not Use PAC
+Not Use HEPT
+Not Use PPC
+Not Use KE
+Not Use PBG (Flamethrower)
+Use Mass driver
+Use PSG (wide area)
+Use Ion Disruptor (Flash)
+Use Flak
+Use IH
+Use Mining
+Use Tug
+Use Repairlaser
+Not Use Dumbfire (DMBF)
+Use Missile Boat Missiles
+Select weapons
+Trade skill
+Agression
+Morale
+Fight skill
+NPC ID
+Job is dormant
+Is Invincible 
+IsHiddenPirat
+Destory when player OOS
+Rebuild Select New Sector
+Fly with AVRSPEED
+No Race Logic
+Military
+Trader
+Civilist
+Fighter
+'''

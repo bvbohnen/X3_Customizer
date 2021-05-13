@@ -107,7 +107,7 @@ def Adjust_Weapon_Fire_Rate(
       - The base multiplier to apply to fire rate.
     * laser_name_adjustment_dict:
       - Dict, keyed by laser name (eg. 'SS_LASER_HEPT'), with the
-        multiplier to apply instead of using the scaling_factor.     
+        multiplier to apply instead of using the scaling_factor.
     * fire_rate_floor:
       - Int, the floor below which fire rate will not be reduced, 
         in shots per minute. Eg. 60 for 1/second.

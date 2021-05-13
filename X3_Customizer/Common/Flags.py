@@ -41,6 +41,21 @@ Race_code_name_dict = {
     17 : 'ATF',
     18 : 'Terran',
     19 : 'Yaki',
+    # New races in FL; indexes assumed.
+    # https://www.egosoft.com:8444/confluence/display/X3WIKI/6D+-+Mod+Files+Changes
+    20 : 'OTAS',
+    21 : 'TerraCorp',
+    22 : 'Atreus',
+    23 : 'NMMC',
+    24 : 'Strong Arms',
+    25 : 'Beryll',
+    26 : 'Dukes',
+    27 : 'DarkSpace',
+    28 : 'Industritech',
+    29 : 'Race1',
+    30 : 'Race2',
+    31 : 'Corporation1',
+    32 : 'Corporation2',
     }
 # Convenience reverse direction lookup dict.
 Race_name_code_dict = {x:y for y,x in Race_code_name_dict.items()}
@@ -68,6 +83,19 @@ Director_race_code_name_dict = {
     17 : 'atf',
     18 : 'terran',
     19 : 'yaki',
+    20 : 'otas',
+    21 : 'terracorp',
+    22 : 'atreus',
+    23 : 'strongarms',
+    24 : 'nmmc',
+    25 : 'beryll',
+    26 : 'dukes',
+    27 : 'darkspace',
+    28 : 'industritech',
+    # Note: race1/race2 not in the md changes doc.
+    30 : 'corporation1',
+    31 : 'corporation2',
+
     #  Other options include:
     #  'default' : 5 primary races
     #  'pirategroup' : yaki and pirate

@@ -27,7 +27,8 @@ Defend station mission capping
 #  and some in other modules.
 
     
-@File_Manager.Transform_Wrapper('director/2.024 Player Corp.xml')
+@File_Manager.Transform_Wrapper('director/2.024 Player Corp.xml', 
+                                FL = False)
 def Fix_Corporation_Troubles_Balance_Rollover():
     '''
     In the Corporation Troubles plot, prevents the bank balance from
@@ -109,7 +110,8 @@ def Fix_Corporation_Troubles_Balance_Rollover():
 
 
     
-@File_Manager.Transform_Wrapper('director/2.004 Terran Plot Scene 4.xml')
+@File_Manager.Transform_Wrapper('director/2.004 Terran Plot Scene 4.xml', 
+                                FL = False)
 def Fix_Terran_Plot_Aimless_TPs():
     '''
     In the Terran Conflict plot when allied TPs move to capture an Elephant,
@@ -164,9 +166,10 @@ def Fix_Terran_Plot_Aimless_TPs():
     return
 
 
-
+# Note: havent checked FL changes; bug may still exist (hopefully not).
 @File_Manager.Transform_Wrapper('director/0.83 Dual Convoy.xml', 
-                                'director/2.183 Dual Convoy.xml')
+                                'director/2.183 Dual Convoy.xml', 
+                                FL = False)
 def Fix_Dual_Convoy_Invincible_Stations():
     '''
     Fixes Dual Convoy generic missions to no longer leave stations
@@ -333,7 +336,7 @@ def Fix_Dual_Convoy_Invincible_Stations():
 
 
 
-@File_Manager.Transform_Wrapper()
+@File_Manager.Transform_Wrapper(FL = False)
 def Fix_Reset_Invincible_Stations(cue_index = 0):
     '''
     Resets the invinciblity flag on stations in an existing save.
@@ -364,7 +367,8 @@ def Fix_Reset_Invincible_Stations(cue_index = 0):
 
 
 
-@File_Manager.Transform_Wrapper('director/2.023 Shady Business.xml')
+@File_Manager.Transform_Wrapper('director/2.023 Shady Business.xml', 
+                                FL = False)
 def _Fix_Shady_Business_Captured_Ship_Despawn():
     '''
     In the Shady Business plot, at the end, various spawned ship groups

@@ -46,7 +46,6 @@ class Game_File:
       - Bool, if True then this file should be treated as modified,
         to be written out.
       - Files only read should leave this flag False.
-      - Pending development; defaults True for now.
     '''
     def __init__(
             s,
@@ -57,6 +56,8 @@ class Game_File:
         s.name = virtual_path.split('/')[-1]
         s.virtual_path = virtual_path
         s.file_source_path = file_source_path
+        # Default to treating as modified for files not matching any
+        # subclass (which may default it to False).
         s.modified = True
 
 
@@ -366,8 +367,8 @@ class T_File(Game_File):
             # Create an ordered dict for this line to hold the fields.
             this_dict = OrderedDict()
 
-            # Note: the line may be a TC format or AP format, in the
-            #  case of the jobs file.
+            # Note: for the jobs file, the line could be in tc, ap, or fl
+            #  format, distinguished by column count.
             # If the fields_dict specifies a line count for an AP
             #  format, and that format is seen here, it will provide
             #  some special insertion points for new AP fields.
@@ -375,14 +376,15 @@ class T_File(Game_File):
             #  case, with no extra lines.
             # (This is inside the loop, so it gets triggered on the first
             #  data line which has a length matching an AP file).
-            if ('lines_ap' in field_dict
-            and len(data_list) == field_dict['lines_ap']):
-                # Switch to the ap field dict.
+            entries = len(data_list)
+            if ('alt_fields_cols_names' in field_dict
+            and len(data_list) in field_dict['alt_fields_cols_names']):
+                # Switch to the ap/fl field dict.
                 # This will only swap once; afterward there is no
-                #  'lines_ap' field in field_dict, and these checks
-                #  are skipped.
+                #  'alt_fields_cols_names' field in field_dict, and these 
+                #  checks are skipped.
                 field_dict = File_Fields.T_file_name_field_dict_dict[
-                    field_dict['ap_name']]
+                    field_dict['alt_fields_cols_names'][len(data_list)]]
                         
 
             # Step through the fields, with an index counter.
@@ -513,6 +515,9 @@ class T_File(Game_File):
             header_columns = 3
             index_with_count = 1
         elif s.virtual_path == 'types/TFactories.txt':
+            header_columns = 3
+            index_with_count = 1
+        elif s.virtual_path == 'types/TFacSizes.txt':
             header_columns = 3
             index_with_count = 1
         elif s.virtual_path == 'types/Globals.txt':

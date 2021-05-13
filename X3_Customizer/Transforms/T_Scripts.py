@@ -6,7 +6,7 @@ convenience transforms for select scripts.
 Modified scripts will tend to be handled with patches, while original
 scripts will just be moved to the scripts folder.
 
-TODO: quiet xrm bounty messages.
+TODO: quiet xrm bounty messages (in plugin.xrm.bounty.plkiller?)
 '''
 from .. import File_Manager
 from ..File_Manager.File_Patcher import *
@@ -17,7 +17,7 @@ from ..File_Manager.File_Patcher import *
 
 
 @File_Manager.Transform_Wrapper('scripts/!fight.war.protectsector.xml', 
-                                LU = False, TC = False)
+                                LU = False, TC = False, FL = False)
 def Disable_OOS_War_Sector_Spawns(
     ):
     '''
@@ -30,7 +30,7 @@ def Disable_OOS_War_Sector_Spawns(
 
     
 @File_Manager.Transform_Wrapper('scripts/plugin.com.agent.main.xml', 
-                                LU = False, TC = False)
+                                LU = False, TC = False, FL = False)
 def Allow_CAG_Apprentices_To_Sell(
     ):
     '''
@@ -41,7 +41,7 @@ def Allow_CAG_Apprentices_To_Sell(
     
     
 @File_Manager.Transform_Wrapper('scripts/!plugin.acp.fight.attack.object.xml', 
-                                LU = False, TC = False)
+                                LU = False, TC = False, FL = False)
 def Fix_OOS_Laser_Missile_Conflict(
     ):
     '''
@@ -56,7 +56,7 @@ def Fix_OOS_Laser_Missile_Conflict(
     
 
 @File_Manager.Transform_Wrapper('scripts/!lib.fleet.shipsfortarget.xml', 
-                                LU = False, TC = False)
+                                LU = False, TC = False, FL = False)
 def Fleet_Interceptor_Bug_Fix(
     ):
     '''
@@ -72,8 +72,9 @@ def Fleet_Interceptor_Bug_Fix(
     Apply_Patch('scripts/!lib.fleet.shipsfortarget.xml')
 
 
+# TODO: maybe update this for FL.
 @File_Manager.Transform_Wrapper('scripts/!move.follow.template.xml', 
-                                LU = False, TC = False)
+                                LU = False, TC = False, FL = False)
 def Increase_Escort_Engagement_Range(
     small_range  = 3000,
     medium_range = 4000,
@@ -129,8 +130,8 @@ def Convert_Attack_To_Attack_Nearest():
     File_Manager.Copy_File(
         'scripts/!ship.cmd.attack.std.xml')
 
-    
-@File_Manager.Transform_Wrapper()
+# No CLS in FL.
+@File_Manager.Transform_Wrapper(FL = False)
 def Add_CLS_Software_To_More_Docks():
     '''
     Adds Commodity Logistics Software, internal and external, to all
@@ -144,7 +145,8 @@ def Add_CLS_Software_To_More_Docks():
 
         
     
-@File_Manager.Transform_Wrapper('scripts/plugin.gz.CmpClean.Main.xml', LU = False)
+@File_Manager.Transform_Wrapper('scripts/plugin.gz.CmpClean.Main.xml', 
+                                LU = False, FL = False)
 def Complex_Cleaner_Bug_Fix(
         # Note: no cleanup needed, since the unmodified script should
         # be present in the source_folder and it will just be moved
@@ -161,7 +163,8 @@ def Complex_Cleaner_Bug_Fix(
 
     
     
-@File_Manager.Transform_Wrapper('scripts/plugin.gz.CmpClean.crunch.xml', LU = False)
+@File_Manager.Transform_Wrapper('scripts/plugin.gz.CmpClean.crunch.xml', 
+                                LU = False, FL = False)
 def Complex_Cleaner_Use_Small_Cube(
         # Note: no cleanup needed, as above.
     ):

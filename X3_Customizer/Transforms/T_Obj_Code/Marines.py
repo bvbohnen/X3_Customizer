@@ -43,7 +43,7 @@ Notes on mixing Set_Max_Marines and Max_Marines_Video_Id_Overwrite:
     in an intuitive way for the user.
 '''
 
-@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False)
+@File_Manager.Transform_Wrapper('L/x3story.obj', LU = False, TC = False, FL = False)
 def Set_Max_Marines(
         tm_count = 8,
         tp_count = 40,
@@ -59,6 +59,7 @@ def Set_Max_Marines(
     These are byte values, signed, so max is 127.
     Note: in some cases, a larger ship type may use the marine count of
     a smaller ship if it is greater.
+    Note: FL sets per-ship limits through tboarding.txt instead.
     
     * tm_count
       - Int, marines carried by TMs.

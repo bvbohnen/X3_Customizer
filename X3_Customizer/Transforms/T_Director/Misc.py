@@ -10,7 +10,7 @@ TC plots in AP.
 import copy
 from ... import File_Manager
 
-@File_Manager.Transform_Wrapper('director/3.01 Generic Missions.xml')
+@File_Manager.Transform_Wrapper('director/3.01 Generic Missions.xml', FL = False)
 def Adjust_Generic_Missions(
     adjustment_dict = {},
     cap_at_100 = False
@@ -162,7 +162,7 @@ def Adjust_Generic_Missions(
 
     
 # Convenience version of the above to turn off all missions.
-@File_Manager.Transform_Wrapper('director/3.01 Generic Missions.xml')
+@File_Manager.Transform_Wrapper('director/3.01 Generic Missions.xml', FL = False)
 def Disable_Generic_Missions():
     '''
     Disable generic missions from spawning. Existing generic missions
@@ -177,7 +177,7 @@ def Disable_Generic_Missions():
     return
 
     
-@File_Manager.Transform_Wrapper('director/2.119 Trade Convoy.xml')
+@File_Manager.Transform_Wrapper('director/2.119 Trade Convoy.xml', FL = False)
 def Convoys_made_of_race_ships():
     '''
     If convoy defense missions should use the convoy's race to select their ship type.

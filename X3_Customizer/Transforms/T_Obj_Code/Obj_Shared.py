@@ -267,7 +267,7 @@ def Apply_Obj_Patch_Group(patch_list):
     for patch in patch_list:
         matches_list.append(Get_Matches(patch))
 
-    # Return early on a None was returned.
+    # Return early if a None was returned.
     if None in matches_list:
 
         # Get the indices of the patches that had errors or no errors.

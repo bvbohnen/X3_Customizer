@@ -235,6 +235,8 @@ Change Log:
    - Fix to handle negative numbers for missile flag masks in tships.
  * 3.15
    - Added Prevent_Ship_Equipment_Damage.
+ * 3.16
+   - Added support for Farnham's Legacy.
 '''
 # Note: changes moved here for organization, and to make them easier to
 # break out during documentation generation.
